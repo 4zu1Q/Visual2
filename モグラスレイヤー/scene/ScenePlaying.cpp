@@ -1,0 +1,117 @@
+#include "ScenePlaying.h"
+#include "SceneTitle.h"
+#include "DxLib.h"
+
+#include "Camera.h"
+#include "Player.h"
+#include "Enemy.h"
+
+#include "Stage.h"
+
+/// <summary>
+/// コンストラクタ
+/// </summary>
+ScenePlaying::ScenePlaying() :
+	m_isPlayerHit(false),
+	m_isAttackHit(false)
+{
+	m_pCamera = std::make_shared<Camera>();
+	m_pPlayer = std::make_shared<Player>();
+	m_pEnemy = std::make_shared<Enemy>();
+	m_pStage = std::make_shared<Stage>();
+
+
+	m_pPlayer->Load();
+	m_pEnemy->Load();
+	m_pStage->Load();
+}
+
+/// <summary>
+/// デストラクタ
+/// </summary>
+ScenePlaying::~ScenePlaying()
+{
+}
+
+/// <summary>
+/// 初期化
+/// </summary>
+void ScenePlaying::Init()
+{
+	m_pCamera->Init();
+
+	m_pPlayer->Init();
+	m_pEnemy->Init();
+	m_pStage->Init();
+}
+
+/// <summary>
+/// アップデート
+/// </summary>
+std::shared_ptr<SceneBase> ScenePlaying::Update()
+{
+	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
+	m_pPlayer->Update();
+
+	m_pCamera->PlayCameraUpdate(*m_pPlayer);
+	//m_pCamera->TitleCameraUpdate();
+	m_pEnemy->Update();
+
+	//m_pStage->Update();
+
+	//当たった場合のフラグの取得
+	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
+	m_isAttackHit;
+
+	VECTOR toEnemy = VSub(m_pEnemy->GetPos(),m_pPlayer->GetPos() );
+
+	float length = VSize(toEnemy);
+
+
+	//プレイヤーと敵が当たった場合
+	if (m_isPlayerHit)
+	{
+		VECTOR posVec;
+		VECTOR moveVec;
+
+		posVec = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
+
+		moveVec = VScale(posVec, length - (m_pPlayer->GetRadius() + m_pEnemy->GetRadius()));
+
+		m_pPlayer->SetPos(VAdd(m_pPlayer->GetPos(), moveVec));
+
+	}
+
+	//プレイヤーの攻撃と敵が当たった場合
+	if (m_isAttackHit)
+	{
+		printfDx("当たった");
+
+
+	}
+
+	return shared_from_this();
+}
+
+/// <summary>
+/// 描画
+/// </summary>
+void ScenePlaying::Draw()
+{
+
+	m_pPlayer->Draw();
+	m_pEnemy->Draw();
+	//m_pStage->Draw();
+
+	DrawString(0, 0, "Scene Playing", 0xffffff, false);
+}
+
+/// <summary>
+/// メモリの解放
+/// </summary>
+void ScenePlaying::End()
+{
+	m_pPlayer->Delete();
+	m_pEnemy->Delete();
+	m_pStage->Delete();
+}
