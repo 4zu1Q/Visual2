@@ -20,8 +20,8 @@ public:
 	float GetRadius() { return m_radius; }
 
 	//プレイヤーの座標を取得
-	VECTOR GetPos() { return m_pos; }
-	void SetPos(VECTOR pos) { m_pos = pos; }
+	const VECTOR& GetPos() const { return m_pos; }
+	void SetPos(const VECTOR pos) { m_pos = pos; }
 
 	//プレイヤーの攻撃の座標を取得
 

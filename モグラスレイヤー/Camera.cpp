@@ -26,11 +26,11 @@ namespace
 /// コンストラクタ
 /// </summary>
 Camera::Camera():
-	m_pos(VGet(0,0,0)),
+	m_pos(VGet(0,10,0)),
 	m_targetPos(VGet(0,0,0)),
 	m_cameraAngle(- DX_PI_F / 2)
 {
-	m_pPlayer = std::make_shared<Player>();
+	SetCameraNearFar(20, 600);
 }
 
 /// <summary>
@@ -52,7 +52,7 @@ void Camera::Init()
 /// <summary>
 /// プレイシーンのアップデート
 /// </summary>
-void Camera::PlayCameraUpdate(const Player& player)
+void Camera::PlayCameraUpdate(Player& player)
 {
 	Pad::Update();
 
@@ -62,28 +62,45 @@ void Camera::PlayCameraUpdate(const Player& player)
 
 #endif
 	
-	if (Pad::IsPress PAD_INPUT_LEFT)
-	{
-		m_cameraAngle -= kAngleSpeed;
+	//// カメラに位置を反映.
+	VECTOR aimPos = VGet(0, player.GetPos().y + 20.0f, player.GetPos().z - 50.0f); // b
+	VECTOR posToAim = VSub(aimPos, m_pos);	// (b-a)
+	VECTOR scaledPosToAim = VScale(posToAim, 0.5f);	// ((b-a) * t)
+	m_pos = VAdd(m_pos, scaledPosToAim);	// a + ((b-a) * t)
 
-		if (m_cameraAngle < -DX_PI_F)
-		{
-			m_cameraAngle += DX_TWO_PI_F;
-		}
-	}
+	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
 
-	if (Pad::IsPress PAD_INPUT_RIGHT)
-	{
-		m_cameraAngle += kAngleSpeed;
+	//VECTOR aimPos = VAdd(player.GetPos(), VScale(player.GetPos(), -30));
+	//aimPos
 
-		if (m_cameraAngle > DX_PI_F)
-		{
-			m_cameraAngle -= DX_TWO_PI_F;
-		}
-	}
+
+	////押している間水平角度をマイナスにする
+	//if (Pad::IsPress PAD_INPUT_LEFT)
+	//{
+	//	m_cameraAngle -= kAngleSpeed;
+
+	//	if (m_cameraAngle < -DX_PI_F)
+	//	{
+	//		m_cameraAngle += DX_TWO_PI_F;
+	//	}
+	//}
+
+
+
+	////押している間水平角度をプラスにする
+	//if (Pad::IsPress PAD_INPUT_RIGHT)
+	//{
+	//	m_cameraAngle += kAngleSpeed;
+
+	//	if (m_cameraAngle > DX_PI_F)
+	//	{
+	//		m_cameraAngle -= DX_TWO_PI_F;
+	//	}
+	//}
 
 	//カメラの注視点はプレイヤー座標から規定値分高い座標
-	m_targetPos = VAdd(m_pPlayer->GetPos(), VGet(0.0f, kCameraPlayerTargetHeight, 0.0f));
+	//m_targetPos = VAdd(player.GetPos(), VGet(0.0f, kCameraPlayerTargetHeight, 0.0f));
+
 
 
 
@@ -135,7 +152,17 @@ void Camera::TitleCameraUpdate()
 	DrawGrid();
 
 #endif
+	Pad::Update();
+	
 
+	if (Pad::IsPress PAD_INPUT_6)
+	{
+		m_cameraAngle += 0.05f;
+	}
+	if (Pad::IsPress PAD_INPUT_5)
+	{
+		m_cameraAngle -= 0.05f;
+	}
 
 	SetCameraNearFar(20.0f, 400.0f);
 	m_pos.x = cosf(m_cameraAngle) * kCameraDist;
@@ -169,4 +196,9 @@ void Camera::DrawGrid()
 	DrawStringF(dispPos.x, dispPos.y, "Z+", 0xffffff);
 	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -50));
 	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
+}
+
+void Camera::FixCameraPosition(Stage& stage)
+{
+
 }

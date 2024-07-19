@@ -4,6 +4,7 @@
 
 class Player;
 class Enemy;
+class Stage;
 class Camera
 {
 public:
@@ -13,7 +14,7 @@ public:
 	void Init();
 
 	void TitleCameraUpdate();
-	void PlayCameraUpdate(const Player& player);		//ゲームプレイ用のカメラ設定
+	void PlayCameraUpdate(Player& player);		//ゲームプレイ用のカメラ設定
 	void TargetCameraUpadate();		//ロックオン機能のカメラ設定
 
 	const float GetAngle() const { return m_cameraAngle; }
@@ -32,7 +33,7 @@ private:
 
 	float m_cameraAngle;	//カメラ角度
 
-
+	void FixCameraPosition(Stage& stage);
 
 
 };
