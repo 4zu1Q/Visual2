@@ -24,7 +24,7 @@ public:
 	void SetPos(const VECTOR pos) { m_pos = pos; }
 
 	//プレイヤーの攻撃の座標を取得
-
+	void OnHit();
 
 private:
 	//アニメーションの進行
@@ -44,7 +44,8 @@ private:
 	int m_outlineVsH;
 	int m_outlinePsH;
 
-
+	//HP
+	float m_hp;
 
 	//表示情報
 	VECTOR m_pos;

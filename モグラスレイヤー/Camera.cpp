@@ -63,15 +63,20 @@ void Camera::PlayCameraUpdate(Player& player)
 #endif
 	
 	//// カメラに位置を反映.
-	VECTOR aimPos = VGet(0, player.GetPos().y + 20.0f, player.GetPos().z - 50.0f); // b
+	VECTOR aimPos = VGet(player.GetPos().x, player.GetPos().y + 20.0f, player.GetPos().z - 50.0f); // b
 	VECTOR posToAim = VSub(aimPos, m_pos);	// (b-a)
-	VECTOR scaledPosToAim = VScale(posToAim, 0.5f);	// ((b-a) * t)
-	m_pos = VAdd(m_pos, scaledPosToAim);	// a + ((b-a) * t)
+	//VECTOR scaledPosToAim = VScale(posToAim, 0.1f);	// ((b-a) * t)
+
+	
+
+	m_pos = VAdd(m_pos, posToAim);	// a + ((b-a) * t)
+
+
+
 
 	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
 
 	//VECTOR aimPos = VAdd(player.GetPos(), VScale(player.GetPos(), -30));
-	//aimPos
 
 
 	////押している間水平角度をマイナスにする
@@ -167,8 +172,8 @@ void Camera::TitleCameraUpdate()
 	SetCameraNearFar(20.0f, 400.0f);
 	m_pos.x = cosf(m_cameraAngle) * kCameraDist;
 	m_pos.y = kCameraHeight;
-	//m_cameraPos.z = sinf(m_cameraAngle) * kCameraDist;
-	m_pos.z = -160;
+	m_pos.z = sinf(m_cameraAngle) * kCameraDist;
+	//m_pos.z = -160;
 	SetCameraPositionAndTarget_UpVecY(m_pos, VGet(0, 0, 0));
 }
 
@@ -198,7 +203,3 @@ void Camera::DrawGrid()
 	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
 }
 
-void Camera::FixCameraPosition(Stage& stage)
-{
-
-}

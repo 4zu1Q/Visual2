@@ -17,12 +17,16 @@ public:
 	void PlayCameraUpdate(Player& player);		//ゲームプレイ用のカメラ設定
 	void TargetCameraUpadate();		//ロックオン機能のカメラ設定
 
+	//カメラのアングルを取得
 	const float GetAngle() const { return m_cameraAngle; }
 
+	//カメラの座標を取得
 	const VECTOR& GetPos() const { return m_pos; }
+	//注視点の座標を取得
 	const VECTOR& GetTargetPos() const { return m_targetPos; }
 
 private:
+
 
 	std::shared_ptr<Player> m_pPlayer;
 
@@ -33,7 +37,7 @@ private:
 
 	float m_cameraAngle;	//カメラ角度
 
-	void FixCameraPosition(Stage& stage);
+
 
 
 };

@@ -5,6 +5,7 @@
 class Camera;
 class Player;
 class Enemy;
+class GimmickObj;
 class Stage;
 class ScenePlaying :
     public SceneBase
@@ -22,10 +23,12 @@ private:
 	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<Enemy> m_pEnemy;
+	std::shared_ptr<GimmickObj> m_pGimmick;
 	std::shared_ptr<Stage> m_pStage;
 
 	//“–‚½‚è”»’è
 	bool m_isPlayerHit;
 	bool m_isAttackHit;
+	bool m_isGimmickHit;
 };
 

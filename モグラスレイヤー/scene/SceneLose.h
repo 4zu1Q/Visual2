@@ -1,35 +1,24 @@
 #pragma once
 #include "SceneBase.h"
-
-class SceneTitle :
+class SceneLose :
     public SceneBase
 {
 public:
-    SceneTitle();
-    virtual ~SceneTitle();
+	SceneLose();
+	virtual ~SceneLose();
 
 	virtual void Init();	//シーンに入るときの初期化処理
 	virtual std::shared_ptr<SceneBase> Update();	//毎フレーム行う更新処理
 	virtual void Draw();	//毎フレーム行う描画処理
 	virtual void End();	//シーンを抜けるときの処理
-    
+
 private:
-	//カーソル選択
+
 #ifdef _DEBUG
 
-	enum Select
-	{
-		kSceneSelect,
-		kScenePlaying,
-		kSceneWin,
-		kSceneLose,
-	};
-	Select m_select;	//選択変数
+
 
 #endif
-
-	int m_frameCount;
-
 
 };
 

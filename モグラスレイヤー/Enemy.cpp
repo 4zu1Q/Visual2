@@ -88,12 +88,13 @@ void Enemy::Init()
 /// <summary>
 /// アップデート
 /// </summary>
-void Enemy::Update()
+void Enemy::Update(Player& player)
 {
-	//for (int i = 0; i < 9; i++)
-	//{
-	//	MV1SetPosition(m_modelHandle[i], m_pos);
-	//}
+	VECTOR enemyToPlayer = VSub(player.GetPos(), m_pos);
+	
+
+
+
 
 	MV1SetPosition(m_modelHandle, m_pos);
 }
@@ -108,7 +109,13 @@ void Enemy::Draw()
 	//	MV1DrawModel(m_modelHandle[i]);
 	//}
 	MV1DrawModel(m_modelHandle);
-	DrawSphere3D(m_pos, m_radius, 16, 0xffffff, 0xffffff, false);
+
+#ifdef _DEBUG
+
+	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
+	DrawFormatString(0, 32, 0xffffff, "Enemy(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
+
+#endif
 }
 
 /// <summary>
@@ -119,7 +126,7 @@ bool Enemy::SphereHitFlag(std::shared_ptr<Player> pPlayer)
 
 	//X,Y,Zの距離の成分を取得
 	float delX = (m_pos.x - pPlayer->GetPos().x) * (m_pos.x - pPlayer->GetPos().x);
-	float delY = (m_pos.y - pPlayer->GetPos().y) * (m_pos.y - pPlayer->GetPos().y);
+	float delY = ((m_pos.y + 8.0f) - (pPlayer->GetPos().y + 8.0f)) * ((m_pos.y + 8.0f) - (pPlayer->GetPos().y + 8.0f));
 	float delZ = (m_pos.z - pPlayer->GetPos().z) * (m_pos.z - pPlayer->GetPos().z);
 
 	//球と球の距離

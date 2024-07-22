@@ -31,6 +31,9 @@ namespace
 	constexpr float kAnalogRangeMax = 0.8;
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大値
 
+	//
+	constexpr float kJumpPower = 10.0f;
+
 }
 
 /// <summary>
@@ -57,6 +60,7 @@ Player::Player() :
 /// </summary>
 Player::~Player()
 {
+
 }
 
 /// <summary>
@@ -67,6 +71,7 @@ void Player::Load()
 	//モデルのロード
 	m_modelHandle = MV1LoadModel(kPlayerModelFilename);
 	assert(m_modelHandle > -1);
+	//シェーダのロード
 	//ShaderLoad();
 }
 
@@ -104,9 +109,15 @@ void Player::Init()
 /// </summary>
 void Player::Update()
 {
+	m_pos.y -= 0.1f;
+
 	Pad::Update();
 
-
+	if (m_pos.y <= 0)
+	{
+		m_pos.y = 0;
+		m_isJump = false;
+	}
 
 	//アニメーション
 	if (m_prevAnimNo != -1)
@@ -124,21 +135,13 @@ void Player::Update()
 	bool isLoop = UpdateAnim(m_currentAnimNo);
 	UpdateAnim(m_prevAnimNo);
 
-	int frame = 0;
 
-	//if (Pad::IsTrigger PAD_INPUT_1) m_isJump = true;
-
-	//if(m_isJump)
-	//{
-	//	frame++;
-	//	if (frame >= 120)
-	//	{
-	//		if (Pad::IsTrigger PAD_INPUT_1)
-	//		{
-	//			printfDx("osita");
-	//		}
-	//	}
-	//}
+	//ジャンプ
+	if (Pad::IsTrigger PAD_INPUT_1 && m_isJump)
+	{
+		m_pos.y = kJumpPower;
+		m_isJump = false;
+	}
 
 	//ボタンを押したら攻撃アニメーションを再生する
 	if (!m_isAttack)
@@ -244,9 +247,18 @@ void Player::Update()
 void Player::Draw()
 {
 	MV1DrawModel(m_modelHandle);
-	DrawSphere3D(m_pos, m_radius, 16, 0xffffff, 0xffffff, false);
 	//DrawSphere3D(m_attackPos, m_radius, 16, 0xffff00, 0xffffff, false);
 
+#ifdef _DEBUG
+
+	DrawSphere3D(VAdd(m_pos,VGet(0,8,0)), m_radius, 8, 0xffffff, 0xffffff, false);
+	DrawFormatString(0, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
+
+#endif
+}
+
+void Player::OnHit()
+{
 }
 
 /// <summary>

@@ -11,4 +11,5 @@ std::shared_ptr<SceneBase> SceneBase::Update()
 
 void SceneBase::Draw()
 {
+
 }

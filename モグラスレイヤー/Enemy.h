@@ -14,7 +14,7 @@ public:
 	void Delete();
 
 	void Init();
-	void Update();
+	void Update(Player& player);
 	void Draw();
 
 	//ƒvƒŒƒCƒ„[‚Æ“G‚Ì“–‚½‚è”»’è

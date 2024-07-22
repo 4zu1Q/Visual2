@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "GimmickObj.h"
 
 #include "Stage.h"
 
@@ -18,7 +19,9 @@ ScenePlaying::ScenePlaying() :
 	m_pCamera = std::make_shared<Camera>();
 	m_pPlayer = std::make_shared<Player>();
 	m_pEnemy = std::make_shared<Enemy>();
+	m_pGimmick = std::make_shared<GimmickObj>();
 	m_pStage = std::make_shared<Stage>();
+
 
 
 	m_pPlayer->Load();
@@ -42,6 +45,7 @@ void ScenePlaying::Init()
 
 	m_pPlayer->Init();
 	m_pEnemy->Init();
+	m_pGimmick->Init();
 	m_pStage->Init();
 }
 
@@ -55,7 +59,8 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 	m_pCamera->PlayCameraUpdate(*m_pPlayer);
 	//m_pCamera->TitleCameraUpdate();
-	m_pEnemy->Update();
+	m_pEnemy->Update(*m_pPlayer);
+	m_pGimmick->Update();
 
 	//m_pStage->Update();
 
@@ -63,10 +68,16 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
 	m_isAttackHit;
 
-	VECTOR toEnemy = VSub(m_pEnemy->GetPos(),m_pPlayer->GetPos() );
+	//ギミックに当たった場合のフラグ取得
+	m_isGimmickHit = m_pGimmick->SphereHitFlag(m_pPlayer);
 
+	VECTOR toEnemy = VSub(m_pEnemy->GetPos(),m_pPlayer->GetPos() );
 	float length = VSize(toEnemy);
 
+	if (m_isGimmickHit)
+	{
+		printfDx("使える");
+	}
 
 	//プレイヤーと敵が当たった場合
 	if (m_isPlayerHit)
@@ -74,8 +85,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		VECTOR posVec;
 		VECTOR moveVec;
 
+		//エネミーのベクトル座標からプレイヤーのベクトル座標を引いたベクトル
 		posVec = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
 
+		//
 		moveVec = VScale(posVec, length - (m_pPlayer->GetRadius() + m_pEnemy->GetRadius()));
 
 		m_pPlayer->SetPos(VAdd(m_pPlayer->GetPos(), moveVec));
@@ -86,8 +99,6 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	if (m_isAttackHit)
 	{
 		printfDx("当たった");
-
-
 	}
 
 	return shared_from_this();
@@ -101,6 +112,7 @@ void ScenePlaying::Draw()
 
 	m_pPlayer->Draw();
 	m_pEnemy->Draw();
+	m_pGimmick->Draw();
 	//m_pStage->Draw();
 
 	DrawString(0, 0, "Scene Playing", 0xffffff, false);

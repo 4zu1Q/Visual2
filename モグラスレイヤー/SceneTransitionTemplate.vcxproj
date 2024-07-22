@@ -139,6 +139,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Yasuda%27sMask\scene\SceneLose.cpp" />
+    <ClCompile Include="..\Yasuda%27sMask\scene\SceneWin.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GimmickObj.cpp" />
@@ -152,6 +154,8 @@
     <ClCompile Include="Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Yasuda%27sMask\scene\SceneLose.h" />
+    <ClInclude Include="..\Yasuda%27sMask\scene\SceneWin.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GimmickObj.h" />
