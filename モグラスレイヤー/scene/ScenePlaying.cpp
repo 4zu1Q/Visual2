@@ -54,15 +54,16 @@ void ScenePlaying::Init()
 /// </summary>
 std::shared_ptr<SceneBase> ScenePlaying::Update()
 {
+	//カメラのアングルをセットする
 	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
-	m_pPlayer->Update();
 
+	m_pPlayer->Update();
 	m_pCamera->PlayCameraUpdate(*m_pPlayer);
 	//m_pCamera->TitleCameraUpdate();
 	m_pEnemy->Update(*m_pPlayer);
 	m_pGimmick->Update();
 
-	//m_pStage->Update();
+	m_pStage->Update();
 
 	//当たった場合のフラグの取得
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
@@ -74,9 +75,12 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	VECTOR toEnemy = VSub(m_pEnemy->GetPos(),m_pPlayer->GetPos() );
 	float length = VSize(toEnemy);
 
+	//プレイヤーのhpを取得
+	int playerHp = m_pPlayer->GetHp();
+
 	if (m_isGimmickHit)
 	{
-		printfDx("使える");
+		m_pPlayer->OnGimmickHitUpdate();
 	}
 
 	//プレイヤーと敵が当たった場合
@@ -85,14 +89,18 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		VECTOR posVec;
 		VECTOR moveVec;
 
+
 		//エネミーのベクトル座標からプレイヤーのベクトル座標を引いたベクトル
 		posVec = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
 
 		//
 		moveVec = VScale(posVec, length - (m_pPlayer->GetRadius() + m_pEnemy->GetRadius()));
-
 		m_pPlayer->SetPos(VAdd(m_pPlayer->GetPos(), moveVec));
 
+
+		playerHp -= 1;
+		m_pPlayer->SetHp(playerHp);
+		
 	}
 
 	//プレイヤーの攻撃と敵が当たった場合
@@ -113,7 +121,7 @@ void ScenePlaying::Draw()
 	m_pPlayer->Draw();
 	m_pEnemy->Draw();
 	m_pGimmick->Draw();
-	//m_pStage->Draw();
+	m_pStage->Draw();
 
 	DrawString(0, 0, "Scene Playing", 0xffffff, false);
 }

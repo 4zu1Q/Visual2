@@ -28,7 +28,7 @@ namespace
 Camera::Camera():
 	m_pos(VGet(0,10,0)),
 	m_targetPos(VGet(0,0,0)),
-	m_cameraAngle(- DX_PI_F / 2)
+	m_angle(-DX_PI_F / 2)
 {
 	SetCameraNearFar(20, 600);
 }
@@ -62,89 +62,41 @@ void Camera::PlayCameraUpdate(Player& player)
 
 #endif
 	
-	//// カメラに位置を反映.
-	VECTOR aimPos = VGet(player.GetPos().x, player.GetPos().y + 20.0f, player.GetPos().z - 50.0f); // b
-	VECTOR posToAim = VSub(aimPos, m_pos);	// (b-a)
-	//VECTOR scaledPosToAim = VScale(posToAim, 0.1f);	// ((b-a) * t)
+	// カメラに位置を反映
+	//注視点の座標
+	VECTOR playerAimPos = VGet(player.GetPos().x, player.GetPos().y + 20.0f, player.GetPos().z - 50.0f);
+	//ベクトルの方向(注視点-カメラのポジション)
+	VECTOR posToAim = VSub(playerAimPos, m_pos);
 
+	//現在位置に設定したポジションを足す
+	m_pos = VAdd(m_pos, posToAim);
 	
 
-	m_pos = VAdd(m_pos, posToAim);	// a + ((b-a) * t)
+
+
+	if (Pad::IsPress PAD_INPUT_6)
+	{
+		m_angle += 0.05f;
+	}
+	if (Pad::IsPress PAD_INPUT_5)
+	{
+		m_angle -= 0.05f;
+	}
+	
+	
+	
+
+	//m_pos.x = cosf(m_angle) * size;
+	//m_pos.z = sinf(m_angle) * size;
+	
+
 
 
 
 
 	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
 
-	//VECTOR aimPos = VAdd(player.GetPos(), VScale(player.GetPos(), -30));
 
-
-	////押している間水平角度をマイナスにする
-	//if (Pad::IsPress PAD_INPUT_LEFT)
-	//{
-	//	m_cameraAngle -= kAngleSpeed;
-
-	//	if (m_cameraAngle < -DX_PI_F)
-	//	{
-	//		m_cameraAngle += DX_TWO_PI_F;
-	//	}
-	//}
-
-
-
-	////押している間水平角度をプラスにする
-	//if (Pad::IsPress PAD_INPUT_RIGHT)
-	//{
-	//	m_cameraAngle += kAngleSpeed;
-
-	//	if (m_cameraAngle > DX_PI_F)
-	//	{
-	//		m_cameraAngle -= DX_TWO_PI_F;
-	//	}
-	//}
-
-	//カメラの注視点はプレイヤー座標から規定値分高い座標
-	//m_targetPos = VAdd(player.GetPos(), VGet(0.0f, kCameraPlayerTargetHeight, 0.0f));
-
-
-
-
-	//SetCameraNearFar(20.0f, 400.0f);
-	//m_pos.x = cosf(m_cameraAngle) * kCameraDist;
-	//m_pos.y = kCameraHeight;
-	////m_cameraPos.z = sinf(m_cameraAngle) * kCameraDist;
-	//m_pos.z = -80;
-	//SetCameraPositionAndTarget_UpVecY(m_pos, VGet(0, 30, 0));
-
-	//カメラとプレイヤーとの距離
-	
-
-
-
-
-
-
-	//VECTOR toCameraPosXZ = m_cameraPos;
-//float height = toCameraPosXZ.y;
-//toCameraPosXZ.y = 0.0f;
-//float toCameraPosXZLen = VSize(toCameraPosXZ);
-//VNorm(toCameraPosXZ);
-
-//VECTOR target = m_pPlayer->GetPos();
-//target.y += 50.0f;
-
-//VECTOR toNewCameraPos = VSub(m_cameraPos,target);
-//toNewCameraPos.y = 0.0f;
-//VNorm(toNewCameraPos);
-
-//float weight = 0.7f;	//このウェイトの値は0.0～1.0の値をとる。1.0に近づくほど追尾が強くなる
-//toNewCameraPos = VAdd(VScale(toNewCameraPos, weight), VScale(toCameraPosXZ,(1.0f - weight)));
-//VNorm(toNewCameraPos);
-//toNewCameraPos = VScale(toNewCameraPos, toCameraPosXZLen);
-//toNewCameraPos.y = height;
-//VECTOR camera = VAdd(target, toNewCameraPos);
-
-//m_cameraPos = camera;
 }
 
 /// <summary>
@@ -162,23 +114,22 @@ void Camera::TitleCameraUpdate()
 
 	if (Pad::IsPress PAD_INPUT_6)
 	{
-		m_cameraAngle += 0.05f;
+		m_angle += 0.05f;
 	}
 	if (Pad::IsPress PAD_INPUT_5)
 	{
-		m_cameraAngle -= 0.05f;
+		m_angle -= 0.05f;
 	}
 
-	SetCameraNearFar(20.0f, 400.0f);
-	m_pos.x = cosf(m_cameraAngle) * kCameraDist;
+	m_pos.x = cosf(m_angle) * kCameraDist;
 	m_pos.y = kCameraHeight;
-	m_pos.z = sinf(m_cameraAngle) * kCameraDist;
-	//m_pos.z = -160;
+	m_pos.z = sinf(m_angle) * kCameraDist;
 	SetCameraPositionAndTarget_UpVecY(m_pos, VGet(0, 0, 0));
 }
 
 void Camera::TargetCameraUpadate()
 {
+
 }
 
 void Camera::DrawGrid()
@@ -201,5 +152,10 @@ void Camera::DrawGrid()
 	DrawStringF(dispPos.x, dispPos.y, "Z+", 0xffffff);
 	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -50));
 	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
+
+	DrawFormatString(0, 64, 0xffffff, "Camera(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
+
+
 }
+
 

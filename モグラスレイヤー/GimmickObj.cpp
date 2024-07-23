@@ -21,6 +21,7 @@ GimmickObj::GimmickObj():
 
 GimmickObj::~GimmickObj()
 {
+
 }
 
 void GimmickObj::Init()

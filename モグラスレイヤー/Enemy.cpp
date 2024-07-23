@@ -14,6 +14,9 @@ namespace
 	const char* const kOutlinePsFilename = "./OutlinePs.pso";
 	const char* const kOutlineVsFilename = "./OutlineVs.vso";
 
+	//“–‚½‚è”»’è
+	constexpr float kAddPosY = 8.0f;
+
 }
 
 /// <summary>
@@ -126,7 +129,8 @@ bool Enemy::SphereHitFlag(std::shared_ptr<Player> pPlayer)
 
 	//X,Y,Z‚Ì‹——£‚Ì¬•ª‚ðŽæ“¾
 	float delX = (m_pos.x - pPlayer->GetPos().x) * (m_pos.x - pPlayer->GetPos().x);
-	float delY = ((m_pos.y + 8.0f) - (pPlayer->GetPos().y + 8.0f)) * ((m_pos.y + 8.0f) - (pPlayer->GetPos().y + 8.0f));
+	float delY = ((m_pos.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY)) *
+					((m_pos.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY));
 	float delZ = (m_pos.z - pPlayer->GetPos().z) * (m_pos.z - pPlayer->GetPos().z);
 
 	//‹…‚Æ‹…‚Ì‹——£

@@ -23,8 +23,12 @@ public:
 	const VECTOR& GetPos() const { return m_pos; }
 	void SetPos(const VECTOR pos) { m_pos = pos; }
 
+	//プレイヤーのHPを取得
+	const int& GetHp() const { return m_hp; }
+	void SetHp(const int hp) { m_hp = hp; }
+
 	//プレイヤーの攻撃の座標を取得
-	void OnHit();
+	void OnGimmickHitUpdate();
 
 private:
 	//アニメーションの進行

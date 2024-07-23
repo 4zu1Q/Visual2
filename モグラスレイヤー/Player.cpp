@@ -12,6 +12,9 @@ namespace
 	//モデルのファイル名
 	const char* const kPlayerModelFilename = "data/model/player/barbarian.mv1";
 
+	//モデル用の定数
+	constexpr float kScale = 10.0f;
+
 	//シェーダのファイル名
 	const char* const kOutlinePsFilename = "./OutlinePs.pso";
 	const char* const kOutlineVsFilename = "./OutlineVs.vso";
@@ -33,6 +36,7 @@ namespace
 
 	//
 	constexpr float kJumpPower = 10.0f;
+	constexpr float kGimmickJumpPower = 40.0f;
 
 }
 
@@ -50,7 +54,8 @@ Player::Player() :
 	m_angle(0.0f),
 	m_radius(6.0f),
 	m_isAttack(false),
-	m_isJump(false)
+	m_isJump(false),
+	m_hp(5)
 {
 	
 }
@@ -99,7 +104,7 @@ void Player::Init()
 	m_attackPos = VAdd(m_pos,VGet(0.0f,7.0f,4.0f));
 
 	MV1SetPosition(m_modelHandle, m_pos);
-	MV1SetScale(m_modelHandle, VGet(10, 10, 10));
+	MV1SetScale(m_modelHandle, VGet(kScale, kScale, kScale));
 
 	m_isAttack = false;
 }
@@ -109,15 +114,7 @@ void Player::Init()
 /// </summary>
 void Player::Update()
 {
-	m_pos.y -= 0.1f;
-
 	Pad::Update();
-
-	if (m_pos.y <= 0)
-	{
-		m_pos.y = 0;
-		m_isJump = false;
-	}
 
 	//アニメーション
 	if (m_prevAnimNo != -1)
@@ -166,7 +163,6 @@ void Player::Update()
 			//アナログスティックの入力の10% ~ 80%の範囲を使用する
 
 			//ベクトルの長さが最大で1000になる
-
 			//プレイヤーの最大移動速度は0.01f / frame
 
 			VECTOR move = VGet(analogX, 0.0f, -analogZ);	//ベクトルの長さは0～1000
@@ -182,14 +178,10 @@ void Player::Update()
 			rate = min(rate, 1.0f);
 			rate = max(rate, 0.0f);
 
-
 			//速度が決定できるので移動ベクトルに反映する
 			move = VNorm(move);
-
 			float speed = kMaxSpeed * rate;
-
 			move = VScale(move, speed);
-
 
 			//カメラのいる場所(角度)から
 			//コントローラーによる移動方向を決定する
@@ -217,10 +209,6 @@ void Player::Update()
 
 			m_attackPos = VAdd(m_pos, move);
 		}
-
-
-
-
 	}
 	else
 	{
@@ -229,7 +217,6 @@ void Player::Update()
 		{
 			m_isAttack = false;
 			ChangeAnim(kIdleAnimIndex);
-
 		}
 
 	}
@@ -247,18 +234,33 @@ void Player::Update()
 void Player::Draw()
 {
 	MV1DrawModel(m_modelHandle);
-	//DrawSphere3D(m_attackPos, m_radius, 16, 0xffff00, 0xffffff, false);
 
 #ifdef _DEBUG
 
+	//DrawSphere3D(m_attackPos, m_radius, 16, 0xffff00, 0xffffff, false);
 	DrawSphere3D(VAdd(m_pos,VGet(0,8,0)), m_radius, 8, 0xffffff, 0xffffff, false);
 	DrawFormatString(0, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
+	//DrawFormatString(380, 16, 0xffffff, "PlayerHp:%d", m_hp);
+	
 
 #endif
 }
 
-void Player::OnHit()
+/// <summary>
+/// ギミックに当たった時のアップデート処理
+/// </summary>
+void Player::OnGimmickHitUpdate()
 {
+	Pad::Update();
+
+	int frame = 0;
+
+	if (Pad::IsTrigger PAD_INPUT_1)
+	{
+		m_pos.y = kGimmickJumpPower;
+	}
+
+
 }
 
 /// <summary>
