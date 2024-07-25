@@ -80,6 +80,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 	if (m_isGimmickHit)
 	{
+		printfDx("d");
 		m_pPlayer->OnGimmickHitUpdate();
 	}
 

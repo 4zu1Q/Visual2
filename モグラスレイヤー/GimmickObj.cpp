@@ -47,7 +47,7 @@ bool GimmickObj::SphereHitFlag(std::shared_ptr<Player> pPlayer)
 {
 	//X,Y,Z‚Ì‹——£‚Ì¬•ª‚ðŽæ“¾
 	float delX = (m_pos.x - pPlayer->GetPos().x) * (m_pos.x - pPlayer->GetPos().x);
-	float delY = ((m_pos.y + 8.0f) - (pPlayer->GetPos().y + 8.0f)) * ((m_pos.y + 8.0f) - (pPlayer->GetPos().y + 8.0f));
+	float delY = (m_pos.y  - (pPlayer->GetPos().y + 8.0f)) * (m_pos.y  - (pPlayer->GetPos().y + 8.0f));
 	float delZ = (m_pos.z - pPlayer->GetPos().z) * (m_pos.z - pPlayer->GetPos().z);
 
 	//‹…‚Æ‹…‚Ì‹——£

@@ -8,7 +8,7 @@
 namespace
 {
 	//モデルのファイル名
-	const char* const kEnemyModelFilename = "data/model/enemy/knight.mv1";
+	const char* const kEnemyModelFilename = "data/model/enemy/Enemy.mv1";
 
 	//シェーダのファイル名
 	const char* const kOutlinePsFilename = "./OutlinePs.pso";

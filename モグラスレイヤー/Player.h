@@ -30,6 +30,33 @@ public:
 	//プレイヤーの攻撃の座標を取得
 	void OnGimmickHitUpdate();
 
+	//プレイヤーの状態
+	enum class State : int
+	{
+		kStand,		//立ち止まり
+		kWalk,		//歩き
+		kRun,		//走り
+		kAttack,	//攻撃
+		kJump,		//ジャンプ
+		kBigJump,	//大ジャンプ
+	};
+
+	//プレイヤーのアニメーション種別
+	enum class AnimKind : int
+	{
+		kNone = -1,	//なし
+		kUnknown,	//不明
+		kIdle,		//待機
+		kWalk,		//歩き
+		kRun,		//走り
+		kAttack,	//攻撃
+		kJump,		//ジャンプ
+		kBigJump,	//大ジャンプ
+		kFall,		//落下中
+		kDamage,	//ダメージ
+		kStop,		//立ち止まり
+	};
+
 private:
 	//アニメーションの進行
 	//ループしたかどうかを返す
@@ -40,6 +67,8 @@ private:
 
 	void ShaderLoad();
 	void ShaderUpdate();
+
+	void PlayAnim(AnimKind playAnim);	//新たなアニメーションを再生
 
 private:
 	//モデルハンドル
@@ -65,8 +94,7 @@ private:
 	int m_currentAnimNo;	//現在のアニメーション
 	int m_prevAnimNo;		//変更前のアニメーション
 	float m_animBlendRate;	//アニメーション合成割合
-	//0.0f:prevが再生される
-	//1.0f:currentが再生される
+
 
 	//当たり判定の半径
 	float m_radius;
@@ -74,6 +102,16 @@ private:
 	//カメラ情報
 	float m_cameraAngle;
 
+
+	int m_currentPlayAnim;
+	float m_currentAnimCount;
+
+	int m_prevPlayAnim;
+	float m_prevAnimCount;
+	float m_animBlendRate;
+	bool m_isMove;
+
+	State m_currentState;
 
 };
 

@@ -1,12 +1,12 @@
 #include "Camera.h"
 #include "Player.h"
 #include "Enemy.h"
-
 #include "Pad.h"
 
 #include "DxLib.h"
-
 #include <cmath>
+
+
 
 /// <summary>
 /// 定数
@@ -71,7 +71,9 @@ void Camera::PlayCameraUpdate(Player& player)
 	//現在位置に設定したポジションを足す
 	m_pos = VAdd(m_pos, posToAim);
 	
-
+	//VECTOR pos = VSub(m_pos,playerAimPos);
+	//pos = VNorm(pos);
+	//float size = VSize(pos);
 
 
 	if (Pad::IsPress PAD_INPUT_6)
@@ -83,11 +85,11 @@ void Camera::PlayCameraUpdate(Player& player)
 		m_angle -= 0.05f;
 	}
 	
-	
+	//m_pos.x = cosf(m_angle) * size;
+	//m_pos.x = sinf(m_angle) * size;
+
 	
 
-	//m_pos.x = cosf(m_angle) * size;
-	//m_pos.z = sinf(m_angle) * size;
 	
 
 
@@ -96,7 +98,11 @@ void Camera::PlayCameraUpdate(Player& player)
 
 	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
 
-
+	//VECTOR pPos;
+//pPos.x = cosf(m_angle) * size;
+//pPos.y = m_pos.y;
+//pPos.z = sinf(m_angle) * size;
+//player.SetPos(pPos);
 }
 
 /// <summary>

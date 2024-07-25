@@ -55,7 +55,8 @@ Player::Player() :
 	m_radius(6.0f),
 	m_isAttack(false),
 	m_isJump(false),
-	m_hp(5)
+	m_hp(5),
+	m_currentState(State::kStand)
 {
 	
 }
@@ -65,7 +66,7 @@ Player::Player() :
 /// </summary>
 Player::~Player()
 {
-
+	Delete();
 }
 
 /// <summary>
@@ -76,6 +77,17 @@ void Player::Load()
 	//モデルのロード
 	m_modelHandle = MV1LoadModel(kPlayerModelFilename);
 	assert(m_modelHandle > -1);
+
+	//アニメーションのブレンド率を初期化
+	m_animBlendRate = 1.0f;
+
+	//初期状態ではアニメーションはアタッチされていないにする
+	m_currentPlayAnim = -1;
+	m_prevPlayAnim = -1;
+
+	//アニメーションを再生
+	PlayAnim(AnimKind::kIdle);
+
 	//シェーダのロード
 	//ShaderLoad();
 }
@@ -237,11 +249,8 @@ void Player::Draw()
 
 #ifdef _DEBUG
 
-	//DrawSphere3D(m_attackPos, m_radius, 16, 0xffff00, 0xffffff, false);
 	DrawSphere3D(VAdd(m_pos,VGet(0,8,0)), m_radius, 8, 0xffffff, 0xffffff, false);
 	DrawFormatString(0, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
-	//DrawFormatString(380, 16, 0xffffff, "PlayerHp:%d", m_hp);
-	
 
 #endif
 }
@@ -349,6 +358,27 @@ void Player::ShaderUpdate()
 	SetUsePixelShader(m_outlinePsH);
 	MV1DrawModel(m_modelHandle);
 
+
+}
+
+void Player::PlayAnim(AnimKind playAnim)
+{
+	if (m_prevPlayAnim != -1)
+	{
+		MV1DetachAnim(m_modelHandle, m_prevPlayAnim);
+		m_prevPlayAnim = -1;
+	}
+
+	//今まで再生中のモーションだったものの情報をPrevに移動する
+	m_prevPlayAnim = m_currentPlayAnim;
+	m_prevAnimCount = m_currentAnimCount;
+
+	//新たに指定のモーションをモデルにアタッチして、アタッチ番号を保存する
+	m_currentPlayAnim = MV1AttachAnim(m_modelHandle, static_cast<int>(playAnim));
+	m_currentAnimCount = 0.0f;
+
+	//ブレンド率はPrevが有効ではない場合は1.0f(現在モーションが100%の状態)にする
+	m_animBlendRate = m_prevPlayAnim == -1 ? 1.0f : 0.0f;
 
 }
 
