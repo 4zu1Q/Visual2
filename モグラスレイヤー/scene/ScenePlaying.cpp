@@ -66,7 +66,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	m_pGimmick->Update();
 
 	m_pStage->Update();
-	m_pSkyDome->Update(m_pPlayer->GetPos());
+	//m_pSkyDome->Update(m_pPlayer->GetPos());
 
 	//“–‚½‚Á‚½ê‡‚Ìƒtƒ‰ƒO‚ÌŽæ“¾
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
@@ -126,7 +126,7 @@ void ScenePlaying::Draw()
 	m_pEnemy->Draw();
 	m_pGimmick->Draw();
 	m_pStage->Draw();
-	m_pSkyDome->Draw();
+	//m_pSkyDome->Draw();
 
 	DrawString(0, 0, "Scene Playing", 0xffffff, false);
 }

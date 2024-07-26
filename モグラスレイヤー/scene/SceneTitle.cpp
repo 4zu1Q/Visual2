@@ -22,8 +22,12 @@ void SceneTitle::Init()
 std::shared_ptr<SceneBase> SceneTitle::Update()
 {
 	Pad::Update();
+	bool isCommand = false;
 
 #ifdef _DEBUG
+
+	//Œˆ’è‚µ‚½‚ç“®‚©‚¹‚È‚­‚³‚¹‚é
+	if (isCommand) return shared_from_this();
 
 	//ã•ûŒü‚ğ‰Ÿ‚µ‚½‚Æ‚«
 	if (Pad::IsTrigger(PAD_INPUT_UP))
@@ -71,17 +75,21 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 	{
 		if (m_select == kSceneSelect)
 		{
+			isCommand = true;
 		}
 		else if (m_select == kScenePlaying)
 		{
+			isCommand = true;
 			return std::make_shared<ScenePlaying>();
 		}
 		else if (m_select == kSceneWin)
 		{
+			isCommand = true;
 			return std::make_shared<SceneLose>();
 		}
 		else if (m_select == kSceneLose)
 		{
+			isCommand = true;
 			return std::make_shared<SceneLose>();
 		}
 

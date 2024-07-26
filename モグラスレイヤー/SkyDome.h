@@ -15,7 +15,9 @@ private:
 	//スカイドームの回転率
 	float m_rot;
 	//スカイドームのモデル
-	int m_handle;
+	int m_handle = -1;
+
+	VECTOR m_pos = VGet(0,0,0);
 
 };
 
