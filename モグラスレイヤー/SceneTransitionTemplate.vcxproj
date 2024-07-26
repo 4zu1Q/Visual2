@@ -153,6 +153,7 @@
     <ClCompile Include="scene\ScenePlaying.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
     <ClCompile Include="Shot.cpp" />
+    <ClCompile Include="SkyDome.cpp" />
     <ClCompile Include="Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +171,7 @@
     <ClInclude Include="scene\ScenePlaying.h" />
     <ClInclude Include="scene\SceneTitle.h" />
     <ClInclude Include="Shot.h" />
+    <ClInclude Include="SkyDome.h" />
     <ClInclude Include="Stage.h" />
   </ItemGroup>
   <ItemGroup>

@@ -78,12 +78,12 @@ void Player::Load()
 	m_modelHandle = MV1LoadModel(kPlayerModelFilename);
 	assert(m_modelHandle > -1);
 
-	//アニメーションのブレンド率を初期化
-	m_animBlendRate = 1.0f;
+	////アニメーションのブレンド率を初期化
+	//m_animBlendRate = 1.0f;
 
-	//初期状態ではアニメーションはアタッチされていないにする
-	m_currentPlayAnim = -1;
-	m_prevPlayAnim = -1;
+	////初期状態ではアニメーションはアタッチされていないにする
+	//m_currentPlayAnim = -1;
+	//m_prevPlayAnim = -1;
 
 	//アニメーションを再生
 	PlayAnim(AnimKind::kIdle);
@@ -363,22 +363,26 @@ void Player::ShaderUpdate()
 
 void Player::PlayAnim(AnimKind playAnim)
 {
-	if (m_prevPlayAnim != -1)
-	{
-		MV1DetachAnim(m_modelHandle, m_prevPlayAnim);
-		m_prevPlayAnim = -1;
-	}
+	//if (m_prevPlayAnim != -1)
+	//{
+	//	MV1DetachAnim(m_modelHandle, m_prevPlayAnim);
+	//	m_prevPlayAnim = -1;
+	//}
 
-	//今まで再生中のモーションだったものの情報をPrevに移動する
-	m_prevPlayAnim = m_currentPlayAnim;
-	m_prevAnimCount = m_currentAnimCount;
+	////今まで再生中のモーションだったものの情報をPrevに移動する
+	//m_prevPlayAnim = m_currentPlayAnim;
+	//m_prevAnimCount = m_currentAnimCount;
 
-	//新たに指定のモーションをモデルにアタッチして、アタッチ番号を保存する
-	m_currentPlayAnim = MV1AttachAnim(m_modelHandle, static_cast<int>(playAnim));
-	m_currentAnimCount = 0.0f;
+	////新たに指定のモーションをモデルにアタッチして、アタッチ番号を保存する
+	//m_currentPlayAnim = MV1AttachAnim(m_modelHandle, static_cast<int>(playAnim));
+	//m_currentAnimCount = 0.0f;
 
-	//ブレンド率はPrevが有効ではない場合は1.0f(現在モーションが100%の状態)にする
-	m_animBlendRate = m_prevPlayAnim == -1 ? 1.0f : 0.0f;
+	////ブレンド率はPrevが有効ではない場合は1.0f(現在モーションが100%の状態)にする
+	//m_animBlendRate = m_prevPlayAnim == -1 ? 1.0f : 0.0f;
 
+}
+
+void Player::AttackCol(VECTOR pos)
+{
 }
 

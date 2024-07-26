@@ -7,6 +7,7 @@ class Player;
 class Enemy;
 class GimmickObj;
 class Stage;
+class SkyDome;
 class ScenePlaying :
     public SceneBase
 {
@@ -25,6 +26,8 @@ private:
 	std::shared_ptr<Enemy> m_pEnemy;
 	std::shared_ptr<GimmickObj> m_pGimmick;
 	std::shared_ptr<Stage> m_pStage;
+	std::shared_ptr<SkyDome> m_pSkyDome;
+
 
 	//“–‚½‚è”»’è
 	bool m_isPlayerHit;

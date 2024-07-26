@@ -37,6 +37,7 @@ Enemy::Enemy():
 /// </summary>
 Enemy::~Enemy()
 {
+	Delete();
 }
 
 /// <summary>

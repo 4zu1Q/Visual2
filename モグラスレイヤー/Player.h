@@ -70,6 +70,8 @@ private:
 
 	void PlayAnim(AnimKind playAnim);	//新たなアニメーションを再生
 
+	void AttackCol(VECTOR pos);
+
 private:
 	//モデルハンドル
 	int m_modelHandle;
@@ -83,6 +85,7 @@ private:
 	//表示情報
 	VECTOR m_pos;
 	VECTOR m_attackPos;
+
 
 	float m_angle;
 
@@ -108,7 +111,7 @@ private:
 
 	int m_prevPlayAnim;
 	float m_prevAnimCount;
-	float m_animBlendRate;
+	//float m_animBlendRate;
 	bool m_isMove;
 
 	State m_currentState;

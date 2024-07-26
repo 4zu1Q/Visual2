@@ -8,6 +8,7 @@
 #include "GimmickObj.h"
 
 #include "Stage.h"
+#include "SkyDome.h"
 
 /// <summary>
 /// コンストラクタ
@@ -21,12 +22,13 @@ ScenePlaying::ScenePlaying() :
 	m_pEnemy = std::make_shared<Enemy>();
 	m_pGimmick = std::make_shared<GimmickObj>();
 	m_pStage = std::make_shared<Stage>();
-
+	m_pSkyDome = std::make_shared<SkyDome>();
 
 
 	m_pPlayer->Load();
 	m_pEnemy->Load();
 	m_pStage->Load();
+
 }
 
 /// <summary>
@@ -64,6 +66,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	m_pGimmick->Update();
 
 	m_pStage->Update();
+	m_pSkyDome->Update(m_pPlayer->GetPos());
 
 	//当たった場合のフラグの取得
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
@@ -123,6 +126,7 @@ void ScenePlaying::Draw()
 	m_pEnemy->Draw();
 	m_pGimmick->Draw();
 	m_pStage->Draw();
+	m_pSkyDome->Draw();
 
 	DrawString(0, 0, "Scene Playing", 0xffffff, false);
 }
