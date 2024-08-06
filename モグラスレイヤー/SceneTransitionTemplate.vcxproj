@@ -149,12 +149,14 @@
     <ClCompile Include="Pad.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="scene\SceneBase.cpp" />
+    <ClCompile Include="scene\SceneDebug.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
     <ClCompile Include="scene\ScenePlaying.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
     <ClCompile Include="Shot.cpp" />
     <ClCompile Include="SkyDome.cpp" />
     <ClCompile Include="Stage.cpp" />
+    <ClCompile Include="Vec2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Yasuda%27sMask\scene\SceneLose.h" />
@@ -167,12 +169,14 @@
     <ClInclude Include="Pad.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="scene\SceneBase.h" />
+    <ClInclude Include="scene\SceneDebug.h" />
     <ClInclude Include="scene\SceneManager.h" />
     <ClInclude Include="scene\ScenePlaying.h" />
     <ClInclude Include="scene\SceneTitle.h" />
     <ClInclude Include="Shot.h" />
     <ClInclude Include="SkyDome.h" />
     <ClInclude Include="Stage.h" />
+    <ClInclude Include="Vec2.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="OutlinePS.hlsl">

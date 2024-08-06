@@ -5,7 +5,7 @@
 class SceneBase :public std::enable_shared_from_this<SceneBase>
 {
 public:
-	SceneBase() {}
+	SceneBase() {};
 	virtual ~SceneBase() {}
 
 	
@@ -17,6 +17,30 @@ public:
 										
 	virtual void Draw() = 0;	//毎フレーム行う描画処理
 	virtual void End() = 0;	//シーンを抜けるときの処理
+
+	//フェード関係
+	void UpdateFade();
+	void DrawFade();
+
+	void SkipFadeIn();
+	void SkipFadeOut();
+
+	bool IsFadeingIn() const;
+	bool IsFadeingOut() const;
+
+	bool IsFadeing() const { return IsFadeingIn() || IsFadeingOut(); }	//フェードインorアウト中
+
+	void StartFadeOut();	//フェードアウト開始
+
+
+
+private:
+	//フェード関連
+	int m_fadeColor;
+	int m_fadeBright;
+	int m_fadeSpeed;
+
+
 
 };
 

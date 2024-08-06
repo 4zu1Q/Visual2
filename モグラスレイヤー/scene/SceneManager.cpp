@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include "SceneTitle.h"
 #include "ScenePlaying.h"
+#include "SceneDebug.h"
 
 SceneManager::SceneManager():
 	m_pScene(nullptr)
@@ -14,7 +15,11 @@ SceneManager::~SceneManager()
 void SceneManager::Init()
 {
 	//Å‰‚ÌƒV[ƒ“‚Ìƒƒ‚ƒŠ‚ğŠm•Û‚·‚é
-	m_pScene = std::make_shared<ScenePlaying>();
+#ifdef _DEBUG
+	m_pScene = std::make_shared<SceneDebug>();
+#else
+	m_pScene = std::make_shared<SceneTitle>();
+#endif
 	m_pScene->Init();
 }
 

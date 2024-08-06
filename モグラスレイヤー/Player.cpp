@@ -263,10 +263,17 @@ void Player::OnGimmickHitUpdate()
 	Pad::Update();
 
 	int frame = 0;
+	m_isJump = true;
+
+	if (m_isJump)
+	{
+		m_pos.y = kGimmickJumpPower;
+	}
 
 	if (Pad::IsTrigger PAD_INPUT_1)
 	{
-		m_pos.y = kGimmickJumpPower;
+
+
 	}
 
 
