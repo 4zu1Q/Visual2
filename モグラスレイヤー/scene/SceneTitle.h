@@ -17,7 +17,7 @@ private:
 
 
 	int m_frameCount;
-
+	bool m_isInterval;
 
 };
 
