@@ -15,7 +15,23 @@ public:
     
 private:
 
+	//カーソル選択
+	enum Select
+	{
+		kStart,		//スタート
+		kOption,	//オプション
+		kGameEnd,	//終了
+	};
 
+	Select m_select;
+
+	//グラフィックハンドル
+	int m_logoH;
+	int m_startH;
+	int m_optionH;
+	int m_endH;
+
+	int m_frameScene;
 	int m_frameCount;
 	bool m_isInterval;
 
