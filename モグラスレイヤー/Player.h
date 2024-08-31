@@ -30,26 +30,26 @@ public:
 	//プレイヤーの攻撃の座標を取得
 	void OnGimmickHitUpdate();
 
-	//プレイヤーの状態
-	enum class State : int
-	{
-		kStand,		//立ち止まり
-		kWalk,		//歩き
-		kRun,		//走り
-		kAttack,	//攻撃
-		kJump,		//ジャンプ
-		kBigJump,	//大ジャンプ
-	};
+	////プレイヤーの状態
+	//enum class State : int
+	//{
+	//	kStand,		//立ち止まり
+	//	kWalk,		//歩き
+	//	kRun,		//走り
+	//	kAttack,	//攻撃
+	//	kJump,		//ジャンプ
+	//	kBigJump,	//大ジャンプ
+	//};
 
 	//プレイヤーのアニメーション種別
 	enum class AnimKind : int
 	{
 		kNone = -1,	//なし
 		kUnknown,	//不明
-		kIdle,		//待機
-		kWalk,		//歩き
+		kIdle = 1,		//待機
+		kWalk = 2,		//歩き
 		kRun,		//走り
-		kAttack,	//攻撃
+		kAttack = 30,	//攻撃
 		kJump,		//ジャンプ
 		kBigJump,	//大ジャンプ
 		kFall,		//落下中
@@ -74,13 +74,19 @@ private:
 
 private:
 	//モデルハンドル
-	int m_modelHandle;
+	int m_modelH;
+
+	//画像ハンドル
+	int m_hpH;
+	int m_losthpH;
+
 	//シェーダハンドル
 	int m_outlineVsH;
 	int m_outlinePsH;
 
 	//HP
-	float m_hp;
+	int m_hp;
+	int m_losthp;
 
 	//表示情報
 	VECTOR m_pos;
@@ -105,7 +111,6 @@ private:
 	//カメラ情報
 	float m_cameraAngle;
 
-
 	int m_currentPlayAnim;
 	float m_currentAnimCount;
 
@@ -114,8 +119,11 @@ private:
 	//float m_animBlendRate;
 	bool m_isMove;
 
-	State m_currentState;
+	float m_hpAnimationHeight;
 
+	//State m_currentState;
+	AnimKind m_animIndex;
+	int m_animationIndex;
 };
 
 

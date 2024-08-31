@@ -9,13 +9,24 @@
 
 #include "Stage.h"
 #include "SkyDome.h"
+#include "Game.h"
+
+namespace 
+{
+	//フェード関連
+	constexpr int kFadeTime = 120;
+	constexpr int kBlend = 255;
+
+}
 
 /// <summary>
 /// コンストラクタ
 /// </summary>
 ScenePlaying::ScenePlaying() :
+	m_isInterval(false),
 	m_isPlayerHit(false),
-	m_isAttackHit(false)
+	m_isAttackHit(false),
+	m_frameScene(0)
 {
 	m_pCamera = std::make_shared<Camera>();
 	m_pPlayer = std::make_shared<Player>();
@@ -66,7 +77,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	m_pGimmick->Update();
 
 	m_pStage->Update();
-	//m_pSkyDome->Update(m_pPlayer->GetPos());
+	m_pSkyDome->Update(m_pPlayer->GetPos());
 
 	//当たった場合のフラグの取得
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
@@ -90,6 +101,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//プレイヤーと敵が当たった場合
 	if (m_isPlayerHit)
 	{
+
 		VECTOR posVec;
 		VECTOR moveVec;
 
@@ -105,6 +117,21 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		playerHp -= 1;
 		m_pPlayer->SetHp(playerHp);
 		
+	}
+
+	//プレイヤーのHPがゼロになったら
+	if (m_pPlayer->GetHp() <= 0)
+	{
+		m_isInterval = true;
+	}
+
+	if (m_isInterval)
+	{
+		m_frameScene++;
+		if (m_frameScene >= kFadeTime) 
+		{
+			return std::make_shared<SceneTitle>();
+		}
 	}
 
 	//プレイヤーの攻撃と敵が当たった場合
@@ -126,7 +153,16 @@ void ScenePlaying::Draw()
 	m_pEnemy->Draw();
 	m_pGimmick->Draw();
 	m_pStage->Draw();
-	//m_pSkyDome->Draw();
+	m_pSkyDome->Draw();
+
+		//フェード暗幕
+	if (m_isInterval)
+	{
+		int alpha = kBlend * m_frameScene / kFadeTime;
+		SetDrawBlendMode(DX_BLENDMODE_MULA, alpha);
+		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 
 	DrawString(0, 0, "Scene Playing", 0xffffff, false);
 }

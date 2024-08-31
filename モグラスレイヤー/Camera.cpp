@@ -85,8 +85,8 @@ void Camera::PlayCameraUpdate(Player& player)
 		m_angle -= 0.05f;
 	}
 	
-	//m_pos.x = cosf(m_angle) * size;
-	//m_pos.x = sinf(m_angle) * size;
+	//m_pos.x = cosf(m_angle) * player.GetPos().x;
+	//m_pos.z = sinf(m_angle) * player.GetPos().z;
 
 	
 
@@ -140,23 +140,23 @@ void Camera::TargetCameraUpadate()
 
 void Camera::DrawGrid()
 {
-	for (int x = -100; x <= 100; x += 10)
+	for (int x = -200; x <= 200; x += 10)
 	{
-		DrawLine3D(VGet(static_cast<float>(x), 0, -100), VGet(static_cast<float>(x), 0, 100), 0xffff00);
+		DrawLine3D(VGet(static_cast<float>(x), 0, -200), VGet(static_cast<float>(x), 0, 200), 0xffff00);
 	}
-	for (int z = -100; z <= 100; z += 10)
+	for (int z = -200; z <= 200; z += 10)
 	{
-		DrawLine3D(VGet(-100, 0, static_cast<float>(z)), VGet(100, 0, static_cast<float>(z)), 0xff0000);
+		DrawLine3D(VGet(-200, 0, static_cast<float>(z)), VGet(200, 0, static_cast<float>(z)), 0xff0000);
 	}
 
 	// X+-,Z+-‚Ì•ûŒü‚ª•ª‚©‚è‚â‚·‚¢‚æ‚¤‚É•\Ž¦‚ð’Ç‰Á‚·‚é
-	VECTOR dispPos = ConvWorldPosToScreenPos(VGet(50, 0, 0));
+	VECTOR dispPos = ConvWorldPosToScreenPos(VGet(200, 0, 0));
 	DrawStringF(dispPos.x, dispPos.y, "X+", 0xffffff);
-	dispPos = ConvWorldPosToScreenPos(VGet(-50, 0, 0));
+	dispPos = ConvWorldPosToScreenPos(VGet(-200, 0, 0));
 	DrawStringF(dispPos.x, dispPos.y, "X-", 0xffffff);
-	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, 50));
+	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, 200));
 	DrawStringF(dispPos.x, dispPos.y, "Z+", 0xffffff);
-	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -50));
+	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -200));
 	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
 
 	DrawFormatString(0, 64, 0xffffff, "Camera(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);

@@ -2,6 +2,9 @@
 #include "DxLib.h"
 #include <memory>
 
+
+
+
 class Player;
 class Enemy
 {
@@ -27,7 +30,23 @@ public:
 	VECTOR GetPos() { return m_pos; }
 	void SetPos(VECTOR pos) { m_pos = pos; }
 
+	//“G‚ÌHP‚ğæ“¾
+	const int& GetHp() const { return m_hp; }
+	void SetHp(const int hp) { m_hp = hp; }
+
+	//“G‚ª‰½‚ğ‚·‚é‚©‚ğ‚«‚ß‚é
+	enum State
+	{
+		kIdle,	//‘Ò‹@
+		kRun,	//‘–‚é
+		kAttack,	 //UŒ‚
+		kPowerAttack,//—­‚ßUŒ‚
+	};
+
+
+
 private:
+
 	//ƒ‚ƒfƒ‹ƒnƒ“ƒhƒ‹
 	//int m_modelHandle[8];
 	int m_modelHandle;
@@ -35,11 +54,16 @@ private:
 	int m_outlineVsH;
 	int m_outlinePsH;
 
+	//Hp
+	int m_hp;
+
 	//•\¦î•ñ
 	VECTOR m_pos;
 
 	//“–‚½‚è”»’è‚Ì”¼Œa
 	float m_radius;
 
+	//State•Ï”
+	State m_state;
 };
 

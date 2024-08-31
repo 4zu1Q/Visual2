@@ -7,7 +7,7 @@ namespace
 	//ファイル名
 	const char* const kSkyDomeFileName = "data/skyDome/Dome.mv1";
 	//スカイドームのスケール
-	const VECTOR kSkyDomeScale = VGet(35.0f, 35.0f, 35.0f);
+	const VECTOR kSkyDomeScale = VGet(100, 100, 100);
 }
 
 SkyDome::SkyDome():

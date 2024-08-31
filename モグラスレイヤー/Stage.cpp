@@ -1,5 +1,6 @@
 #include "Stage.h"
 #include "DxLib.h"
+#include <cassert>
 
 /// <summary>
 /// 定数
@@ -7,7 +8,7 @@
 namespace
 {
 	//モデルのファイル名
-	const char* const kPlayerModelFileName = "data/model/ground/ground.mv1";
+	const char* const kPlayerModelFileName = "data/model/stage/ground.mv1";
 }
 
 /// <summary>
@@ -15,7 +16,7 @@ namespace
 /// </summary>
 Stage::Stage() :
 	m_modelHandle(-1),
-	m_pos(VGet(0.0f, -10.0f, 0.0f))
+	m_pos(VGet(0.0f, 0.0f, 0.0f))
 {
 }
 
@@ -32,6 +33,8 @@ Stage::~Stage()
 void Stage::Load()
 {
 	m_modelHandle = MV1LoadModel(kPlayerModelFileName);
+	assert(m_modelHandle >= 0);
+
 }
 
 /// <summary>
@@ -49,7 +52,7 @@ void Stage::Delete()
 void Stage::Init()
 {
 	//3Dモデルのスケールを2倍する
-	MV1SetScale(m_modelHandle, VGet(3.0f, 3.0f, 3.0f));
+	MV1SetScale(m_modelHandle, VGet(1.0f, 1.0f, 1.0f));
 
 	MV1SetPosition(m_modelHandle, m_pos);
 

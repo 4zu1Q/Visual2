@@ -28,6 +28,11 @@ private:
 	std::shared_ptr<Stage> m_pStage;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 
+	//フレーム関係
+	int m_frameScene;
+
+	//フラグ
+	bool m_isInterval;
 
 	//当たり判定
 	bool m_isPlayerHit;

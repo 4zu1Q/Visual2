@@ -1,11 +1,11 @@
 #pragma once
 #include <memory>
 
-
+class SceneManager;
 class SceneBase :public std::enable_shared_from_this<SceneBase>
 {
 public:
-	SceneBase() {};
+	SceneBase();
 	virtual ~SceneBase() {}
 
 	
@@ -40,7 +40,8 @@ private:
 	int m_fadeBright;
 	int m_fadeSpeed;
 
-
+protected:
+	SceneManager& m_pManager;
 
 };
 

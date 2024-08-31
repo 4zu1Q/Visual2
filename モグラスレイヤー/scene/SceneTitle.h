@@ -1,6 +1,7 @@
 #pragma once
 #include "SceneBase.h"
 
+class SceneManager;
 class SceneTitle :
     public SceneBase
 {
@@ -14,6 +15,9 @@ public:
 	virtual void End();	//シーンを抜けるときの処理
     
 private:
+	//シーンを管理するポインタ
+	//std::shared_ptr<SceneManager> m_pManager = std::make_shared<SceneManager>();
+
 
 	//カーソル選択
 	enum Select
@@ -23,17 +27,24 @@ private:
 		kGameEnd,	//終了
 	};
 
+	//enum変数
 	Select m_select;
+	int m_selectPosY;
 
 	//グラフィックハンドル
 	int m_logoH;
 	int m_startH;
 	int m_optionH;
 	int m_endH;
+	int m_selectH;
+	int m_backgroundH;
 
+	//フレーム変数
 	int m_frameScene;
 	int m_frameCount;
-	bool m_isInterval;
 
+	//フラグ変数
+	bool m_isInterval;
+	bool m_isCommand;
 };
 
