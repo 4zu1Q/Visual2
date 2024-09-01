@@ -6,7 +6,7 @@
 #include "DxLib.h"
 #include <cmath>
 
-
+#define D2R(deg) ((deg)*DX_PI_F/180.0f)
 
 /// <summary>
 /// 定数
@@ -20,14 +20,17 @@ namespace
 	constexpr float kCameraPlayerTargetHeight = 400.0f;	//プレイヤー座標からどれだけ高い位置を注視点とするか
 	constexpr float kToPlayerLength = 1600.0f;	//プレイヤーとの距離
 	constexpr float kCollisionSize = 50.0f;		//カメラの当たり判定サイズ
+
+
 }
 
 /// <summary>
 /// コンストラクタ
 /// </summary>
-Camera::Camera():
-	m_pos(VGet(0,10,0)),
-	m_targetPos(VGet(0,0,0)),
+Camera::Camera() :
+	m_pos(VGet(0, 10, -25)),
+	m_targetPos(VGet(0, 0, 0)),
+	m_cameraangle(VGet(0,0,0)),
 	m_angle(-DX_PI_F / 2)
 {
 	SetCameraNearFar(20, 600);
@@ -45,7 +48,7 @@ Camera::~Camera()
 /// </summary>
 void Camera::Init()
 {
-	
+	m_cameraangle = VGet(D2R(-20.0f), 0.0f, 0.0f);
 	
 }
 
@@ -78,15 +81,32 @@ void Camera::PlayCameraUpdate(Player& player)
 
 	if (Pad::IsPress PAD_INPUT_6)
 	{
-		m_angle += 0.05f;
+		m_cameraangle.y += D2R(1.0f);
 	}
 	if (Pad::IsPress PAD_INPUT_5)
 	{
-		m_angle -= 0.05f;
+		m_cameraangle.y -= D2R(1.0f);
+		//m_angle -= 0.05f;
 	}
-	
-	//m_pos.x = cosf(m_angle) * player.GetPos().x;
-	//m_pos.z = sinf(m_angle) * player.GetPos().z;
+
+	//注視点の座標をプレイヤーの座標に代入
+	m_targetPos = player.GetPos();
+
+	//基準ベクトル
+	VECTOR Direction = VGet(0.0f, 0.0f, 10.0f);
+
+	// Ｘ軸回転行列
+	MATRIX MatrixX = MGetRotX(m_cameraangle.x);
+	// Ｙ軸回転行列
+	MATRIX MatrixY = MGetRotY(m_cameraangle.y);
+	// 行列の合成
+	MATRIX Matrix = MMult(MatrixX, MatrixY);
+	// 基準ベクトルを行列で変換
+	Direction = VTransform(Direction, Matrix);
+
+
+	//m_pos.y = cosf(m_angle) * player.GetPos().y;
+	//m_pos.y = sinf(m_angle) * player.GetPos().y;
 
 	
 
@@ -96,7 +116,8 @@ void Camera::PlayCameraUpdate(Player& player)
 
 
 
-	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
+	SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
+	//SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
 
 	//VECTOR pPos;
 //pPos.x = cosf(m_angle) * size;

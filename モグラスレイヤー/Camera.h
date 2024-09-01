@@ -34,10 +34,12 @@ private:
 
 	VECTOR m_pos;			//カメラ座標
 	VECTOR m_targetPos;		//注視点座標
+	VECTOR m_cameraangle;			//カメラのアングル
+
 
 	float m_angle;	//カメラ角度
 
-
+	
 
 
 };

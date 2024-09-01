@@ -56,6 +56,11 @@ SceneTitle::SceneTitle():
 
 SceneTitle::~SceneTitle()
 {
+	DeleteGraph(m_logoH);
+	DeleteGraph(m_selectH);
+	DeleteGraph(m_startH);
+	DeleteGraph(m_optionH);
+	DeleteGraph(m_endH);
 
 }
 
@@ -171,6 +176,8 @@ void SceneTitle::Draw()
 	DrawExtendGraph(kLeft, kStartTop, kRight,kStartDown, m_startH, true); //スタート
 	DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
 	DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
+
+
 	//フェード暗幕
 	if (m_isInterval)
 	{
