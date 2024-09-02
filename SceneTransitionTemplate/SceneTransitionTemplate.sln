@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SceneTransitionTemplate", "SceneTransitionTemplate.vcxproj", "{5212A699-C50D-445F-B75E-ACF352CAC497}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5212A699-C50D-445F-B75E-ACF352CAC497}.Debug|x64.ActiveCfg = Debug|x64
+		{5212A699-C50D-445F-B75E-ACF352CAC497}.Debug|x64.Build.0 = Debug|x64
+		{5212A699-C50D-445F-B75E-ACF352CAC497}.Debug|x86.ActiveCfg = Debug|Win32
+		{5212A699-C50D-445F-B75E-ACF352CAC497}.Debug|x86.Build.0 = Debug|Win32
+		{5212A699-C50D-445F-B75E-ACF352CAC497}.Release|x64.ActiveCfg = Release|x64
+		{5212A699-C50D-445F-B75E-ACF352CAC497}.Release|x64.Build.0 = Release|x64
+		{5212A699-C50D-445F-B75E-ACF352CAC497}.Release|x86.ActiveCfg = Release|Win32
+		{5212A699-C50D-445F-B75E-ACF352CAC497}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BCA10E01-0DDF-4565-B561-F3A0464E318A}
+	EndGlobalSection
+EndGlobal
