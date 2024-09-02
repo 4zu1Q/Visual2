@@ -1,0 +1,42 @@
+﻿  Main.cpp
+  SceneBase.cpp
+  SceneManager.cpp
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(19,2): error C2679: 二項演算子 '=': 型 'std::shared_ptr<SceneDebug>' の右オペランドを扱う演算子が見つかりません (または変換できません)。
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(1633,17): message : 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(std::shared_ptr<SceneBase> &&) noexcept' の可能性があります
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(1622,17): message : または 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(const std::shared_ptr<SceneBase> &) noexcept'
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(1656,17): message : または 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(std::unique_ptr<_Ux,_Dx> &&)'
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(19,2): message : 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(std::unique_ptr<_Ux,_Dx> &&)': 'std::unique_ptr<_Ux,_Dx> &&' の テンプレート 引数を 'std::shared_ptr<SceneDebug>' から推測できませんでした
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(1646,17): message : または 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(std::auto_ptr<_Other> &&)'
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(19,2): message : 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(std::auto_ptr<_Other> &&)': 'std::auto_ptr<_Other> &&' の テンプレート 引数を 'std::shared_ptr<SceneDebug>' から推測できませんでした
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(1639,17): message : または 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(std::shared_ptr<_Ty2> &&) noexcept'
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(19,43): message : 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(std::shared_ptr<_Ty2> &&) noexcept': '__formal' の テンプレート 引数を推測できませんでした
+C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.34.31933\include\memory(1628,17): message : または 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(const std::shared_ptr<_Ty2> &) noexcept'
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(19,43): message : 'std::shared_ptr<SceneBase> &std::shared_ptr<SceneBase>::operator =(const std::shared_ptr<_Ty2> &) noexcept': '__formal' の テンプレート 引数を推測できませんでした
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(19,2): message : 引数リスト '(std::shared_ptr<SceneBase>, std::shared_ptr<SceneDebug>)' を一致させようとしているとき
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(23,10): error C2027: 認識できない型 'SceneBase' が使われています。
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(4,7): message : 'SceneBase' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(23,12): error C2039: 'Init': 'std::shared_ptr<SceneBase>' のメンバーではありません
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(26,7): message : 'std::shared_ptr<SceneBase>' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(29,44): error C2027: 認識できない型 'SceneBase' が使われています。
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(4,7): message : 'SceneBase' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(29,46): error C2039: 'Update': 'std::shared_ptr<SceneBase>' のメンバーではありません
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(26,7): message : 'std::shared_ptr<SceneBase>' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(33,11): error C2027: 認識できない型 'SceneBase' が使われています。
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(4,7): message : 'SceneBase' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(33,13): error C2039: 'End': 'std::shared_ptr<SceneBase>' のメンバーではありません
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(26,7): message : 'std::shared_ptr<SceneBase>' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(37,11): error C2027: 認識できない型 'SceneBase' が使われています。
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(4,7): message : 'SceneBase' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(37,13): error C2039: 'Init': 'std::shared_ptr<SceneBase>' のメンバーではありません
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(26,7): message : 'std::shared_ptr<SceneBase>' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(44,10): error C2027: 認識できない型 'SceneBase' が使われています。
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(4,7): message : 'SceneBase' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(44,12): error C2039: 'Draw': 'std::shared_ptr<SceneBase>' のメンバーではありません
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(26,7): message : 'std::shared_ptr<SceneBase>' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(49,10): error C2027: 認識できない型 'SceneBase' が使われています。
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(4,7): message : 'SceneBase' の宣言を確認してください
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.cpp(49,12): error C2039: 'End': 'std::shared_ptr<SceneBase>' のメンバーではありません
+C:\Users\fko2347038\Desktop\小人の旅路\scene\SceneManager.h(26,7): message : 'std::shared_ptr<SceneBase>' の宣言を確認してください
+  ScenePlaying.cpp
+  SceneWin.cpp
+  コードを生成中...
