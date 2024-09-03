@@ -82,18 +82,19 @@ void Camera::PlayCameraUpdate(Player& player)
 	if (Pad::IsPress PAD_INPUT_6)
 	{
 		m_cameraangle.y += D2R(1.0f);
+		m_angle += 0.05f;
 	}
 	if (Pad::IsPress PAD_INPUT_5)
 	{
 		m_cameraangle.y -= D2R(1.0f);
-		//m_angle -= 0.05f;
+		m_angle -= 0.05f;
 	}
 
 	//注視点の座標をプレイヤーの座標に代入
 	m_targetPos = player.GetPos();
 
 	//基準ベクトル
-	VECTOR Direction = VGet(0.0f, 0.0f, 10.0f);
+	VECTOR Direction = VGet(0.0f, 0.0f, 50.0f);
 
 	// Ｘ軸回転行列
 	MATRIX MatrixX = MGetRotX(m_cameraangle.x);
@@ -108,16 +109,12 @@ void Camera::PlayCameraUpdate(Player& player)
 	//m_pos.y = cosf(m_angle) * player.GetPos().y;
 	//m_pos.y = sinf(m_angle) * player.GetPos().y;
 
+	m_pos.x += cosf(m_angle) * kCameraDist;
+	m_pos.y += kCameraHeight;
+	m_pos.z += sinf(m_angle) * kCameraDist;
 
-
-
-
-
-
-
-
-	SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
-	//SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
+	//SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
+	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
 
 	//VECTOR pPos;
 //pPos.x = cosf(m_angle) * size;
@@ -180,7 +177,9 @@ void Camera::DrawGrid()
 	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -200));
 	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
 
+#ifdef _DEBUG
 	DrawFormatString(0, 64, 0xffffff, "Camera(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
+#endif
 
 
 }

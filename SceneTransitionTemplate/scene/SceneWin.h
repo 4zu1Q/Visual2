@@ -33,6 +33,7 @@ private:
 		kTitle,		//I—¹
 	};
 
+	float m_selectAnimation;
 	Select m_select;
 
 	//ƒtƒ‰ƒO•Ï”

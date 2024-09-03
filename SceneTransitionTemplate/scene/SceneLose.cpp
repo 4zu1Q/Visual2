@@ -35,6 +35,9 @@ namespace
 	constexpr int kFadeTime = 120;
 
 	constexpr int kBlend = 255;
+
+	constexpr float kSelectSpeed = 0.05f;
+	constexpr float kSelectAnimationSize = 9.0f;
 }
 
 SceneLose::SceneLose() :
@@ -136,21 +139,25 @@ std::shared_ptr<SceneBase> SceneLose::Update()
 		}
 	}
 
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
+
 	return shared_from_this();
 }
 
 void SceneLose::Draw()
 {
-	DrawString(0, 0, "Scene Win", 0xffffff, false);
 
 	//セレクト
 	if (m_select == kRetry)
 	{
-		DrawExtendGraph(kSelectLeft, kStartTop, kSelectRight, kStartDown, m_selectH, true);
+		DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
 	}
 	else if (m_select == kTitle)
 	{
-		DrawExtendGraph(kSelectLeft, kOptionTop, kSelectRight, kOptionDown, m_selectH, true);
+		DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
 	}
 
 	DrawExtendGraph(kLogoLeft, kLogoTop, kLogoRight, kLogoDown, m_gameoverH, true);	//ロゴ
@@ -166,7 +173,10 @@ void SceneLose::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 
+#ifdef _DEBUG
 	DrawFormatString(0, 16, 0xffffff, "Select:%d", m_select);
+	DrawString(0, 0, "Scene Win", 0xffffff, false);
+#endif
 
 }
 

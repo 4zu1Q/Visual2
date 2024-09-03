@@ -50,10 +50,8 @@ namespace
 	constexpr float kHpAnimationSize = 3.0f;
 
 
-	//
-	constexpr float kJumpPower = 10.0f;
-	constexpr float kGimmickJumpPower = 40.0f;
-
+	//壁
+	constexpr float kWall = 200;
 }
 
 /// <summary>
@@ -72,6 +70,7 @@ Player::Player() :
 	m_angle(0.0f),
 	m_radius(6.0f),
 	m_isAttack(false),
+	m_isWalk(false),
 	m_isJump(false),
 	m_hp(10),
 	m_losthp(10),
@@ -99,12 +98,12 @@ void Player::Load()
 	m_modelH = MV1LoadModel(kPlayerModelFilename);
 	assert(m_modelH > -1);
 
-	////アニメーションのブレンド率を初期化
-	//m_animBlendRate = 1.0f;
+	//アニメーションのブレンド率を初期化
+	m_animBlendRate = 1.0f;
 
-	////初期状態ではアニメーションはアタッチされていないにする
-	//m_currentPlayAnim = -1;
-	//m_prevPlayAnim = -1;
+	//初期状態ではアニメーションはアタッチされていないにする
+	m_currentPlayAnim = -1;
+	m_prevPlayAnim = -1;
 
 	//アニメーションを再生
 
@@ -127,6 +126,7 @@ void Player::Delete()
 /// </summary>
 void Player::Init()
 {
+
 	//待機アニメーションを設定
 	m_currentAnimNo = MV1AttachAnim(m_modelH, kIdleAnimIndex, -1, false);
 	m_prevAnimNo = -1;
@@ -134,7 +134,7 @@ void Player::Init()
 
 	//プレイヤーの初期位置設定
 	m_pos = VGet(0.0f, 0.0f, -30.0f);
-	m_attackPos = VAdd(m_pos, VGet(0.0f, 7.0f, 4.0f));
+	m_attackPos = VGet(m_pos.x, m_pos.y, m_pos.z - 10);
 
 	MV1SetPosition(m_modelH, m_pos);
 	MV1SetScale(m_modelH, VGet(kScale, kScale, kScale));
@@ -166,12 +166,7 @@ void Player::Update()
 	UpdateAnim(m_prevAnimNo);
 
 
-	//ジャンプ
-	if (Pad::IsTrigger PAD_INPUT_1 && m_isJump)
-	{
-		m_pos.y = kJumpPower;
-		m_isJump = false;
-	}
+
 
 	//ボタンを押したら攻撃アニメーションを再生する
 	if (!m_isAttack)
@@ -179,20 +174,17 @@ void Player::Update()
 
 		if (Pad::IsTrigger PAD_INPUT_3)
 		{
-
 			m_isAttack = true;
 			ChangeAnim(kAttackAnimIndex);
-
-
 		}
-		else
-		{
+
+			m_isWalk = true;
+
 			//アナログスティックを使って移動
 			int analogX = 0;
 			int analogZ = 0;
 
 			GetJoypadAnalogInput(&analogX, &analogZ, DX_INPUT_PAD1);
-
 			//アナログスティックの入力の10% ~ 80%の範囲を使用する
 
 			//ベクトルの長さが最大で1000になる
@@ -233,7 +225,6 @@ void Player::Update()
 			//Bボタンを押している間
 			if (Pad::IsPress(PAD_INPUT_1))
 			{
-				ChangeAnim(kRunAnimIndex);
 
 				//動くスピードを1.2倍
 				move = VScale(move, 1.2f);
@@ -241,9 +232,11 @@ void Player::Update()
 				m_pos = VAdd(m_pos, move);
 			}
 
-			VECTOR attackMove = VScale(move, 15.0f);
-			m_attackPos = VAdd(m_pos, attackMove);
-		}
+			//VECTOR attackMove = VScale(move, 15.0f);
+			//m_attackPos = VAdd(m_pos, attackMove);
+
+			//m_attackPos = VTransform(m_attackPos, mtx);
+
 	}
 	else
 	{
@@ -253,19 +246,28 @@ void Player::Update()
 			m_isAttack = false;
 			ChangeAnim(kIdleAnimIndex);
 		}
+		
+			
 
 	}
 
 	MV1SetPosition(m_modelH, m_pos);
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
+	
 
 	//ShaderUpdate();
 
+	//Hpのアニメーション
 	static float SinCount = 0;
 	SinCount += kHpSinSpeed;
 	m_hpAnimationHeight = sinf(SinCount) * kHpAnimationSize;
 
 
+	if (m_pos.x >= 195) m_pos.x = 195;
+	if (m_pos.x <= -195) m_pos.x = -195;
+	if (m_pos.z >= 195) m_pos.z = 195;
+	if (m_pos.z <= -195) m_pos.z = -195;
+	
 
 }
 
@@ -275,18 +277,6 @@ void Player::Update()
 void Player::Draw()
 {
 	MV1DrawModel(m_modelH);
-
-
-#ifdef _DEBUG
-
-	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
-	DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xff00ff, true);
-
-	DrawFormatString(0, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
-
-	DrawFormatString(400, 16, 0xffffff, "PlayerHp:%d", m_hp);
-
-#endif
 
 	for (int i = 1; i <= m_losthp; i++)
 	{
@@ -298,6 +288,20 @@ void Player::Draw()
 	{
 		DrawExtendGraph(35 * i, 16 + m_hpAnimationHeight, 35 * i + 32, 48, m_hpH, true);
 	}
+
+#ifdef _DEBUG
+
+	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
+	DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xff00ff, 0xff00ff, false);
+
+	DrawFormatString(0, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
+	DrawFormatString(800, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_attackPos.x, m_attackPos.y, m_attackPos.z);
+
+	DrawFormatString(400, 16, 0xffffff, "PlayerHp:%d", m_hp);
+
+#endif
+
+
 
 }
 
@@ -311,10 +315,6 @@ void Player::OnGimmickHitUpdate()
 	int frame = 0;
 	m_isJump = true;
 
-	if (m_isJump)
-	{
-		m_pos.y = kGimmickJumpPower;
-	}
 
 	if (Pad::IsTrigger PAD_INPUT_1)
 	{

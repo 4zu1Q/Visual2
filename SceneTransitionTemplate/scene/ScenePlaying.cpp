@@ -1,11 +1,12 @@
 #include "ScenePlaying.h"
 #include "SceneTitle.h"
+#include "SceneLose.h"
+#include "SceneWin.h"
 #include "DxLib.h"
 
 #include "Camera.h"
 #include "Player.h"
 #include "Enemy.h"
-//#include "GimmickObj.h"
 
 #include "Stage.h"
 #include "SkyDome.h"
@@ -33,6 +34,9 @@ namespace
 
 	constexpr int kEndTop = 420;
 	constexpr int kEndDown = 500;
+
+	constexpr float kSelectSpeed = 0.05f;
+	constexpr float kSelectAnimationSize = 9.0f;
 }
 
 /// <summary>
@@ -48,14 +52,13 @@ ScenePlaying::ScenePlaying() :
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_restartH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
-	m_titleH(LoadGraph("data/image/End.png")),
+	m_titleH(LoadGraph("data/image/Title.png")),
 	m_select(kRestart),
 	m_frameScene(0)
 {
 	m_pCamera = std::make_shared<Camera>();
 	m_pPlayer = std::make_shared<Player>();
 	m_pEnemy = std::make_shared<Enemy>();
-	//m_pGimmick = std::make_shared<GimmickObj>();
 	m_pStage = std::make_shared<Stage>();
 	m_pSkyDome = std::make_shared<SkyDome>();
 
@@ -87,7 +90,6 @@ void ScenePlaying::Init()
 
 	m_pPlayer->Init();
 	m_pEnemy->Init();
-	//m_pGimmick->Init();
 	m_pStage->Init();
 }
 
@@ -97,7 +99,7 @@ void ScenePlaying::Init()
 std::shared_ptr<SceneBase> ScenePlaying::Update()
 {
 	Pad::Update();
-	if (Pad::IsTrigger(PAD_INPUT_9)) m_isMenu = true;
+	if (Pad::IsTrigger(PAD_INPUT_8)) m_isMenu = true;
 
 
 	//カメラのアングルをセットする
@@ -169,31 +171,27 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	}
 
 	m_pCamera->PlayCameraUpdate(*m_pPlayer);
-	//m_pGimmick->Update();
 
 	m_pStage->Update();
-	m_pSkyDome->Update(m_pPlayer->GetPos());
+	m_pSkyDome->Update(*m_pPlayer);
 
-	//当たった場合のフラグの取得
+	//プレイヤーと敵が当たった場合のフラグの取得
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
-	m_isAttackHit;
 
-	//ギミックに当たった場合のフラグ取得
-	//m_isGimmickHit = m_pGimmick->SphereHitFlag(m_pPlayer);
+	//プレイヤーの攻撃に当たった場合のフラグ取得
+	m_isAttackHit = m_pEnemy->AttackSphereHitFlag(m_pPlayer);
+
+	//敵の攻撃に当たった場合のフラグ取得
+	m_isDamageHit = m_pEnemy->DamageSphereHitFlag(m_pPlayer);
 
 	VECTOR toEnemy = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
 	float length = VSize(toEnemy);
 
 	//プレイヤーのhpを取得
 	int playerHp = m_pPlayer->GetHp();
+	int enemyHp = m_pEnemy->GetHp();
 
 
-	//ギミックに当たった場合
-	//if (m_isGimmickHit)
-	//{
-	//	printfDx("d");
-	//	m_pPlayer->OnGimmickHitUpdate();
-	//}
 
 	//プレイヤーと敵が当たった場合
 	if (m_isPlayerHit)
@@ -210,10 +208,20 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		moveVec = VScale(posVec, length - (m_pPlayer->GetRadius() + m_pEnemy->GetRadius()));
 		m_pPlayer->SetPos(VAdd(m_pPlayer->GetPos(), moveVec));
 
+	}
 
+	//プレイヤーの攻撃が敵に入った場合
+	if (m_isAttackHit)
+	{
+		enemyHp -= 1;
+		m_pEnemy->SetHp(enemyHp);
+	}
+
+	//敵の攻撃を受けた場合
+	if (m_isDamageHit)
+	{
 		playerHp -= 1;
 		m_pPlayer->SetHp(playerHp);
-
 	}
 
 	//プレイヤーのHPがゼロになったら
@@ -223,7 +231,18 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		m_frameScene++;
 		if (m_frameScene >= kFadeTime)
 		{
-			return std::make_shared<SceneTitle>();
+			return std::make_shared<SceneLose>();
+		}
+	}
+
+	//ボスのHPがゼロになったら
+	if (m_pEnemy->GetHp() <= 0)
+	{
+		m_isInterval = true;
+		m_frameScene++;
+		if (m_frameScene >= kFadeTime)
+		{
+			return std::make_shared<SceneWin>();
 		}
 	}
 
@@ -237,11 +256,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		}
 	}
 
-	//プレイヤーの攻撃と敵が当たった場合
-	if (m_isAttackHit)
-	{
-		printfDx("当たった");
-	}
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
 
 	return shared_from_this();
 }
@@ -252,11 +270,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 void ScenePlaying::Draw()
 {
 
+	m_pSkyDome->Draw();
+	m_pStage->Draw();
 	m_pPlayer->Draw();
 	m_pEnemy->Draw();
-	//m_pGimmick->Draw();
-	m_pStage->Draw();
-	m_pSkyDome->Draw();
 
 	if (m_isMenu)
 	{
@@ -271,15 +288,15 @@ void ScenePlaying::Draw()
 		//セレクト
 		if (m_select == kRestart)
 		{
-			DrawExtendGraph(kSelectLeft, kStartTop, kSelectRight, kStartDown, m_selectH, true);
+			DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
 		}
 		else if (m_select == kOption)
 		{
-			DrawExtendGraph(kSelectLeft, kOptionTop, kSelectRight, kOptionDown, m_selectH, true);
+			DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
 		}
 		else if (m_select == kTitle)
 		{
-			DrawExtendGraph(kSelectLeft, kEndTop, kSelectRight, kEndDown, m_selectH, true);
+			DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
 		}
 
 
@@ -297,8 +314,10 @@ void ScenePlaying::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 
+#ifdef _DEBUG
 	DrawFormatString(700, 16, 0xffffff, "Select:%d", m_select);
 	DrawString(0, 0, "Scene Playing", 0xffffff, false);
+#endif
 }
 
 /// <summary>

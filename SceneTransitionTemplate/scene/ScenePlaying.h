@@ -5,7 +5,6 @@
 class Camera;
 class Player;
 class Enemy;
-//class GimmickObj;
 class Stage;
 class SkyDome;
 class ScenePlaying :
@@ -33,7 +32,6 @@ private:
 	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<Enemy> m_pEnemy;
-	//std::shared_ptr<GimmickObj> m_pGimmick;
 	std::shared_ptr<Stage> m_pStage;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 
@@ -51,9 +49,11 @@ private:
 	bool m_isTitle;
 
 	//当たり判定
-	bool m_isPlayerHit;
-	bool m_isAttackHit;
-	bool m_isGimmickHit;
+	bool m_isPlayerHit;	//プレイヤーと敵があった場合
+	bool m_isAttackHit;	//プレイヤーの攻撃が当たった場合
+	bool m_isDamageHit;	//敵の攻撃が当たった場合
+
+	float m_selectAnimation;
 
 	//enum変数
 	Select m_select;

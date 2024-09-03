@@ -29,6 +29,8 @@ private:
 	Select m_select;
 	int m_selectPosY;
 
+	float m_selectAnimation;
+
 	//グラフィックハンドル
 	int m_logoH;
 	int m_startH;

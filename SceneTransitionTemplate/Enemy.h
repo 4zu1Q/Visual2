@@ -21,6 +21,8 @@ public:
 	bool SphereHitFlag(std::shared_ptr<Player> pPlayer);
 	//ƒvƒŒƒCƒ„[‚ÌUŒ‚‚Æ“G‚Ì“–‚½‚è”»’è
 	bool AttackSphereHitFlag(std::shared_ptr<Player> pPlayer);
+	//“G‚ÌUŒ‚”»’è
+	bool DamageSphereHitFlag(std::shared_ptr<Player> pPlayer);
 
 
 	float GetRadius() { return m_radius; }
@@ -56,6 +58,7 @@ private:
 
 	//•\¦î•ñ
 	VECTOR m_pos;
+	VECTOR m_attackPos;
 
 	//“–‚½‚è”»’è‚Ì”¼Œa
 	float m_radius;

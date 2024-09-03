@@ -37,6 +37,9 @@ namespace
 	constexpr int kFadeTime = 120;
 
 	constexpr int kBlend = 255;
+
+	constexpr float kSelectSpeed = 0.05f;
+	constexpr float kSelectAnimationSize = 9.0f;
 }
 
 SceneTitle::SceneTitle() :
@@ -146,27 +149,35 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 
 	}
 
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
+
 	return shared_from_this();
 }
 
 void SceneTitle::Draw()
 {
 
+#ifdef _DEBUG
 	DrawString(0, 0, "Scene Title", 0xffffff, false);
 	DrawFormatString(0, 16, 0xffffff, "Select:%d", m_select);
+#endif
+
 
 	//セレクト
 	if (m_select == kStart)
 	{
-		DrawExtendGraph(kSelectLeft, kStartTop, kSelectRight, kStartDown, m_selectH, true);
+		DrawExtendGraph(kSelectLeft+ m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
 	}
 	else if (m_select == kOption)
 	{
-		DrawExtendGraph(kSelectLeft, kOptionTop, kSelectRight, kOptionDown, m_selectH, true);
+		DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
 	}
 	else if (m_select == kGameEnd)
 	{
-		DrawExtendGraph(kSelectLeft, kEndTop, kSelectRight, kEndDown, m_selectH, true);
+		DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
 	}
 
 

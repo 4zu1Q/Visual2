@@ -2,13 +2,14 @@
 #include <memory>
 #include "DxLib.h"
 
+class Player;
 class SkyDome
 {
 public:
 	SkyDome();
 	virtual ~SkyDome();
 
-	void Update(VECTOR pos);
+	void Update(Player& player);
 	void Draw();
 
 private:

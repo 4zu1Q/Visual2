@@ -23,6 +23,10 @@ public:
 	const VECTOR& GetPos() const { return m_pos; }
 	void SetPos(const VECTOR pos) { m_pos = pos; }
 
+	//プレイヤーの攻撃座標を取得
+	const VECTOR& GetAttackPos() const { return m_attackPos; }
+	void SetAttackPos(const VECTOR attackPos) { m_attackPos = attackPos; }
+
 	//プレイヤーのHPを取得
 	const int& GetHp() const { return m_hp; }
 	void SetHp(const int hp) { m_hp = hp; }
@@ -97,6 +101,8 @@ private:
 
 	//攻撃中フラグ
 	bool m_isAttack;
+
+	bool m_isWalk;
 	bool m_isJump;
 
 	//アニメーション情報

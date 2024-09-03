@@ -27,7 +27,9 @@ Enemy::Enemy() :
 	m_outlinePsH(-1),
 	m_outlineVsH(-1),
 	m_radius(6.0f),
-	m_pos(VGet(0, 0, 0))
+	m_hp(50),
+	m_pos(VGet(0, 0, 0)),
+	m_attackPos(VGet(0,0,0))
 {
 
 }
@@ -77,6 +79,7 @@ void Enemy::Delete()
 void Enemy::Init()
 {
 	m_pos = VGet(-60.0f, 0.0f, 0.0f);
+	m_attackPos = VGet(m_pos.x, m_pos.y, m_pos.z - 10);
 	//for (int i = 0; i < 9; i++)
 	//{
 	//	//敵の初期位置設定
@@ -117,7 +120,9 @@ void Enemy::Draw()
 #ifdef _DEBUG
 
 	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
+	DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xf00fff, 0xffffff, false);
 	DrawFormatString(0, 32, 0xffffff, "Enemy(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
+	DrawFormatString(400, 32, 0xffffff, "EnemyHp:%d", m_hp);
 
 #endif
 }
@@ -153,7 +158,40 @@ bool Enemy::SphereHitFlag(std::shared_ptr<Player> pPlayer)
 /// <returns></returns>
 bool Enemy::AttackSphereHitFlag(std::shared_ptr<Player> pPlayer)
 {
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_pos.x - pPlayer->GetAttackPos().x) * (m_pos.x - pPlayer->GetAttackPos().x);
+	float delY = ((m_pos.y + kAddPosY) - (pPlayer->GetAttackPos().y + kAddPosY)) *
+		((m_pos.y + kAddPosY) - (pPlayer->GetAttackPos().y + kAddPosY));
+	float delZ = (m_pos.z - pPlayer->GetAttackPos().z) * (m_pos.z - pPlayer->GetAttackPos().z);
 
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_radius + pPlayer->GetRadius())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Enemy::DamageSphereHitFlag(std::shared_ptr<Player> pPlayer)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_attackPos.x - pPlayer->GetPos().x) * (m_attackPos.x - pPlayer->GetPos().x);
+	float delY = ((m_attackPos.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY)) *
+		((m_attackPos.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY));
+	float delZ = (m_attackPos.z - pPlayer->GetPos().z) * (m_attackPos.z - pPlayer->GetPos().z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_radius + pPlayer->GetRadius())
+	{
+		return true;
+	}
 
 	return false;
 }
