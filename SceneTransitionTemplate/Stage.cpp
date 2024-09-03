@@ -10,7 +10,7 @@
 namespace
 {
 	//モデルのファイル名
-	const char* const kPlayerModelFileName = "data/model/stage/stage.mv1";
+	const char* const kPlayerModelFileName = "data/model/stage/ground.mv1";
 }
 
 /// <summary>
@@ -56,7 +56,7 @@ void Stage::Delete()
 void Stage::Init()
 {
 	//3Dモデルのスケールを2倍する
-	MV1SetScale(m_modelHandle, VGet(10.0f, 2.0f, 10.0f));
+	MV1SetScale(m_modelHandle, VGet(7.50f, 2.0f, 7.50f));
 
 	MV1SetPosition(m_modelHandle, m_pos);
 

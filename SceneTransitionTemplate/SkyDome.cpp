@@ -13,6 +13,7 @@ namespace
 
 SkyDome::SkyDome() :
 	m_handle(MV1LoadModel(kSkyDomeFileName)),
+	m_pos(VGet(0,0,0)),
 	m_rot(0.0f)
 {
 
@@ -34,6 +35,7 @@ void SkyDome::Update(Player& player)
 
 	//スカイドームを更新
 	MV1SetRotationXYZ(m_handle, m_pos);
+	//MV1SetPosition(m_handle, player.GetPos());
 	MV1SetPosition(m_handle, VGet(player.GetPos().x, 0.0f, player.GetPos().z));
 
 }

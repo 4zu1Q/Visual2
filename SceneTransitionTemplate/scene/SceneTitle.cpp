@@ -47,7 +47,12 @@ SceneTitle::SceneTitle() :
 	m_frameScene(0),
 	m_isInterval(false),
 	m_isCommand(false),
+	m_isOption(false),
+	m_isOperator(false),
+	m_isSound(false),
+	m_isFullScreen(false),
 	m_select(kStart),
+	m_option(kOperator),
 	m_selectPosY(0),
 	m_logoH(LoadGraph("data/image/TitleLogo.png")),
 	m_selectH(LoadGraph("data/image/Select.png")),
@@ -75,7 +80,7 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 {
 	Pad::Update();
 
-	if (!m_isCommand)
+	if (!m_isCommand && !m_isOption)
 	{
 		//上方向を押したとき
 		if (Pad::IsTrigger(PAD_INPUT_UP))
@@ -122,7 +127,7 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 			}
 			else if (m_select == kOption)
 			{
-				m_isCommand = true;
+				m_isOption = true;
 			}
 			else if (m_select == kGameEnd)
 			{
@@ -131,7 +136,84 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 		}
 	}
 
+	//オプション画面を選択した時
+	if (m_isOption)
+	{
+		//Bボタンで戻る
+		if (Pad::IsTrigger(PAD_INPUT_2)) m_isOption = false;
 
+		//上方向を押したとき
+		if (Pad::IsTrigger(PAD_INPUT_UP))
+		{
+
+			if (m_option == kOperator)
+			{
+				m_option = kFullScreen;
+			}
+			else if (m_option == kSound)
+			{
+				m_option = kOperator;
+			}
+			else if (m_option == kFullScreen)
+			{
+				m_option = kSound;
+			}
+		}
+
+		//下方向を押したとき
+		if (Pad::IsTrigger(PAD_INPUT_DOWN))
+		{
+			if (m_option == kOperator)
+			{
+				m_option = kSound;
+			}
+			else if (m_option == kSound)
+			{
+				m_option = kFullScreen;
+			}
+			else if (m_option == kFullScreen)
+			{
+				m_option = kOperator;
+			}
+		}
+
+		//決定ボタンを押したとき
+		if (Pad::IsTrigger(PAD_INPUT_1))
+		{
+			if (m_option == kOperator)
+			{
+				m_isOperator = true;
+
+			}
+			else if (m_option == kSound)
+			{
+				m_isSound = true;
+			}
+			else if (m_option == kFullScreen)
+			{
+				m_isFullScreen = true;
+			}
+		}
+		
+	}
+
+	//操作説明
+	if (m_isOperator)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_2)) m_isOperator = false;
+	}
+	
+	if (m_isSound)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_2)) m_isSound = false;
+
+	}
+
+	if (m_isFullScreen)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_2)) m_isFullScreen = false;
+
+	}
 
 	if (m_isInterval)
 	{
@@ -142,11 +224,6 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 				return std::make_shared<ScenePlaying>();
 			}
 		}
-		else if (m_select == kOption)
-		{
-			//オプション
-		}
-
 	}
 
 	//セレクトのアニメーション
@@ -163,29 +240,78 @@ void SceneTitle::Draw()
 #ifdef _DEBUG
 	DrawString(0, 0, "Scene Title", 0xffffff, false);
 	DrawFormatString(0, 16, 0xffffff, "Select:%d", m_select);
+	DrawFormatString(0, 32, 0xffffff, "Option:%d", m_option);
 #endif
 
-
-	//セレクト
-	if (m_select == kStart)
+	//オプションフラグがfalseの場合
+	if (!m_isOption)	
 	{
-		DrawExtendGraph(kSelectLeft+ m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
+		//セレクト
+		if (m_select == kStart)
+		{
+			DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
+		}
+		else if (m_select == kOption)
+		{
+			DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
+		}
+		else if (m_select == kGameEnd)
+		{
+			DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
+		}
+
+		DrawExtendGraph(kLogoLeft, kLogoTop, kLogoRight, kLogoDown, m_logoH, true);	//ロゴ
+		DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
+		DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
+		DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
 	}
-	else if (m_select == kOption)
+	else	
 	{
-		DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
+		if (!m_isOperator && !m_isSound && !m_isFullScreen)
+		{
+			// 半透明にしてメニュー背景の四角
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+			DrawFillBox(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, 0x000000);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+			// 不透明に戻して白い枠
+			DrawLineBox(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, 0x00ffff);
+
+			//セレクト
+			if (m_option == kOperator)
+			{
+				DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
+			}
+			else if (m_option == kSound)
+			{
+				DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
+			}
+			else if (m_option == kFullScreen)
+			{
+				DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
+			}
+
+			DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
+			DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
+			DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
+		}
+
 	}
-	else if (m_select == kGameEnd)
+
+	if (m_isOperator)
 	{
-		DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
+		DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
 	}
 
+	if (m_isSound)
+	{
+		DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
+	}
 
-
-	DrawExtendGraph(kLogoLeft, kLogoTop, kLogoRight, kLogoDown, m_logoH, true);	//ロゴ
-	DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
-	DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
-	DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
+	if (m_isFullScreen)
+	{
+		DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
+	}
 
 
 	//フェード暗幕

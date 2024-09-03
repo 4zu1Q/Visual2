@@ -25,8 +25,17 @@ private:
 		kGameEnd,	//終了
 	};
 
+	//カーソル選択
+	enum Option
+	{
+		kOperator,		//操作説明
+		kSound,			//サウンド
+		kFullScreen,	//フルスクリーン
+	};
+
 	//enum変数
 	Select m_select;
+	Option m_option;
 	int m_selectPosY;
 
 	float m_selectAnimation;
@@ -44,7 +53,12 @@ private:
 	int m_frameCount;
 
 	//フラグ変数
-	bool m_isInterval;
-	bool m_isCommand;
+	bool m_isInterval;	//フェード用
+	bool m_isOption;	//オプション画面用
+	bool m_isCommand;	//決定した後に動かさない用
+	bool m_isFullScreen;//フルスクリーン用
+	bool m_isSound;		//サウンド設定用
+	bool m_isOperator;	//説明画面表示用
+
 };
 

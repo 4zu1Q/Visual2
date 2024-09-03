@@ -28,11 +28,9 @@ namespace
 	constexpr int kIdleAnimIndex = 1;		//待機
 	constexpr int kWalkAnimIndex = 2;		//歩き
 	constexpr int kRunAnimIndex = 7;		//走り
-	constexpr int kJumpAnimIndex = 12;		//ジャンプ
-	constexpr int kJumpingAnimIndex = 13;		//ジャンプ中
 	constexpr int kAttackAnimIndex = 30;	//攻撃
 	constexpr int kDamageAnimIndex = 25;	//ダメージ
-	constexpr int kFallAnimIndex = 26;	//倒れる
+	constexpr int kFallAnimIndex = 26;		//倒れる
 	constexpr int kFallingAnimIndex = 27;	//倒れ中
 
 	//アニメーションの切り替えにかかるフレーム数
@@ -263,6 +261,7 @@ void Player::Update()
 	m_hpAnimationHeight = sinf(SinCount) * kHpAnimationSize;
 
 
+	//移動範囲
 	if (m_pos.x >= 195) m_pos.x = 195;
 	if (m_pos.x <= -195) m_pos.x = -195;
 	if (m_pos.z >= 195) m_pos.z = 195;
@@ -314,13 +313,6 @@ void Player::OnGimmickHitUpdate()
 
 	int frame = 0;
 	m_isJump = true;
-
-
-	if (Pad::IsTrigger PAD_INPUT_1)
-	{
-
-
-	}
 
 
 }
