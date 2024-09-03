@@ -105,7 +105,7 @@ std::shared_ptr<SceneBase> SceneDebug::Update()
 		else if (m_select == kSceneWin)
 		{
 			isCommand = true;
-			return std::make_shared<SceneLose>();
+			return std::make_shared<SceneWin>();
 		}
 		else if (m_select == kSceneLose)
 		{

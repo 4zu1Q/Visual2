@@ -1,5 +1,8 @@
 #pragma once
 #include "SceneBase.h"
+#include "DxLib.h"
+
+class SceneManager;
 class SceneLose :
     public SceneBase
 {
@@ -14,5 +17,25 @@ public:
 
 private:
 
+	//ハンドル変数
+	int m_gameoverH;
+	int m_retryH;
+	int m_titleH;
+	int m_selectH;
+
+	int m_frameScene;
+
+	//カーソル選択
+	enum Select
+	{
+		kRetry,		//スタート
+		kTitle,		//終了
+	};
+
+	Select m_select;
+
+	//フラグ変数
+	bool m_isInterval;
+	bool m_isCommand;
 };
 
