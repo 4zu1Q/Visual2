@@ -22,10 +22,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetUseBackCulling(true);
 
 	//シーンを管理するポインタ
-	std::shared_ptr<SceneManager> pScene = std::make_shared<SceneManager>();
+	std::shared_ptr<SceneManager> pSceneManager = std::make_shared<SceneManager>();
 
-	//SceneManager* pScene = new SceneManager;
-	pScene->Init();
+	pSceneManager->Init();
 	
 	// ゲームループ
 	while (ProcessMessage() != -1)
@@ -37,14 +36,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		ClearDrawScreen();
 
 		// ゲームの処理
-		pScene->Update();
-		pScene->Draw();
+		pSceneManager->Update();
+		pSceneManager->Draw();
 
 		// 画面が切り替わるのを待つ
 		ScreenFlip();
 
 		// escキーでゲーム終了
 		if (CheckHitKey(KEY_INPUT_ESCAPE))
+		{
+			break;
+		}
+
+		// 閉じる用のフラグがtrueの場合
+		if (pSceneManager->GetClose() == true)
 		{
 			break;
 		}
@@ -56,7 +61,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 	
-	pScene->End();
+	pSceneManager->End();
 
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理

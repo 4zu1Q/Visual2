@@ -1,5 +1,7 @@
 #pragma once
 #include "SceneBase.h"
+
+class SceneManager;
 class SceneTitle :
     public SceneBase
 {
@@ -14,7 +16,7 @@ public:
 
 private:
 	//シーンを管理するポインタ
-	//std::shared_ptr<SceneManager> m_pManager = std::make_shared<SceneManager>();
+	std::shared_ptr<SceneManager> m_pManager = std::make_shared<SceneManager>();
 
 
 	//カーソル選択

@@ -21,7 +21,11 @@ namespace
 	constexpr float kToPlayerLength = 1600.0f;	//プレイヤーとの距離
 	constexpr float kCollisionSize = 50.0f;		//カメラの当たり判定サイズ
 
-
+	//アナログスティックによる移動関連
+	constexpr float kMaxSpeed = 0.5f;		//プレイヤーの最大移動速度
+	constexpr float kAnalogRangeMin = 0.1;	//アナログスティックの入力判定範囲
+	constexpr float kAnalogRangeMax = 0.8;
+	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大値
 }
 
 /// <summary>
@@ -33,7 +37,7 @@ Camera::Camera() :
 	m_cameraangle(VGet(0, 0, 0)),
 	m_angle(-DX_PI_F / 2)
 {
-	SetCameraNearFar(20, 600);
+	SetCameraNearFar(20, 800);
 }
 
 /// <summary>
@@ -57,12 +61,20 @@ void Camera::Init()
 /// </summary>
 void Camera::PlayCameraUpdate(Player& player)
 {
+	//アナログスティックを使って移動
+	int analogX = 0;
+	int analogZ = 0;
+
+	GetJoypadAnalogInputRight(&analogX, &analogZ, DX_INPUT_PAD1);
+
 	Pad::Update();
 
 #ifdef _DEBUG
 
 	DrawGrid();
+	DrawLine(320, 240, 320 + analogX / 10, 240 + analogZ / 10, 0xff0fff, 4);
 
+	DrawFormatString(0, 120, 0xffffff, "ANALOG(X:%d,Y:%d)", analogX, analogZ);
 #endif
 
 	// カメラに位置を反映
@@ -78,16 +90,27 @@ void Camera::PlayCameraUpdate(Player& player)
 	//pos = VNorm(pos);
 	//float size = VSize(pos);
 
+	//if (Pad::IsPress PAD_INPUT_6)
+	//{
+	//	m_cameraangle.y += D2R(1.0f);
+	//	m_angle += 0.05f;
+	//}
+	//if (Pad::IsPress PAD_INPUT_5)
+	//{
+	//	m_cameraangle.y -= D2R(1.0f);
+	//	m_angle -= 0.05f;
+	//}
 
-	if (Pad::IsPress PAD_INPUT_6)
+	if (analogX >= 10)
 	{
-		m_cameraangle.y += D2R(1.0f);
 		m_angle += 0.05f;
+
 	}
-	if (Pad::IsPress PAD_INPUT_5)
+
+	if (analogX <= -10)
 	{
-		m_cameraangle.y -= D2R(1.0f);
 		m_angle -= 0.05f;
+
 	}
 
 	//注視点の座標をプレイヤーの座標に代入
@@ -106,9 +129,6 @@ void Camera::PlayCameraUpdate(Player& player)
 	Direction = VTransform(Direction, Matrix);
 
 
-	//m_pos.y = cosf(m_angle) * player.GetPos().y;
-	//m_pos.y = sinf(m_angle) * player.GetPos().y;
-
 	m_pos.x += cosf(m_angle) * kCameraDist;
 	m_pos.y += kCameraHeight;
 	m_pos.z += sinf(m_angle) * kCameraDist;
@@ -116,11 +136,7 @@ void Camera::PlayCameraUpdate(Player& player)
 	//SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
 	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
 
-	//VECTOR pPos;
-//pPos.x = cosf(m_angle) * size;
-//pPos.y = m_pos.y;
-//pPos.z = sinf(m_angle) * size;
-//player.SetPos(pPos);
+
 }
 
 /// <summary>
@@ -131,6 +147,7 @@ void Camera::TitleCameraUpdate()
 #ifdef _DEBUG
 
 	DrawGrid();
+
 
 #endif
 	Pad::Update();
@@ -179,6 +196,7 @@ void Camera::DrawGrid()
 
 #ifdef _DEBUG
 	DrawFormatString(0, 64, 0xffffff, "Camera(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
+
 #endif
 
 

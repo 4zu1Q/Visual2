@@ -34,6 +34,9 @@ public:
 	//プレイヤーの攻撃の座標を取得
 	void OnGimmickHitUpdate();
 
+	//プレイヤーダメージのフラグ取得
+	void SetDamage(const bool damage) { m_isDamage = damage; }
+
 	////プレイヤーの状態
 	//enum class State : int
 	//{
@@ -126,6 +129,10 @@ private:
 	bool m_isMove;
 
 	float m_hpAnimationHeight;
+
+	//プレイヤーの点滅
+	int m_damageFrame;
+	bool m_isDamage;
 
 	//State m_currentState;
 	AnimKind m_animIndex;

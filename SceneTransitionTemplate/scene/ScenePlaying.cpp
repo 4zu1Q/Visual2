@@ -49,12 +49,16 @@ ScenePlaying::ScenePlaying() :
 	m_isMenu(false),
 	m_isCommand(false),
 	m_isTitle(false),
+	m_isDamageCount(false),
+	m_isHitCount(false),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_restartH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
 	m_titleH(LoadGraph("data/image/Title.png")),
 	m_select(kRestart),
-	m_frameScene(0)
+	m_frameScene(0),
+	m_frameHit(0),
+	m_frameDamage(0)
 {
 	m_pCamera = std::make_shared<Camera>();
 	m_pPlayer = std::make_shared<Player>();
@@ -105,13 +109,17 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//カメラのアングルをセットする
 	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
 
+	//メニューを表示していない場合
 	if (!m_isMenu)
 	{
 		m_pPlayer->Update();
-		m_pEnemy->Update(*m_pPlayer);
+		m_pEnemy->Update();
+		m_pStage->Update();
+		m_pSkyDome->Update(*m_pPlayer);
 	}
-	else
+	else //メニューを表示してる場合
 	{
+
 		if (!m_isCommand)
 		{
 			//上方向を押したとき
@@ -172,8 +180,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 	m_pCamera->PlayCameraUpdate(*m_pPlayer);
 
-	m_pStage->Update();
-	m_pSkyDome->Update(*m_pPlayer);
+
 
 	//プレイヤーと敵が当たった場合のフラグの取得
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
@@ -210,18 +217,49 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 	}
 
-	//プレイヤーの攻撃が敵に入った場合
-	if (m_isAttackHit)
+	//攻撃のクールタイム
+	if (!m_isHitCount)
 	{
-		enemyHp -= 1;
-		m_pEnemy->SetHp(enemyHp);
+		//プレイヤーの攻撃が敵に入った場合
+		if (m_isAttackHit)
+		{
+			enemyHp -= 1;
+			m_pEnemy->SetHp(enemyHp);
+			m_isHitCount = true;
+		}
+	}
+	else
+	{
+		m_frameHit++;
+
+		if (m_frameHit >= 30)
+		{
+			m_isHitCount = false;
+			m_frameHit = 0;
+		}
 	}
 
-	//敵の攻撃を受けた場合
-	if (m_isDamageHit)
+	//ダメージのクールタイム
+	if (!m_isDamageCount)
 	{
-		playerHp -= 1;
-		m_pPlayer->SetHp(playerHp);
+		//敵の攻撃を受けた場合
+		if (m_isDamageHit)
+		{
+			playerHp -= 1;
+			m_pPlayer->SetHp(playerHp);
+			m_isDamageCount = true;
+			m_pPlayer->SetDamage(true);
+		}
+	}
+	else
+	{
+		m_frameDamage++;
+
+		if (m_frameDamage >= 120)
+		{
+			m_isDamageCount = false;
+			m_frameDamage = 0;
+		}
 	}
 
 	//プレイヤーのHPがゼロになったら
@@ -245,6 +283,8 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			return std::make_shared<SceneWin>();
 		}
 	}
+
+
 
 	//メニューからタイトルへ
 	if (m_isTitle)

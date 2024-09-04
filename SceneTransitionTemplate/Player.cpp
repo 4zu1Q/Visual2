@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Pad.h"
+#include "Game.h"
 #include <cmath>
 #include <cassert>
 
@@ -37,6 +38,11 @@ namespace
 	constexpr float kAnimChangeFrame = 8.0f;
 	constexpr float kAnimChangeRateSpeed = 1.0f / kAnimChangeFrame;
 
+	//ダメージ
+	constexpr int kDamageCount = 120;
+
+
+
 	//アナログスティックによる移動関連
 	constexpr float kMaxSpeed = 0.5f;		//プレイヤーの最大移動速度
 	constexpr float kAnalogRangeMin = 0.1;	//アナログスティックの入力判定範囲
@@ -70,6 +76,8 @@ Player::Player() :
 	m_isAttack(false),
 	m_isWalk(false),
 	m_isJump(false),
+	m_isDamage(false),
+	m_damageFrame(0),
 	m_hp(10),
 	m_losthp(10),
 	m_hpAnimationHeight(0.0f),
@@ -163,9 +171,6 @@ void Player::Update()
 	bool isLoop = UpdateAnim(m_currentAnimNo);
 	UpdateAnim(m_prevAnimNo);
 
-
-
-
 	//ボタンを押したら攻撃アニメーションを再生する
 	if (!m_isAttack)
 	{
@@ -223,17 +228,15 @@ void Player::Update()
 			//Bボタンを押している間
 			if (Pad::IsPress(PAD_INPUT_1))
 			{
-
-				//動くスピードを1.2倍
-				move = VScale(move, 1.2f);
+				//動くスピードを1.5倍
+				move = VScale(move, 1.5f);
 				//動きを反映
 				m_pos = VAdd(m_pos, move);
 			}
 
-			//VECTOR attackMove = VScale(move, 15.0f);
-			//m_attackPos = VAdd(m_pos, attackMove);
+			VECTOR attackMove = VScale(move, 15.0f);
+			m_attackPos = VAdd(m_pos,attackMove);
 
-			//m_attackPos = VTransform(m_attackPos, mtx);
 
 	}
 	else
@@ -267,7 +270,16 @@ void Player::Update()
 	if (m_pos.z >= 195) m_pos.z = 195;
 	if (m_pos.z <= -195) m_pos.z = -195;
 	
-
+	//ダメージ点滅時間
+	if (m_isDamage)
+	{
+		m_damageFrame++;
+		if (m_damageFrame > kDamageCount)
+		{
+			m_isDamage = false;
+			m_damageFrame = 0;
+		}
+	}
 }
 
 /// <summary>
@@ -275,7 +287,14 @@ void Player::Update()
 /// </summary>
 void Player::Draw()
 {
-	MV1DrawModel(m_modelH);
+
+
+	// 半透明にしてメニュー背景の四角
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+	DrawFillBox(10, 10, 500, 50, 0x000000);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	// 不透明に戻して白い枠
+	DrawLineBox(10, 10, 500, 50, 0x00ffff);
 
 	for (int i = 1; i <= m_losthp; i++)
 	{
@@ -299,8 +318,16 @@ void Player::Draw()
 	DrawFormatString(400, 16, 0xffffff, "PlayerHp:%d", m_hp);
 
 #endif
+	// ダメージ演出  2フレーム間隔で表示非表示切り替え
+	// 0: 表示される
+	// 1: 表示される
+	// 2: 非表示
+	// 3: 非表示
+	// 4: 表示される	...
+	// % 4 することで012301230123... に変換する
+	if (m_damageFrame % 4 >= 2) return;
 
-
+	MV1DrawModel(m_modelH);
 
 }
 

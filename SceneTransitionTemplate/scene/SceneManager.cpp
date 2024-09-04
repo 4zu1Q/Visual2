@@ -47,3 +47,4 @@ void SceneManager::End()
 {
 	m_pScene->End();
 }
+

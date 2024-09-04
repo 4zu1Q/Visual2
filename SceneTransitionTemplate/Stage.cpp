@@ -19,6 +19,7 @@ namespace
 Stage::Stage() :
 	m_modelHandle(-1),
 	m_pos(VGet(0.0f, -5.0f, 0.0f))
+	//m_pos(VGet(200.0f, 400, 0.0f))
 {
 }
 

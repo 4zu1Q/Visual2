@@ -8,7 +8,7 @@ namespace
 	//ファイル名
 	const char* const kSkyDomeFileName = "data/skyDome/Dome.mv1";
 	//スカイドームのスケール
-	const VECTOR kSkyDomeScale = VGet(300, 300, 300);
+	const VECTOR kSkyDomeScale = VGet(5, 5, 5);
 }
 
 SkyDome::SkyDome() :
@@ -31,12 +31,13 @@ void SkyDome::Update(Player& player)
 	m_rot += kRotSpeed;
 
 	//1回転したら値をリセット
-	//if (m_rot >= DX_PI_F) m_rot = 0.0f;
+	if (m_rot >= DX_PI_F) m_rot = 0.0f;
+
+	m_pos = player.GetPos();
 
 	//スカイドームを更新
-	MV1SetRotationXYZ(m_handle, m_pos);
-	//MV1SetPosition(m_handle, player.GetPos());
-	MV1SetPosition(m_handle, VGet(player.GetPos().x, 0.0f, player.GetPos().z));
+	MV1SetRotationXYZ(m_handle, VGet(0, m_rot, 0) );
+	MV1SetPosition(m_handle, m_pos);
 
 }
 

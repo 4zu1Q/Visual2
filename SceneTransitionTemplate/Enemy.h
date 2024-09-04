@@ -14,7 +14,7 @@ public:
 	void Delete();
 
 	void Init();
-	void Update(Player& player);
+	void Update();
 	void Draw();
 
 	//ƒvƒŒƒCƒ„[‚Æ“G‚Ì“–‚½‚è”»’è
@@ -23,6 +23,11 @@ public:
 	bool AttackSphereHitFlag(std::shared_ptr<Player> pPlayer);
 	//“G‚ÌUŒ‚”»’è
 	bool DamageSphereHitFlag(std::shared_ptr<Player> pPlayer);
+	//“G‚Ìõ“G”ÍˆÍ
+	bool SearchSphereHitFlag(std::shared_ptr<Player> pPlayer);
+	//“G‚ª~‚Ü‚é”ÍˆÍ
+	bool StopSphereHitFlag(std::shared_ptr<Player> pPlayer);
+
 
 
 	float GetRadius() { return m_radius; }
@@ -46,6 +51,8 @@ public:
 
 private:
 
+	std::shared_ptr<Player> m_pPlayer;
+
 	//ƒ‚ƒfƒ‹ƒnƒ“ƒhƒ‹
 	//int m_modelHandle[8];
 	int m_modelHandle;
@@ -62,6 +69,8 @@ private:
 
 	//“–‚½‚è”»’è‚Ì”¼Œa
 	float m_radius;
+	float m_searchRadius;
+	float m_stopRadius;
 
 	//State•Ï”
 	State m_state;

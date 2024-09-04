@@ -27,11 +27,13 @@ Enemy::Enemy() :
 	m_outlinePsH(-1),
 	m_outlineVsH(-1),
 	m_radius(6.0f),
-	m_hp(50),
+	m_searchRadius(70.0f),
+	m_stopRadius(20.0f),
+	m_hp(20),
 	m_pos(VGet(0, 0, 0)),
 	m_attackPos(VGet(0,0,0))
 {
-
+	m_pPlayer = std::make_shared<Player>();
 }
 
 /// <summary>
@@ -51,11 +53,6 @@ void Enemy::Load()
 	//m_modelHandle[0] = MV1LoadModel(kEnemyModelFilename);
 	m_modelHandle = MV1LoadModel(kEnemyModelFilename);
 
-	//for (int i = 1; i < 9; i++)
-	//{
-	//	m_modelHandle[i] = MV1DuplicateModel(m_modelHandle[0]);
-	//}
-
 	//ShaderLoad();
 }
 
@@ -64,11 +61,6 @@ void Enemy::Load()
 /// </summary>
 void Enemy::Delete()
 {
-	//for (int i = 0; i < 9; i++)
-	//{
-	//	MV1DeleteModel(m_modelHandle[i]);
-	//	m_modelHandle[i] = -1;
-	//}
 	MV1DeleteModel(m_modelHandle);
 	m_modelHandle = -1;
 }
@@ -80,13 +72,9 @@ void Enemy::Init()
 {
 	m_pos = VGet(-60.0f, 0.0f, 0.0f);
 	m_attackPos = VGet(m_pos.x, m_pos.y, m_pos.z - 10);
-	//for (int i = 0; i < 9; i++)
-	//{
-	//	//敵の初期位置設定
-	//	MV1SetPosition(m_modelHandle[i], m_pos);
-	//	//敵のスケール
-	//	MV1SetScale(m_modelHandle[i], VGet(10, 10, 10));
-	//}
+
+
+
 	MV1SetPosition(m_modelHandle, m_pos);
 	//敵のスケール
 	MV1SetScale(m_modelHandle, VGet(10, 10, 10));
@@ -95,13 +83,41 @@ void Enemy::Init()
 /// <summary>
 /// アップデート
 /// </summary>
-void Enemy::Update(Player& player)
+void Enemy::Update()
 {
-	VECTOR enemyToPlayer = VSub(player.GetPos(), m_pos);
+	VECTOR enemyToPlayer = VSub(m_pPlayer->GetPos(), m_pos);
+	bool isSearch = SearchSphereHitFlag(m_pPlayer);
+	bool isStop = StopSphereHitFlag(m_pPlayer);
+
+	if (isSearch)
+	{
+		m_state = kRun;
+	}
+	
+	if (isStop)
+	{
+		m_state = kAttack;
+	}
 
 
+	
 
+	if (m_state == kIdle)			//止まっている状態
+	{
 
+	}
+	else if (m_state == kRun)		//プレイヤーを追っている状態
+	{
+
+	}
+	else if (m_state == kAttack)	//攻撃の状態
+	{
+
+	}
+	else if (m_state == kPowerAttack)//溜め攻撃の状態
+	{
+
+	}
 
 	MV1SetPosition(m_modelHandle, m_pos);
 }
@@ -111,15 +127,14 @@ void Enemy::Update(Player& player)
 /// </summary>
 void Enemy::Draw()
 {
-	//for (int i = 0; i < 9; i++)
-	//{
-	//	MV1DrawModel(m_modelHandle[i]);
-	//}
+
 	MV1DrawModel(m_modelHandle);
 
 #ifdef _DEBUG
 
 	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
+	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_searchRadius, 8, 0xffffff, 0xffffff, false);
+	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_stopRadius, 8, 0xffffff, 0xffffff, false);
 	DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xf00fff, 0xffffff, false);
 	DrawFormatString(0, 32, 0xffffff, "Enemy(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(400, 32, 0xffffff, "EnemyHp:%d", m_hp);
@@ -189,6 +204,47 @@ bool Enemy::DamageSphereHitFlag(std::shared_ptr<Player> pPlayer)
 
 	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
 	if (Distance < m_radius + pPlayer->GetRadius())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Enemy::SearchSphereHitFlag(std::shared_ptr<Player> pPlayer)
+{
+
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_pos.x - pPlayer->GetPos().x) * (m_pos.x - pPlayer->GetPos().x);
+	float delY = ((m_pos.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY)) *
+		((m_pos.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY));
+	float delZ = (m_pos.z - pPlayer->GetPos().z) * (m_pos.z - pPlayer->GetPos().z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_searchRadius + pPlayer->GetRadius())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Enemy::StopSphereHitFlag(std::shared_ptr<Player> pPlayer)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_pos.x - pPlayer->GetPos().x) * (m_pos.x - pPlayer->GetPos().x);
+	float delY = ((m_pos.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY)) *
+		((m_pos.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY));
+	float delZ = (m_pos.z - pPlayer->GetPos().z) * (m_pos.z - pPlayer->GetPos().z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_searchRadius + pPlayer->GetRadius())
 	{
 		return true;
 	}

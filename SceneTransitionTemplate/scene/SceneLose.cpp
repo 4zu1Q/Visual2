@@ -45,7 +45,7 @@ SceneLose::SceneLose() :
 	m_isInterval(false),
 	m_isCommand(false),
 	m_select(kRetry),
-	m_gameoverH(LoadGraph("data/image/Gameclear.png")),
+	m_gameoverH(LoadGraph("data/image/GameOver.png")),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_retryH(LoadGraph("data/image/Retry.png")),
 	m_titleH(LoadGraph("data/image/Title.png"))
@@ -175,7 +175,7 @@ void SceneLose::Draw()
 
 #ifdef _DEBUG
 	DrawFormatString(0, 16, 0xffffff, "Select:%d", m_select);
-	DrawString(0, 0, "Scene Win", 0xffffff, false);
+	DrawString(0, 0, "Scene Lose", 0xffffff, false);
 #endif
 
 }

@@ -131,6 +131,7 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 			}
 			else if (m_select == kGameEnd)
 			{
+				bool isClose = true;
 				m_isCommand = true;
 			}
 		}

@@ -43,6 +43,8 @@ private:
 
 	//フレーム関係
 	int m_frameScene;
+	int m_frameHit;
+	int m_frameDamage;
 
 	//フェードフラグ
 	bool m_isInterval;
@@ -62,6 +64,8 @@ private:
 	//メニュー
 	bool m_isMenu;
 
+	bool m_isDamageCount;
+	bool m_isHitCount;
 	bool m_isCommand;
 
 };
