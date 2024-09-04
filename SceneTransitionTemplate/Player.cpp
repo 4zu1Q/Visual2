@@ -76,6 +76,7 @@ Player::Player() :
 	m_cameraAngle(0.0f),
 	m_angle(0.0f),
 	m_radius(6.0f),
+	m_attackRadius(12.0f),
 	m_isAttack(false),
 	m_isWalk(false),
 	m_isJump(false),
@@ -183,6 +184,8 @@ void Player::Update()
 			m_isAttack = true;
 			ChangeAnim(kAttackAnimIndex);
 		}
+
+
 
 			m_isWalk = true;
 
@@ -315,6 +318,7 @@ void Player::Draw()
 
 	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
 	DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xff00ff, 0xff00ff, false);
+	DrawSphere3D(VAdd(m_attackPos,VGet(0, 8, 0)), m_attackRadius, 8, 0xff00ff, 0xff00ff, false);
 
 	DrawFormatString(0, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(800, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_attackPos.x, m_attackPos.y, m_attackPos.z);

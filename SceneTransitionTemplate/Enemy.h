@@ -21,13 +21,14 @@ public:
 	bool SphereHitFlag(std::shared_ptr<Player> pPlayer);
 	//ƒvƒŒƒCƒ„[‚ÌUŒ‚‚Æ“G‚Ì“–‚½‚è”»’è
 	bool AttackSphereHitFlag(std::shared_ptr<Player> pPlayer);
+	//ƒvƒŒƒCƒ„[‚ÌUŒ‚
+	bool AttackSphereHitFlag(std::shared_ptr<Player> pPlayer);
 	//“G‚ÌUŒ‚”»’è
 	bool DamageSphereHitFlag(std::shared_ptr<Player> pPlayer);
 	//“G‚Ìõ“G”ÍˆÍ
-	bool SearchSphereHitFlag(std::shared_ptr<Player> pPlayer);
+	bool SearchSphereFlag(std::shared_ptr<Player> pPlayer);
 	//“G‚ª~‚Ü‚é”ÍˆÍ
-	bool StopSphereHitFlag(std::shared_ptr<Player> pPlayer);
-
+	bool StopSphereFlag(std::shared_ptr<Player> pPlayer);
 
 
 	float GetRadius() { return m_radius; }

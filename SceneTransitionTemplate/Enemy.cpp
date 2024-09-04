@@ -86,8 +86,8 @@ void Enemy::Init()
 void Enemy::Update()
 {
 	VECTOR enemyToPlayer = VSub(m_pPlayer->GetPos(), m_pos);
-	bool isSearch = SearchSphereHitFlag(m_pPlayer);
-	bool isStop = StopSphereHitFlag(m_pPlayer);
+	bool isSearch = SearchSphereFlag(m_pPlayer);
+	bool isStop = StopSphereFlag(m_pPlayer);
 
 	if (isSearch)
 	{
@@ -211,7 +211,7 @@ bool Enemy::DamageSphereHitFlag(std::shared_ptr<Player> pPlayer)
 	return false;
 }
 
-bool Enemy::SearchSphereHitFlag(std::shared_ptr<Player> pPlayer)
+bool Enemy::SearchSphereFlag(std::shared_ptr<Player> pPlayer)
 {
 
 	//X,Y,Z‚Ì‹——£‚Ì¬•ª‚ğæ“¾
@@ -232,7 +232,7 @@ bool Enemy::SearchSphereHitFlag(std::shared_ptr<Player> pPlayer)
 	return false;
 }
 
-bool Enemy::StopSphereHitFlag(std::shared_ptr<Player> pPlayer)
+bool Enemy::StopSphereFlag(std::shared_ptr<Player> pPlayer)
 {
 	//X,Y,Z‚Ì‹——£‚Ì¬•ª‚ğæ“¾
 	float delX = (m_pos.x - pPlayer->GetPos().x) * (m_pos.x - pPlayer->GetPos().x);

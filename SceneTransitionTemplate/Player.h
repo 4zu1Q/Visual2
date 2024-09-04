@@ -116,6 +116,7 @@ private:
 
 	//“–‚½‚è”»’è‚Ì”¼Œa
 	float m_radius;
+	float m_attackRadius;
 
 	//ƒJƒƒ‰î•ñ
 	float m_cameraAngle;
