@@ -47,6 +47,7 @@ private:
 	int m_startH;
 	int m_optionH;
 	int m_endH;
+	int m_operatorH;
 	int m_selectH;
 	int m_backgroundH;
 

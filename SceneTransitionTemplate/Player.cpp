@@ -63,6 +63,9 @@ namespace
 /// </summary>
 Player::Player() :
 	m_modelH(-1),
+	m_pos(VGet(0,0,0)),
+	m_attackPos(VGet(0,0,0)),
+	m_attackDir(VGet(0,0,0)),
 	m_hpH(LoadGraph(kHpFilename)),
 	m_losthpH(LoadGraph(kLostHpFilename)),
 	m_outlinePsH(-1),
@@ -221,6 +224,7 @@ void Player::Update()
 			if (VSquareSize(move) > 0.0f)
 			{
 				m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+				m_attackDir = VNorm(move);
 			}
 
 			m_pos = VAdd(m_pos, move);
@@ -233,8 +237,8 @@ void Player::Update()
 				//“®‚«‚ð”½‰f
 				m_pos = VAdd(m_pos, move);
 			}
-
-			VECTOR attackMove = VScale(move, 15.0f);
+			
+			VECTOR attackMove = VScale(m_attackDir, 12.0f);
 			m_attackPos = VAdd(m_pos,attackMove);
 
 

@@ -98,7 +98,7 @@ private:
 	//•\¦î•ñ
 	VECTOR m_pos;
 	VECTOR m_attackPos;
-
+	VECTOR m_attackDir;
 
 	float m_angle;
 

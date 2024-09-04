@@ -79,12 +79,11 @@ void Camera::PlayCameraUpdate(Player& player)
 
 	// カメラに位置を反映
 	//注視点の座標
-	VECTOR playerAimPos = VGet(player.GetPos().x, player.GetPos().y + 20.0f, player.GetPos().z - 50.0f);
+	VECTOR playerAimPos = VGet(player.GetPos().x, player.GetPos().y + 20.0f, player.GetPos().z );
 	//ベクトルの方向(注視点-カメラのポジション)
 	VECTOR posToAim = VSub(playerAimPos, m_pos);
 
-	//現在位置に設定したポジションを足す
-	m_pos = VAdd(m_pos, posToAim);
+	
 
 	//VECTOR pos = VSub(m_pos,playerAimPos);
 	//pos = VNorm(pos);
@@ -133,9 +132,11 @@ void Camera::PlayCameraUpdate(Player& player)
 	m_pos.y += kCameraHeight;
 	m_pos.z += sinf(m_angle) * kCameraDist;
 
+	//現在位置に設定したポジションを足す
+	m_pos = VAdd(m_pos, posToAim);
 	//SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
 	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
-
+	//DrawSphere3D(m_pos, 30, 6, 0xff0000, 0xff0000, true);
 
 }
 

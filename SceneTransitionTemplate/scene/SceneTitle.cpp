@@ -58,6 +58,7 @@ SceneTitle::SceneTitle() :
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_startH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
+	m_operatorH(LoadGraph("data/image/Operator.png")),
 	m_endH(LoadGraph("data/image/End.png"))
 {
 }
@@ -266,10 +267,9 @@ void SceneTitle::Draw()
 		DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
 		DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
 	}
-	else	
+	
+	if(m_isOption)
 	{
-		if (!m_isOperator && !m_isSound && !m_isFullScreen)
-		{
 			// 半透明にしてメニュー背景の四角
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
 			DrawFillBox(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, 0x000000);
@@ -295,24 +295,22 @@ void SceneTitle::Draw()
 			DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
 			DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
 			DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
-		}
-
 	}
 
-	if (m_isOperator)
-	{
-		DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
-	}
+	//if (m_isOperator)
+	//{
+	//	DrawGraph(100, 100, m_operatorH, true); //スタート
+	//}
 
-	if (m_isSound)
-	{
-		DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
-	}
+	//if (m_isSound)
+	//{
+	//	DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
+	//}
 
-	if (m_isFullScreen)
-	{
-		DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
-	}
+	//if (m_isFullScreen)
+	//{
+	//	DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
+	//}
 
 
 	//フェード暗幕
