@@ -1,12 +1,15 @@
 #pragma once
 #include "SceneBase.h"
 #include "Camera.h"
+#include <vector>
+#include <memory>
 
 class Camera;
 class Player;
 class Enemy;
 class Stage;
 class SkyDome;
+class ItemBase;
 class ScenePlaying :
     public SceneBase
 {
@@ -18,6 +21,11 @@ public:
 	virtual std::shared_ptr<SceneBase> Update();	//毎フレーム行う更新処理
 	virtual void Draw();	//毎フレーム行う描画処理
 	virtual void End();	//シーンを抜けるときの処理
+
+private:
+
+	void CreateItemHp(VECTOR pos);	//HPを回復するアイテムを生成
+
 
 private:
 
@@ -34,6 +42,7 @@ private:
 	std::shared_ptr<Enemy> m_pEnemy;
 	std::shared_ptr<Stage> m_pStage;
 	std::shared_ptr<SkyDome> m_pSkyDome;
+	std::vector<ItemBase*> m_pItem;
 
 	//ハンドル変数
 	int m_restartH;
@@ -41,9 +50,13 @@ private:
 	int m_titleH;
 	int m_selectH;
 
+	//モデル変数
+	int m_modelHeartH;
+
 	//フレーム関係
 	int m_frameScene;
-	int m_frameHit;
+	int m_attackFrameHit;
+	int m_skillFrameHit;
 	int m_frameDamage;
 
 	//フェードフラグ
@@ -54,6 +67,7 @@ private:
 	bool m_isPlayerHit;	//プレイヤーと敵があった場合
 	bool m_isAttackHit;	//プレイヤーの攻撃が当たった場合
 	bool m_isDamageHit;	//敵の攻撃が当たった場合
+	bool m_isSkillHit;
 
 	float m_selectAnimation;
 
@@ -65,7 +79,8 @@ private:
 	bool m_isMenu;
 
 	bool m_isDamageCount;
-	bool m_isHitCount;
+	bool m_isAttackHitCount;
+	bool m_isSkillHitCount;
 	bool m_isCommand;
 
 };

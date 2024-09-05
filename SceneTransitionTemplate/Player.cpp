@@ -13,6 +13,9 @@ namespace
 	//モデルのファイル名
 	const char* const kPlayerModelFilename = "data/model/player/barbarian.mv1";
 
+	//モデルの向いてる位置の初期化
+	constexpr float kInitAngle = 3.143059f;
+
 	//モデル用の定数
 	constexpr float kScale = 10.0f;
 
@@ -30,6 +33,7 @@ namespace
 	constexpr int kWalkAnimIndex = 2;		//歩き
 	constexpr int kRunAnimIndex = 7;		//走り
 	constexpr int kAttackAnimIndex = 30;	//攻撃
+	constexpr int kSkillAnimIndex = 41;	//スキル
 	constexpr int kDamageAnimIndex = 25;	//ダメージ
 	constexpr int kFallAnimIndex = 26;		//倒れる
 	constexpr int kFallingAnimIndex = 27;	//倒れ中
@@ -74,19 +78,25 @@ Player::Player() :
 	m_prevAnimNo(-1),
 	m_animBlendRate(0.0f),
 	m_cameraAngle(0.0f),
-	m_angle(0.0f),
+	m_angle(kInitAngle),
 	m_radius(6.0f),
-	m_attackRadius(12.0f),
-	m_isAttack(false),
+	m_skillRadius(12.0f),
 	m_isWalk(false),
 	m_isJump(false),
 	m_isDamage(false),
+	m_isDash(false),
+	m_isAttack(false),
+	m_isSkill(false),
+	m_isAttackGeneration(false),
+	m_isSkillGeneration(false),
 	m_damageFrame(0),
 	m_hp(10),
 	m_losthp(10),
 	m_hpAnimationHeight(0.0f),
-	m_animIndex(AnimKind::kNone),
-	m_animationIndex(-1)
+	m_animKind(AnimKind::kIdle),
+	m_animationIndex(-1),
+	m_analogX(0.0f),
+	m_analogZ(0.0f)
 {
 
 }
@@ -107,13 +117,6 @@ void Player::Load()
 	//モデルのロード
 	m_modelH = MV1LoadModel(kPlayerModelFilename);
 	assert(m_modelH > -1);
-
-	//アニメーションのブレンド率を初期化
-	m_animBlendRate = 1.0f;
-
-	//初期状態ではアニメーションはアタッチされていないにする
-	m_currentPlayAnim = -1;
-	m_prevPlayAnim = -1;
 
 	//アニメーションを再生
 
@@ -143,13 +146,12 @@ void Player::Init()
 	m_animBlendRate = 1.0f;
 
 	//プレイヤーの初期位置設定
-	m_pos = VGet(0.0f, 0.0f, -30.0f);
-	m_attackPos = VGet(m_pos.x, m_pos.y, m_pos.z - 10);
+	m_pos = VGet(0.0f, 0.0f, -170.0f);
 
 	MV1SetPosition(m_modelH, m_pos);
 	MV1SetScale(m_modelH, VGet(kScale, kScale, kScale));
 
-	m_isAttack = false;
+
 }
 
 /// <summary>
@@ -175,88 +177,58 @@ void Player::Update()
 	bool isLoop = UpdateAnim(m_currentAnimNo);
 	UpdateAnim(m_prevAnimNo);
 
-	//ボタンを押したら攻撃アニメーションを再生する
-	if (!m_isAttack)
-	{
 
-		if (Pad::IsTrigger PAD_INPUT_3)
+
+	//ボタンを押したら攻撃アニメーションを再生する
+	if (!m_isAttack && !m_isSkill)
+	{
+		//攻撃
+		if (Pad::IsPress(PAD_INPUT_3))
 		{
+			
 			m_isAttack = true;
 			ChangeAnim(kAttackAnimIndex);
+			m_isMove = true;
+
+		}
+		else
+		{
+			if (m_isMove)
+			{
+				Move();
+			}
 		}
 
-
-
-			m_isWalk = true;
-
-			//アナログスティックを使って移動
-			int analogX = 0;
-			int analogZ = 0;
-
-			GetJoypadAnalogInput(&analogX, &analogZ, DX_INPUT_PAD1);
-			//アナログスティックの入力の10% ~ 80%の範囲を使用する
-
-			//ベクトルの長さが最大で1000になる
-			//プレイヤーの最大移動速度は0.01f / frame
-
-			VECTOR move = VGet(analogX, 0.0f, -analogZ);	//ベクトルの長さは0～1000
-
-			//0.00 ~ 0.01の長さにする
-			//ベクトルの長さを取得する
-			float len = VSize(move);
-			//ベクトルの長さを0.0~1.0の割合に変換する
-			float rate = len / kAnalogInputMax;
-
-			//アナログスティック無効な範囲を除外する
-			rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-			rate = min(rate, 1.0f);
-			rate = max(rate, 0.0f);
-
-			//速度が決定できるので移動ベクトルに反映する
-			move = VNorm(move);
-			float speed = kMaxSpeed * rate;
-			move = VScale(move, speed);
-
-			//カメラのいる場所(角度)から
-			//コントローラーによる移動方向を決定する
-			MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
-			move = VTransform(move, mtx);
-
-			//移動方向からプレイヤーの向く方向を決定する
-			//移動していない場合(ゼロベクトル)の場合は変更しない
-			if (VSquareSize(move) > 0.0f)
+		//スキル攻撃
+		if (Pad::IsPress(PAD_INPUT_4))
+		{
+			m_isSkill = true;
+			ChangeAnim(kSkillAnimIndex);
+			m_isMove = false;
+		}
+		else
+		{
+			if (!m_isMove)
 			{
-				m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-				m_attackDir = VNorm(move);
+				Move();
 			}
-
-			m_pos = VAdd(m_pos, move);
-
-			//Bボタンを押している間
-			if (Pad::IsPress(PAD_INPUT_1))
-			{
-				//動くスピードを1.5倍
-				move = VScale(move, 1.5f);
-				//動きを反映
-				m_pos = VAdd(m_pos, move);
-			}
-			
-			VECTOR attackMove = VScale(m_attackDir, 12.0f);
-			m_attackPos = VAdd(m_pos,attackMove);
-
+		}
 
 	}
 	else
 	{
+
 		//攻撃アニメーションが終了したら待機アニメーションを再生する
 		if (isLoop)
 		{
 			m_isAttack = false;
+			m_isSkill = false;
+			//m_isWalk = false;
+			m_isDash = false;
+
 			ChangeAnim(kIdleAnimIndex);
 		}
 		
-			
-
 	}
 
 	MV1SetPosition(m_modelH, m_pos);
@@ -287,6 +259,20 @@ void Player::Update()
 			m_damageFrame = 0;
 		}
 	}
+
+	if (m_isAttack)
+	{
+		//プレイヤーが攻撃したら生成するためのフラグがtrueになる
+		m_isAttackGeneration = true;
+	}
+	else m_isAttackGeneration = false;
+
+	if (m_isSkill)
+	{
+		//プレイヤーがスキルを使用したら生成するためのフラグがtrueになる
+		m_isSkillGeneration = true;
+	}
+	else m_isSkillGeneration = false;
 }
 
 /// <summary>
@@ -294,8 +280,6 @@ void Player::Update()
 /// </summary>
 void Player::Draw()
 {
-
-
 	// 半透明にしてメニュー背景の四角
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
 	DrawFillBox(10, 10, 500, 50, 0x000000);
@@ -317,13 +301,35 @@ void Player::Draw()
 #ifdef _DEBUG
 
 	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
-	DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xff00ff, 0xff00ff, false);
-	DrawSphere3D(VAdd(m_attackPos,VGet(0, 8, 0)), m_attackRadius, 8, 0xff00ff, 0xff00ff, false);
+	//当たり判定が生成されているかどうか
+	if (!m_isSkill)
+	{
+		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_skillRadius, 8, 0xff00ff, 0xff00ff, false);
+	}
+	else
+	{
+		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_skillRadius, 8, 0x0000ff, 0x0000ff, false);
+	}
+
+	if (!m_isAttack)
+	{
+		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xff00ff, 0xff00ff, false);
+	}
+	else
+	{
+		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0x0000ff, 0x0000ff, false);
+	}
 
 	DrawFormatString(0, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(800, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_attackPos.x, m_attackPos.y, m_attackPos.z);
 
 	DrawFormatString(400, 16, 0xffffff, "PlayerHp:%d", m_hp);
+	DrawFormatString(400, 48, 0xffffff, "AttackFlag:%f", m_isSkill);
+	DrawFormatString(400, 64, 0xffffff, "PlayerAngle:%f", m_angle);
+
+
+	DrawFormatString(400, 96, 0xffffff, "PlayerLeftAngle(x:%f,z:%f)", m_analogX, m_analogZ);
+
 
 #endif
 	// ダメージ演出  2フレーム間隔で表示非表示切り替え
@@ -464,4 +470,93 @@ void Player::PlayAnim(AnimKind playAnim)
 
 void Player::AttackCol(VECTOR pos)
 {
+}
+
+void Player::Move()
+{
+
+	//アナログスティックを使って移動
+	int analogX = 0;
+	int analogZ = 0;
+
+	GetJoypadAnalogInput(&analogX, &analogZ, DX_INPUT_PAD1);
+	//アナログスティックの入力の10% ~ 80%の範囲を使用する
+
+	//ベクトルの長さが最大で1000になる
+	//プレイヤーの最大移動速度は0.01f / frame
+
+	VECTOR move = VGet(analogX, 0.0f, -analogZ);	//ベクトルの長さは0～1000
+
+	m_analogX = analogX;
+	m_analogZ = analogZ;
+
+	//0.00 ~ 0.01の長さにする
+	//ベクトルの長さを取得する
+	float len = VSize(move);
+	//ベクトルの長さを0.0~1.0の割合に変換する
+	float rate = len / kAnalogInputMax;
+
+	//アナログスティック無効な範囲を除外する
+	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	rate = min(rate, 1.0f);
+	rate = max(rate, 0.0f);
+
+	//速度が決定できるので移動ベクトルに反映する
+	move = VNorm(move);
+	float speed = kMaxSpeed * rate;
+	move = VScale(move, speed);
+
+	//カメラのいる場所(角度)から
+	//コントローラーによる移動方向を決定する
+	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
+	move = VTransform(move, mtx);
+
+	//if()
+	//{
+	//	m_isWalk = true;
+	//}
+	//else
+	//{
+	//	m_isWalk = false;
+	//}
+
+	if (m_isWalk)
+	{
+		ChangeAnim(kWalkAnimIndex);
+	}
+
+
+	//移動方向からプレイヤーの向く方向を決定する
+	//移動していない場合(ゼロベクトル)の場合は変更しない
+	if (VSquareSize(move) > 0.0f)
+	{
+		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+		m_attackDir = VNorm(move);
+
+	}
+
+	m_pos = VAdd(m_pos, move);
+
+	if (!m_isDash)
+	{
+		//Bボタンを押している間
+		if (Pad::IsPress(PAD_INPUT_1))
+		{
+
+			//動くスピードを1.5倍
+			move = VScale(move, 1.5f);
+			//動きを反映
+			m_pos = VAdd(m_pos, move);
+
+			m_isDash = true;
+			ChangeAnim(kRunAnimIndex);
+
+		}
+	}
+
+
+
+
+	VECTOR attackMove = VScale(m_attackDir, 12.0f);
+	m_attackPos = VAdd(m_pos, attackMove);
 }

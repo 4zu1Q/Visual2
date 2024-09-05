@@ -85,7 +85,7 @@ std::shared_ptr<SceneBase> SceneDebug::Update()
 		}
 	}
 
-	if (Pad::IsTrigger(PAD_INPUT_1))
+	if (Pad::IsTrigger(PAD_INPUT_1) )
 	{
 		if (m_select == kSceneDebug)
 		{

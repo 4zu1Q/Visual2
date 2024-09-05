@@ -4,7 +4,7 @@
 namespace
 {
 	//回転速度
-	constexpr float kRotSpeed = 0.0004f;
+	constexpr float kRotSpeed = 0.0009f;
 	//ファイル名
 	const char* const kSkyDomeFileName = "data/skyDome/Dome.mv1";
 	//スカイドームのスケール
@@ -33,7 +33,7 @@ void SkyDome::Update(Player& player)
 	//1回転したら値をリセット
 	if (m_rot >= DX_PI_F) m_rot = 0.0f;
 
-	m_pos = player.GetPos();
+	//m_pos = player.GetPos();
 
 	//スカイドームを更新
 	MV1SetRotationXYZ(m_handle, VGet(0, m_rot, 0) );

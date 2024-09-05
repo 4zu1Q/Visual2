@@ -102,13 +102,13 @@ void Camera::PlayCameraUpdate(Player& player)
 
 	if (analogX >= 10)
 	{
-		m_angle += 0.05f;
+		m_angle -= 0.05f;
 
 	}
 
 	if (analogX <= -10)
 	{
-		m_angle -= 0.05f;
+		m_angle += 0.05f;
 
 	}
 
@@ -116,16 +116,16 @@ void Camera::PlayCameraUpdate(Player& player)
 	m_targetPos = player.GetPos();
 
 	//Šî€ƒxƒNƒgƒ‹
-	VECTOR Direction = VGet(0.0f, 0.0f, 50.0f);
+	//VECTOR Direction = VGet(0.0f, 0.0f, 50.0f);
 
-	// ‚wŽ²‰ñ“]s—ñ
-	MATRIX MatrixX = MGetRotX(m_cameraangle.x);
-	// ‚xŽ²‰ñ“]s—ñ
-	MATRIX MatrixY = MGetRotY(m_cameraangle.y);
-	// s—ñ‚Ì‡¬
-	MATRIX Matrix = MMult(MatrixX, MatrixY);
-	// Šî€ƒxƒNƒgƒ‹‚ðs—ñ‚Å•ÏŠ·
-	Direction = VTransform(Direction, Matrix);
+	//// ‚wŽ²‰ñ“]s—ñ
+	//MATRIX MatrixX = MGetRotX(m_cameraangle.x);
+	//// ‚xŽ²‰ñ“]s—ñ
+	//MATRIX MatrixY = MGetRotY(m_cameraangle.y);
+	//// s—ñ‚Ì‡¬
+	//MATRIX Matrix = MMult(MatrixX, MatrixY);
+	//// Šî€ƒxƒNƒgƒ‹‚ðs—ñ‚Å•ÏŠ·
+	//Direction = VTransform(Direction, Matrix);
 
 
 	m_pos.x += cosf(m_angle) * kCameraDist;
@@ -176,6 +176,7 @@ void Camera::TargetCameraUpadate()
 
 void Camera::DrawGrid()
 {
+#ifdef _DEBUG
 	for (int x = -200; x <= 200; x += 10)
 	{
 		DrawLine3D(VGet(static_cast<float>(x), 0, -200), VGet(static_cast<float>(x), 0, 200), 0xffff00);
@@ -195,7 +196,6 @@ void Camera::DrawGrid()
 	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -200));
 	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
 
-#ifdef _DEBUG
 	DrawFormatString(0, 64, 0xffffff, "Camera(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
 
 #endif

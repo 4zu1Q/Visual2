@@ -18,6 +18,8 @@ public:
 	void SetCameraAngle(float angle) { m_cameraAngle = angle; }
 	//半径の取得
 	float GetRadius() { return m_radius; }
+	//スキルの半径
+	float GetSkillRadius() { return m_skillRadius; }
 
 	//プレイヤーの座標を取得
 	const VECTOR& GetPos() const { return m_pos; }
@@ -27,9 +29,15 @@ public:
 	const VECTOR& GetAttackPos() const { return m_attackPos; }
 	void SetAttackPos(const VECTOR attackPos) { m_attackPos = attackPos; }
 
+
 	//プレイヤーのHPを取得
 	const int& GetHp() const { return m_hp; }
 	void SetHp(const int hp) { m_hp = hp; }
+
+	//プレイヤーの攻撃の当たり判定を生成するかのフラグを取得
+	const bool& GetAttackGeneration() const { return m_isAttackGeneration; }
+	const bool& GetSkillGeneration() const { return m_isSkillGeneration; }
+	
 
 	//プレイヤーの攻撃の座標を取得
 	void OnGimmickHitUpdate();
@@ -53,10 +61,11 @@ public:
 	{
 		kNone = -1,	//なし
 		kUnknown,	//不明
-		kIdle = 1,		//待機
-		kWalk = 2,		//歩き
+		kIdle,		//待機
+		kWalk,		//歩き
 		kRun,		//走り
-		kAttack = 30,	//攻撃
+		kAttack,	//攻撃
+		kSkill,		//スキル
 		kJump,		//ジャンプ
 		kBigJump,	//大ジャンプ
 		kFall,		//落下中
@@ -79,6 +88,9 @@ private:
 
 	void AttackCol(VECTOR pos);
 
+	//移動関数
+	void Move();
+
 private:
 	//モデルハンドル
 	int m_modelH;
@@ -95,6 +107,9 @@ private:
 	int m_hp;
 	int m_losthp;
 
+	float m_analogX;
+	float m_analogZ;
+
 	//表示情報
 	VECTOR m_pos;
 	VECTOR m_attackPos;
@@ -104,10 +119,11 @@ private:
 
 	//攻撃中フラグ
 	bool m_isAttack;
+	bool m_isSkill;
 
 	bool m_isWalk;
 	bool m_isJump;
-
+	bool m_isDash;
 	//アニメーション情報
 	int m_currentAnimNo;	//現在のアニメーション
 	int m_prevAnimNo;		//変更前のアニメーション
@@ -116,7 +132,11 @@ private:
 
 	//当たり判定の半径
 	float m_radius;
-	float m_attackRadius;
+	float m_skillRadius;
+
+	//当たり判定の発生フラグ
+	bool m_isAttackGeneration;
+	bool m_isSkillGeneration;
 
 	//カメラ情報
 	float m_cameraAngle;
@@ -136,7 +156,7 @@ private:
 	bool m_isDamage;
 
 	//State m_currentState;
-	AnimKind m_animIndex;
+	AnimKind m_animKind;
 	int m_animationIndex;
 };
 

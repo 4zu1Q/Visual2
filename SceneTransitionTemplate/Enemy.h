@@ -21,8 +21,8 @@ public:
 	bool SphereHitFlag(std::shared_ptr<Player> pPlayer);
 	//ƒvƒŒƒCƒ„[‚ÌUŒ‚‚Æ“G‚Ì“–‚½‚è”»’è
 	bool AttackSphereHitFlag(std::shared_ptr<Player> pPlayer);
-	//ƒvƒŒƒCƒ„[‚ÌUŒ‚
-	bool AttackSphereHitFlag(std::shared_ptr<Player> pPlayer);
+	//ƒvƒŒƒCƒ„[‚Ì•KE‹Z‚Æ“G‚Ì“–‚½‚è”»’è
+	bool SkillSphereHitFlag(std::shared_ptr<Player> pPlayer);
 	//“G‚ÌUŒ‚”»’è
 	bool DamageSphereHitFlag(std::shared_ptr<Player> pPlayer);
 	//“G‚Ìõ“G”ÍˆÍ

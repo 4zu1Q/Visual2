@@ -73,8 +73,6 @@ void Enemy::Init()
 	m_pos = VGet(-60.0f, 0.0f, 0.0f);
 	m_attackPos = VGet(m_pos.x, m_pos.y, m_pos.z - 10);
 
-
-
 	MV1SetPosition(m_modelHandle, m_pos);
 	//敵のスケール
 	MV1SetScale(m_modelHandle, VGet(10, 10, 10));
@@ -89,15 +87,19 @@ void Enemy::Update()
 	bool isSearch = SearchSphereFlag(m_pPlayer);
 	bool isStop = StopSphereFlag(m_pPlayer);
 
-	if (isSearch)
+	//サーチしたら
+	if (isSearch && !isStop)
 	{
 		m_state = kRun;
 	}
 	
+	//止まったら攻撃
 	if (isStop)
 	{
 		m_state = kAttack;
 	}
+
+	//m_pos.x++;
 
 
 	
@@ -118,6 +120,14 @@ void Enemy::Update()
 	{
 
 	}
+
+	//m_attackPos = m_pos;
+
+	//移動範囲
+	if (m_pos.x >= 195) m_pos.x = 195;
+	if (m_pos.x <= -195) m_pos.x = -195;
+	if (m_pos.z >= 195) m_pos.z = 195;
+	if (m_pos.z <= -195) m_pos.z = -195;
 
 	MV1SetPosition(m_modelHandle, m_pos);
 }
@@ -189,6 +199,27 @@ bool Enemy::AttackSphereHitFlag(std::shared_ptr<Player> pPlayer)
 	}
 
 	return false;
+}
+
+bool Enemy::SkillSphereHitFlag(std::shared_ptr<Player> pPlayer)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_pos.x - pPlayer->GetAttackPos().x) * (m_pos.x - pPlayer->GetAttackPos().x);
+	float delY = ((m_pos.y + kAddPosY) - (pPlayer->GetAttackPos().y + kAddPosY)) *
+		((m_pos.y + kAddPosY) - (pPlayer->GetAttackPos().y + kAddPosY));
+	float delZ = (m_pos.z - pPlayer->GetAttackPos().z) * (m_pos.z - pPlayer->GetAttackPos().z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_radius + pPlayer->GetSkillRadius())
+	{
+		return true;
+	}
+
+	return false;
+
 }
 
 bool Enemy::DamageSphereHitFlag(std::shared_ptr<Player> pPlayer)

@@ -7,9 +7,11 @@
 #include "Camera.h"
 #include "Player.h"
 #include "Enemy.h"
-
 #include "Stage.h"
 #include "SkyDome.h"
+#include "ItemBase.h"
+#include "ItemHp.h"
+
 #include "Game.h"
 #include "Pad.h"
 
@@ -37,6 +39,10 @@ namespace
 
 	constexpr float kSelectSpeed = 0.05f;
 	constexpr float kSelectAnimationSize = 9.0f;
+
+	//アイテムのファイル名
+	const char* const kItemHpModelFilename = "data/model/item/Heart.mv1";
+	const char* const kPlayerModelFilename = "data/model/player/barbarian.mv1";
 }
 
 /// <summary>
@@ -50,14 +56,17 @@ ScenePlaying::ScenePlaying() :
 	m_isCommand(false),
 	m_isTitle(false),
 	m_isDamageCount(false),
-	m_isHitCount(false),
+	m_isAttackHitCount(false),
+	m_isSkillHitCount(false),
+	m_isSkillHit(false),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_restartH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
 	m_titleH(LoadGraph("data/image/Title.png")),
 	m_select(kRestart),
 	m_frameScene(0),
-	m_frameHit(0),
+	m_attackFrameHit(0),
+	m_skillFrameHit(0),
 	m_frameDamage(0)
 {
 	m_pCamera = std::make_shared<Camera>();
@@ -65,7 +74,13 @@ ScenePlaying::ScenePlaying() :
 	m_pEnemy = std::make_shared<Enemy>();
 	m_pStage = std::make_shared<Stage>();
 	m_pSkyDome = std::make_shared<SkyDome>();
+	m_pItem.resize(20);
 
+	CreateItemHp(VGet(100, 5, 100));
+	CreateItemHp(VGet(60, 5, 60));
+	CreateItemHp(VGet(100, 5, 200));
+	CreateItemHp(VGet(-100, 5, 100));
+	
 
 	m_pPlayer->Load();
 	m_pEnemy->Load();
@@ -82,6 +97,9 @@ ScenePlaying::~ScenePlaying()
 	DeleteGraph(m_restartH);
 	DeleteGraph(m_optionH);
 	DeleteGraph(m_titleH);
+
+	MV1DeleteModel(m_modelHeartH);
+	m_modelHeartH = -1;
 
 }
 
@@ -105,6 +123,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	Pad::Update();
 	if (Pad::IsTrigger(PAD_INPUT_8)) m_isMenu = true;
 
+	//プレイヤーのhpを取得
+	int playerHp = m_pPlayer->GetHp();
+	int enemyHp = m_pEnemy->GetHp();
+
 
 	//カメラのアングルをセットする
 	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
@@ -116,6 +138,25 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		m_pEnemy->Update();
 		m_pStage->Update();
 		m_pSkyDome->Update(*m_pPlayer);
+
+		for (int i = 0; i < m_pItem.size(); i++)
+		{
+			if (m_pItem[i])
+			{
+				m_pItem[i]->Update();
+
+				//アイテムに当たったら
+				if (m_pItem[i]->ItemSphereFlag(m_pPlayer)) {
+					playerHp += 1;
+					m_pPlayer->SetHp(playerHp);
+					m_pItem[i]->ItemLost();
+
+					delete m_pItem[i];
+					m_pItem[i] = nullptr;
+				}
+			}
+		}
+
 	}
 	else //メニューを表示してる場合
 	{
@@ -191,12 +232,12 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//敵の攻撃に当たった場合のフラグ取得
 	m_isDamageHit = m_pEnemy->DamageSphereHitFlag(m_pPlayer);
 
+	m_isSkillHit = m_pEnemy->SkillSphereHitFlag(m_pPlayer);
+
 	VECTOR toEnemy = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
 	float length = VSize(toEnemy);
 
-	//プレイヤーのhpを取得
-	int playerHp = m_pPlayer->GetHp();
-	int enemyHp = m_pEnemy->GetHp();
+
 
 
 
@@ -217,27 +258,64 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 	}
 
-	//攻撃のクールタイム
-	if (!m_isHitCount)
+	//攻撃した時だけ発生する
+	if (m_pPlayer->GetAttackGeneration())
 	{
-		//プレイヤーの攻撃が敵に入った場合
-		if (m_isAttackHit)
+		//攻撃のクールタイム
+		if (!m_isAttackHitCount)
 		{
-			enemyHp -= 1;
-			m_pEnemy->SetHp(enemyHp);
-			m_isHitCount = true;
-		}
-	}
-	else
-	{
-		m_frameHit++;
+			//プレイヤーの攻撃が敵に入った場合
+			if (m_isAttackHit)
+			{
+				enemyHp -= 1;
+				m_pEnemy->SetHp(enemyHp);
+				m_isAttackHitCount = true;
+			}
 
-		if (m_frameHit >= 30)
+		}
+		else
 		{
-			m_isHitCount = false;
-			m_frameHit = 0;
+			m_attackFrameHit++;
+
+			if (m_attackFrameHit >= 60)
+			{
+				m_isAttackHitCount = false;
+				m_attackFrameHit = 0;
+			}
 		}
 	}
+
+	//スキルを使用した時のみ発生する
+	if (m_pPlayer->GetSkillGeneration())
+	{
+		//スキルのクールタイム
+		if (!m_isSkillHitCount)
+		{
+
+			//プレイヤーのスキルが敵に入った場合
+			if (m_isSkillHit)
+			{
+				enemyHp -= 10;
+				m_pEnemy->SetHp(enemyHp);
+				m_isSkillHitCount = true;
+			}
+
+		}
+		else
+		{
+			m_skillFrameHit++;
+
+			if (m_skillFrameHit >= 180)
+			{
+				m_isSkillHitCount = false;
+				m_skillFrameHit = 0;
+			}
+		}
+	}
+
+
+
+
 
 	//ダメージのクールタイム
 	if (!m_isDamageCount)
@@ -314,6 +392,14 @@ void ScenePlaying::Draw()
 	m_pStage->Draw();
 	m_pPlayer->Draw();
 	m_pEnemy->Draw();
+	
+	for (int i = 0; i < m_pItem.size(); i++)
+	{
+		if (m_pItem[i])
+		{
+			m_pItem[i]->Draw();
+		}
+	}
 
 	if (m_isMenu)
 	{
@@ -368,5 +454,19 @@ void ScenePlaying::End()
 	m_pPlayer->Delete();
 	m_pEnemy->Delete();
 	m_pStage->Delete();
+}
+
+void ScenePlaying::CreateItemHp(VECTOR pos)
+{
+	for (int i = 0; i < m_pItem.size(); i++)
+	{
+		if (!m_pItem[i])
+		{
+			m_pItem[i] = new ItemHp;
+			m_pItem[i]->Start(pos);
+			//m_pItem[i]->SetHandle(m_modelHeartH);
+			return;
+		}
+	}
 }
 
