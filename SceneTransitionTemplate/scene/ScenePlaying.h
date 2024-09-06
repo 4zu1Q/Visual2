@@ -66,8 +66,12 @@ private:
 	//当たり判定
 	bool m_isPlayerHit;	//プレイヤーと敵があった場合
 	bool m_isAttackHit;	//プレイヤーの攻撃が当たった場合
+	bool m_isSkillHit;	//プレイヤーのスキルが当たった場合
 	bool m_isDamageHit;	//敵の攻撃が当たった場合
-	bool m_isSkillHit;
+	bool m_isItemHit;	//アイテムとプレイヤーが当たった場合
+
+	bool m_isEnemySearch;
+	bool m_isEnemyStop;
 
 	float m_selectAnimation;
 

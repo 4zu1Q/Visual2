@@ -39,6 +39,11 @@ public:
 	const int& GetHp() const { return m_hp; }
 	void SetHp(const int hp) { m_hp = hp; }
 
+	
+
+	//プレイヤーダメージのフラグ取得
+	void SetDamage(const bool damage) { m_isDamage = damage; }
+
 	//敵が何をするかをきめる
 	enum State
 	{
@@ -48,7 +53,8 @@ public:
 		kPowerAttack,//溜め攻撃
 	};
 
-
+	State GetState() { return m_state; }
+	void SetState(State state) { m_state = state; }
 
 private:
 
@@ -64,9 +70,14 @@ private:
 	//Hp
 	int m_hp;
 
+	int m_damageFrame;
+	bool m_isDamage;
+	
+
 	//表示情報
 	VECTOR m_pos;
 	VECTOR m_attackPos;
+	VECTOR m_velocity;
 
 	//当たり判定の半径
 	float m_radius;
@@ -75,5 +86,10 @@ private:
 
 	//State変数
 	State m_state;
+
+#ifdef _DEBUG
+	bool m_isDebugFlag = false;
+#endif
+
 };
 

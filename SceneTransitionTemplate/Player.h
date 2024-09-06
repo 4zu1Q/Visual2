@@ -45,16 +45,9 @@ public:
 	//プレイヤーダメージのフラグ取得
 	void SetDamage(const bool damage) { m_isDamage = damage; }
 
-	////プレイヤーの状態
-	//enum class State : int
-	//{
-	//	kStand,		//立ち止まり
-	//	kWalk,		//歩き
-	//	kRun,		//走り
-	//	kAttack,	//攻撃
-	//	kJump,		//ジャンプ
-	//	kBigJump,	//大ジャンプ
-	//};
+	//アニメーションのセットフラグ
+	void SetAnimDamage(const bool animDamage);
+	void SetAnimDown(const bool animDown) { m_isAnimDown = animDown; }
 
 	//プレイヤーのアニメーション種別
 	enum class AnimKind : int
@@ -122,13 +115,21 @@ private:
 	bool m_isSkill;
 
 	bool m_isWalk;
-	bool m_isJump;
 	bool m_isDash;
+	bool m_isDown;
+
 	//アニメーション情報
+	int m_animIndex;
 	int m_currentAnimNo;	//現在のアニメーション
 	int m_prevAnimNo;		//変更前のアニメーション
 	float m_animBlendRate;	//アニメーション合成割合
 
+	//アニメーションフラグ
+	bool m_isAnimAttack;
+	bool m_isAnimWalk;
+	bool m_isAnimDash;
+	bool m_isAnimDamage;
+	bool m_isAnimDown;
 
 	//当たり判定の半径
 	float m_radius;

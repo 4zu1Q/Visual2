@@ -8,7 +8,7 @@ namespace
 	const char* const kItemHpModelFilename = "data/model/item/Heart.mv1";
 
 	constexpr float kSinSpeed = 0.01f;
-	constexpr float kHeightSize = 0.2f;
+	constexpr float kHeightSize = 0.1f;
 }
 
 ItemHp::ItemHp():
@@ -49,7 +49,7 @@ void ItemHp::Draw()
 
 #ifdef _DEBUG
 
-	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0x0000ff, 0x0000ff, false);
+	DrawSphere3D(m_pos, m_radius, 8, 0x0000ff, 0x0000ff, false);
 
 #endif
 

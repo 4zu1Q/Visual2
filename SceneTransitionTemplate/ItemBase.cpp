@@ -15,7 +15,7 @@ ItemBase::ItemBase():
 	m_pos(VGet(0,0,0)),
 	m_radius(6.0f)
 {
-	m_pPlayer = std::make_shared<Player>();
+	//m_pPlayer = std::make_shared<Player>();
 }
 
 void ItemBase::ItemLost()

@@ -32,7 +32,7 @@ namespace
 	constexpr int kIdleAnimIndex = 1;		//待機
 	constexpr int kWalkAnimIndex = 2;		//歩き
 	constexpr int kRunAnimIndex = 7;		//走り
-	constexpr int kAttackAnimIndex = 30;	//攻撃
+	constexpr int kAttackAnimIndex = 31;	//攻撃
 	constexpr int kSkillAnimIndex = 41;	//スキル
 	constexpr int kDamageAnimIndex = 25;	//ダメージ
 	constexpr int kFallAnimIndex = 26;		//倒れる
@@ -44,7 +44,6 @@ namespace
 
 	//ダメージ
 	constexpr int kDamageCount = 120;
-
 
 
 	//アナログスティックによる移動関連
@@ -82,13 +81,17 @@ Player::Player() :
 	m_radius(6.0f),
 	m_skillRadius(12.0f),
 	m_isWalk(false),
-	m_isJump(false),
 	m_isDamage(false),
 	m_isDash(false),
 	m_isAttack(false),
 	m_isSkill(false),
+	m_isDown(false),
 	m_isAttackGeneration(false),
 	m_isSkillGeneration(false),
+	m_isAnimWalk(false),
+	m_isAnimDash(false),
+	m_isAnimDamage(false),
+	m_isAnimDown(false),
 	m_damageFrame(0),
 	m_hp(10),
 	m_losthp(10),
@@ -149,6 +152,7 @@ void Player::Init()
 	m_pos = VGet(0.0f, 0.0f, -170.0f);
 
 	MV1SetPosition(m_modelH, m_pos);
+	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
 	MV1SetScale(m_modelH, VGet(kScale, kScale, kScale));
 
 
@@ -175,8 +179,22 @@ void Player::Update()
 
 	//アニメーションを進める
 	bool isLoop = UpdateAnim(m_currentAnimNo);
+	if (isLoop)
+	{
+		ChangeAnim(m_animIndex);
+	}
 	UpdateAnim(m_prevAnimNo);
 
+	////HPが無くなってゲームオーバー
+	//if (m_isAnimDown)
+	//{
+	//	if (!m_isDown)
+	//	{
+	//		ChangeAnim(kFallAnimIndex);
+	//		m_isDown = true;
+	//	}
+	//	
+	//}
 
 
 	//ボタンを押したら攻撃アニメーションを再生する
@@ -223,16 +241,12 @@ void Player::Update()
 		{
 			m_isAttack = false;
 			m_isSkill = false;
-			//m_isWalk = false;
 			m_isDash = false;
-
-			ChangeAnim(kIdleAnimIndex);
 		}
 		
 	}
 
-	MV1SetPosition(m_modelH, m_pos);
-	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
+
 	
 
 	//ShaderUpdate();
@@ -273,6 +287,13 @@ void Player::Update()
 		m_isSkillGeneration = true;
 	}
 	else m_isSkillGeneration = false;
+
+
+
+
+
+	MV1SetPosition(m_modelH, m_pos);
+	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
 }
 
 /// <summary>
@@ -339,7 +360,7 @@ void Player::Draw()
 	// 3: 非表示
 	// 4: 表示される	...
 	// % 4 することで012301230123... に変換する
-	if (m_damageFrame % 4 >= 2) return;
+	if (m_damageFrame % 8 >= 4) return;
 
 	MV1DrawModel(m_modelH);
 
@@ -353,9 +374,14 @@ void Player::OnGimmickHitUpdate()
 	Pad::Update();
 
 	int frame = 0;
-	m_isJump = true;
 
 
+}
+
+void Player::SetAnimDamage(const bool animDamage)
+{
+	m_isAnimDamage = animDamage;
+	ChangeAnim(kDamageAnimIndex);
 }
 
 /// <summary>
@@ -511,20 +537,19 @@ void Player::Move()
 	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 	move = VTransform(move, mtx);
 
-	//if()
-	//{
-	//	m_isWalk = true;
-	//}
-	//else
-	//{
-	//	m_isWalk = false;
-	//}
-
-	if (m_isWalk)
+	if(VSize(move) != 0.0f)
 	{
-		ChangeAnim(kWalkAnimIndex);
+		if (!m_isWalk) 
+		{
+			ChangeAnim(kWalkAnimIndex);
+			m_animIndex = kWalkAnimIndex;
+		}
+		m_isWalk = true;
 	}
-
+	else
+	{
+		m_isWalk = false;
+	}
 
 	//移動方向からプレイヤーの向く方向を決定する
 	//移動していない場合(ゼロベクトル)の場合は変更しない
@@ -537,24 +562,37 @@ void Player::Move()
 
 	m_pos = VAdd(m_pos, move);
 
-	if (!m_isDash)
+
+	//Aボタンを押している間
+	if (Pad::IsPress(PAD_INPUT_1))
 	{
-		//Bボタンを押している間
-		if (Pad::IsPress(PAD_INPUT_1))
+		//動くスピードを1.5倍
+		move = VScale(move, 1.5f);
+
+		//動きを反映
+		m_pos = VAdd(m_pos, move);
+		if (!m_isDash)
 		{
-
-			//動くスピードを1.5倍
-			move = VScale(move, 1.5f);
-			//動きを反映
-			m_pos = VAdd(m_pos, move);
-
-			m_isDash = true;
 			ChangeAnim(kRunAnimIndex);
-
+			m_animIndex = kRunAnimIndex;
 		}
+		m_isDash = true;
+	}
+	else
+	{
+		if (m_isDash && m_isWalk)
+		{
+			ChangeAnim(kWalkAnimIndex);
+			m_animIndex = kWalkAnimIndex;
+		}
+		m_isDash = false;
 	}
 
-
+	if (!m_isDash && !m_isWalk)
+	{
+		ChangeAnim(kIdleAnimIndex);
+		m_animIndex = kIdleAnimIndex;
+	}
 
 
 	VECTOR attackMove = VScale(m_attackDir, 12.0f);

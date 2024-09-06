@@ -7,8 +7,12 @@ namespace
 
 }
 
-EnemyBase::EnemyBase()
+EnemyBase::EnemyBase():
+	m_handle(-1),
+	m_pos(VGet(0,0,0)),
+	m_radius(6.0f)
 {
+	
 }
 
 void EnemyBase::EnemyLost()

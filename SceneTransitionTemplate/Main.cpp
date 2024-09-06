@@ -1,4 +1,5 @@
 #include "DxLib.h"
+#include <EffekseerForDXLib.h>
 #include "SceneManager.h"
 #include <memory>
 
@@ -21,10 +22,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWriteZBuffer3D(true);
 	SetUseBackCulling(true);
 
+	Effekseer_Init(8000);
+	Effekseer_InitDistortion();
+	SetChangeScreenModeGraphicsSystemResetFlag(false);
+	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
+
+
 	//シーンを管理するポインタ
 	std::shared_ptr<SceneManager> pSceneManager = std::make_shared<SceneManager>();
 
 	pSceneManager->Init();
+
+	//int sH = LoadEffekseerEffect(L"path");
+	//int pH = PlayEffekseer3DEffect(sH);
+	//SetPosPlayingEffekseer3DEffect(pH, x, y, z);
+	//StopEffekseer3DEffect(pH);
+	//DeleteEffekseerEffect(sH);
 	
 	// ゲームループ
 	while (ProcessMessage() != -1)
@@ -37,7 +50,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		// ゲームの処理
 		pSceneManager->Update();
+		UpdateEffekseer3D();
 		pSceneManager->Draw();
+		Effekseer_Sync3DSetting();
+		DrawEffekseer3D();
 
 		// 画面が切り替わるのを待つ
 		ScreenFlip();
@@ -63,7 +79,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	pSceneManager->End();
 
-
+	Effkseer_End();
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 
 	return 0;				// ソフトの終了

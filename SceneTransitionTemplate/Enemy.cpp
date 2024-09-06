@@ -17,6 +17,13 @@ namespace
 	//当たり判定
 	constexpr float kAddPosY = 8.0f;
 
+	//ダメージ
+	constexpr int kDamageCount = 120;
+
+	//スピード
+
+
+
 }
 
 /// <summary>
@@ -31,7 +38,11 @@ Enemy::Enemy() :
 	m_stopRadius(20.0f),
 	m_hp(20),
 	m_pos(VGet(0, 0, 0)),
-	m_attackPos(VGet(0,0,0))
+	m_attackPos(VGet(0,0,0)),
+	m_velocity(VGet(0, 0, 0)),
+	m_damageFrame(0),
+	m_isDamage(false),
+	m_state(kIdle)
 {
 	m_pPlayer = std::make_shared<Player>();
 }
@@ -87,22 +98,19 @@ void Enemy::Update()
 	bool isSearch = SearchSphereFlag(m_pPlayer);
 	bool isStop = StopSphereFlag(m_pPlayer);
 
-	//サーチしたら
-	if (isSearch && !isStop)
-	{
-		m_state = kRun;
-	}
-	
-	//止まったら攻撃
-	if (isStop)
-	{
-		m_state = kAttack;
-	}
+#ifdef _DEBUG
+	m_isDebugFlag = isSearch;
+#endif
 
-	//m_pos.x++;
+	VECTOR direction;
+	//プレイヤーへの向きを取得
+	direction = VSub(m_pPlayer->GetPos(), m_pos);
+	//ベクトルを、正規化し、向きだけを保存させる
+	direction = VNorm(direction);
 
+	float speed = 1.1f;
+	m_velocity = VScale(direction, speed);
 
-	
 
 	if (m_state == kIdle)			//止まっている状態
 	{
@@ -111,9 +119,14 @@ void Enemy::Update()
 	else if (m_state == kRun)		//プレイヤーを追っている状態
 	{
 
+
+		//敵の移動
+		m_pos = VAdd(m_pos,m_velocity);
+
 	}
 	else if (m_state == kAttack)	//攻撃の状態
 	{
+
 
 	}
 	else if (m_state == kPowerAttack)//溜め攻撃の状態
@@ -129,6 +142,17 @@ void Enemy::Update()
 	if (m_pos.z >= 195) m_pos.z = 195;
 	if (m_pos.z <= -195) m_pos.z = -195;
 
+	//ダメージ点滅時間
+	if (m_isDamage)
+	{
+		m_damageFrame++;
+		if (m_damageFrame > kDamageCount)
+		{
+			m_isDamage = false;
+			m_damageFrame = 0;
+		}
+	}
+
 	MV1SetPosition(m_modelHandle, m_pos);
 }
 
@@ -138,7 +162,6 @@ void Enemy::Update()
 void Enemy::Draw()
 {
 
-	MV1DrawModel(m_modelHandle);
 
 #ifdef _DEBUG
 
@@ -148,8 +171,20 @@ void Enemy::Draw()
 	DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xf00fff, 0xffffff, false);
 	DrawFormatString(0, 32, 0xffffff, "Enemy(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(400, 32, 0xffffff, "EnemyHp:%d", m_hp);
+	DrawFormatString(400, 332, 0xffffff, "EnemyState:%d", m_state);
 
 #endif
+
+	// ダメージ演出  2フレーム間隔で表示非表示切り替え
+// 0: 表示される
+// 1: 表示される
+// 2: 非表示
+// 3: 非表示
+// 4: 表示される	...
+// % 4 することで012301230123... に変換する
+	if (m_damageFrame % 8 >= 4) return;
+
+	MV1DrawModel(m_modelHandle);
 }
 
 /// <summary>

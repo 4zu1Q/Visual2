@@ -27,7 +27,7 @@ public:
 
 protected:
 
-	std::shared_ptr<Player> m_pPlayer;
+	//std::shared_ptr<Player> m_pPlayer;
 
 	//ƒnƒ“ƒhƒ‹
 	int m_handle;

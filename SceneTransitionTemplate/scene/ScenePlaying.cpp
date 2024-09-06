@@ -40,6 +40,8 @@ namespace
 	constexpr float kSelectSpeed = 0.05f;
 	constexpr float kSelectAnimationSize = 9.0f;
 
+	constexpr int kPlayerMaxHp = 10;
+
 	//アイテムのファイル名
 	const char* const kItemHpModelFilename = "data/model/item/Heart.mv1";
 	const char* const kPlayerModelFilename = "data/model/player/barbarian.mv1";
@@ -59,6 +61,9 @@ ScenePlaying::ScenePlaying() :
 	m_isAttackHitCount(false),
 	m_isSkillHitCount(false),
 	m_isSkillHit(false),
+	m_isItemHit(false),
+	m_isEnemySearch(false),
+	m_isEnemyStop(false),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_restartH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
@@ -144,16 +149,6 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			if (m_pItem[i])
 			{
 				m_pItem[i]->Update();
-
-				//アイテムに当たったら
-				if (m_pItem[i]->ItemSphereFlag(m_pPlayer)) {
-					playerHp += 1;
-					m_pPlayer->SetHp(playerHp);
-					m_pItem[i]->ItemLost();
-
-					delete m_pItem[i];
-					m_pItem[i] = nullptr;
-				}
 			}
 		}
 
@@ -229,17 +224,64 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//プレイヤーの攻撃に当たった場合のフラグ取得
 	m_isAttackHit = m_pEnemy->AttackSphereHitFlag(m_pPlayer);
 
+	//プレイヤーのスキルに当たった場合のフラグ取得
+	m_isSkillHit = m_pEnemy->SkillSphereHitFlag(m_pPlayer);
+
 	//敵の攻撃に当たった場合のフラグ取得
 	m_isDamageHit = m_pEnemy->DamageSphereHitFlag(m_pPlayer);
 
-	m_isSkillHit = m_pEnemy->SkillSphereHitFlag(m_pPlayer);
+	m_isEnemySearch = m_pEnemy->SearchSphereFlag(m_pPlayer);
+
+	m_isEnemyStop = m_pEnemy->StopSphereFlag(m_pPlayer);
 
 	VECTOR toEnemy = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
 	float length = VSize(toEnemy);
 
 
+	//敵の行動の当たり判定
+	//敵の索敵にプレイヤーがいなかったら
+	if (!m_isEnemySearch && !m_isEnemyStop)
+	{
+		m_pEnemy->SetState(Enemy::kIdle);
+	}
+	//敵の索敵にプレイヤーがいたら
+	if (m_isEnemySearch && !m_isEnemyStop)
+	{
+		m_pEnemy->SetState(Enemy::kRun);
+	}
+	//敵の攻撃する範囲にプレイヤーがいたら
+	if (m_isEnemyStop)
+	{
+		m_pEnemy->SetState(Enemy::kAttack);
+	}
 
 
+
+
+	//アイテムとプレイヤーの当たり判定
+	for (int i = 0; i < m_pItem.size(); i++)
+	{
+		if (m_pItem[i])
+		{
+			//アイテムに当たったら
+			if (m_isItemHit = m_pItem[i]->ItemSphereFlag(m_pPlayer))
+			{
+				if (m_pPlayer->GetHp() == kPlayerMaxHp)
+				{
+					//何もしない
+				}
+				else
+				{
+					playerHp += 1;
+					m_pPlayer->SetHp(playerHp);
+					m_pItem[i]->ItemLost();
+
+					delete m_pItem[i];
+					m_pItem[i] = nullptr;
+				}
+			}
+		}
+	}
 
 	//プレイヤーと敵が当たった場合
 	if (m_isPlayerHit)
@@ -270,6 +312,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				enemyHp -= 1;
 				m_pEnemy->SetHp(enemyHp);
 				m_isAttackHitCount = true;
+				m_pEnemy->SetDamage(true);
 			}
 
 		}
@@ -298,6 +341,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				enemyHp -= 10;
 				m_pEnemy->SetHp(enemyHp);
 				m_isSkillHitCount = true;
+				m_pEnemy->SetDamage(true);
 			}
 
 		}
@@ -316,8 +360,8 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 
 
-
 	//ダメージのクールタイム
+
 	if (!m_isDamageCount)
 	{
 		//敵の攻撃を受けた場合
@@ -327,6 +371,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			m_pPlayer->SetHp(playerHp);
 			m_isDamageCount = true;
 			m_pPlayer->SetDamage(true);
+			m_pPlayer->SetAnimDamage(true);
 		}
 	}
 	else
@@ -464,7 +509,6 @@ void ScenePlaying::CreateItemHp(VECTOR pos)
 		{
 			m_pItem[i] = new ItemHp;
 			m_pItem[i]->Start(pos);
-			//m_pItem[i]->SetHandle(m_modelHeartH);
 			return;
 		}
 	}
