@@ -81,6 +81,8 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 {
 	Pad::Update();
 
+	m_pManager->m_pSoundManager.PlayBGM("TitleBgm", true);
+
 	if (!m_isCommand && !m_isOption)
 	{
 		//ã•ûŒü‚ğ‰Ÿ‚µ‚½‚Æ‚«

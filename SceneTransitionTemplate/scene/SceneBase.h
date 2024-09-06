@@ -1,7 +1,6 @@
 #pragma once
 #include <memory>
 
-
 class SceneBase :public std::enable_shared_from_this<SceneBase>
 {
 public:
@@ -18,6 +17,7 @@ public:
 	virtual void Draw() = 0;	//毎フレーム行う描画処理
 	virtual void End() = 0;	//シーンを抜けるときの処理
 
+protected:
 
 
 };

@@ -18,13 +18,10 @@ namespace
 /// </summary>
 Stage::Stage() :
 	m_modelHandle(-1),
-	//m_pos(VGet(0,540,0))
-	m_pos(VGet(0.0f, 129, 0.0f))
-	//m_pos(VGet(0.0f, 161, 0.0f))
-	//m_pos(VGet(200.0f, 400, 0.0f))
-	//m_pos(VGet(0.0f, -5.0f, 0.0f))
-
+	m_pos(VGet(0.0f, 129, 0.0f)),
+	m_light(-1)
 {
+	
 }
 
 /// <summary>
@@ -32,6 +29,7 @@ Stage::Stage() :
 /// </summary>
 Stage::~Stage()
 {
+	Delete();
 }
 
 /// <summary>
@@ -53,6 +51,8 @@ void Stage::Delete()
 {
 	MV1DeleteModel(m_modelHandle);
 	m_modelHandle = -1;
+
+	DeleteLightHandle(m_light);
 }
 
 /// <summary>
@@ -60,6 +60,9 @@ void Stage::Delete()
 /// </summary>
 void Stage::Init()
 {
+	ChangeLightTypeDir(VGet(-1.0f, 0.0f, 0.0f));
+	m_light = CreateDirLightHandle(VGet(1.0f, 0.0f, 0.0f));
+
 	//3Dモデルのスケールを2倍する
 	MV1SetScale(m_modelHandle, VGet(0.4f, 0.4f, 0.4f));
 

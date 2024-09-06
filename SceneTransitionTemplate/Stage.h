@@ -18,5 +18,7 @@ private:
 
 	int m_modelHandle;
 	VECTOR m_pos;
+
+	int m_light;
 };
 
