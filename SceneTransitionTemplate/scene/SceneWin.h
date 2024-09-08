@@ -40,5 +40,9 @@ private:
 	bool m_isInterval;
 	bool m_isCommand;
 
+	//サウンドハンドル
+	int m_soundSelectH;
+	int m_soundCancelH;
+	int m_soundDecsionH;
 };
 

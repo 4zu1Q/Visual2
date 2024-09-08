@@ -77,10 +77,6 @@ private:
 	void ShaderLoad();
 	void ShaderUpdate();
 
-	void PlayAnim(AnimKind playAnim);	//新たなアニメーションを再生
-
-	void AttackCol(VECTOR pos);
-
 	//移動関数
 	void Move();
 
@@ -91,6 +87,11 @@ private:
 	//画像ハンドル
 	int m_hpH;
 	int m_losthpH;
+
+	//サウンドハンドル
+	int m_damageSeH;
+	int m_axeAttackSeH;
+	int m_axeSkillSeH;
 
 	//シェーダハンドル
 	int m_outlineVsH;
@@ -158,6 +159,5 @@ private:
 
 	//State m_currentState;
 	AnimKind m_animKind;
-	int m_animationIndex;
 };
 

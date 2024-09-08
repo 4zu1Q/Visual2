@@ -37,7 +37,7 @@ Camera::Camera() :
 	m_cameraangle(VGet(0, 0, 0)),
 	m_angle(-DX_PI_F / 2)
 {
-	SetCameraNearFar(20, 800);
+	SetCameraNearFar(20, 1600);
 }
 
 /// <summary>

@@ -23,6 +23,10 @@ namespace
 	const char* const kHpFilename = "data/image/Hp.png";
 	const char* const kLostHpFilename = "data/image/LostHp.png";
 
+	//サウンドのファイル名
+	const char* const kAttackFilename = "data/sound/se/AxeSlashSe.mp3";
+	const char* const kSkillFilename = "data/sound/se/AxeSkillSe.mp3";
+	const char* const kDamageFilename = "data/sound/se/DamageSe.mp3";
 
 	//シェーダのファイル名
 	const char* const kOutlinePsFilename = "./OutlinePs.pso";
@@ -58,7 +62,7 @@ namespace
 
 
 	//壁
-	constexpr float kWall = 200;
+	constexpr float kWall = 475;
 }
 
 /// <summary>
@@ -97,10 +101,19 @@ Player::Player() :
 	m_losthp(10),
 	m_hpAnimationHeight(0.0f),
 	m_animKind(AnimKind::kIdle),
-	m_animationIndex(-1),
 	m_analogX(0.0f),
-	m_analogZ(0.0f)
+	m_analogZ(0.0f),
+	m_damageSeH(-1),
+	m_axeAttackSeH(-1),
+	m_axeSkillSeH(-1)
 {
+	m_damageSeH = LoadSoundMem(kDamageFilename);	  //ダメージ音
+	m_axeAttackSeH = LoadSoundMem(kAttackFilename);	  //攻撃音
+	m_axeSkillSeH = LoadSoundMem(kSkillFilename);	  //スキル音
+
+	ChangeVolumeSoundMem(128, m_damageSeH);
+	ChangeVolumeSoundMem(128, m_axeAttackSeH);
+	ChangeVolumeSoundMem(128, m_axeSkillSeH);
 
 }
 
@@ -110,6 +123,11 @@ Player::Player() :
 Player::~Player()
 {
 	Delete();
+
+	DeleteSoundMem(m_damageSeH);
+	DeleteSoundMem(m_axeAttackSeH);
+	DeleteSoundMem(m_axeSkillSeH);
+
 }
 
 /// <summary>
@@ -207,7 +225,7 @@ void Player::Update()
 			m_isAttack = true;
 			ChangeAnim(kAttackAnimIndex);
 			m_isMove = true;
-
+			PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
 		}
 		else
 		{
@@ -223,6 +241,7 @@ void Player::Update()
 			m_isSkill = true;
 			ChangeAnim(kSkillAnimIndex);
 			m_isMove = false;
+			PlaySoundMem(m_axeSkillSeH, DX_PLAYTYPE_BACK, true);//アタック
 		}
 		else
 		{
@@ -258,10 +277,10 @@ void Player::Update()
 
 
 	//移動範囲
-	if (m_pos.x >= 195) m_pos.x = 195;
-	if (m_pos.x <= -195) m_pos.x = -195;
-	if (m_pos.z >= 195) m_pos.z = 195;
-	if (m_pos.z <= -195) m_pos.z = -195;
+	if (m_pos.x >= kWall) m_pos.x = kWall;
+	if (m_pos.x <= -kWall) m_pos.x = -kWall;
+	if (m_pos.z >= kWall) m_pos.z = kWall;
+	if (m_pos.z <= -kWall) m_pos.z = -kWall;
 	
 	//ダメージ点滅時間
 	if (m_isDamage)
@@ -274,8 +293,18 @@ void Player::Update()
 		}
 	}
 
+	int soundAttackFrame = 0;
+	int soundSkillFrame = 0;
+
 	if (m_isAttack)
 	{
+		soundAttackFrame++;
+		if (soundAttackFrame == 5)
+		{
+			PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
+
+		}
+
 		//プレイヤーが攻撃したら生成するためのフラグがtrueになる
 		m_isAttackGeneration = true;
 	}
@@ -283,11 +312,16 @@ void Player::Update()
 
 	if (m_isSkill)
 	{
+		soundSkillFrame++;
+		if (soundSkillFrame == 30)
+		{
+			PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
+
+		}
 		//プレイヤーがスキルを使用したら生成するためのフラグがtrueになる
 		m_isSkillGeneration = true;
 	}
 	else m_isSkillGeneration = false;
-
 
 
 
@@ -397,7 +431,7 @@ bool Player::UpdateAnim(int attachNo)
 	//アニメーションを進行させる
 	float now = MV1GetAttachAnimTime(m_modelH, attachNo);	//現在の再生カウントを取得
 	bool isLoop = false;
-	now += 0.5f;	//アニメーションを進める
+	now += 0.5f;	// アニメーションを進める
 
 	//現在再生中のアニメーションの総カウントを取得する
 	float total = MV1GetAttachAnimTotalTime(m_modelH, attachNo);
@@ -471,31 +505,6 @@ void Player::ShaderUpdate()
 	MV1DrawModel(m_modelH);
 
 
-}
-
-void Player::PlayAnim(AnimKind playAnim)
-{
-	if (m_prevPlayAnim != -1)
-	{
-		MV1DetachAnim(m_modelH, m_prevPlayAnim);
-		m_prevPlayAnim = -1;
-	}
-
-	//今まで再生中のモーションだったものの情報をPrevに移動する
-	m_prevPlayAnim = m_currentPlayAnim;
-	m_prevAnimCount = m_currentAnimCount;
-
-	//新たに指定のモーションをモデルにアタッチして、アタッチ番号を保存する
-	m_currentPlayAnim = MV1AttachAnim(m_modelH, static_cast<int>(playAnim));
-	m_currentAnimCount = 0.0f;
-
-	//ブレンド率はPrevが有効ではない場合は1.0f(現在モーションが100%の状態)にする
-	m_animBlendRate = m_prevPlayAnim == -1 ? 1.0f : 0.0f;
-
-}
-
-void Player::AttackCol(VECTOR pos)
-{
 }
 
 void Player::Move()

@@ -37,6 +37,11 @@ namespace
 
 	constexpr float kSelectSpeed = 0.05f;
 	constexpr float kSelectAnimationSize = 9.0f;
+
+	//SEのファイル名
+	const char* const kSelectFilename = "data/sound/se/SelectSe.mp3";
+	const char* const kDecisionFilename = "data/sound/se/DecisionSe.mp3";
+	const char* const kCancelFilename = "data/sound/se/CancelSe.mp3";
 }
 
 SceneWin::SceneWin() :
@@ -47,9 +52,19 @@ SceneWin::SceneWin() :
 	m_gameclearH(LoadGraph("data/image/Gameclear.png")),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_retryH(LoadGraph("data/image/Retry.png")),
-	m_titleH(LoadGraph("data/image/Title.png"))
+	m_titleH(LoadGraph("data/image/Title.png")),
+	m_soundSelectH(-1),
+	m_soundCancelH(-1),
+	m_soundDecsionH(-1)
 {
+	m_soundSelectH = LoadSoundMem(kSelectFilename);	  //選択音
+	m_soundDecsionH = LoadSoundMem(kDecisionFilename);	  //決定音
+	m_soundCancelH = LoadSoundMem(kCancelFilename);	  //キャンセル音
 
+
+	ChangeVolumeSoundMem(128, m_soundSelectH);
+	ChangeVolumeSoundMem(128, m_soundDecsionH);
+	ChangeVolumeSoundMem(128, m_soundCancelH);
 }
 
 SceneWin::~SceneWin()
@@ -58,6 +73,10 @@ SceneWin::~SceneWin()
 	DeleteGraph(m_gameclearH);
 	DeleteGraph(m_retryH);
 	DeleteGraph(m_titleH);
+
+	DeleteSoundMem(m_soundSelectH);
+	DeleteSoundMem(m_soundDecsionH);
+	DeleteSoundMem(m_soundCancelH);
 }
 
 void SceneWin::Init()
@@ -78,10 +97,12 @@ std::shared_ptr<SceneBase> SceneWin::Update()
 			if (m_select == kRetry)
 			{
 				m_select = kTitle;
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 			}
 			else if (m_select == kTitle)
 			{
 				m_select = kRetry;
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 			}
 
 		}
@@ -92,10 +113,12 @@ std::shared_ptr<SceneBase> SceneWin::Update()
 			if (m_select == kRetry)
 			{
 				m_select = kTitle;
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 			}
 			else if (m_select == kTitle)
 			{
 				m_select = kRetry;
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 			}
 
 		}
@@ -106,12 +129,15 @@ std::shared_ptr<SceneBase> SceneWin::Update()
 			{
 				m_isInterval = true;
 				m_isCommand = true;
+				PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
 
 			}
 			else if (m_select == kTitle)
 			{
 				m_isInterval = true;
 				m_isCommand = true;
+				PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
+
 			}
 
 		}

@@ -49,6 +49,7 @@ private:
 	int m_optionH;
 	int m_titleH;
 	int m_selectH;
+	int m_operatorH;
 
 	//モデル変数
 	int m_modelHeartH;
@@ -65,9 +66,10 @@ private:
 
 	//当たり判定
 	bool m_isPlayerHit;	//プレイヤーと敵があった場合
-	bool m_isAttackHit;	//プレイヤーの攻撃が当たった場合
-	bool m_isSkillHit;	//プレイヤーのスキルが当たった場合
-	bool m_isDamageHit;	//敵の攻撃が当たった場合
+	bool m_isPlayerAttackHit;	//プレイヤーの攻撃が当たった場合
+	bool m_isPlayerSkillHit;	//プレイヤーのスキルが当たった場合
+	bool m_isEnemyAttackHit;	//敵の攻撃が当たった場合
+	bool m_isEnemySkillHit;	//敵の攻撃が当たった場合
 	bool m_isItemHit;	//アイテムとプレイヤーが当たった場合
 
 	bool m_isEnemySearch;
@@ -82,10 +84,22 @@ private:
 	//メニュー
 	bool m_isMenu;
 
-	bool m_isDamageCount;
-	bool m_isAttackHitCount;
-	bool m_isSkillHitCount;
+	bool m_isEnemyAttackHitCount;
+	bool m_isEnemySkillHitCount;
+	bool m_isPlayerAttackHitCount;
+	bool m_isPlayerSkillHitCount;
 	bool m_isCommand;
+	bool m_isOption;
+
+	int m_soundBgmH;
+	int m_soundSelectH;
+	int m_soundCancelH;
+	int m_soundDecsionH;
+
+	int m_soundPlayerDamageH;
+	int m_soundADamageH;
+	int m_soundSDamageH;
+	int m_soundItemH;
 
 };
 

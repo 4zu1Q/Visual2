@@ -41,9 +41,9 @@ public:
 
 	SoundManager m_pSoundManager;
 
-private:
 	//ゲームを終了させるフラグ
 	bool m_isClose = false;
+private:
 
 	int m_bgmVolume = 5;
 	int m_seVolume = 5;
@@ -52,8 +52,6 @@ private:
 	void SetBgmVolume(int volume) { m_bgmVolume = volume; }
 	void SetSeVolume(int volume) { m_seVolume = volume; }
 	void SetIsFull(bool isFull) { m_isFull = isFull; }
-
-
 
 };
 

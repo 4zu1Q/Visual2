@@ -45,6 +45,24 @@ namespace
 	//アイテムのファイル名
 	const char* const kItemHpModelFilename = "data/model/item/Heart.mv1";
 	const char* const kPlayerModelFilename = "data/model/player/barbarian.mv1";
+
+	//SEのファイル名
+	const char* const kSelectFilename = "data/sound/se/SelectSe.mp3";
+	const char* const kDecisionFilename = "data/sound/se/DecisionSe.mp3";
+	const char* const kCancelFilename = "data/sound/se/CancelSe.mp3";
+
+	const char* const kADamageFilename = "data/sound/se/EnemyADamageSe.mp3";
+	const char* const kSDamageFilename = "data/sound/se/EenemySDamageSe.mp3";
+	const char* const kPlayerDamageFilename = "data/sound/se/PlayerDamageSe.mp3";
+	const char* const kItemFilename = "data/sound/se/HealSe.mp3";
+
+
+	//BGMのファイル名
+	const char* const kBgmFilename = "data/sound/bgm/GamePlayBgm.mp3";
+
+	constexpr float kWall = 475;
+
+
 }
 
 /// <summary>
@@ -53,27 +71,40 @@ namespace
 ScenePlaying::ScenePlaying() :
 	m_isInterval(false),
 	m_isPlayerHit(false),
-	m_isAttackHit(false),
+	m_isPlayerAttackHit(false),
 	m_isMenu(false),
 	m_isCommand(false),
 	m_isTitle(false),
-	m_isDamageCount(false),
-	m_isAttackHitCount(false),
-	m_isSkillHitCount(false),
-	m_isSkillHit(false),
+	m_isEnemyAttackHitCount(false),
+	m_isEnemySkillHitCount(false),
+	m_isPlayerAttackHitCount(false),
+	m_isPlayerSkillHitCount(false),
+	m_isPlayerSkillHit(false),
 	m_isItemHit(false),
 	m_isEnemySearch(false),
 	m_isEnemyStop(false),
+	m_isEnemyAttackHit(false),
+	m_isEnemySkillHit(false),
+	m_isOption(false),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_restartH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
 	m_titleH(LoadGraph("data/image/Title.png")),
+	m_operatorH(LoadGraph("data/image/Operator.png")),
 	m_select(kRestart),
 	m_frameScene(0),
 	m_attackFrameHit(0),
 	m_skillFrameHit(0),
-	m_frameDamage(0)
+	m_frameDamage(0),
+	m_soundBgmH(-1),
+	m_soundCancelH(-1),
+	m_soundDecsionH(-1),
+	m_soundSelectH(-1),
+	m_soundPlayerDamageH(-1),
+	m_soundADamageH(-1),
+	m_soundSDamageH(-1)
 {
+
 	m_pCamera = std::make_shared<Camera>();
 	m_pPlayer = std::make_shared<Player>();
 	m_pEnemy = std::make_shared<Enemy>();
@@ -81,15 +112,53 @@ ScenePlaying::ScenePlaying() :
 	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pItem.resize(20);
 
-	CreateItemHp(VGet(100, 5, 100));
-	CreateItemHp(VGet(60, 5, 60));
-	CreateItemHp(VGet(100, 5, 200));
-	CreateItemHp(VGet(-100, 5, 100));
-	
+	CreateItemHp(VGet(460, 5, 460));
+	CreateItemHp(VGet(-460, 5, 460));
+	CreateItemHp(VGet(460, 5, -460));
+	CreateItemHp(VGet(-460, 5, -460));
+
+	CreateItemHp(VGet(460, 5, 0));
+	CreateItemHp(VGet(0, 5, 460));
+	CreateItemHp(VGet(-460, 5, 0));
+	CreateItemHp(VGet(0, 5, -460));
+
+	CreateItemHp(VGet(230, 5, 0));
+	CreateItemHp(VGet(0, 5, -230));
+	CreateItemHp(VGet(-230, 5, 0));
+	CreateItemHp(VGet(0, 5, 230));
+
+
+	CreateItemHp(VGet(230, 5, 230));
+	CreateItemHp(VGet(-230, 5, 230));
+	CreateItemHp(VGet(230, 5, -230));
+	CreateItemHp(VGet(-230, 5, -230));
+
+	m_soundBgmH = LoadSoundMem(kBgmFilename);	  //BGM
+
+	m_soundSelectH = LoadSoundMem(kSelectFilename);	  //選択音
+	m_soundDecsionH = LoadSoundMem(kDecisionFilename);	  //決定音
+	m_soundCancelH = LoadSoundMem(kCancelFilename);	  //キャンセル音
+	m_soundPlayerDamageH = LoadSoundMem(kPlayerDamageFilename);		//プレイヤーダメージ音
+	m_soundADamageH = LoadSoundMem(kADamageFilename);		//敵ダメージ音
+	m_soundSDamageH = LoadSoundMem(kSDamageFilename);		//敵ダメージ音
+	m_soundItemH = LoadSoundMem(kItemFilename);		//アイテム音
+
+	ChangeVolumeSoundMem(64, m_soundBgmH);
+	ChangeVolumeSoundMem(128, m_soundSelectH);
+	ChangeVolumeSoundMem(128, m_soundDecsionH);
+	ChangeVolumeSoundMem(128, m_soundCancelH);
+	ChangeVolumeSoundMem(128, m_soundPlayerDamageH);
+	ChangeVolumeSoundMem(128, m_soundADamageH);
+	ChangeVolumeSoundMem(128, m_soundSDamageH);
+	ChangeVolumeSoundMem(128, m_soundItemH);
+
+
 
 	m_pPlayer->Load();
 	m_pEnemy->Load();
 	m_pStage->Load();
+
+	PlaySoundMem(m_soundBgmH, DX_PLAYTYPE_LOOP);
 
 }
 
@@ -102,6 +171,15 @@ ScenePlaying::~ScenePlaying()
 	DeleteGraph(m_restartH);
 	DeleteGraph(m_optionH);
 	DeleteGraph(m_titleH);
+
+	DeleteSoundMem(m_soundSelectH);
+	DeleteSoundMem(m_soundDecsionH);
+	DeleteSoundMem(m_soundCancelH);
+	DeleteSoundMem(m_soundBgmH);
+	DeleteSoundMem(m_soundPlayerDamageH);
+	DeleteSoundMem(m_soundADamageH);
+	DeleteSoundMem(m_soundSDamageH);
+	DeleteSoundMem(m_soundItemH);
 
 	MV1DeleteModel(m_modelHeartH);
 	m_modelHeartH = -1;
@@ -139,8 +217,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//メニューを表示していない場合
 	if (!m_isMenu)
 	{
+		ChangeVolumeSoundMem(64, m_soundBgmH);
+
 		m_pPlayer->Update();
-		m_pEnemy->Update();
+		m_pEnemy->Update(m_pPlayer);
 		m_pStage->Update();
 		m_pSkyDome->Update(*m_pPlayer);
 
@@ -158,6 +238,9 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 		if (!m_isCommand)
 		{
+			ChangeVolumeSoundMem(32, m_soundBgmH);
+
+
 			//上方向を押したとき
 			if (Pad::IsTrigger(PAD_INPUT_UP))
 			{
@@ -165,14 +248,17 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				if (m_select == kRestart)
 				{
 					m_select = kTitle;
+					PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				}
 				else if (m_select == kOption)
 				{
 					m_select = kRestart;
+					PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				}
 				else if (m_select == kTitle)
 				{
 					m_select = kOption;
+					PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				}
 			}
 
@@ -182,14 +268,17 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				if (m_select == kRestart)
 				{
 					m_select = kOption;
+					PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				}
 				else if (m_select == kOption)
 				{
 					m_select = kTitle;
+					PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				}
 				else if (m_select == kTitle)
 				{
 					m_select = kRestart;
+					PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				}
 			}
 
@@ -199,16 +288,31 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				{
 					m_isMenu = false;
 					m_isCommand = false;
+					PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
 				}
 				else if (m_select == kOption)
 				{
 					m_isCommand = true;
+					m_isOption = true;
+					PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
 				}
 				else if (m_select == kTitle)
 				{
 					m_isInterval = true;
 					m_isTitle = true;
+					PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
+					StopSoundMem(m_soundBgmH);
 				}
+			}
+
+		}
+
+		if (m_isOption)
+		{
+			if (Pad::IsTrigger PAD_INPUT_2)
+			{
+				m_isOption = false;
+				m_isCommand = false;
 			}
 		}
 
@@ -222,16 +326,21 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
 
 	//プレイヤーの攻撃に当たった場合のフラグ取得
-	m_isAttackHit = m_pEnemy->AttackSphereHitFlag(m_pPlayer);
+	m_isPlayerAttackHit = m_pEnemy->PlayerAttackSphereHitFlag(m_pPlayer);
 
 	//プレイヤーのスキルに当たった場合のフラグ取得
-	m_isSkillHit = m_pEnemy->SkillSphereHitFlag(m_pPlayer);
+	m_isPlayerSkillHit = m_pEnemy->PlayerSkillSphereHitFlag(m_pPlayer);
 
 	//敵の攻撃に当たった場合のフラグ取得
-	m_isDamageHit = m_pEnemy->DamageSphereHitFlag(m_pPlayer);
+	m_isEnemyAttackHit = m_pEnemy->EnemyAttackSphereHitFlag(m_pPlayer);
 
+	//敵のスキルに当たった場合のフラグ取得
+	m_isEnemySkillHit = m_pEnemy->EnemySkillSphereHitFlag(m_pPlayer);
+
+	//敵の索敵範囲に入った場合のフラグ取得
 	m_isEnemySearch = m_pEnemy->SearchSphereFlag(m_pPlayer);
 
+	//敵の止まる範囲に入った場合のフラグ取得
 	m_isEnemyStop = m_pEnemy->StopSphereFlag(m_pPlayer);
 
 	VECTOR toEnemy = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
@@ -272,6 +381,9 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				}
 				else
 				{
+
+					PlaySoundMem(m_soundItemH, DX_PLAYTYPE_BACK, true);//アイテム音
+
 					playerHp += 1;
 					m_pPlayer->SetHp(playerHp);
 					m_pItem[i]->ItemLost();
@@ -304,14 +416,16 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	if (m_pPlayer->GetAttackGeneration())
 	{
 		//攻撃のクールタイム
-		if (!m_isAttackHitCount)
+		if (!m_isPlayerAttackHitCount)
 		{
 			//プレイヤーの攻撃が敵に入った場合
-			if (m_isAttackHit)
+			if (m_isPlayerAttackHit)
 			{
-				enemyHp -= 1;
+				PlaySoundMem(m_soundADamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+
+				enemyHp -= 3;
 				m_pEnemy->SetHp(enemyHp);
-				m_isAttackHitCount = true;
+				m_isPlayerAttackHitCount = true;
 				m_pEnemy->SetDamage(true);
 			}
 
@@ -322,7 +436,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 			if (m_attackFrameHit >= 60)
 			{
-				m_isAttackHitCount = false;
+				m_isPlayerAttackHitCount = false;
 				m_attackFrameHit = 0;
 			}
 		}
@@ -332,15 +446,16 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	if (m_pPlayer->GetSkillGeneration())
 	{
 		//スキルのクールタイム
-		if (!m_isSkillHitCount)
+		if (!m_isPlayerSkillHitCount)
 		{
 
 			//プレイヤーのスキルが敵に入った場合
-			if (m_isSkillHit)
+			if (m_isPlayerSkillHit)
 			{
-				enemyHp -= 10;
+				PlaySoundMem(m_soundSDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+				enemyHp -= 2;
 				m_pEnemy->SetHp(enemyHp);
-				m_isSkillHitCount = true;
+				m_isPlayerSkillHitCount = true;
 				m_pEnemy->SetDamage(true);
 			}
 
@@ -351,7 +466,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 			if (m_skillFrameHit >= 180)
 			{
-				m_isSkillHitCount = false;
+				m_isPlayerSkillHitCount = false;
 				m_skillFrameHit = 0;
 			}
 		}
@@ -360,30 +475,61 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 
 
-	//ダメージのクールタイム
-
-	if (!m_isDamageCount)
+	if (m_pEnemy->GetAttackGeneration())
 	{
-		//敵の攻撃を受けた場合
-		if (m_isDamageHit)
+		//ダメージのクールタイム
+		if (!m_isEnemyAttackHitCount)
 		{
-			playerHp -= 1;
-			m_pPlayer->SetHp(playerHp);
-			m_isDamageCount = true;
-			m_pPlayer->SetDamage(true);
-			m_pPlayer->SetAnimDamage(true);
+			//敵の攻撃を受けた場合
+			if (m_isEnemyAttackHit)
+			{
+				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+				playerHp -= 1;
+				m_pPlayer->SetHp(playerHp);
+				m_isEnemyAttackHitCount = true;
+				m_pPlayer->SetDamage(true);
+				m_pPlayer->SetAnimDamage(true);
+			}
+		}
+		else
+		{
+			m_frameDamage++;
+
+			if (m_frameDamage >= 120)
+			{
+				m_isEnemyAttackHitCount = false;
+				m_frameDamage = 0;
+			}
 		}
 	}
-	else
-	{
-		m_frameDamage++;
 
-		if (m_frameDamage >= 120)
-		{
-			m_isDamageCount = false;
-			m_frameDamage = 0;
-		}
-	}
+	//if (m_pEnemy->GetSkillGeneration())
+	//{
+	//	//ダメージのクールタイム
+	//	if (!m_isEnemySkillHitCount)
+	//	{
+	//		//敵の攻撃を受けた場合
+	//		if (m_isEnemySkillHit)
+	//		{
+	//			PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+	//			playerHp -= 3;
+	//			m_pPlayer->SetHp(playerHp);
+	//			m_isEnemySkillHitCount = true;
+	//			m_pPlayer->SetDamage(true);
+	//			m_pPlayer->SetAnimDamage(true);
+	//		}
+	//	}
+	//	else
+	//	{
+	//		m_frameDamage++;
+
+	//		if (m_frameDamage >= 120)
+	//		{
+	//			m_isEnemySkillHitCount = false;
+	//			m_frameDamage = 0;
+	//		}
+	//	}
+	//}
 
 	//プレイヤーのHPがゼロになったら
 	if (m_pPlayer->GetHp() <= 0)
@@ -406,6 +552,8 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			return std::make_shared<SceneWin>();
 		}
 	}
+
+
 
 
 
@@ -455,25 +603,31 @@ void ScenePlaying::Draw()
 		// 不透明に戻して白い枠
 		DrawLineBox(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, 0x00ffff);
 
-
-		//セレクト
-		if (m_select == kRestart)
+		if (!m_isOption)
 		{
-			DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
+			//セレクト
+			if (m_select == kRestart)
+			{
+				DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
+			}
+			else if (m_select == kOption)
+			{
+				DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
+			}
+			else if (m_select == kTitle)
+			{
+				DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
+			}
+
+			DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_restartH, true); //スタート
+			DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
+			DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_titleH, true);//ゲーム終了
 		}
-		else if (m_select == kOption)
+		else
 		{
-			DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
-		}
-		else if (m_select == kTitle)
-		{
-			DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
+			DrawExtendGraph(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, m_operatorH, true);
 		}
 
-
-		DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_restartH, true); //スタート
-		DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
-		DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_titleH, true);//ゲーム終了
 	}
 
 	//フェード暗幕
@@ -487,7 +641,6 @@ void ScenePlaying::Draw()
 
 #ifdef _DEBUG
 	DrawFormatString(700, 16, 0xffffff, "Select:%d", m_select);
-	DrawString(0, 0, "Scene Playing", 0xffffff, false);
 #endif
 }
 

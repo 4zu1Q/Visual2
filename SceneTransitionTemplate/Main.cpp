@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 		// •Â‚¶‚é—p‚Ìƒtƒ‰ƒO‚ªtrue‚Ìê‡
-		if (pSceneManager->GetClose() == true)
+		if (pSceneManager->m_isClose)
 		{
 			break;
 		}

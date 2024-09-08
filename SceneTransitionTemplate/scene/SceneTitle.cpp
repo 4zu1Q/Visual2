@@ -40,6 +40,14 @@ namespace
 
 	constexpr float kSelectSpeed = 0.05f;
 	constexpr float kSelectAnimationSize = 9.0f;
+
+	//SEのファイル名
+	const char* const kSelectFilename = "data/sound/se/SelectSe.mp3";
+	const char* const kDecisionFilename = "data/sound/se/DecisionSe.mp3";
+	const char* const kCancelFilename = "data/sound/se/CancelSe.mp3";
+
+	//BGMのファイル名
+	const char* const kBgmFilename = "data/sound/bgm/TitleBgm.mp3";
 }
 
 SceneTitle::SceneTitle() :
@@ -59,8 +67,24 @@ SceneTitle::SceneTitle() :
 	m_startH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
 	m_operatorH(LoadGraph("data/image/Operator.png")),
-	m_endH(LoadGraph("data/image/End.png"))
+	m_endH(LoadGraph("data/image/End.png")),
+	m_soundBgmH(-1),
+	m_soundCancelH(-1),
+	m_soundDecsionH(-1),
+	m_soundSelectH(-1)
 {
+	m_soundBgmH = LoadSoundMem(kBgmFilename);	  //BGM
+
+	m_soundSelectH = LoadSoundMem(kSelectFilename);	  //選択音
+	m_soundDecsionH = LoadSoundMem(kDecisionFilename);	  //決定音
+	m_soundCancelH = LoadSoundMem(kCancelFilename);	  //キャンセル音
+
+	ChangeVolumeSoundMem(64, m_soundBgmH);
+	ChangeVolumeSoundMem(128, m_soundSelectH);
+	ChangeVolumeSoundMem(128, m_soundDecsionH);
+	ChangeVolumeSoundMem(128, m_soundCancelH);
+
+	PlaySoundMem(m_soundBgmH, DX_PLAYTYPE_LOOP);
 }
 
 SceneTitle::~SceneTitle()
@@ -71,6 +95,10 @@ SceneTitle::~SceneTitle()
 	DeleteGraph(m_optionH);
 	DeleteGraph(m_endH);
 
+	DeleteSoundMem(m_soundSelectH);
+	DeleteSoundMem(m_soundDecsionH);
+	DeleteSoundMem(m_soundCancelH);
+	DeleteSoundMem(m_soundBgmH);
 }
 
 void SceneTitle::Init()
@@ -81,7 +109,7 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 {
 	Pad::Update();
 
-	m_pManager->m_pSoundManager.PlayBGM("TitleBgm", true);
+	//m_pManager->m_pSoundManager.PlayBGM("TitleBgm", true);
 
 	if (!m_isCommand && !m_isOption)
 	{
@@ -91,14 +119,20 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 
 			if (m_select == kStart)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				m_select = kGameEnd;
 			}
 			else if (m_select == kOption)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				m_select = kStart;
 			}
 			else if (m_select == kGameEnd)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				m_select = kOption;
 			}
 		}
@@ -108,14 +142,20 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 		{
 			if (m_select == kStart)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				m_select = kOption;
 			}
 			else if (m_select == kOption)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				m_select = kGameEnd;
 			}
 			else if (m_select == kGameEnd)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				m_select = kStart;
 			}
 		}
@@ -124,18 +164,25 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 		{
 			if (m_select == kStart)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
 				m_isInterval = true;
 				m_isCommand = true;
+				PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
 
 			}
 			else if (m_select == kOption)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
 				m_isOption = true;
+				PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
 			}
 			else if (m_select == kGameEnd)
 			{
+				//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
 				bool isClose = true;
-				m_isCommand = true;
+				PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
+				DxLib_End();
+				//m_pManager->m_isClose = true;
 			}
 		}
 	}
@@ -146,85 +193,108 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 		//Bボタンで戻る
 		if (Pad::IsTrigger(PAD_INPUT_2)) m_isOption = false;
 
-		//上方向を押したとき
-		if (Pad::IsTrigger(PAD_INPUT_UP))
-		{
+		////上方向を押したとき
+		//if (Pad::IsTrigger(PAD_INPUT_UP))
+		//{
 
-			if (m_option == kOperator)
-			{
-				m_option = kFullScreen;
-			}
-			else if (m_option == kSound)
-			{
-				m_option = kOperator;
-			}
-			else if (m_option == kFullScreen)
-			{
-				m_option = kSound;
-			}
-		}
+		//	if (m_option == kOperator)
+		//	{
+		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+		//		m_option = kFullScreen;
+		//	}
+		//	else if (m_option == kSound)
+		//	{
+		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+		//		m_option = kOperator;
+		//	}
+		//	else if (m_option == kFullScreen)
+		//	{
+		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+		//		m_option = kSound;
+		//	}
+		//}
 
-		//下方向を押したとき
-		if (Pad::IsTrigger(PAD_INPUT_DOWN))
-		{
-			if (m_option == kOperator)
-			{
-				m_option = kSound;
-			}
-			else if (m_option == kSound)
-			{
-				m_option = kFullScreen;
-			}
-			else if (m_option == kFullScreen)
-			{
-				m_option = kOperator;
-			}
-		}
+		////下方向を押したとき
+		//if (Pad::IsTrigger(PAD_INPUT_DOWN))
+		//{
+		//	if (m_option == kOperator)
+		//	{
+		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+		//		m_option = kSound;
+		//	}
+		//	else if (m_option == kSound)
+		//	{
+		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+		//		m_option = kFullScreen;
+		//	}
+		//	else if (m_option == kFullScreen)
+		//	{
+		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
+		//		m_option = kOperator;
+		//	}
+		//}
 
-		//決定ボタンを押したとき
-		if (Pad::IsTrigger(PAD_INPUT_1))
-		{
-			if (m_option == kOperator)
-			{
-				m_isOperator = true;
+		////決定ボタンを押したとき
+		//if (Pad::IsTrigger(PAD_INPUT_1))
+		//{
+		//	if (m_option == kOperator)
+		//	{
+		//		m_isOperator = true;
+		//		//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
 
-			}
-			else if (m_option == kSound)
-			{
-				m_isSound = true;
-			}
-			else if (m_option == kFullScreen)
-			{
-				m_isFullScreen = true;
-			}
-		}
+		//	}
+		//	else if (m_option == kSound)
+		//	{
+		//		m_isSound = true;
+		//		//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
+		//	}
+		//	else if (m_option == kFullScreen)
+		//	{
+		//		m_isFullScreen = true;
+		//		//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
+		//	}
+		//}
 		
 	}
 
-	//操作説明
-	if (m_isOperator)
-	{
-		if (Pad::IsTrigger(PAD_INPUT_2)) m_isOperator = false;
-	}
+	//if (Pad::IsTrigger(PAD_INPUT_2))
+	//{
+	//	//操作説明
+	//	if (m_isOperator)
+	//	{
+	//		//m_pManager->m_pSoundManager.PlaySE("CancelSe");
+	//		PlaySoundMem(m_soundCancelH, DX_PLAYTYPE_BACK, true);//キャンセル音
+	//		m_isOperator = false;
+	//	}
+	//	//サウンド関係
+	//	else if (m_isSound)
+	//	{
+	//		//m_pManager->m_pSoundManager.PlaySE("CancelSe");
+	//		PlaySoundMem(m_soundCancelH, DX_PLAYTYPE_BACK, true);//キャンセル音
+	//		m_isSound = false;
+	//	}
+	//	//フルスクリーン
+	//	else if (m_isFullScreen)
+	//	{
+	//		//m_pManager->m_pSoundManager.PlaySE("CancelSe");
+	//		PlaySoundMem(m_soundCancelH, DX_PLAYTYPE_BACK, true);//キャンセル音
+	//		m_isFullScreen = false;
+
+	//	}
+	//}
+
+
 	
-	if (m_isSound)
-	{
-		if (Pad::IsTrigger(PAD_INPUT_2)) m_isSound = false;
 
-	}
-
-	if (m_isFullScreen)
-	{
-		if (Pad::IsTrigger(PAD_INPUT_2)) m_isFullScreen = false;
-
-	}
 
 	if (m_isInterval)
 	{
 		m_frameScene++;
 		if (m_select == kStart)
 		{
-			if (m_frameScene >= kFadeTime) {
+			if (m_frameScene >= kFadeTime) 
+			{
+				//m_pManager->m_pSoundManager.StopBGM("TitleBgm");
 				return std::make_shared<ScenePlaying>();
 			}
 		}
@@ -269,8 +339,7 @@ void SceneTitle::Draw()
 		DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
 		DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
 	}
-	
-	if(m_isOption)
+	else	
 	{
 			// 半透明にしてメニュー背景の四角
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
@@ -280,39 +349,28 @@ void SceneTitle::Draw()
 			// 不透明に戻して白い枠
 			DrawLineBox(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, 0x00ffff);
 
-			//セレクト
-			if (m_option == kOperator)
-			{
-				DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
-			}
-			else if (m_option == kSound)
-			{
-				DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
-			}
-			else if (m_option == kFullScreen)
-			{
-				DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
-			}
+			DrawExtendGraph(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, m_operatorH, true);
 
-			DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
-			DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
-			DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
+			////セレクト
+			//if (m_option == kOperator)
+			//{
+			//	DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
+			//}
+			//else if (m_option == kSound)
+			//{
+			//	DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
+			//}
+			//else if (m_option == kFullScreen)
+			//{
+			//	DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
+			//}
+
+			//DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
+			//DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
+			//DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
 	}
 
-	//if (m_isOperator)
-	//{
-	//	DrawGraph(100, 100, m_operatorH, true); //スタート
-	//}
 
-	//if (m_isSound)
-	//{
-	//	DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
-	//}
-
-	//if (m_isFullScreen)
-	//{
-	//	DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
-	//}
 
 
 	//フェード暗幕

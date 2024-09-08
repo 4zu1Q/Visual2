@@ -14,6 +14,8 @@ public:
 	virtual void Draw();	//毎フレーム行う描画処理
 	virtual void End();	//シーンを抜けるときの処理
 
+	bool GetisClose() { return m_isClose; }
+
 private:
 	//シーンを管理するポインタ
 	std::shared_ptr<SceneManager> m_pManager = std::make_shared<SceneManager>();
@@ -63,5 +65,12 @@ private:
 	bool m_isSound;		//サウンド設定用
 	bool m_isOperator;	//説明画面表示用
 
+	//サウンドハンドル
+	int m_soundBgmH;
+	int m_soundSelectH;
+	int m_soundCancelH;
+	int m_soundDecsionH;
+
+	bool m_isClose;
 };
 

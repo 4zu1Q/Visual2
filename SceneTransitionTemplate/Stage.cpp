@@ -10,7 +10,7 @@
 namespace
 {
 	//モデルのファイル名
-	const char* const kPlayerModelFileName = "data/model/stage/stage.mv1";
+	const char* const kPlayerModelFileName = "data/model/stage/Stage10.mv1";
 }
 
 /// <summary>
