@@ -35,6 +35,9 @@ public:
 	const bool& GetAttackGeneration() const { return m_isAttackGeneration; }
 	const bool& GetSkillGeneration() const { return m_isAttackGeneration; }
 
+	void SetAttackGeneration(bool isGeneration) { m_isAttackGeneration = isGeneration; }
+	void SetSkillGeneration(bool isGeneration) { m_isSkillGeneration = isGeneration; }
+
 	float GetRadius() { return m_radius; }
 	VECTOR GetPos() { return m_pos; }
 	void SetPos(VECTOR pos) { m_pos = pos; }
@@ -43,7 +46,7 @@ public:
 	const int& GetHp() const { return m_hp; }
 	void SetHp(const int hp) { m_hp = hp; }
 
-	
+
 
 	//プレイヤーダメージのフラグ取得
 	void SetDamage(const bool damage) { m_isDamage = damage; }
@@ -107,6 +110,7 @@ private:
 
 	//当たり判定の半径
 	float m_radius;
+	float m_skillRadius;
 	float m_searchRadius;
 	float m_stopRadius;
 

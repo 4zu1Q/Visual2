@@ -44,5 +44,6 @@ private:
 	int m_soundCancelH;
 	int m_soundDecsionH;
 
+	int m_soundBgmH;
 };
 

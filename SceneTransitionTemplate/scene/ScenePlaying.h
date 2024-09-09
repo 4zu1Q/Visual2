@@ -56,9 +56,12 @@ private:
 
 	//フレーム関係
 	int m_frameScene;
-	int m_attackFrameHit;
-	int m_skillFrameHit;
-	int m_frameDamage;
+	int m_playerAttackHitFrame;
+	int m_playerSkillHitFrame;
+	int m_enemyAttackHitFrame;
+	int m_enemySkillHitFrame;
+
+	
 
 	//フェードフラグ
 	bool m_isInterval;

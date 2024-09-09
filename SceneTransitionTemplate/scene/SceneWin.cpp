@@ -42,6 +42,9 @@ namespace
 	const char* const kSelectFilename = "data/sound/se/SelectSe.mp3";
 	const char* const kDecisionFilename = "data/sound/se/DecisionSe.mp3";
 	const char* const kCancelFilename = "data/sound/se/CancelSe.mp3";
+
+	//BGMのファイル名
+	const char* const kBgmFilename = "data/sound/bgm/GameClearBgm.mp3";
 }
 
 SceneWin::SceneWin() :
@@ -53,6 +56,7 @@ SceneWin::SceneWin() :
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_retryH(LoadGraph("data/image/Retry.png")),
 	m_titleH(LoadGraph("data/image/Title.png")),
+	m_soundBgmH(-1),
 	m_soundSelectH(-1),
 	m_soundCancelH(-1),
 	m_soundDecsionH(-1)
@@ -61,10 +65,14 @@ SceneWin::SceneWin() :
 	m_soundDecsionH = LoadSoundMem(kDecisionFilename);	  //決定音
 	m_soundCancelH = LoadSoundMem(kCancelFilename);	  //キャンセル音
 
+	m_soundBgmH = LoadSoundMem(kBgmFilename);
 
+	ChangeVolumeSoundMem(128, m_soundBgmH);
 	ChangeVolumeSoundMem(128, m_soundSelectH);
 	ChangeVolumeSoundMem(128, m_soundDecsionH);
 	ChangeVolumeSoundMem(128, m_soundCancelH);
+
+	PlaySoundMem(m_soundBgmH, DX_PLAYTYPE_LOOP);
 }
 
 SceneWin::~SceneWin()
@@ -137,7 +145,7 @@ std::shared_ptr<SceneBase> SceneWin::Update()
 				m_isInterval = true;
 				m_isCommand = true;
 				PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
-
+				
 			}
 
 		}
@@ -152,6 +160,7 @@ std::shared_ptr<SceneBase> SceneWin::Update()
 		{
 			if (m_frameScene >= kFadeTime)
 			{
+				StopSoundMem(m_soundBgmH);
 				return std::make_shared<ScenePlaying>();
 			}
 		}
@@ -159,6 +168,7 @@ std::shared_ptr<SceneBase> SceneWin::Update()
 		{
 			if (m_frameScene >= kFadeTime)
 			{
+				StopSoundMem(m_soundBgmH);
 				return std::make_shared<SceneTitle>();
 			}
 		}

@@ -87,6 +87,7 @@ private:
 	//画像ハンドル
 	int m_hpH;
 	int m_losthpH;
+	int m_hpFlameH;
 
 	//サウンドハンドル
 	int m_damageSeH;

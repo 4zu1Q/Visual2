@@ -22,6 +22,7 @@ namespace
 	//HPのファイル名
 	const char* const kHpFilename = "data/image/Hp.png";
 	const char* const kLostHpFilename = "data/image/LostHp.png";
+	const char* const kHpFlameFilename = "data/image/HpFlame.png";
 
 	//サウンドのファイル名
 	const char* const kAttackFilename = "data/sound/se/AxeSlashSe.mp3";
@@ -75,6 +76,7 @@ Player::Player() :
 	m_attackDir(VGet(0,0,0)),
 	m_hpH(LoadGraph(kHpFilename)),
 	m_losthpH(LoadGraph(kLostHpFilename)),
+	m_hpFlameH(LoadGraph(kHpFlameFilename)),
 	m_outlinePsH(-1),
 	m_outlineVsH(-1),
 	m_currentAnimNo(-1),
@@ -82,8 +84,8 @@ Player::Player() :
 	m_animBlendRate(0.0f),
 	m_cameraAngle(0.0f),
 	m_angle(kInitAngle),
-	m_radius(6.0f),
-	m_skillRadius(12.0f),
+	m_radius(7.0f),
+	m_skillRadius(15.0f),
 	m_isWalk(false),
 	m_isDamage(false),
 	m_isDash(false),
@@ -335,22 +337,19 @@ void Player::Update()
 /// </summary>
 void Player::Draw()
 {
-	// 半透明にしてメニュー背景の四角
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
-	DrawFillBox(10, 10, 500, 50, 0x000000);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	// 不透明に戻して白い枠
-	DrawLineBox(10, 10, 500, 50, 0x00ffff);
+
+
+	DrawExtendGraph(10, 10, 420, 50, m_hpFlameH,true);
 
 	for (int i = 1; i <= m_losthp; i++)
 	{
-		DrawExtendGraph(35 * i, 16 + m_hpAnimationHeight, 35 * i + 32, 48, m_losthpH, true);
+		DrawExtendGraph(35 * i + 20, 16 + m_hpAnimationHeight, 35 * i + 52, 48, m_losthpH, true);
 
 	}
 
 	for (int i = 1; i <= m_hp; i++)
 	{
-		DrawExtendGraph(35 * i, 16 + m_hpAnimationHeight, 35 * i + 32, 48, m_hpH, true);
+		DrawExtendGraph(35 * i + 20, 16 + m_hpAnimationHeight, 35 * i + 52, 48, m_hpH, true);
 	}
 
 #ifdef _DEBUG

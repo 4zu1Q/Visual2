@@ -49,9 +49,10 @@ Enemy::Enemy() :
 	m_modelH(),
 	m_outlinePsH(-1),
 	m_outlineVsH(-1),
-	m_radius(6.0f),
-	m_searchRadius(70.0f),
-	m_stopRadius(15.0f),
+	m_radius(15.0f),
+	m_skillRadius(25.0f),
+	m_searchRadius(300.0f),
+	m_stopRadius(40.0f),
 	m_hp(20),
 	m_pos(VGet(0, 0, 0)),
 	m_attackPos(VGet(0,0,0)),
@@ -128,7 +129,7 @@ void Enemy::Init()
 
 	MV1SetPosition(m_modelH, m_pos);
 	//敵のスケール
-	MV1SetScale(m_modelH, VGet(10, 10, 10));
+	MV1SetScale(m_modelH, VGet(20, 20, 20));
 }
 
 /// <summary>
@@ -172,113 +173,27 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 	m_direction = VSub(pPlayer->GetPos(), m_pos);
 	m_direction = VNorm(m_direction);
 
-	m_dirPos.x = m_pos.x * 1.5f;
-	m_dirPos.y = m_pos.y;
-	m_dirPos.z = m_pos.z * 1.5f;
+	//m_dirPos.x = m_pos.x * 1.5f;
+	//m_dirPos.y = m_pos.y;
+	//m_dirPos.z = m_pos.z * 1.5f;
 
-	VECTOR d = VSub(m_dirPos, m_pos);
-	d = VNorm(d);
+	//VECTOR d = VSub(m_dirPos, m_pos);
+	//d = VNorm(d);
 
 
 	if (m_state == kIdle)			//止まっている状態
 	{
-
-		if (!m_isRand)
-		{
-			m_rand = GetRand(6);
-			m_isRand = true;
-		}
-
-		if (m_rand == 0)
-		{
-			m_workFrame++;
-			if (m_workFrame >= 180)
-			{
-				m_isRand = false;
-				m_workFrame = 0;
-			}
-			m_pos.x += kSpeed;
-		}
-		else if (m_rand == 1)
-		{
-			m_workFrame++;
-			if (m_workFrame >= 200)
-			{
-				m_isRand = false;
-				m_workFrame = 0;
-			}
-			m_pos.x -= kSpeed;
-		}
-		else if (m_rand == 2)
-		{
-			m_workFrame++;
-			if (m_workFrame >= 240)
-			{
-				m_isRand = false;
-				m_workFrame = 0;
-			}
-			m_pos.z += kSpeed;
-		}
-		else if (m_rand == 3)
-		{
-			m_workFrame++;
-			if (m_workFrame >= 120)
-			{
-				m_isRand = false;
-				m_workFrame = 0;
-			}
-			m_pos.z -= kSpeed;
-		}
-		else if (m_rand == 4)
-		{
-			m_workFrame++;
-			if (m_workFrame >= 300)
-			{
-				m_isRand = false;
-				m_workFrame = 0;
-			}
-		}
-		else if (m_rand == 5)
-		{
-			m_workFrame++;
-			if (m_workFrame >= 300)
-			{
-				m_isRand = false;
-				m_workFrame = 0;
-			}
-		}
-		else if (m_rand == 6)
-		{
-			m_workFrame++;
-			if (m_workFrame >= 300)
-			{
-				m_isRand = false;
-				m_workFrame = 0;
-			}
-		}
-
-		m_angle = atan2f(d.x, d.z);
-
-
-		m_frame++;
-
-		if (m_frame == 1)
-		{
-			m_isIdleAnim = true;
-			m_frame = 0;
-		}
-		else
-		{
-			m_isIdleAnim = false;
-
-		}
-
 		if (!m_isIdleAnim)
 		{
 			ChangeAnim(kIdleAnimIndex);
 		}
+		m_isIdleAnim = true;
 
 		m_animIndex = kIdleAnimIndex;
+	}
+	else
+	{
+		m_isIdleAnim = false;
 	}
 
 	if (m_state == kRun)		//プレイヤーを追っている状態
@@ -288,25 +203,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 
 		m_angle = atan2f(m_direction.x, m_direction.z);
 
-
-		if (m_frame == 1)
-		{
-			m_isRunAnim = true;
-			m_frame = 0;
-		}
-		else
-		{
-			m_isRunAnim = false;
-		}
-
-		if (!m_isRunAnim)
-		{
-			ChangeAnim(kRunAnimIndex);
-
-		}
 		m_animIndex = kRunAnimIndex;
-		m_isRunAnim = true;
-
 
 		//ベクトルを、正規化し、向きだけを保存させる
 		m_velocity = VScale(m_direction, kSpeed);
@@ -315,67 +212,85 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		{
 			//敵の移動
 			m_pos = VAdd(m_pos, m_velocity);
+
+			if (!m_isRunAnim )
+			{
+				ChangeAnim(kRunAnimIndex);
+			}
+			m_isRunAnim = true;
 		}
+	}
+	else
+	{
+		if (m_isIdleAnim && m_isRunAnim)
+		{
+			ChangeAnim(kIdleAnimIndex);
+		}
+		m_isRunAnim = false;
+		m_animIndex = kIdleAnimIndex;
 	}
 
 	if (m_state == kAttack)	//攻撃の状態
 	{
+
+		if (!m_isAttackAnim && !m_isSkillAnim && !m_isIdleAnim)
+		{
+			m_isIdleAnim = true;
+			ChangeAnim(kIdleAnimIndex);
+		}
+		else m_isIdleAnim = false;
+
 		if (!m_isRand)
 		{
 			m_rand = GetRand(kMax);
 			m_isRand = true;
 		}
 
-		//if (m_attackFrame >= 180)
-		//{
 
-			if (!m_isAttackAnim /*&& !m_isSkillAnim*/)
+		if (!m_isAttackAnim && !m_isSkillAnim)
+		{
+
+			m_attackFrame++;
+
+			if (m_attackFrame >= 180)
 			{
-				m_attackFrame++;
 
-				if (m_attackFrame >= 180)
+				if (m_rand == 0 || m_rand == 1)
 				{
-
 					ChangeAnim(kAttackAnimIndex);
-					m_attackFrame = 0;
 					m_isAttackAnim = true;
+					m_isRand = false;
 				}
-				//else if (m_rand == 1)
-				//{
-
-				//	ChangeAnim(kAttackAnimIndex);
-				//	m_isAttackAnim = true;
-				//}
-				//else if (m_rand == 2)
-				//{
-
-				//	ChangeAnim(kSkillAnimIndex);
-				//	m_isSkillAnim = true;
-				//}
-
-			}
-			else
-			{
-				if (isLoop)
+				else if (m_rand == 2)
 				{
-					m_isAttackAnim = false;
-					//m_isSkillAnim = false;
-
+					ChangeAnim(kSkillAnimIndex);
+					m_isSkillAnim = true;
+					m_isRand = false;
 				}
+
+
+				m_attackFrame = 0;
 			}
 
-		//}
 		
+		}
+		else
+		{
+			if (isLoop)
+			{
+				ChangeAnim(kIdleAnimIndex);
+
+				m_isAttackAnim = false;
+				m_isSkillAnim = false;
+
+			}
+		}
 
 
-
-		//アニメーションが終わったら当たり判定の生成をやめる
-		//if (m_isSkillAnim)
-		//{
-		//	m_isSkillGeneration = true;
-		//}
-		//else m_isSkillGeneration = false;
-
+	}
+	else
+	{
+		m_isIdleAnim = false;
 	}
 
 
@@ -386,6 +301,12 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 	}
 	else m_isAttackGeneration = false;
 
+	//アニメーションが終わったら当たり判定の生成をやめる
+	if (m_isSkillAnim)
+	{
+		m_isSkillGeneration = true;
+	}
+	else m_isSkillGeneration = false;
 
 	//m_attackPos = m_pos;
 
@@ -406,8 +327,15 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		}
 	}
 
-	VECTOR m_attackDir = VScale(m_direction, 12.0f);
-	m_attackPos = VAdd(m_pos, m_attackDir);
+
+	if (!m_isAttackAnim && !m_isSkillAnim)
+	{
+		m_angle = atan2f(m_direction.x, m_direction.z);
+
+		VECTOR m_attackDir = VScale(m_direction, 20.0f);
+		m_attackPos = VAdd(m_pos, m_attackDir);
+	}
+
 
 	MV1SetPosition(m_modelH, m_pos);
 	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));
@@ -424,11 +352,12 @@ void Enemy::Draw()
 
 	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
 	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_searchRadius, 8, 0xffffff, 0xffffff, false);
-	//DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_stopRadius, 8, 0xffffff, 0xffffff, false);
+	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_stopRadius, 8, 0xffffff, 0xffffff, false);
 	DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xf00fff, 0xffffff, false);
 	DrawFormatString(0, 32, 0xffffff, "Enemy(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(400, 32, 0xffffff, "EnemyHp:%d", m_hp);
 	DrawFormatString(400, 332, 0xffffff, "EnemyState:%d", m_state);
+	DrawFormatString(400, 352, 0xffffff, "EnemyRand:%d", m_rand);
 
 	if (!m_isAttackGeneration)
 	{
@@ -441,11 +370,11 @@ void Enemy::Draw()
 
 	if (!m_isSkillGeneration)
 	{
-		DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_stopRadius, 8, 0xff00ff, 0xff00ff, false);
+		DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_skillRadius, 8, 0xff00ff, 0xff00ff, false);
 	}
 	else
 	{
-		DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_stopRadius, 8, 0x0000ff, 0x0000ff, false);
+		DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_skillRadius, 8, 0x0000ff, 0x0000ff, false);
 	}
 
 #endif
@@ -564,7 +493,7 @@ bool Enemy::EnemySkillSphereHitFlag(std::shared_ptr<Player> pPlayer)
 	float Distance = sqrt(delX + delY + delZ);
 
 	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
-	if (Distance < m_stopRadius + pPlayer->GetRadius())
+	if (Distance < m_skillRadius + pPlayer->GetRadius())
 	{
 		return true;
 	}

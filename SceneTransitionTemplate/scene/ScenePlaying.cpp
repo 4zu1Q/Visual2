@@ -93,9 +93,10 @@ ScenePlaying::ScenePlaying() :
 	m_operatorH(LoadGraph("data/image/Operator.png")),
 	m_select(kRestart),
 	m_frameScene(0),
-	m_attackFrameHit(0),
-	m_skillFrameHit(0),
-	m_frameDamage(0),
+	m_playerAttackHitFrame(0),
+	m_playerSkillHitFrame(0),
+	m_enemyAttackHitFrame(0),
+	m_enemySkillHitFrame(0),
 	m_soundBgmH(-1),
 	m_soundCancelH(-1),
 	m_soundDecsionH(-1),
@@ -412,7 +413,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 	}
 
-	//攻撃した時だけ発生する
+	//プレイヤー攻撃した時だけ発生する
 	if (m_pPlayer->GetAttackGeneration())
 	{
 		//攻撃のクールタイム
@@ -432,17 +433,17 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		}
 		else
 		{
-			m_attackFrameHit++;
+			m_playerAttackHitFrame++;
 
-			if (m_attackFrameHit >= 60)
+			if (m_playerAttackHitFrame >= 60)
 			{
 				m_isPlayerAttackHitCount = false;
-				m_attackFrameHit = 0;
+				m_playerAttackHitFrame = 0;
 			}
 		}
 	}
 
-	//スキルを使用した時のみ発生する
+	//プレイヤースキルを使用した時のみ発生する
 	if (m_pPlayer->GetSkillGeneration())
 	{
 		//スキルのクールタイム
@@ -462,19 +463,19 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		}
 		else
 		{
-			m_skillFrameHit++;
+			m_playerSkillHitFrame++;
 
-			if (m_skillFrameHit >= 180)
+			if (m_playerSkillHitFrame >= 80)
 			{
 				m_isPlayerSkillHitCount = false;
-				m_skillFrameHit = 0;
+				m_playerSkillHitFrame = 0;
 			}
 		}
 	}
 
 
 
-
+	//敵の攻撃を発生どうか
 	if (m_pEnemy->GetAttackGeneration())
 	{
 		//ダメージのクールタイム
@@ -484,6 +485,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			if (m_isEnemyAttackHit)
 			{
 				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+				
 				playerHp -= 1;
 				m_pPlayer->SetHp(playerHp);
 				m_isEnemyAttackHitCount = true;
@@ -493,43 +495,45 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		}
 		else
 		{
-			m_frameDamage++;
+			m_enemyAttackHitFrame++;
 
-			if (m_frameDamage >= 120)
+			if (m_enemyAttackHitFrame >= 120)
 			{
 				m_isEnemyAttackHitCount = false;
-				m_frameDamage = 0;
+				m_enemyAttackHitFrame = 0;
 			}
 		}
 	}
 
-	//if (m_pEnemy->GetSkillGeneration())
-	//{
-	//	//ダメージのクールタイム
-	//	if (!m_isEnemySkillHitCount)
-	//	{
-	//		//敵の攻撃を受けた場合
-	//		if (m_isEnemySkillHit)
-	//		{
-	//			PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-	//			playerHp -= 3;
-	//			m_pPlayer->SetHp(playerHp);
-	//			m_isEnemySkillHitCount = true;
-	//			m_pPlayer->SetDamage(true);
-	//			m_pPlayer->SetAnimDamage(true);
-	//		}
-	//	}
-	//	else
-	//	{
-	//		m_frameDamage++;
+	//敵のスキルを発生させるかどうか
+	if (m_pEnemy->GetSkillGeneration())
+	{
+		//ダメージのクールタイム
+		if (!m_isEnemySkillHitCount)
+		{
+			//敵の攻撃を受けた場合
+			if (m_isEnemySkillHit)
+			{
 
-	//		if (m_frameDamage >= 120)
-	//		{
-	//			m_isEnemySkillHitCount = false;
-	//			m_frameDamage = 0;
-	//		}
-	//	}
-	//}
+				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+				playerHp -= 3;
+				m_pPlayer->SetHp(playerHp);
+				m_isEnemySkillHitCount = true;
+				m_pPlayer->SetDamage(true);
+				m_pPlayer->SetAnimDamage(true);
+			}
+		}
+		else
+		{
+			m_enemySkillHitFrame++;
+
+			if (m_enemySkillHitFrame >= 120)
+			{
+				m_isEnemySkillHitCount = false;
+				m_enemySkillHitFrame = 0;
+			}
+		}
+	}
 
 	//プレイヤーのHPがゼロになったら
 	if (m_pPlayer->GetHp() <= 0)

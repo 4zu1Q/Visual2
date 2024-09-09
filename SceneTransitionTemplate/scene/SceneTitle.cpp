@@ -295,6 +295,8 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 			if (m_frameScene >= kFadeTime) 
 			{
 				//m_pManager->m_pSoundManager.StopBGM("TitleBgm");
+				StopSoundMem(m_soundBgmH);
+
 				return std::make_shared<ScenePlaying>();
 			}
 		}
