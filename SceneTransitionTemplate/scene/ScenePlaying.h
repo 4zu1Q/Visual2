@@ -64,6 +64,8 @@ private:
 	
 
 	//フェードフラグ
+	bool m_isWin;
+	bool m_isLose;
 	bool m_isInterval;
 	bool m_isTitle;
 

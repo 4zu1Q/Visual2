@@ -86,6 +86,8 @@ ScenePlaying::ScenePlaying() :
 	m_isEnemyAttackHit(false),
 	m_isEnemySkillHit(false),
 	m_isOption(false),
+	m_isLose(false),
+	m_isWin(false),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_restartH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
@@ -539,24 +541,33 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	if (m_pPlayer->GetHp() <= 0)
 	{
 		m_isInterval = true;
+		m_isLose = true;
 		m_frameScene++;
 		if (m_frameScene >= kFadeTime)
 		{
 			return std::make_shared<SceneLose>();
 		}
 	}
+	else
+	{
+		m_isLose = false;
+	}
 
 	//ボスのHPがゼロになったら
 	if (m_pEnemy->GetHp() <= 0)
 	{
 		m_isInterval = true;
+		m_isWin = true;
 		m_frameScene++;
 		if (m_frameScene >= kFadeTime)
 		{
 			return std::make_shared<SceneWin>();
 		}
 	}
-
+	else
+	{
+		m_isWin = false;
+	}
 
 
 
@@ -635,13 +646,21 @@ void ScenePlaying::Draw()
 	}
 
 	//フェード暗幕
-	if (m_isInterval)
+	if (m_isInterval && m_isLose)
 	{
 		int alpha = kBlend * m_frameScene / kFadeTime;
 		SetDrawBlendMode(DX_BLENDMODE_MULA, alpha);
 		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
+
+	if (m_isInterval && m_isWin)
+	{
+		int alpha = kBlend * m_frameScene / kFadeTime;
+		SetDrawBlendMode(DX_BLENDMODE_MULA, alpha);
+		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xffffff, true);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
 
 #ifdef _DEBUG
 	DrawFormatString(700, 16, 0xffffff, "Select:%d", m_select);
