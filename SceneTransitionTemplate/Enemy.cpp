@@ -34,9 +34,11 @@ namespace
 	constexpr int kDamageCount = 120;
 
 	//スピード
-	constexpr float kSpeed = 0.4f;
+	constexpr float kSpeed = 0.8f;
 
 	constexpr float kWall = 475;
+
+	constexpr int kMaxHp = 200;
 
 	constexpr int kMax = 2;
 	constexpr int kHalf = 5;
@@ -53,7 +55,7 @@ Enemy::Enemy() :
 	m_skillRadius(25.0f),
 	m_searchRadius(300.0f),
 	m_stopRadius(40.0f),
-	m_hp(20),
+	m_hp(kMaxHp),
 	m_pos(VGet(0, 0, 0)),
 	m_attackPos(VGet(0,0,0)),
 	m_velocity(VGet(0, 0, 0)),
@@ -233,12 +235,12 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 	if (m_state == kAttack)	//攻撃の状態
 	{
 
-		if (!m_isAttackAnim && !m_isSkillAnim && !m_isIdleAnim)
-		{
-			m_isIdleAnim = true;
-			ChangeAnim(kIdleAnimIndex);
-		}
-		else m_isIdleAnim = false;
+		//if (!m_isAttackAnim && !m_isSkillAnim && !m_isIdleAnim)
+		//{
+		//	m_isIdleAnim = true;
+		//	ChangeAnim(kIdleAnimIndex);
+		//}
+		//else m_isIdleAnim = false;
 
 		if (!m_isRand)
 		{
@@ -250,7 +252,19 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		if (!m_isAttackAnim && !m_isSkillAnim)
 		{
 
-			m_attackFrame++;
+			//m_attackFrame++;
+			//	if (m_rand == 0 || m_rand == 1)
+			//	{
+			//		ChangeAnim(kAttackAnimIndex);
+			//		m_isAttackAnim = true;
+			//		m_isRand = false;
+			//	}
+			//	else if (m_rand == 2)
+			//	{
+			//		ChangeAnim(kSkillAnimIndex);
+			//		m_isSkillAnim = true;
+			//		m_isRand = false;
+			//	}
 
 			if (m_attackFrame >= 180)
 			{
@@ -336,6 +350,10 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		m_attackPos = VAdd(m_pos, m_attackDir);
 	}
 
+	if (m_hp <= 0)
+	{
+		m_hp = 0;
+	}
 
 	MV1SetPosition(m_modelH, m_pos);
 	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));
@@ -347,6 +365,8 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 void Enemy::Draw()
 {
 
+	DrawBox(1000, 10, 1000 + kMaxHp, 50, 0x0000ff, true);
+	DrawBox(1000, 10, 1000 + m_hp, 50, 0xff00ff, true);
 
 #ifdef _DEBUG
 

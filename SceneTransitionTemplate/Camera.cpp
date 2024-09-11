@@ -13,8 +13,8 @@
 /// </summary>
 namespace
 {
-	constexpr float kCameraDist = 96;
-	constexpr float kCameraHeight = 20;
+	constexpr float kCameraDist = 66;
+	constexpr float kCameraHeight = 10;
 
 	constexpr float kAngleSpeed = 0.05f;	//旋回速度
 	constexpr float kCameraPlayerTargetHeight = 400.0f;	//プレイヤー座標からどれだけ高い位置を注視点とするか
@@ -32,7 +32,7 @@ namespace
 /// コンストラクタ
 /// </summary>
 Camera::Camera() :
-	m_pos(VGet(0, 10, -25)),
+	m_pos(VGet(0, 10, 0)),
 	m_targetPos(VGet(0, 0, 0)),
 	m_cameraangle(VGet(0, 0, 0)),
 	m_angle(-DX_PI_F / 2)
@@ -52,7 +52,7 @@ Camera::~Camera()
 /// </summary>
 void Camera::Init()
 {
-	m_cameraangle = VGet(D2R(-20.0f), 0.0f, 0.0f);
+	//m_cameraangle = VGet(D2R(-20.0f), 0.0f, 0.0f);
 
 }
 

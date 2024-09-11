@@ -426,7 +426,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			{
 				PlaySoundMem(m_soundADamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
 
-				enemyHp -= 3;
+				enemyHp -= 30;
 				m_pEnemy->SetHp(enemyHp);
 				m_isPlayerAttackHitCount = true;
 				m_pEnemy->SetDamage(true);
@@ -456,7 +456,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			if (m_isPlayerSkillHit)
 			{
 				PlaySoundMem(m_soundSDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-				enemyHp -= 2;
+				enemyHp -= 20;
 				m_pEnemy->SetHp(enemyHp);
 				m_isPlayerSkillHitCount = true;
 				m_pEnemy->SetDamage(true);
@@ -646,7 +646,7 @@ void ScenePlaying::Draw()
 	}
 
 	//フェード暗幕
-	if (m_isInterval && m_isLose)
+	if (m_isInterval)
 	{
 		int alpha = kBlend * m_frameScene / kFadeTime;
 		SetDrawBlendMode(DX_BLENDMODE_MULA, alpha);
@@ -654,13 +654,13 @@ void ScenePlaying::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 
-	if (m_isInterval && m_isWin)
-	{
-		int alpha = kBlend * m_frameScene / kFadeTime;
-		SetDrawBlendMode(DX_BLENDMODE_MULA, alpha);
-		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xffffff, true);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-}
+	//if (m_isInterval)
+	//{
+	//	int alpha = kBlend * m_frameScene / kFadeTime;
+	//	SetDrawBlendMode(DX_BLENDMODE_MULA, alpha);
+	//	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xffffff, true);
+	//	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	//}
 
 #ifdef _DEBUG
 	DrawFormatString(700, 16, 0xffffff, "Select:%d", m_select);
