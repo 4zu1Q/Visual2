@@ -14,7 +14,7 @@
 namespace
 {
 	constexpr float kCameraDist = 66;
-	constexpr float kCameraHeight = 10;
+	constexpr float kCameraHeight = 5;
 
 	constexpr float kAngleSpeed = 0.05f;	//旋回速度
 	constexpr float kCameraPlayerTargetHeight = 400.0f;	//プレイヤー座標からどれだけ高い位置を注視点とするか

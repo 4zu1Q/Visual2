@@ -9,6 +9,8 @@ namespace
 {
 	//モデルのファイル名
 	const char* const kEnemyModelFilename = "data/model/enemy/Enemy.mv1";
+	const char* const kWeponModelFilename = "data/model/enemy/Skeleton_Blade.mv1";
+	const char* const kHpFlameFilename = "data/image/EnemyHpFlame.png";
 
 	//シェーダのファイル名
 	const char* const kOutlinePsFilename = "./OutlinePs.pso";
@@ -20,8 +22,8 @@ namespace
 	constexpr int kAttackAnimIndex = 5;	//攻撃
 	constexpr int kSkillAnimIndex = 12;	//スキル
 	constexpr int kDamageAnimIndex = 25;	//ダメージ
-	constexpr int kFallAnimIndex = 26;		//倒れる
-	constexpr int kFallingAnimIndex = 27;	//倒れ中
+	constexpr int kFallAnimIndex = 27;		//倒れる
+	constexpr int kFallingAnimIndex = 28;	//倒れ中
 
 	//アニメーションの切り替えにかかるフレーム数
 	constexpr float kAnimChangeFrame = 8.0f;
@@ -31,14 +33,14 @@ namespace
 	constexpr float kAddPosY = 8.0f;
 
 	//ダメージ
-	constexpr int kDamageCount = 120;
+	constexpr int kDamageCount = 60;
 
 	//スピード
 	constexpr float kSpeed = 0.8f;
 
 	constexpr float kWall = 475;
 
-	constexpr int kMaxHp = 200;
+	constexpr int kMaxHp = 500;
 
 	constexpr int kMax = 2;
 	constexpr int kHalf = 5;
@@ -48,7 +50,9 @@ namespace
 /// コンストラクタ
 /// </summary>
 Enemy::Enemy() :
-	m_modelH(),
+	m_modelH(-1),
+	m_modelWeponH(-1),
+	m_hpFlameH(LoadGraph(kHpFlameFilename)),
 	m_outlinePsH(-1),
 	m_outlineVsH(-1),
 	m_radius(15.0f),
@@ -70,9 +74,11 @@ Enemy::Enemy() :
 	m_isSkillAnim(false),
 	m_isDamageAnim(false),
 	m_isDeadAnim(false),
+	m_isDeadingAnim(false),
 	m_isAttackGeneration(false),
 	m_isSkillGeneration(false),
 	m_isRand(false),
+	m_isMove(false),
 	m_state(kIdle),
 	m_angle(0.0f),
 	m_frame(0),
@@ -82,7 +88,8 @@ Enemy::Enemy() :
 	m_animBlendRate(0.0f),
 	m_random(0),
 	m_rand(0),
-	m_workFrame(0)
+	m_workFrame(0),
+	m_attachFramePosition(VGet(0,0,0))
 {
 
 }
@@ -103,7 +110,7 @@ void Enemy::Load()
 	//モデルのロード
 	//m_modelHandle[0] = MV1LoadModel(kEnemyModelFilename);
 	m_modelH = MV1LoadModel(kEnemyModelFilename);
-
+	m_modelWeponH = MV1LoadModel(kWeponModelFilename);
 	//ShaderLoad();
 }
 
@@ -113,7 +120,9 @@ void Enemy::Load()
 void Enemy::Delete()
 {
 	MV1DeleteModel(m_modelH);
+	MV1DeleteModel(m_modelWeponH);
 	m_modelH = -1;
+	m_modelWeponH = -1;
 }
 
 /// <summary>
@@ -124,14 +133,10 @@ void Enemy::Init()
 	m_pos = VGet(-60.0f, 0.0f, 0.0f);
 	m_attackPos = VGet(m_pos.x, m_pos.y, m_pos.z - 10);
 
-	//待機アニメーションを設定
-	m_currentAnimNo = MV1AttachAnim(m_modelH, kIdleAnimIndex, -1, false);
-	m_prevAnimNo = -1;
-	m_animBlendRate = 1.0f;
-
 	MV1SetPosition(m_modelH, m_pos);
 	//敵のスケール
 	MV1SetScale(m_modelH, VGet(20, 20, 20));
+	MV1SetScale(m_modelWeponH, VGet(0.1, 0.1, 0.1));
 }
 
 /// <summary>
@@ -139,6 +144,24 @@ void Enemy::Init()
 /// </summary>
 void Enemy::Update(std::shared_ptr<Player> pPlayer)
 {
+
+	MATRIX transMat;
+	MATRIX attachFrameMat;
+	MATRIX mixMatrix;
+
+	//アタッチするモデルのMV1SetMatrixの設定を無効にする
+	MV1SetMatrix(m_modelWeponH, MGetIdent());
+
+	m_attachFramePosition = MV1GetFramePosition(m_modelWeponH, 0);
+
+	transMat = MGetTranslate(VScale(m_attachFramePosition, -1.0f));
+
+	attachFrameMat = MV1GetFrameLocalWorldMatrix(m_modelH, 14);
+
+	mixMatrix = MMult(transMat, attachFrameMat);
+
+	MV1SetMatrix(m_modelWeponH, mixMatrix);
+
 
 	//アニメーション
 	if (m_prevAnimNo != -1)
@@ -153,176 +176,156 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 	}
 
 	//アニメーションを進める
-	bool isLoop = UpdateAnim(m_currentAnimNo);
+	bool isLoop = UpdateAnim(m_currentAnimNo, m_isDeadAnim);
 	if (isLoop)
 	{
 		ChangeAnim(m_animIndex);
 	}
 	UpdateAnim(m_prevAnimNo);
 
-
-	//VECTOR enemyToPlayer = VSub(m_pPlayer->GetPos(), m_pos);
-	//bool isSearch = SearchSphereFlag(m_pPlayer);
-	//bool isStop = StopSphereFlag(m_pPlayer);
-
-#ifdef _DEBUG
-	//m_isDebugFlag = isSearch;
-#endif
-
-
-
-	//プレイヤーへの向きを取得
-	m_direction = VSub(pPlayer->GetPos(), m_pos);
-	m_direction = VNorm(m_direction);
-
-	//m_dirPos.x = m_pos.x * 1.5f;
-	//m_dirPos.y = m_pos.y;
-	//m_dirPos.z = m_pos.z * 1.5f;
-
-	//VECTOR d = VSub(m_dirPos, m_pos);
-	//d = VNorm(d);
-
-
-	if (m_state == kIdle)			//止まっている状態
+	if (m_state == kDeath)
 	{
-		if (!m_isIdleAnim)
+		if (!m_isDeadAnim)
 		{
-			ChangeAnim(kIdleAnimIndex);
+			ChangeAnim(kFallAnimIndex);
+			m_animIndex = kFallingAnimIndex;
+			m_isDeadAnim = true;
 		}
-		m_isIdleAnim = true;
-
-		m_animIndex = kIdleAnimIndex;
-	}
-	else
-	{
-		m_isIdleAnim = false;
-	}
-
-	if (m_state == kRun)		//プレイヤーを追っている状態
-	{
-
-		m_frame++;
-
-		m_angle = atan2f(m_direction.x, m_direction.z);
-
-		m_animIndex = kRunAnimIndex;
-
-		//ベクトルを、正規化し、向きだけを保存させる
-		m_velocity = VScale(m_direction, kSpeed);
-
-		if (!m_isAttackAnim && !m_isSkillAnim)
-		{
-			//敵の移動
-			m_pos = VAdd(m_pos, m_velocity);
-
-			if (!m_isRunAnim )
-			{
-				ChangeAnim(kRunAnimIndex);
-			}
-			m_isRunAnim = true;
-		}
-	}
-	else
-	{
-		if (m_isIdleAnim && m_isRunAnim)
-		{
-			ChangeAnim(kIdleAnimIndex);
-		}
-		m_isRunAnim = false;
-		m_animIndex = kIdleAnimIndex;
-	}
-
-	if (m_state == kAttack)	//攻撃の状態
-	{
-
-		//if (!m_isAttackAnim && !m_isSkillAnim && !m_isIdleAnim)
-		//{
-		//	m_isIdleAnim = true;
-		//	ChangeAnim(kIdleAnimIndex);
-		//}
-		//else m_isIdleAnim = false;
-
-		if (!m_isRand)
-		{
-			m_rand = GetRand(kMax);
-			m_isRand = true;
-		}
-
-
-		if (!m_isAttackAnim && !m_isSkillAnim)
-		{
-
-			//m_attackFrame++;
-			//	if (m_rand == 0 || m_rand == 1)
-			//	{
-			//		ChangeAnim(kAttackAnimIndex);
-			//		m_isAttackAnim = true;
-			//		m_isRand = false;
-			//	}
-			//	else if (m_rand == 2)
-			//	{
-			//		ChangeAnim(kSkillAnimIndex);
-			//		m_isSkillAnim = true;
-			//		m_isRand = false;
-			//	}
-
-			if (m_attackFrame >= 180)
-			{
-
-				if (m_rand == 0 || m_rand == 1)
-				{
-					ChangeAnim(kAttackAnimIndex);
-					m_isAttackAnim = true;
-					m_isRand = false;
-				}
-				else if (m_rand == 2)
-				{
-					ChangeAnim(kSkillAnimIndex);
-					m_isSkillAnim = true;
-					m_isRand = false;
-				}
-
-
-				m_attackFrame = 0;
-			}
-
 		
+	}
+	else
+	{
+
+		//プレイヤーへの向きを取得
+		m_direction = VSub(pPlayer->GetPos(), m_pos);
+		m_direction = VNorm(m_direction);
+
+
+		if (m_state == kIdle)			//止まっている状態
+		{
+			if (!m_isIdleAnim)
+			{
+				ChangeAnim(kIdleAnimIndex);
+			}
+			m_isIdleAnim = true;
+
+			m_animIndex = kIdleAnimIndex;
 		}
 		else
 		{
-			if (isLoop)
+			m_isIdleAnim = false;
+		}
+
+		if (!m_isMove)
+		{
+
+			if (m_state == kRun)		//プレイヤーを追っている状態
 			{
-				ChangeAnim(kIdleAnimIndex);
 
-				m_isAttackAnim = false;
-				m_isSkillAnim = false;
+				m_frame++;
 
+				m_angle = atan2f(m_direction.x, m_direction.z);
+
+				m_animIndex = kRunAnimIndex;
+
+				//ベクトルを、正規化し、向きだけを保存させる
+				m_velocity = VScale(m_direction, kSpeed);
+
+				//敵の移動
+				m_pos = VAdd(m_pos, m_velocity);
+
+				if (!m_isRunAnim)
+				{
+					ChangeAnim(kRunAnimIndex);
+				}
+				m_isRunAnim = true;
 			}
 		}
 
+		//else
+		//{
+		//	if (m_isIdleAnim && m_isRunAnim)
+		//	{
+		//		ChangeAnim(kIdleAnimIndex);
+		//	}
+		//	m_isRunAnim = false;
+		//	m_animIndex = kIdleAnimIndex;
+		//}
 
+		if (m_state == kAttack)	//攻撃の状態
+		{
+
+			if (!m_isRand)
+			{
+				m_rand = GetRand(kMax);
+				m_isRand = true;
+			}
+
+
+			if (!m_isAttackAnim && !m_isSkillAnim)
+			{
+
+				m_attackFrame++;
+
+				if (m_attackFrame >= 150)
+				{
+					if (m_rand == 0 || m_rand == 1)
+					{
+						ChangeAnim(kAttackAnimIndex);
+						m_isAttackAnim = true;
+						m_isRand = false;
+						m_isMove = true;
+					}
+					else if (m_rand == 2)
+					{
+						ChangeAnim(kSkillAnimIndex);
+						m_isSkillAnim = true;
+						m_isRand = false;
+						m_isMove = true;
+					}
+
+					m_attackFrame = 0;
+				}
+
+
+			}
+			else
+			{
+				if (isLoop)
+				{
+					m_isMove = false;
+
+					m_isAttackAnim = false;
+					m_isSkillAnim = false;
+				}
+			}
+
+
+		}
+		else
+		{
+			m_isIdleAnim = false;
+		}
+
+		//アニメーションが終わったら当たり判定の生成をやめる
+		if (m_isAttackAnim)
+		{
+			m_isAttackGeneration = true;
+		}
+		else
+		{
+			m_isAttackGeneration = false;
+		}
+		//アニメーションが終わったら当たり判定の生成をやめる
+		if (m_isSkillAnim)
+		{
+			m_isSkillGeneration = true;
+		}
+		else
+		{
+			m_isSkillGeneration = false;
+		}
 	}
-	else
-	{
-		m_isIdleAnim = false;
-	}
-
-
-	//アニメーションが終わったら当たり判定の生成をやめる
-	if (m_isAttackAnim)
-	{
-		m_isAttackGeneration = true;
-	}
-	else m_isAttackGeneration = false;
-
-	//アニメーションが終わったら当たり判定の生成をやめる
-	if (m_isSkillAnim)
-	{
-		m_isSkillGeneration = true;
-	}
-	else m_isSkillGeneration = false;
-
-	//m_attackPos = m_pos;
 
 	//移動範囲
 	if (m_pos.x >= kWall) m_pos.x = kWall;
@@ -365,8 +368,9 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 void Enemy::Draw()
 {
 
-	DrawBox(1000, 10, 1000 + kMaxHp, 50, 0x0000ff, true);
-	DrawBox(1000, 10, 1000 + m_hp, 50, 0xff00ff, true);
+	DrawBox(700, 13, 700 + kMaxHp, 50, 0xdc143c, true);
+	DrawBox(700, 13, 700 + m_hp, 50, 0x3cb371, true);
+	DrawExtendGraph(620, 10,1205, 50, m_hpFlameH, true);
 
 #ifdef _DEBUG
 
@@ -397,6 +401,11 @@ void Enemy::Draw()
 		DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_skillRadius, 8, 0x0000ff, 0x0000ff, false);
 	}
 
+	if (m_state == kDeath)
+	{
+
+	}
+
 #endif
 
 	// ダメージ演出  2フレーム間隔で表示非表示切り替え
@@ -408,7 +417,9 @@ void Enemy::Draw()
 // % 4 することで012301230123... に変換する
 	if (m_damageFrame % 8 >= 4) return;
 
+	MV1DrawModel(m_modelWeponH);
 	MV1DrawModel(m_modelH);
+	
 }
 
 /// <summary>
@@ -452,7 +463,7 @@ bool Enemy::PlayerAttackSphereHitFlag(std::shared_ptr<Player> pPlayer)
 	float Distance = sqrt(delX + delY + delZ);
 
 	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
-	if (Distance < m_radius + pPlayer->GetRadius())
+	if (Distance < m_radius + pPlayer->GetAttackRadius())
 	{
 		return true;
 	}
@@ -567,7 +578,7 @@ bool Enemy::StopSphereFlag(std::shared_ptr<Player> pPlayer)
 /// </summary>
 /// <param name="attachNo"></param>
 /// <returns></returns>
-bool Enemy::UpdateAnim(int attachNo)
+bool Enemy::UpdateAnim(int attachNo, bool isStayEndAnim)
 {
 	//アニメーションが設定されていないので終了
 	if (attachNo == -1) return false;
@@ -580,9 +591,10 @@ bool Enemy::UpdateAnim(int attachNo)
 	//現在再生中のアニメーションの総カウントを取得する
 	float total = MV1GetAttachAnimTotalTime(m_modelH, attachNo);
 
-	while (now >= total)
+	while (now > total)
 	{
-		now -= total;
+		if (isStayEndAnim)	now = total;
+		else				now -= total;
 		isLoop = true;
 	}
 

@@ -26,6 +26,7 @@ private:
 
 	void CreateItemHp(VECTOR pos);	//HPを回復するアイテムを生成
 
+	void Knockback(VECTOR pos ,VECTOR move ,float length);
 
 private:
 
@@ -56,6 +57,7 @@ private:
 
 	//フレーム関係
 	int m_frameScene;
+	int m_fadeFrameScene;
 	int m_playerAttackHitFrame;
 	int m_playerSkillHitFrame;
 	int m_enemyAttackHitFrame;
@@ -76,6 +78,8 @@ private:
 	bool m_isEnemyAttackHit;	//敵の攻撃が当たった場合
 	bool m_isEnemySkillHit;	//敵の攻撃が当たった場合
 	bool m_isItemHit;	//アイテムとプレイヤーが当たった場合
+
+	bool m_isEnemyDeath;
 
 	bool m_isEnemySearch;
 	bool m_isEnemyStop;

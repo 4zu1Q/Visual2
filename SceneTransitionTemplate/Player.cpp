@@ -61,9 +61,12 @@ namespace
 	constexpr float kHpSinSpeed = 0.05f;
 	constexpr float kHpAnimationSize = 3.0f;
 
+	constexpr float kMaxStamina = 400.0f;
 
 	//壁
 	constexpr float kWall = 475;
+
+	constexpr float kSelectSpeed = 3.0f;
 }
 
 /// <summary>
@@ -85,7 +88,8 @@ Player::Player() :
 	m_cameraAngle(0.0f),
 	m_angle(kInitAngle),
 	m_radius(7.0f),
-	m_skillRadius(15.0f),
+	m_attackRadius(15.0f),
+	m_skillRadius(8.0f),
 	m_isWalk(false),
 	m_isDamage(false),
 	m_isDash(false),
@@ -98,9 +102,11 @@ Player::Player() :
 	m_isAnimDash(false),
 	m_isAnimDamage(false),
 	m_isAnimDown(false),
+	m_isStamina(false),
 	m_damageFrame(0),
 	m_hp(10),
 	m_losthp(10),
+	m_stamina(kMaxStamina),
 	m_hpAnimationHeight(0.0f),
 	m_animKind(AnimKind::kIdle),
 	m_analogX(0.0f),
@@ -185,6 +191,11 @@ void Player::Update()
 {
 	Pad::Update();
 
+	if (m_stamina >= kMaxStamina)
+	{
+		m_stamina = kMaxStamina;
+	}
+
 	//アニメーション
 	if (m_prevAnimNo != -1)
 	{
@@ -238,12 +249,13 @@ void Player::Update()
 		}
 
 		//スキル攻撃
-		if (Pad::IsPress(PAD_INPUT_4))
+		if (Pad::IsPress(PAD_INPUT_4) && m_stamina >= 100.0f)
 		{
 			m_isSkill = true;
 			ChangeAnim(kSkillAnimIndex);
 			m_isMove = false;
-			PlaySoundMem(m_axeSkillSeH, DX_PLAYTYPE_BACK, true);//アタック
+			PlaySoundMem(m_axeSkillSeH, DX_PLAYTYPE_BACK, true);//スキル
+			m_stamina -= 100.0f;
 		}
 		else
 		{
@@ -325,7 +337,11 @@ void Player::Update()
 	}
 	else m_isSkillGeneration = false;
 
-
+	//HPがゼロより
+	if (m_hp <= 0)
+	{
+		m_hp = 0;
+	}
 
 
 	MV1SetPosition(m_modelH, m_pos);
@@ -352,6 +368,23 @@ void Player::Draw()
 		DrawExtendGraph(35 * i + 20, 16 + m_hpAnimationHeight, 35 * i + 52, 48, m_hpH, true);
 	}
 
+	DrawBox(19, 54, 22 + kMaxStamina, 66, 0xdc143c, true);
+
+	float alpha = 0;
+	alpha += kSelectSpeed;
+
+
+	if (!m_isStamina)
+	{
+		DrawBox(20, 55, 20 + m_stamina, 65, 0x3cb371, true);
+	}
+	else
+	{
+		DrawBox(20, 55, 20 + m_stamina, 65, 0xffa500, true);
+	}
+	
+
+
 #ifdef _DEBUG
 
 	DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_radius, 8, 0xffffff, 0xffffff, false);
@@ -367,11 +400,11 @@ void Player::Draw()
 
 	if (!m_isAttack)
 	{
-		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xff00ff, 0xff00ff, false);
+		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_attackRadius, 8, 0xff00ff, 0xff00ff, false);
 	}
 	else
 	{
-		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0x0000ff, 0x0000ff, false);
+		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_attackRadius, 8, 0x0000ff, 0x0000ff, false);
 	}
 
 	DrawFormatString(0, 16, 0xffffff, "Player(x:%f,y:%f,z:%f)", m_pos.x, m_pos.y, m_pos.z);
@@ -572,29 +605,54 @@ void Player::Move()
 
 
 	//Aボタンを押している間
-	if (Pad::IsPress(PAD_INPUT_1))
+	if (!m_isStamina)
 	{
-		//動くスピードを1.5倍
-		move = VScale(move, 1.5f);
+		if (Pad::IsPress(PAD_INPUT_1) && m_stamina >= 0.0f && VSize(move) != 0.0f)
+		{
+			//動くスピードを1.5倍
+			move = VScale(move, 2.0f);
 
-		//動きを反映
-		m_pos = VAdd(m_pos, move);
-		if (!m_isDash)
-		{
-			ChangeAnim(kRunAnimIndex);
-			m_animIndex = kRunAnimIndex;
+			m_stamina--;
+
+			if (m_stamina <= 0.0f)
+			{
+				m_isStamina = true;
+			}
+
+			//動きを反映
+			m_pos = VAdd(m_pos, move);
+			if (!m_isDash)
+			{
+				ChangeAnim(kRunAnimIndex);
+				m_animIndex = kRunAnimIndex;
+			}
+			m_isDash = true;
 		}
-		m_isDash = true;
+		else
+		{
+			m_stamina++;
+
+			if (m_isDash && m_isWalk)
+			{
+				ChangeAnim(kWalkAnimIndex);
+				m_animIndex = kWalkAnimIndex;
+			}
+			m_isDash = false;
+		}
 	}
-	else
+
+
+	if (m_isStamina)
 	{
-		if (m_isDash && m_isWalk)
+		m_stamina++;
+
+		if (m_stamina == kMaxStamina)
 		{
-			ChangeAnim(kWalkAnimIndex);
-			m_animIndex = kWalkAnimIndex;
+			m_isStamina = false;
 		}
-		m_isDash = false;
+
 	}
+	
 
 	if (!m_isDash && !m_isWalk)
 	{
@@ -603,6 +661,6 @@ void Player::Move()
 	}
 
 
-	VECTOR attackMove = VScale(m_attackDir, 12.0f);
+	VECTOR attackMove = VScale(m_attackDir, 15.0f);
 	m_attackPos = VAdd(m_pos, attackMove);
 }

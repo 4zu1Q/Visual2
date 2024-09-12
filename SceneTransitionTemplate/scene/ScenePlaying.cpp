@@ -63,6 +63,7 @@ namespace
 	constexpr float kWall = 475;
 
 
+	constexpr int kSceneTime = 600;
 }
 
 /// <summary>
@@ -88,6 +89,7 @@ ScenePlaying::ScenePlaying() :
 	m_isOption(false),
 	m_isLose(false),
 	m_isWin(false),
+	m_isEnemyDeath(false),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_restartH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
@@ -99,6 +101,7 @@ ScenePlaying::ScenePlaying() :
 	m_playerSkillHitFrame(0),
 	m_enemyAttackHitFrame(0),
 	m_enemySkillHitFrame(0),
+	m_fadeFrameScene(0),
 	m_soundBgmH(-1),
 	m_soundCancelH(-1),
 	m_soundDecsionH(-1),
@@ -340,35 +343,41 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//敵のスキルに当たった場合のフラグ取得
 	m_isEnemySkillHit = m_pEnemy->EnemySkillSphereHitFlag(m_pPlayer);
 
-	//敵の索敵範囲に入った場合のフラグ取得
-	m_isEnemySearch = m_pEnemy->SearchSphereFlag(m_pPlayer);
+	if (!m_isEnemyDeath)
+	{
+		//敵の索敵範囲に入った場合のフラグ取得
+		m_isEnemySearch = m_pEnemy->SearchSphereFlag(m_pPlayer);
 
-	//敵の止まる範囲に入った場合のフラグ取得
-	m_isEnemyStop = m_pEnemy->StopSphereFlag(m_pPlayer);
+		//敵の止まる範囲に入った場合のフラグ取得
+		m_isEnemyStop = m_pEnemy->StopSphereFlag(m_pPlayer);
+
+		//敵の行動の当たり判定
+		//敵の索敵にプレイヤーがいなかったら
+		if (!m_isEnemySearch && !m_isEnemyStop)
+		{
+			m_pEnemy->SetState(Enemy::kIdle);
+		}
+		//敵の索敵にプレイヤーがいたら
+		if (m_isEnemySearch && !m_isEnemyStop)
+		{
+			m_pEnemy->SetState(Enemy::kRun);
+		}
+		//敵の攻撃する範囲にプレイヤーがいたら
+		if (m_isEnemyStop)
+		{
+			m_pEnemy->SetState(Enemy::kAttack);
+		}
+	}
+	else
+	{
+		m_pEnemy->SetState(Enemy::kDeath);
+	}
 
 	VECTOR toEnemy = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
 	float length = VSize(toEnemy);
 
-
-	//敵の行動の当たり判定
-	//敵の索敵にプレイヤーがいなかったら
-	if (!m_isEnemySearch && !m_isEnemyStop)
-	{
-		m_pEnemy->SetState(Enemy::kIdle);
-	}
-	//敵の索敵にプレイヤーがいたら
-	if (m_isEnemySearch && !m_isEnemyStop)
-	{
-		m_pEnemy->SetState(Enemy::kRun);
-	}
-	//敵の攻撃する範囲にプレイヤーがいたら
-	if (m_isEnemyStop)
-	{
-		m_pEnemy->SetState(Enemy::kAttack);
-	}
-
-
-
+	VECTOR posVec = VGet(0,0,0);
+	VECTOR moveVec = VGet(0, 0, 0);
 
 	//アイテムとプレイヤーの当たり判定
 	for (int i = 0; i < m_pItem.size(); i++)
@@ -401,18 +410,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//プレイヤーと敵が当たった場合
 	if (m_isPlayerHit)
 	{
-
-		VECTOR posVec;
-		VECTOR moveVec;
-
-
-		//エネミーのベクトル座標からプレイヤーのベクトル座標を引いたベクトル
-		posVec = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
-
-		//
-		moveVec = VScale(posVec, length - (m_pPlayer->GetRadius() + m_pEnemy->GetRadius()));
-		m_pPlayer->SetPos(VAdd(m_pPlayer->GetPos(), moveVec));
-
+		Knockback(posVec,moveVec,length);
 	}
 
 	//プレイヤー攻撃した時だけ発生する
@@ -426,10 +424,12 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			{
 				PlaySoundMem(m_soundADamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
 
-				enemyHp -= 30;
+				enemyHp -= 100;
+				//enemyHp -= 10;
 				m_pEnemy->SetHp(enemyHp);
 				m_isPlayerAttackHitCount = true;
 				m_pEnemy->SetDamage(true);
+
 			}
 
 		}
@@ -456,7 +456,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			if (m_isPlayerSkillHit)
 			{
 				PlaySoundMem(m_soundSDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-				enemyHp -= 20;
+				enemyHp -= 50;
 				m_pEnemy->SetHp(enemyHp);
 				m_isPlayerSkillHitCount = true;
 				m_pEnemy->SetDamage(true);
@@ -475,75 +475,128 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		}
 	}
 
+	////敵が死んだら当たり判定を無くす
+	//if (!m_isEnemyDeath)
+	//{
+	//	//敵の攻撃を発生どうか
+	//	if (m_pEnemy->GetAttackGeneration() && !m_pEnemy->GetSkillGeneration())
+	//	{
+	//		//ダメージのクールタイム
+	//		if (!m_isEnemyAttackHitCount)
+	//		{
+	//			//敵の攻撃を受けた場合
+	//			if (m_isEnemyAttackHit)
+	//			{
+	//				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+
+	//				playerHp -= 1;
+	//				m_pPlayer->SetHp(playerHp);
+	//				m_isEnemyAttackHitCount = true;
+	//				m_pPlayer->SetDamage(true);
+	//				m_pPlayer->SetAnimDamage(true);
+	//			}
+	//		}
+	//		else
+	//		{
+	//			m_enemyAttackHitFrame++;
+
+	//			if (m_enemyAttackHitFrame >= 120)
+	//			{
+	//				m_isEnemyAttackHitCount = false;
+	//				m_enemyAttackHitFrame = 0;
+	//			}
+	//		}
+	//	}
+
+	//	//敵のスキルを発生させるかどうか
+	//	if (m_pEnemy->GetSkillGeneration() && !m_pEnemy->GetAttackGeneration())
+	//	{
+	//		//ダメージのクールタイム
+	//		if (!m_isEnemySkillHitCount)
+	//		{
+	//			//敵の攻撃を受けた場合
+	//			if (m_isEnemySkillHit)
+	//			{
+
+	//				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+	//				playerHp -= 3;
+	//				m_pPlayer->SetHp(playerHp);
+	//				m_isEnemySkillHitCount = true;
+	//				m_pPlayer->SetDamage(true);
+	//				m_pPlayer->SetAnimDamage(true);
+	//			}
+	//		}
+	//		else
+	//		{
+	//			m_enemySkillHitFrame++;
+
+	//			if (m_enemySkillHitFrame >= 120)
+	//			{
+	//				m_isEnemySkillHitCount = false;
+	//				m_enemySkillHitFrame = 0;
+	//			}
+	//		}
+	//	}
+	//}
 
 
-	//敵の攻撃を発生どうか
-	if (m_pEnemy->GetAttackGeneration())
-	{
-		//ダメージのクールタイム
-		if (!m_isEnemyAttackHitCount)
-		{
-			//敵の攻撃を受けた場合
-			if (m_isEnemyAttackHit)
+//ダメージのクールタイム
+			if (!m_isEnemyAttackHitCount)
 			{
-				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-				
-				playerHp -= 1;
-				m_pPlayer->SetHp(playerHp);
-				m_isEnemyAttackHitCount = true;
-				m_pPlayer->SetDamage(true);
-				m_pPlayer->SetAnimDamage(true);
-			}
-		}
-		else
-		{
-			m_enemyAttackHitFrame++;
+				//敵の攻撃を受けた場合
+				if (m_isEnemyAttackHit)
+				{
+					PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
 
-			if (m_enemyAttackHitFrame >= 120)
+					playerHp -= 1;
+					m_pPlayer->SetHp(playerHp);
+					m_isEnemyAttackHitCount = true;
+					m_pPlayer->SetDamage(true);
+					m_pPlayer->SetAnimDamage(true);
+
+
+				}
+			}
+			else
 			{
-				m_isEnemyAttackHitCount = false;
-				m_enemyAttackHitFrame = 0;
-			}
-		}
-	}
+				m_enemyAttackHitFrame++;
 
-	//敵のスキルを発生させるかどうか
-	if (m_pEnemy->GetSkillGeneration())
-	{
-		//ダメージのクールタイム
-		if (!m_isEnemySkillHitCount)
-		{
-			//敵の攻撃を受けた場合
-			if (m_isEnemySkillHit)
-			{
-
-				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-				playerHp -= 3;
-				m_pPlayer->SetHp(playerHp);
-				m_isEnemySkillHitCount = true;
-				m_pPlayer->SetDamage(true);
-				m_pPlayer->SetAnimDamage(true);
+				if (m_enemyAttackHitFrame >= 120)
+				{
+					m_isEnemyAttackHitCount = false;
+					m_enemyAttackHitFrame = 0;
+				}
 			}
-		}
-		else
-		{
-			m_enemySkillHitFrame++;
 
-			if (m_enemySkillHitFrame >= 120)
-			{
-				m_isEnemySkillHitCount = false;
-				m_enemySkillHitFrame = 0;
-			}
-		}
-	}
+
+	//敵の攻撃を受けた場合
+	//if (m_isEnemySkillHit)
+	//{
+
+	//	PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+	//	playerHp -= 3;
+	//	m_pPlayer->SetHp(playerHp);
+	//	m_isEnemySkillHitCount = true;
+	//	m_pPlayer->SetDamage(true);
+	//	m_pPlayer->SetAnimDamage(true);
+	//}
+
+
+
 
 	//プレイヤーのHPがゼロになったら
 	if (m_pPlayer->GetHp() <= 0)
 	{
-		m_isInterval = true;
 		m_isLose = true;
 		m_frameScene++;
-		if (m_frameScene >= kFadeTime)
+
+
+		if (m_frameScene >= kSceneTime - 120)
+		{
+			m_fadeFrameScene++;
+			m_isInterval = true;
+		}
+		if (m_frameScene >= kSceneTime)
 		{
 			return std::make_shared<SceneLose>();
 		}
@@ -556,10 +609,16 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//ボスのHPがゼロになったら
 	if (m_pEnemy->GetHp() <= 0)
 	{
-		m_isInterval = true;
+		m_isEnemyDeath = true;
 		m_isWin = true;
 		m_frameScene++;
-		if (m_frameScene >= kFadeTime)
+
+		if (m_frameScene >= kSceneTime - 120)
+		{
+			m_fadeFrameScene++;
+			m_isInterval = true;
+		}
+		if (m_frameScene >= kSceneTime)
 		{
 			return std::make_shared<SceneWin>();
 		}
@@ -598,8 +657,8 @@ void ScenePlaying::Draw()
 
 	m_pSkyDome->Draw();
 	m_pStage->Draw();
-	m_pPlayer->Draw();
 	m_pEnemy->Draw();
+	m_pPlayer->Draw();
 	
 	for (int i = 0; i < m_pItem.size(); i++)
 	{
@@ -648,7 +707,7 @@ void ScenePlaying::Draw()
 	//フェード暗幕
 	if (m_isInterval)
 	{
-		int alpha = kBlend * m_frameScene / kFadeTime;
+		int alpha = kBlend * m_fadeFrameScene / kFadeTime;
 		SetDrawBlendMode(DX_BLENDMODE_MULA, alpha);
 		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -688,5 +747,15 @@ void ScenePlaying::CreateItemHp(VECTOR pos)
 			return;
 		}
 	}
+}
+
+void ScenePlaying::Knockback(VECTOR pos, VECTOR move, float length)
+{
+	//エネミーのベクトル座標からプレイヤーのベクトル座標を引いたベクトル
+	pos = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
+
+	//
+	move = VScale(pos, length - (m_pPlayer->GetRadius() + m_pEnemy->GetRadius()));
+	m_pPlayer->SetPos(VAdd(m_pPlayer->GetPos(), move));
 }
 

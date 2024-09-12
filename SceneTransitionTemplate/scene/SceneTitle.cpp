@@ -19,11 +19,15 @@ namespace
 	constexpr int kLogoTop = 30;
 	constexpr int kLogoDown = 380;
 
-	constexpr int kSelectLeft = Game::kScreenWidth * 0.3;
-	constexpr int kSelectRight = Game::kScreenWidth * 0.4;
+	constexpr int kSelectLeft = Game::kScreenWidth * 0.24;
+	constexpr int kSelectRight = Game::kScreenWidth * 0.34;
 
 	constexpr int kLeft = Game::kScreenWidth * 0.45;
 	constexpr int kRight = Game::kScreenWidth * 0.55;
+
+	constexpr int kOperationLeft = Game::kScreenWidth * 0.35;
+	constexpr int kOperationRight = Game::kScreenWidth * 0.65;
+
 
 	constexpr int kStartTop = 420;
 	constexpr int kStartDown = 500;
@@ -65,8 +69,8 @@ SceneTitle::SceneTitle() :
 	m_logoH(LoadGraph("data/image/TitleLogo.png")),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_startH(LoadGraph("data/image/Start.png")),
-	m_optionH(LoadGraph("data/image/Option.png")),
-	m_operatorH(LoadGraph("data/image/Operator.png")),
+	m_optionH(LoadGraph("data/image/Operation.png")),
+	m_operationH(LoadGraph("data/image/Operator.png")),
 	m_endH(LoadGraph("data/image/End.png")),
 	m_soundBgmH(-1),
 	m_soundCancelH(-1),
@@ -123,7 +127,7 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
 				m_select = kGameEnd;
 			}
-			else if (m_select == kOption)
+			else if (m_select == kOperation)
 			{
 				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
 				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
@@ -133,7 +137,7 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 			{
 				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
 				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
-				m_select = kOption;
+				m_select = kOperation;
 			}
 		}
 
@@ -144,9 +148,9 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 			{
 				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
 				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
-				m_select = kOption;
+				m_select = kOperation;
 			}
-			else if (m_select == kOption)
+			else if (m_select == kOperation)
 			{
 				//m_pManager->m_pSoundManager.PlaySE("SelectSe");
 				PlaySoundMem(m_soundSelectH, DX_PLAYTYPE_BACK, true);//選択音
@@ -170,7 +174,7 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 				PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
 
 			}
-			else if (m_select == kOption)
+			else if (m_select == kOperation)
 			{
 				//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
 				m_isOption = true;
@@ -327,7 +331,7 @@ void SceneTitle::Draw()
 		{
 			DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
 		}
-		else if (m_select == kOption)
+		else if (m_select == kOperation)
 		{
 			DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
 		}
@@ -338,7 +342,7 @@ void SceneTitle::Draw()
 
 		DrawExtendGraph(kLogoLeft, kLogoTop, kLogoRight, kLogoDown, m_logoH, true);	//ロゴ
 		DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
-		DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
+		DrawExtendGraph(kOperationLeft, kOptionTop, kOperationRight, kOptionDown, m_optionH, true);//オプション
 		DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
 	}
 	else	
@@ -351,7 +355,7 @@ void SceneTitle::Draw()
 			// 不透明に戻して白い枠
 			DrawLineBox(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, 0x00ffff);
 
-			DrawExtendGraph(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, m_operatorH, true);
+			DrawExtendGraph(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, m_operationH, true);
 
 			////セレクト
 			//if (m_option == kOperator)

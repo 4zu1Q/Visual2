@@ -57,7 +57,7 @@ public:
 		kIdle,	//待機
 		kRun,	//走る
 		kAttack,	 //攻撃
-		kPowerAttack,//溜め攻撃
+		kDeath,		//死ぬ
 	};
 
 	State GetState() { return m_state; }
@@ -66,7 +66,7 @@ public:
 private:
 	//アニメーションの進行
 //ループしたかどうかを返す
-	bool UpdateAnim(int attachNo);
+	bool UpdateAnim(int attachNo, bool isStayEndAnim = false);
 
 	//アニメーションの変更
 	void ChangeAnim(int animIndex);
@@ -79,6 +79,8 @@ private:
 	//モデルハンドル
 	//int m_modelHandle[8];
 	int m_modelH;
+	int m_modelWeponH;
+	int m_hpFlameH;
 	//シェーダハンドル
 	int m_outlineVsH;
 	int m_outlinePsH;
@@ -114,12 +116,17 @@ private:
 	float m_searchRadius;
 	float m_stopRadius;
 
+	//移動するかどうかのフラグ
+	bool m_isMove;
+
+	//アニメーションフラグ
 	bool m_isIdleAnim;
 	bool m_isRunAnim;
 	bool m_isAttackAnim;
 	bool m_isSkillAnim;
 	bool m_isDamageAnim;
 	bool m_isDeadAnim;
+	bool m_isDeadingAnim;
 
 	bool m_isAttackGeneration;
 	bool m_isSkillGeneration;
@@ -132,6 +139,13 @@ private:
 
 	//State変数
 	State m_state;
+
+	//武器に関する変数
+	VECTOR m_attachFramePosition;
+	//MATRIX m_transMat;
+	//MATRIX m_attachFrameMat;
+	//MATRIX m_mixMatrix;
+
 
 #ifdef _DEBUG
 	bool m_isDebugFlag = false;

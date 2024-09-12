@@ -20,6 +20,8 @@ public:
 	float GetRadius() { return m_radius; }
 	//スキルの半径
 	float GetSkillRadius() { return m_skillRadius; }
+	//攻撃の半径
+	float GetAttackRadius() { return m_attackRadius; }
 
 	//プレイヤーの座標を取得
 	const VECTOR& GetPos() const { return m_pos; }
@@ -102,6 +104,10 @@ private:
 	int m_hp;
 	int m_losthp;
 
+	//スタミナ
+	float m_stamina;
+	bool m_isStamina;
+
 	float m_analogX;
 	float m_analogZ;
 
@@ -136,6 +142,7 @@ private:
 	//当たり判定の半径
 	float m_radius;
 	float m_skillRadius;
+	float m_attackRadius;
 
 	//当たり判定の発生フラグ
 	bool m_isAttackGeneration;

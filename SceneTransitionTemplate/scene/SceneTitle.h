@@ -25,7 +25,7 @@ private:
 	enum Select
 	{
 		kStart,		//スタート
-		kOption,	//オプション
+		kOperation,	//オプション
 		kGameEnd,	//終了
 	};
 
@@ -49,7 +49,7 @@ private:
 	int m_startH;
 	int m_optionH;
 	int m_endH;
-	int m_operatorH;
+	int m_operationH;
 	int m_selectH;
 	int m_backgroundH;
 
