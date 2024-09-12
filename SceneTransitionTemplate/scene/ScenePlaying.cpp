@@ -327,6 +327,11 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	m_pCamera->PlayCameraUpdate(*m_pPlayer);
 
 
+	VECTOR toEnemy = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
+	float length = VSize(toEnemy);
+
+	VECTOR posVec = VGet(0, 0, 0);
+	VECTOR moveVec = VGet(0, 0, 0);
 
 	//プレイヤーと敵が当たった場合のフラグの取得
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
@@ -367,17 +372,18 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		{
 			m_pEnemy->SetState(Enemy::kAttack);
 		}
+
+		//プレイヤーと敵が当たった場合
+		if (m_isPlayerHit)
+		{
+			Knockback(posVec, moveVec, length);
+		}
 	}
 	else
 	{
 		m_pEnemy->SetState(Enemy::kDeath);
 	}
 
-	VECTOR toEnemy = VSub(m_pEnemy->GetPos(), m_pPlayer->GetPos());
-	float length = VSize(toEnemy);
-
-	VECTOR posVec = VGet(0,0,0);
-	VECTOR moveVec = VGet(0, 0, 0);
 
 	//アイテムとプレイヤーの当たり判定
 	for (int i = 0; i < m_pItem.size(); i++)
@@ -407,11 +413,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		}
 	}
 
-	//プレイヤーと敵が当たった場合
-	if (m_isPlayerHit)
-	{
-		Knockback(posVec,moveVec,length);
-	}
+
 
 	//プレイヤー攻撃した時だけ発生する
 	if (m_pPlayer->GetAttackGeneration())
