@@ -16,7 +16,7 @@ public:
 
 	void TitleCameraUpdate();
 	void PlayCameraUpdate(Player& player);		//ゲームプレイ用のカメラ設定
-	void TargetCameraUpadate();		//ロックオン機能のカメラ設定
+	void TargetCameraUpadate(Player& player, Enemy& enemy);		//ロックオン機能のカメラ設定
 
 	//カメラのアングルを取得
 	const float GetAngle() const { return m_angle; }
@@ -25,6 +25,7 @@ public:
 	const VECTOR& GetPos() const { return m_pos; }
 	//注視点の座標を取得
 	const VECTOR& GetTargetPos() const { return m_targetPos; }
+
 
 private:
 

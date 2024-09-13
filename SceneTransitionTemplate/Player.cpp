@@ -36,7 +36,7 @@ namespace
 	//アニメーション
 	constexpr int kIdleAnimIndex = 1;		//待機
 	constexpr int kWalkAnimIndex = 2;		//歩き
-	constexpr int kRunAnimIndex = 7;		//走り
+	constexpr int kDashAnimIndex = 7;		//走り
 	constexpr int kAttackAnimIndex = 31;	//攻撃
 	constexpr int kSkillAnimIndex = 41;	//スキル
 	constexpr int kDamageAnimIndex = 25;	//ダメージ
@@ -74,9 +74,10 @@ namespace
 /// </summary>
 Player::Player() :
 	m_modelH(-1),
-	m_pos(VGet(0,0,0)),
-	m_attackPos(VGet(0,0,0)),
-	m_attackDir(VGet(0,0,0)),
+	m_pos(VGet(0, 0, 0)),
+	m_attackPos(VGet(0, 0, 0)),
+	m_attackDir(VGet(0, 0, 0)),
+	m_shadowMapH(-1),
 	m_hpH(LoadGraph(kHpFilename)),
 	m_losthpH(LoadGraph(kLostHpFilename)),
 	m_hpFlameH(LoadGraph(kHpFlameFilename)),
@@ -89,7 +90,7 @@ Player::Player() :
 	m_angle(kInitAngle),
 	m_radius(7.0f),
 	m_attackRadius(15.0f),
-	m_skillRadius(8.0f),
+	m_skillRadius(10.0f),
 	m_isWalk(false),
 	m_isDamage(false),
 	m_isDash(false),
@@ -103,6 +104,7 @@ Player::Player() :
 	m_isAnimDamage(false),
 	m_isAnimDown(false),
 	m_isStamina(false),
+	m_isAvoid(false),
 	m_damageFrame(0),
 	m_hp(10),
 	m_losthp(10),
@@ -113,7 +115,9 @@ Player::Player() :
 	m_analogZ(0.0f),
 	m_damageSeH(-1),
 	m_axeAttackSeH(-1),
-	m_axeSkillSeH(-1)
+	m_axeSkillSeH(-1),
+	m_shadowAngle(0.0f),
+	m_lightDirection(VGet(0, 0, 0))
 {
 	m_damageSeH = LoadSoundMem(kDamageFilename);	  //ダメージ音
 	m_axeAttackSeH = LoadSoundMem(kAttackFilename);	  //攻撃音
@@ -131,6 +135,7 @@ Player::Player() :
 Player::~Player()
 {
 	Delete();
+	ShadowMapDelete(m_modelH);
 
 	DeleteSoundMem(m_damageSeH);
 	DeleteSoundMem(m_axeAttackSeH);
@@ -146,6 +151,9 @@ void Player::Load()
 	//モデルのロード
 	m_modelH = MV1LoadModel(kPlayerModelFilename);
 	assert(m_modelH > -1);
+
+	//シャドウマップモデルをロード
+	//ShadowMapLoad();
 
 	//アニメーションを再生
 
@@ -181,6 +189,8 @@ void Player::Init()
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
 	MV1SetScale(m_modelH, VGet(kScale, kScale, kScale));
 
+	//シャドウマップの初期化
+	//ShadowMapInit();
 
 }
 
@@ -190,6 +200,8 @@ void Player::Init()
 void Player::Update()
 {
 	Pad::Update();
+
+	//ShadowMapUpdate();
 
 	if (m_stamina >= kMaxStamina)
 	{
@@ -216,20 +228,23 @@ void Player::Update()
 	}
 	UpdateAnim(m_prevAnimNo);
 
-	////HPが無くなってゲームオーバー
-	//if (m_isAnimDown)
-	//{
-	//	if (!m_isDown)
-	//	{
-	//		ChangeAnim(kFallAnimIndex);
-	//		m_isDown = true;
-	//	}
-	//	
-	//}
+	//回避入れたい
+	if (m_isAvoid)
+	{
+
+	}
+
+	//死んだら処理
+	if (m_isDown)
+	{
+		
+
+
+	}
 
 
 	//ボタンを押したら攻撃アニメーションを再生する
-	if (!m_isAttack && !m_isSkill)
+	if (!m_isAttack && !m_isSkill && !m_isDown)
 	{
 		//攻撃
 		if (Pad::IsPress(PAD_INPUT_3))
@@ -275,6 +290,7 @@ void Player::Update()
 			m_isAttack = false;
 			m_isSkill = false;
 			m_isDash = false;
+			m_isDown = false;
 		}
 		
 	}
@@ -337,7 +353,7 @@ void Player::Update()
 	}
 	else m_isSkillGeneration = false;
 
-	//HPがゼロより
+	//HPがゼロより下にいった場合
 	if (m_hp <= 0)
 	{
 		m_hp = 0;
@@ -428,8 +444,18 @@ void Player::Draw()
 	// % 4 することで012301230123... に変換する
 	if (m_damageFrame % 8 >= 4) return;
 
+
+	// 描画にキャラクターモデル用のシャドウマップと
+	// ステージモデル用のシャドウマップのどちらも使用する
+	//SetUseShadowMap(0, m_modelH);
+
+	////シャドウマップへの描画の準備
+	//ShadowMap_DrawSetup(m_shadowMapH);
+
 	MV1DrawModel(m_modelH);
 
+	////シャドウマップの設定を解除
+	//SetUseShadowMap(0, -1);
 }
 
 /// <summary>
@@ -539,6 +565,9 @@ void Player::ShaderUpdate()
 
 }
 
+/// <summary>
+/// プレイヤーの移動関数
+/// </summary>
 void Player::Move()
 {
 
@@ -578,9 +607,9 @@ void Player::Move()
 	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 	move = VTransform(move, mtx);
 
-	if(VSize(move) != 0.0f)
+	if (VSize(move) != 0.0f)
 	{
-		if (!m_isWalk) 
+		if (!m_isWalk)
 		{
 			ChangeAnim(kWalkAnimIndex);
 			m_animIndex = kWalkAnimIndex;
@@ -623,8 +652,8 @@ void Player::Move()
 			m_pos = VAdd(m_pos, move);
 			if (!m_isDash)
 			{
-				ChangeAnim(kRunAnimIndex);
-				m_animIndex = kRunAnimIndex;
+				ChangeAnim(kDashAnimIndex);
+				m_animIndex = kDashAnimIndex;
 			}
 			m_isDash = true;
 		}
@@ -640,11 +669,18 @@ void Player::Move()
 			m_isDash = false;
 		}
 	}
-
-
-	if (m_isStamina)
+	else
 	{
-		m_stamina++;
+		m_isDash = false;
+
+		m_stamina += 0.5f;
+
+		if (!m_isDash && !m_isWalk)
+		{
+			ChangeAnim(kWalkAnimIndex);
+			m_animIndex = kWalkAnimIndex;
+		}
+		m_isWalk = true;
 
 		if (m_stamina == kMaxStamina)
 		{
@@ -652,7 +688,7 @@ void Player::Move()
 		}
 
 	}
-	
+
 
 	if (!m_isDash && !m_isWalk)
 	{
@@ -664,3 +700,63 @@ void Player::Move()
 	VECTOR attackMove = VScale(m_attackDir, 15.0f);
 	m_attackPos = VAdd(m_pos, attackMove);
 }
+
+/// <summary>
+/// シャドウマップのロード
+/// </summary>
+void Player::ShadowMapLoad()
+{
+	m_shadowMapH = MakeShadowMap(1024, 1024);
+}
+/// <summary>
+/// シャドウマップの初期化
+/// </summary>
+void Player::ShadowMapInit()
+{
+	SetShadowMapDrawArea(m_shadowMapH, VGet(-1000.0f, -1.0f, -1000.0f), VGet(1000.0f, 1000.0f, 1000.0f));
+	m_shadowAngle = 0.0f;
+}
+/// <summary>
+/// シャドウマップのアップデート
+/// </summary>
+void Player::ShadowMapUpdate()
+{
+	m_shadowAngle += 0.0125f;
+	if (m_shadowAngle > DX_PI_F * 2.0f)
+	{
+		m_shadowAngle -= DX_PI_F * 2.0f;
+	}
+
+	//ライトの方向ベクトルの算出
+	m_lightDirection.x = sin(m_shadowAngle);
+	m_lightDirection.y = -1.0f;
+	m_lightDirection.z = cos(m_shadowAngle);
+
+	//ライトの方向を設定
+	SetLightDirection(m_lightDirection);
+
+	//シャドウマップが想定するライトの方向もセット
+	SetShadowMapLightDirection(m_shadowMapH, m_lightDirection);
+
+
+
+}
+/// <summary>
+/// シャドウマップの描画
+/// </summary>
+void Player::ShadowMapDraw(int handle)
+{
+
+}
+/// <summary>
+/// シャドウマップのデリート
+/// </summary>
+void Player::ShadowMapDelete(int handle)
+{
+	// シャドウマップの削除
+	DeleteShadowMap(handle);
+	m_shadowMapH = -1;
+}
+
+
+

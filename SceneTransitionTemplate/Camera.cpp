@@ -169,9 +169,17 @@ void Camera::TitleCameraUpdate()
 	SetCameraPositionAndTarget_UpVecY(m_pos, VGet(0, 0, 0));
 }
 
-void Camera::TargetCameraUpadate()
+void Camera::TargetCameraUpadate(Player& player, Enemy& enemy)
 {
+	m_pos = VAdd(m_pos , VGet(player.GetPos().x + 5.0f, player.GetPos().y + 20.f, player.GetPos().z + 20));
 
+	VECTOR enemyAimPos = VGet(enemy.GetPos().x, enemy.GetPos().y + 20.0f, enemy.GetPos().z);
+	VECTOR posToAim = VSub(enemyAimPos, m_pos);
+
+	//現在位置に設定したポジションを足す
+	m_pos = VAdd(m_pos, posToAim);
+	//SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
+	SetCameraPositionAndTarget_UpVecY(m_pos, enemy.GetPos());
 }
 
 void Camera::DrawGrid()

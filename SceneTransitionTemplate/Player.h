@@ -82,6 +82,12 @@ private:
 	//移動関数
 	void Move();
 
+	void ShadowMapLoad();
+	void ShadowMapInit();
+	void ShadowMapUpdate();
+	void ShadowMapDraw(int handle);
+	void ShadowMapDelete(int handle);
+
 private:
 	//モデルハンドル
 	int m_modelH;
@@ -125,6 +131,7 @@ private:
 	bool m_isWalk;
 	bool m_isDash;
 	bool m_isDown;
+	bool m_isAvoid;
 
 	//アニメーション情報
 	int m_animIndex;
@@ -167,5 +174,12 @@ private:
 
 	//State m_currentState;
 	AnimKind m_animKind;
+
+	//シャドウマップ変数
+	int m_shadowMapH;
+	float m_shadowAngle;
+	VECTOR m_lightDirection;
+
+
 };
 

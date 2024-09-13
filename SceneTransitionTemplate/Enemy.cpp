@@ -18,7 +18,7 @@ namespace
 
 	//アニメーション
 	constexpr int kIdleAnimIndex = 42;		//待機
-	constexpr int kRunAnimIndex = 55;		//走り
+	constexpr int kDashAnimIndex = 55;		//走り
 	constexpr int kAttackAnimIndex = 5;	//攻撃
 	constexpr int kSkillAnimIndex = 12;	//スキル
 	constexpr int kDamageAnimIndex = 25;	//ダメージ
@@ -226,7 +226,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 
 				m_angle = atan2f(m_direction.x, m_direction.z);
 
-				m_animIndex = kRunAnimIndex;
+				m_animIndex = kDashAnimIndex;
 
 				//ベクトルを、正規化し、向きだけを保存させる
 				m_velocity = VScale(m_direction, kSpeed);
@@ -236,7 +236,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 
 				if (!m_isRunAnim)
 				{
-					ChangeAnim(kRunAnimIndex);
+					ChangeAnim(kDashAnimIndex);
 				}
 				m_isRunAnim = true;
 			}
@@ -252,14 +252,18 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		//	m_animIndex = kIdleAnimIndex;
 		//}
 
+		
+
 		if (m_state == kAttack)	//攻撃の状態
 		{
 
 			if (!m_isRand)
 			{
-				m_rand = GetRand(kMax);
+				m_rand = GetRand(2);
 				m_isRand = true;
 			}
+
+			
 
 
 			if (!m_isAttackAnim && !m_isSkillAnim)
@@ -267,16 +271,16 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 
 				m_attackFrame++;
 
-				if (m_attackFrame >= 150)
+				if (m_attackFrame > 150)
 				{
-					if (m_rand == 0 || m_rand == 1)
+					if (m_rand <= 1)
 					{
 						ChangeAnim(kAttackAnimIndex);
 						m_isAttackAnim = true;
 						m_isRand = false;
 						m_isMove = true;
 					}
-					else if (m_rand == 2)
+					else
 					{
 						ChangeAnim(kSkillAnimIndex);
 						m_isSkillAnim = true;
@@ -286,6 +290,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 
 					m_attackFrame = 0;
 				}
+				
 
 
 			}
@@ -297,6 +302,9 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 
 					m_isAttackAnim = false;
 					m_isSkillAnim = false;
+
+					m_isAttackGeneration = false;
+					m_isSkillGeneration = false;
 				}
 			}
 
@@ -308,7 +316,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		}
 
 		//アニメーションが終わったら当たり判定の生成をやめる
-		if (m_isAttackAnim)
+		if (m_isAttackAnim && !m_isSkillAnim)
 		{
 			m_isAttackGeneration = true;
 		}
@@ -317,7 +325,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 			m_isAttackGeneration = false;
 		}
 		//アニメーションが終わったら当たり判定の生成をやめる
-		if (m_isSkillAnim)
+		if (m_isSkillAnim && !m_isAttackAnim)
 		{
 			m_isSkillGeneration = true;
 		}

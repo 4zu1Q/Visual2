@@ -33,10 +33,10 @@ public:
 	bool StopSphereFlag(std::shared_ptr<Player> pPlayer);
 
 	const bool& GetAttackGeneration() const { return m_isAttackGeneration; }
-	const bool& GetSkillGeneration() const { return m_isAttackGeneration; }
+	const bool& GetSkillGeneration() const { return m_isSkillGeneration; }
 
-	void SetAttackGeneration(bool isGeneration) { m_isAttackGeneration = isGeneration; }
-	void SetSkillGeneration(bool isGeneration) { m_isSkillGeneration = isGeneration; }
+	void SetAttackGeneration(bool isAttackGeneration) { m_isAttackGeneration = isAttackGeneration; }
+	void SetSkillGeneration(bool isSkillGeneration) { m_isSkillGeneration = isSkillGeneration; }
 
 	float GetRadius() { return m_radius; }
 	VECTOR GetPos() { return m_pos; }
