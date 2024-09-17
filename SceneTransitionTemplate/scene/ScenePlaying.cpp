@@ -337,20 +337,21 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//プレイヤーと敵が当たった場合のフラグの取得
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
 
-	//プレイヤーの攻撃に当たった場合のフラグ取得
-	m_isPlayerAttackHit = m_pEnemy->PlayerAttackSphereHitFlag(m_pPlayer);
-
-	//プレイヤーのスキルに当たった場合のフラグ取得
-	m_isPlayerSkillHit = m_pEnemy->PlayerSkillSphereHitFlag(m_pPlayer);
-
 	//敵の攻撃に当たった場合のフラグ取得
 	m_isEnemyAttackHit = m_pEnemy->EnemyAttackSphereHitFlag(m_pPlayer);
 
 	//敵のスキルに当たった場合のフラグ取得
 	m_isEnemySkillHit = m_pEnemy->EnemySkillSphereHitFlag(m_pPlayer);
 
+	//敵が死んだら当たり判定を消す
 	if (!m_isEnemyDeath)
 	{
+		//プレイヤーの攻撃に当たった場合のフラグ取得
+		m_isPlayerAttackHit = m_pEnemy->PlayerAttackSphereHitFlag(m_pPlayer);
+
+		//プレイヤーのスキルに当たった場合のフラグ取得
+		m_isPlayerSkillHit = m_pEnemy->PlayerSkillSphereHitFlag(m_pPlayer);
+
 		//敵の索敵範囲に入った場合のフラグ取得
 		m_isEnemySearch = m_pEnemy->SearchSphereFlag(m_pPlayer);
 
@@ -414,69 +415,72 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		}
 	}
 
-
-
-	//プレイヤー攻撃した時だけ発生する
-	if (m_pPlayer->GetAttackGeneration())
+	if (!m_isEnemyDeath)
 	{
-		//攻撃のクールタイム
-		if (!m_isPlayerAttackHitCount)
+		//プレイヤー攻撃した時だけ発生する
+		if (m_pPlayer->GetAttackGeneration())
 		{
-			//プレイヤーの攻撃が敵に入った場合
-			if (m_isPlayerAttackHit)
+			//攻撃のクールタイム
+			if (!m_isPlayerAttackHitCount)
 			{
-				PlaySoundMem(m_soundADamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+				//プレイヤーの攻撃が敵に入った場合
+				if (m_isPlayerAttackHit)
+				{
+					PlaySoundMem(m_soundADamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
 
-				enemyHp -= 100;
-				//enemyHp -= 10;
-				m_pEnemy->SetHp(enemyHp);
-				m_isPlayerAttackHitCount = true;
-				m_pEnemy->SetDamage(true);
+					//enemyHp -= 100;
+					enemyHp -= 10;
+					m_pEnemy->SetHp(enemyHp);
+					m_isPlayerAttackHitCount = true;
+					m_pEnemy->SetDamage(true);
+
+				}
 
 			}
-
-		}
-		else
-		{
-			m_playerAttackHitFrame++;
-
-			if (m_playerAttackHitFrame >= 60)
+			else
 			{
-				m_isPlayerAttackHitCount = false;
-				m_playerAttackHitFrame = 0;
+				m_playerAttackHitFrame++;
+
+				if (m_playerAttackHitFrame >= 40)
+				{
+					m_isPlayerAttackHitCount = false;
+					m_playerAttackHitFrame = 0;
+				}
+			}
+		}
+
+		//プレイヤースキルを使用した時のみ発生する
+		if (m_pPlayer->GetSkillGeneration())
+		{
+			//スキルのクールタイム
+			if (!m_isPlayerSkillHitCount)
+			{
+
+				//プレイヤーのスキルが敵に入った場合
+				if (m_isPlayerSkillHit)
+				{
+					PlaySoundMem(m_soundSDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+					enemyHp -= 50;
+					m_pEnemy->SetHp(enemyHp);
+					m_isPlayerSkillHitCount = true;
+					m_pEnemy->SetDamage(true);
+				}
+
+			}
+			else
+			{
+				m_playerSkillHitFrame++;
+
+				if (m_playerSkillHitFrame >= 50)
+				{
+					m_isPlayerSkillHitCount = false;
+					m_playerSkillHitFrame = 0;
+				}
 			}
 		}
 	}
 
-	//プレイヤースキルを使用した時のみ発生する
-	if (m_pPlayer->GetSkillGeneration())
-	{
-		//スキルのクールタイム
-		if (!m_isPlayerSkillHitCount)
-		{
-
-			//プレイヤーのスキルが敵に入った場合
-			if (m_isPlayerSkillHit)
-			{
-				PlaySoundMem(m_soundSDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-				enemyHp -= 50;
-				m_pEnemy->SetHp(enemyHp);
-				m_isPlayerSkillHitCount = true;
-				m_pEnemy->SetDamage(true);
-			}
-
-		}
-		else
-		{
-			m_playerSkillHitFrame++;
-
-			if (m_playerSkillHitFrame >= 80)
-			{
-				m_isPlayerSkillHitCount = false;
-				m_playerSkillHitFrame = 0;
-			}
-		}
-	}
+	
 
 	if (m_pEnemy->GetAttackGeneration() && !m_pEnemy->GetSkillGeneration())
 	{
@@ -492,7 +496,6 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				m_isEnemyAttackHitCount = true;
 				m_pPlayer->SetDamage(true);
 				m_pPlayer->SetAnimDamage(true);
-				m_pEnemy->SetAttackGeneration(false);
 
 			}
 		}
@@ -501,8 +504,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			m_enemyAttackHitFrame++;
 			if (m_enemyAttackHitFrame >= 120)
 			{
+				//m_pEnemy->SetAttackAnim(false);
 				m_isEnemyAttackHitCount = false;
 				m_enemyAttackHitFrame = 0;
+				m_pEnemy->SetAttackGeneration(false);
 			}
 		}
 	}
@@ -520,12 +525,11 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			{
 
 				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-				playerHp -= 3;
+				playerHp -= 2;
 				m_pPlayer->SetHp(playerHp);
 				m_isEnemySkillHitCount = true;
 				m_pPlayer->SetDamage(true);
 				m_pPlayer->SetAnimDamage(true);
-				m_pEnemy->SetSkillGeneration(false);
 			}
 		}
 		else
@@ -534,8 +538,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 			if (m_enemySkillHitFrame >= 120)
 			{
+				//m_pEnemy->SetSkillAnim(false);
 				m_isEnemySkillHitCount = false;
 				m_enemySkillHitFrame = 0;
+				m_pEnemy->SetSkillGeneration(false);
 			}
 		}
 	}
@@ -543,69 +549,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 
 	
-	////敵が死んだら当たり判定を無くす
-//if (!m_isEnemyDeath)
-//{
-//	//敵の攻撃を発生どうか
-//	if (m_pEnemy->GetAttackGeneration() && !m_pEnemy->GetSkillGeneration())
-//	{
-//		//ダメージのクールタイム
-//		if (!m_isEnemyAttackHitCount)
-//		{
-//			//敵の攻撃を受けた場合
-//			if (m_isEnemyAttackHit)
-//			{
-//				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
 
-//				playerHp -= 1;
-//				m_pPlayer->SetHp(playerHp);
-//				m_isEnemyAttackHitCount = true;
-//				m_pPlayer->SetDamage(true);
-//				m_pPlayer->SetAnimDamage(true);
-//			}
-//		}
-//		else
-//		{
-//			m_enemyAttackHitFrame++;
-
-//			if (m_enemyAttackHitFrame >= 120)
-//			{
-//				m_isEnemyAttackHitCount = false;
-//				m_enemyAttackHitFrame = 0;
-//			}
-//		}
-//	}
-
-//	//敵のスキルを発生させるかどうか
-//	if (m_pEnemy->GetSkillGeneration() && !m_pEnemy->GetAttackGeneration())
-//	{
-//		//ダメージのクールタイム
-//		if (!m_isEnemySkillHitCount)
-//		{
-//			//敵の攻撃を受けた場合
-//			if (m_isEnemySkillHit)
-//			{
-
-//				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-//				playerHp -= 3;
-//				m_pPlayer->SetHp(playerHp);
-//				m_isEnemySkillHitCount = true;
-//				m_pPlayer->SetDamage(true);
-//				m_pPlayer->SetAnimDamage(true);
-//			}
-//		}
-//		else
-//		{
-//			m_enemySkillHitFrame++;
-
-//			if (m_enemySkillHitFrame >= 120)
-//			{
-//				m_isEnemySkillHitCount = false;
-//				m_enemySkillHitFrame = 0;
-//			}
-//		}
-//	}
-//}
 
 
 
@@ -640,11 +584,18 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		m_isWin = true;
 		m_frameScene++;
 
+		if (m_frameScene >= 240)
+		{
+			m_pPlayer->SetCommand(true);
+
+		}
+
 		if (m_frameScene >= kSceneTime - 120)
 		{
 			m_fadeFrameScene++;
 			m_isInterval = true;
 		}
+
 		if (m_frameScene >= kSceneTime)
 		{
 			return std::make_shared<SceneWin>();
@@ -742,10 +693,10 @@ void ScenePlaying::Draw()
 
 	//if (m_isInterval)
 	//{
-	//	int alpha = kBlend * m_frameScene / kFadeTime;
-	//	SetDrawBlendMode(DX_BLENDMODE_MULA, alpha);
-	//	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xffffff, true);
+	//	int alpha2 = kBlend * m_frameScene / kFadeTime;
 	//	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	//	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xffffff, true);
+	//	SetDrawBlendMode(DX_BLENDMODE_MULA, alpha2);
 	//}
 
 #ifdef _DEBUG

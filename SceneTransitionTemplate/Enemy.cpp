@@ -216,7 +216,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 			m_isIdleAnim = false;
 		}
 
-		if (!m_isMove)
+		if (!m_isAttackAnim && !m_isSkillAnim)
 		{
 
 			if (m_state == kRun)		//プレイヤーを追っている状態
@@ -241,6 +241,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 				m_isRunAnim = true;
 			}
 		}
+
 
 		//else
 		//{
@@ -298,7 +299,6 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 			{
 				if (isLoop)
 				{
-					m_isMove = false;
 
 					m_isAttackAnim = false;
 					m_isSkillAnim = false;
@@ -313,26 +313,27 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		else
 		{
 			m_isIdleAnim = false;
+			m_isMove = false;
 		}
 
-		//アニメーションが終わったら当たり判定の生成をやめる
-		if (m_isAttackAnim && !m_isSkillAnim)
-		{
-			m_isAttackGeneration = true;
-		}
-		else
-		{
-			m_isAttackGeneration = false;
-		}
-		//アニメーションが終わったら当たり判定の生成をやめる
-		if (m_isSkillAnim && !m_isAttackAnim)
-		{
-			m_isSkillGeneration = true;
-		}
-		else
-		{
-			m_isSkillGeneration = false;
-		}
+		////アニメーションが終わったら当たり判定の生成をやめる
+		//if (m_isAttackAnim && !m_isSkillAnim)
+		//{
+		//	m_isAttackGeneration = true;
+		//}
+		//else
+		//{
+		//	m_isAttackGeneration = false;
+		//}
+		////アニメーションが終わったら当たり判定の生成をやめる
+		//if (m_isSkillAnim && !m_isAttackAnim)
+		//{
+		//	m_isSkillGeneration = true;
+		//}
+		//else
+		//{
+		//	m_isSkillGeneration = false;
+		//}
 	}
 
 	//移動範囲
@@ -391,7 +392,11 @@ void Enemy::Draw()
 	DrawFormatString(400, 332, 0xffffff, "EnemyState:%d", m_state);
 	DrawFormatString(400, 352, 0xffffff, "EnemyRand:%d", m_rand);
 
-	if (!m_isAttackGeneration)
+	DrawFormatString(400, 382, 0xffffff, "EnemyAttack:%d", m_isAttackAnim);
+	DrawFormatString(400, 412, 0xffffff, "EnemySkill:%d", m_isSkillAnim);
+
+
+	if (!m_isAttackAnim)
 	{
 		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0xff00ff, 0xff00ff, false);
 	}
@@ -400,7 +405,7 @@ void Enemy::Draw()
 		DrawSphere3D(VAdd(m_attackPos, VGet(0, 8, 0)), m_radius, 8, 0x0000ff, 0x0000ff, false);
 	}
 
-	if (!m_isSkillGeneration)
+	if (!m_isSkillAnim)
 	{
 		DrawSphere3D(VAdd(m_pos, VGet(0, 8, 0)), m_skillRadius, 8, 0xff00ff, 0xff00ff, false);
 	}

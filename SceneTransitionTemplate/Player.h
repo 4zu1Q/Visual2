@@ -40,6 +40,7 @@ public:
 	const bool& GetAttackGeneration() const { return m_isAttackGeneration; }
 	const bool& GetSkillGeneration() const { return m_isSkillGeneration; }
 	
+	void SetCommand(const bool isCommand) { m_isCommand = isCommand; }
 
 	//プレイヤーの攻撃の座標を取得
 	void OnGimmickHitUpdate();
@@ -133,6 +134,8 @@ private:
 	bool m_isDown;
 	bool m_isAvoid;
 
+	bool m_isCommand;
+
 	//アニメーション情報
 	int m_animIndex;
 	int m_currentAnimNo;	//現在のアニメーション
@@ -140,6 +143,7 @@ private:
 	float m_animBlendRate;	//アニメーション合成割合
 
 	//アニメーションフラグ
+	bool m_isAnimIdle;
 	bool m_isAnimAttack;
 	bool m_isAnimWalk;
 	bool m_isAnimDash;

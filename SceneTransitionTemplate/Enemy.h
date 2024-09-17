@@ -38,6 +38,10 @@ public:
 	void SetAttackGeneration(bool isAttackGeneration) { m_isAttackGeneration = isAttackGeneration; }
 	void SetSkillGeneration(bool isSkillGeneration) { m_isSkillGeneration = isSkillGeneration; }
 
+	void SetAttackAnim(bool isAttackAnim) { m_isAttackAnim = isAttackAnim; }
+	void SetSkillAnim(bool isSkillAnim) { m_isSkillAnim = isSkillAnim; }
+
+
 	float GetRadius() { return m_radius; }
 	VECTOR GetPos() { return m_pos; }
 	void SetPos(VECTOR pos) { m_pos = pos; }

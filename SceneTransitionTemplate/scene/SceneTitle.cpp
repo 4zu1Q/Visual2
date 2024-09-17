@@ -387,6 +387,8 @@ void SceneTitle::Draw()
 		DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
+
+	
 }
 
 void SceneTitle::End()

@@ -42,6 +42,7 @@ namespace
 	constexpr int kDamageAnimIndex = 25;	//ダメージ
 	constexpr int kFallAnimIndex = 26;		//倒れる
 	constexpr int kFallingAnimIndex = 27;	//倒れ中
+	constexpr int kGameClearAnimIndex = 10;	//倒した後のモーション
 
 	//アニメーションの切り替えにかかるフレーム数
 	constexpr float kAnimChangeFrame = 8.0f;
@@ -105,6 +106,8 @@ Player::Player() :
 	m_isAnimDown(false),
 	m_isStamina(false),
 	m_isAvoid(false),
+	m_isCommand(false),
+	m_isAnimIdle(false),
 	m_damageFrame(0),
 	m_hp(10),
 	m_losthp(10),
@@ -242,9 +245,19 @@ void Player::Update()
 
 	}
 
+	if (m_isCommand)
+	{
+		if (!m_isAnimIdle)
+		{
+			ChangeAnim(kGameClearAnimIndex);
+			m_animIndex = kGameClearAnimIndex;
+		}
+		m_isAnimIdle = true;
+	}
+
 
 	//ボタンを押したら攻撃アニメーションを再生する
-	if (!m_isAttack && !m_isSkill && !m_isDown)
+	if (!m_isAttack && !m_isSkill && !m_isDown && !m_isCommand)
 	{
 		//攻撃
 		if (Pad::IsPress(PAD_INPUT_3))
@@ -489,7 +502,7 @@ bool Player::UpdateAnim(int attachNo)
 	//アニメーションを進行させる
 	float now = MV1GetAttachAnimTime(m_modelH, attachNo);	//現在の再生カウントを取得
 	bool isLoop = false;
-	now += 0.5f;	// アニメーションを進める
+	now += 0.7f;	// アニメーションを進める
 
 	//現在再生中のアニメーションの総カウントを取得する
 	float total = MV1GetAttachAnimTotalTime(m_modelH, attachNo);
