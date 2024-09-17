@@ -316,24 +316,24 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 			m_isMove = false;
 		}
 
-		////アニメーションが終わったら当たり判定の生成をやめる
-		//if (m_isAttackAnim && !m_isSkillAnim)
-		//{
-		//	m_isAttackGeneration = true;
-		//}
-		//else
-		//{
-		//	m_isAttackGeneration = false;
-		//}
-		////アニメーションが終わったら当たり判定の生成をやめる
-		//if (m_isSkillAnim && !m_isAttackAnim)
-		//{
-		//	m_isSkillGeneration = true;
-		//}
-		//else
-		//{
-		//	m_isSkillGeneration = false;
-		//}
+		//アニメーションが終わったら当たり判定の生成をやめる
+		if (m_isAttackAnim && !m_isSkillAnim)
+		{
+			m_isAttackGeneration = true;
+		}
+		else
+		{
+			m_isAttackGeneration = false;
+		}
+		//アニメーションが終わったら当たり判定の生成をやめる
+		if (m_isSkillAnim && !m_isAttackAnim)
+		{
+			m_isSkillGeneration = true;
+		}
+		else
+		{
+			m_isSkillGeneration = false;
+		}
 	}
 
 	//移動範囲

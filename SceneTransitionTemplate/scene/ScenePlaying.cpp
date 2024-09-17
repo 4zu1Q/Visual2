@@ -504,10 +504,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			m_enemyAttackHitFrame++;
 			if (m_enemyAttackHitFrame >= 120)
 			{
-				//m_pEnemy->SetAttackAnim(false);
+				m_pEnemy->SetAttackAnim(false);
 				m_isEnemyAttackHitCount = false;
 				m_enemyAttackHitFrame = 0;
-				m_pEnemy->SetAttackGeneration(false);
+				//m_pEnemy->SetAttackGeneration(false);
 			}
 		}
 	}
@@ -538,10 +538,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 			if (m_enemySkillHitFrame >= 120)
 			{
-				//m_pEnemy->SetSkillAnim(false);
+				m_pEnemy->SetSkillAnim(false);
 				m_isEnemySkillHitCount = false;
 				m_enemySkillHitFrame = 0;
-				m_pEnemy->SetSkillGeneration(false);
+				//m_pEnemy->SetSkillGeneration(false);
 			}
 		}
 	}
