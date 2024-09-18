@@ -1,5 +1,6 @@
-#include "DxLib.h"
 #include <cmath>
+#include "DxLib.h"
+#include <EffekseerForDXLib.h>
 
 namespace
 {
@@ -27,6 +28,9 @@ void DrawGrid()
 	DrawStringF(dispPos.x, dispPos.y, "Z+", 0xffffff);
 	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -50));
 	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
+
+
+
 }
 
 // プログラムは WinMain から始まります
@@ -44,8 +48,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWriteZBuffer3D(true);
 	SetUseBackCulling(true);
 
+	Effekseer_Init(8000);
+	Effekseer_InitDistortion();
+	SetChangeScreenModeGraphicsSystemResetFlag(false);
+	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
+
 	// ダブルバッファモード
 	SetDrawScreen(DX_SCREEN_BACK);
+
+	VECTOR pos = VGet(0, 0, 0);
+
+	int sH = LoadEffekseerEffect("data/SyoumetuEffect2.efkefc");
+	int pH = PlayEffekseer3DEffect(sH);
+
+	int frame = 0;
 
 	float cameraAngle = -DX_PI_F / 2;
 
@@ -54,6 +70,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		LONGLONG  time = GetNowHiPerformanceCount();
 		// 画面のクリア
 		ClearDrawScreen();
+
+		int pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+		frame++;
+
+
+		UpdateEffekseer3D();
+
+		if (frame > 120)
+		{
+			SetPosPlayingEffekseer3DEffect(pH, pos.x, pos.y, pos.z);
+			frame = 0;
+		}
+
 
 		if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_LEFT))
 		{
@@ -64,6 +93,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			cameraAngle -= 0.05f;
 		}
 
+		if (pad && DX_INPUT_KEY_PAD1)
+		{
+
+		}
+		
+		Effekseer_Sync3DSetting();
+		DrawEffekseer3D();
+
 
 		SetCameraNearFar(1.0f, 180.0f);
 		VECTOR cameraPos;
@@ -72,7 +109,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		cameraPos.z = sinf(cameraAngle) * kCameraDist;
 		SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0, 0, 0));
 
+		//StopEffekseer3DEffect(pH);
+
+
 		DrawGrid();
+		DrawFormatString(0, 16, 0xffffff, "frame:%d", frame);
 
 		//裏画面を表画面を入れ替える
 		ScreenFlip();
@@ -85,6 +126,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 		}
 	}
+	DeleteEffekseerEffect(sH);
 
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 
