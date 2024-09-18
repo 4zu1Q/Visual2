@@ -14,6 +14,7 @@
 
 #include "Game.h"
 #include "Pad.h"
+#include <EffekseerForDXLib.h>
 
 
 namespace
@@ -63,7 +64,9 @@ namespace
 	constexpr float kWall = 475;
 
 
-	constexpr int kSceneTime = 600;
+	constexpr int kGameClearSceneTime = 600;
+	constexpr int kGameOverSceneTime = 240;
+	constexpr int kOptionSceneTime = 120;
 }
 
 /// <summary>
@@ -90,6 +93,7 @@ ScenePlaying::ScenePlaying() :
 	m_isLose(false),
 	m_isWin(false),
 	m_isEnemyDeath(false),
+	m_isPlayerDeath(false),
 	m_selectH(LoadGraph("data/image/Select.png")),
 	m_restartH(LoadGraph("data/image/Start.png")),
 	m_optionH(LoadGraph("data/image/Option.png")),
@@ -305,6 +309,7 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				else if (m_select == kTitle)
 				{
 					m_isInterval = true;
+					m_isCommand = false;
 					m_isTitle = true;
 					PlaySoundMem(m_soundDecsionH, DX_PLAYTYPE_BACK, true);//決定音
 					StopSoundMem(m_soundBgmH);
@@ -337,11 +342,14 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//プレイヤーと敵が当たった場合のフラグの取得
 	m_isPlayerHit = m_pEnemy->SphereHitFlag(m_pPlayer);
 
-	//敵の攻撃に当たった場合のフラグ取得
-	m_isEnemyAttackHit = m_pEnemy->EnemyAttackSphereHitFlag(m_pPlayer);
+	if (!m_isPlayerDeath)
+	{
+		//敵の攻撃に当たった場合のフラグ取得
+		m_isEnemyAttackHit = m_pEnemy->EnemyAttackSphereHitFlag(m_pPlayer);
 
-	//敵のスキルに当たった場合のフラグ取得
-	m_isEnemySkillHit = m_pEnemy->EnemySkillSphereHitFlag(m_pPlayer);
+		//敵のスキルに当たった場合のフラグ取得
+		m_isEnemySkillHit = m_pEnemy->EnemySkillSphereHitFlag(m_pPlayer);
+	}
 
 	//敵が死んだら当たり判定を消す
 	if (!m_isEnemyDeath)
@@ -561,13 +569,15 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		m_isLose = true;
 		m_frameScene++;
 
+		m_isPlayerDeath = true;
+		m_pPlayer->SetIsDown(true);
 
-		if (m_frameScene >= kSceneTime - 120)
+		if (m_frameScene >= kGameOverSceneTime - 120)
 		{
 			m_fadeFrameScene++;
 			m_isInterval = true;
 		}
-		if (m_frameScene >= kSceneTime)
+		if (m_frameScene >= kGameOverSceneTime)
 		{
 			return std::make_shared<SceneLose>();
 		}
@@ -590,13 +600,13 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 		}
 
-		if (m_frameScene >= kSceneTime - 120)
+		if (m_frameScene >= kGameClearSceneTime - 120)
 		{
 			m_fadeFrameScene++;
 			m_isInterval = true;
 		}
 
-		if (m_frameScene >= kSceneTime)
+		if (m_frameScene >= kGameClearSceneTime)
 		{
 			return std::make_shared<SceneWin>();
 		}
@@ -612,8 +622,9 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 	//メニューからタイトルへ
 	if (m_isTitle)
 	{
+		m_fadeFrameScene++;
 		m_frameScene++;
-		if (m_frameScene >= kFadeTime)
+		if (m_frameScene >= kOptionSceneTime)
 		{
 			return std::make_shared<SceneTitle>();
 		}

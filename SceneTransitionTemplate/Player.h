@@ -50,7 +50,9 @@ public:
 
 	//アニメーションのセットフラグ
 	void SetAnimDamage(const bool animDamage);
-	void SetAnimDown(const bool animDown) { m_isAnimDown = animDown; }
+
+	//死んだときの判定
+	void SetIsDown(const bool isDown) { m_isDown = isDown; }
 
 	//プレイヤーのアニメーション種別
 	enum class AnimKind : int
@@ -97,6 +99,10 @@ private:
 	int m_hpH;
 	int m_losthpH;
 	int m_hpFlameH;
+
+	//エフェクトハンドル
+	int m_effectPH;
+	int m_effectSH;
 
 	//サウンドハンドル
 	int m_damageSeH;

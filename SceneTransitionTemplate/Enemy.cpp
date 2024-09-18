@@ -33,10 +33,10 @@ namespace
 	constexpr float kAddPosY = 8.0f;
 
 	//ダメージ
-	constexpr int kDamageCount = 60;
+	constexpr int kDamageCount = 40;
 
 	//スピード
-	constexpr float kSpeed = 0.8f;
+	constexpr float kSpeed = 0.5f;
 
 	constexpr float kWall = 475;
 
@@ -56,7 +56,7 @@ Enemy::Enemy() :
 	m_outlinePsH(-1),
 	m_outlineVsH(-1),
 	m_radius(15.0f),
-	m_skillRadius(25.0f),
+	m_skillRadius(43.0f),
 	m_searchRadius(300.0f),
 	m_stopRadius(40.0f),
 	m_hp(kMaxHp),
@@ -79,7 +79,7 @@ Enemy::Enemy() :
 	m_isSkillGeneration(false),
 	m_isRand(false),
 	m_isMove(false),
-	m_state(kIdle),
+	m_state(kRun),
 	m_angle(0.0f),
 	m_frame(0),
 	m_attackFrame(0),
@@ -89,6 +89,7 @@ Enemy::Enemy() :
 	m_random(0),
 	m_rand(0),
 	m_workFrame(0),
+	m_animIndex(kDashAnimIndex),
 	m_attachFramePosition(VGet(0,0,0))
 {
 
@@ -132,6 +133,7 @@ void Enemy::Init()
 {
 	m_pos = VGet(-60.0f, 0.0f, 0.0f);
 	m_attackPos = VGet(m_pos.x, m_pos.y, m_pos.z - 10);
+	m_animIndex = kDashAnimIndex;
 
 	MV1SetPosition(m_modelH, m_pos);
 	//敵のスケール
@@ -145,6 +147,7 @@ void Enemy::Init()
 void Enemy::Update(std::shared_ptr<Player> pPlayer)
 {
 
+	//武器のアタッチ
 	MATRIX transMat;
 	MATRIX attachFrameMat;
 	MATRIX mixMatrix;
@@ -183,6 +186,15 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 	}
 	UpdateAnim(m_prevAnimNo);
 
+	if (!m_isRunAnim)
+	{
+		ChangeAnim(kDashAnimIndex);
+	}
+	m_animIndex = kDashAnimIndex;
+
+
+
+#if 0
 	if (m_state == kDeath)
 	{
 		if (!m_isDeadAnim)
@@ -191,7 +203,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 			m_animIndex = kFallingAnimIndex;
 			m_isDeadAnim = true;
 		}
-		
+
 	}
 	else
 	{
@@ -253,7 +265,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		//	m_animIndex = kIdleAnimIndex;
 		//}
 
-		
+
 
 		if (m_state == kAttack)	//攻撃の状態
 		{
@@ -264,7 +276,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 				m_isRand = true;
 			}
 
-			
+
 
 
 			if (!m_isAttackAnim && !m_isSkillAnim)
@@ -291,7 +303,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 
 					m_attackFrame = 0;
 				}
-				
+
 
 
 			}
@@ -335,6 +347,83 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 			m_isSkillGeneration = false;
 		}
 	}
+#endif // 0
+
+
+	m_isRunAnim = true;
+
+
+	//プレイヤーへの向きを取得
+	m_direction = VSub(pPlayer->GetPos(), m_pos);
+	m_direction = VNorm(m_direction);
+
+	m_angle = atan2f(m_direction.x, m_direction.z);
+
+
+	//ベクトルを、正規化し、向きだけを保存させる
+	m_velocity = VScale(m_direction, kSpeed);
+
+	if (m_state != kAttack)
+	{
+		//敵の移動
+		m_pos = VAdd(m_pos, m_velocity);
+	}
+
+	VECTOR Pos = VAdd(m_pos, pPlayer->GetPos());
+
+	if (m_state == kAttack)
+	{
+		m_isIdleAnim = true;
+		if (!m_isAttackAnim && !m_isSkillAnim)
+		{
+
+			m_attackFrame++;
+
+			if (m_attackFrame > 150)
+			{
+				if (m_rand <= 1)
+				{
+					ChangeAnim(kAttackAnimIndex);
+					m_isAttackAnim = true;
+					m_isRand = false;
+					m_isMove = true;
+				}
+				else
+				{
+					ChangeAnim(kSkillAnimIndex);
+					m_isSkillAnim = true;
+					m_isRand = false;
+					m_isMove = true;
+				}
+
+				m_attackFrame = 0;
+			}
+
+
+
+		}
+		else
+		{
+			if (isLoop)
+			{
+
+				m_isAttackAnim = false;
+				m_isSkillAnim = false;
+
+				m_isAttackGeneration = false;
+				m_isSkillGeneration = false;
+			}
+		}
+	}
+
+
+	
+
+
+
+
+
+
 
 	//移動範囲
 	if (m_pos.x >= kWall) m_pos.x = kWall;
@@ -358,14 +447,15 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 	{
 		m_angle = atan2f(m_direction.x, m_direction.z);
 
-		VECTOR m_attackDir = VScale(m_direction, 20.0f);
+		VECTOR m_attackDir = VScale(m_direction, 28.0f);
 		m_attackPos = VAdd(m_pos, m_attackDir);
 	}
 
-	if (m_hp <= 0)
-	{
-		m_hp = 0;
-	}
+	//HPをマイナスにさせないため
+	if (m_hp <= 0) m_hp = 0;
+	
+		
+	
 
 	MV1SetPosition(m_modelH, m_pos);
 	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));

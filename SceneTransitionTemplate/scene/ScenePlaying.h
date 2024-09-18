@@ -79,7 +79,9 @@ private:
 	bool m_isEnemySkillHit;	//敵の攻撃が当たった場合
 	bool m_isItemHit;	//アイテムとプレイヤーが当たった場合
 
+	//死んだ判定
 	bool m_isEnemyDeath;
+	bool m_isPlayerDeath;
 
 	bool m_isEnemySearch;
 	bool m_isEnemyStop;

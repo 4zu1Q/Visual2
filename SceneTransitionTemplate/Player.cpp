@@ -3,6 +3,7 @@
 #include "Game.h"
 #include <cmath>
 #include <cassert>
+#include <EffekseerForDXLib.h>
 
 /// <summary>
 /// 定数
@@ -43,13 +44,14 @@ namespace
 	constexpr int kFallAnimIndex = 26;		//倒れる
 	constexpr int kFallingAnimIndex = 27;	//倒れ中
 	constexpr int kGameClearAnimIndex = 10;	//倒した後のモーション
+	constexpr int kGameOverAnimIndex = 10;
 
 	//アニメーションの切り替えにかかるフレーム数
 	constexpr float kAnimChangeFrame = 8.0f;
 	constexpr float kAnimChangeRateSpeed = 1.0f / kAnimChangeFrame;
 
 	//ダメージ
-	constexpr int kDamageCount = 120;
+	constexpr int kDamageCount = 60;
 
 
 	//アナログスティックによる移動関連
@@ -120,11 +122,15 @@ Player::Player() :
 	m_axeAttackSeH(-1),
 	m_axeSkillSeH(-1),
 	m_shadowAngle(0.0f),
+	m_effectPH(-1),
+	m_effectSH(-1),
 	m_lightDirection(VGet(0, 0, 0))
 {
 	m_damageSeH = LoadSoundMem(kDamageFilename);	  //ダメージ音
 	m_axeAttackSeH = LoadSoundMem(kAttackFilename);	  //攻撃音
 	m_axeSkillSeH = LoadSoundMem(kSkillFilename);	  //スキル音
+
+	//m_effectSH = LoadEffekseerEffect("");
 
 	ChangeVolumeSoundMem(128, m_damageSeH);
 	ChangeVolumeSoundMem(128, m_axeAttackSeH);
@@ -240,8 +246,12 @@ void Player::Update()
 	//死んだら処理
 	if (m_isDown)
 	{
-		
-
+		if (!m_isAnimDown)
+		{
+			ChangeAnim(kFallAnimIndex);
+			m_animIndex = kFallingAnimIndex;
+		}
+		m_isAnimDown = true;
 
 	}
 
