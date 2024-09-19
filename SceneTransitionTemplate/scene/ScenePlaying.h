@@ -52,6 +52,11 @@ private:
 	int m_selectH;
 	int m_operatorH;
 
+	int m_hitSH;
+	int m_itemSH;
+	int	m_hitPH;
+	int	m_itemPH;
+
 	//ƒ‚ƒfƒ‹•Ï”
 	int m_modelHeartH;
 
@@ -60,8 +65,10 @@ private:
 	int m_fadeFrameScene;
 	int m_playerAttackHitFrame;
 	int m_playerSkillHitFrame;
+	int m_playerFrame;
 	int m_enemyAttackHitFrame;
 	int m_enemySkillHitFrame;
+	int m_enemyFrame;
 
 	
 

@@ -1,6 +1,7 @@
 #include <cmath>
 #include "DxLib.h"
 #include <EffekseerForDXLib.h>
+#include <list>
 
 namespace
 {
@@ -56,10 +57,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// ダブルバッファモード
 	SetDrawScreen(DX_SCREEN_BACK);
 
-	VECTOR pos = VGet(0, 0, 0);
+	struct EffData
+	{
+		int pH;
+		VECTOR pos = VGet(0, 0, 0);
+		int frame = 0;
+		bool isEnd = false;
+	};
+
+	
 
 	int sH = LoadEffekseerEffect("data/SyoumetuEffect2.efkefc");
-	int pH = PlayEffekseer3DEffect(sH);
+//	int pH = PlayEffekseer3DEffect(sH);
+	std::list<EffData> effList;
 
 	int frame = 0;
 
@@ -71,18 +81,35 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// 画面のクリア
 		ClearDrawScreen();
 
-		int pad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 		frame++;
 
 
 		UpdateEffekseer3D();
 
-		if (frame > 120)
+		if (frame > 30)
 		{
-			SetPosPlayingEffekseer3DEffect(pH, pos.x, pos.y, pos.z);
 			frame = 0;
+			EffData data;
+			data.pH = PlayEffekseer3DEffect(sH);
+			effList.emplace_back(data);
 		}
-
+		for (auto& data : effList)
+		{
+			data.frame++;
+			if (data.frame > 240)
+			{
+				data.isEnd = true;
+				StopEffekseer3DEffect(data.pH);
+				continue;
+			}
+			data.pos = VAdd(data.pos, VGet(0.5f, 0, 0));
+			SetPosPlayingEffekseer3DEffect(data.pH, data.pos.x, data.pos.y, data.pos.z);
+		}
+		effList.remove_if(
+			[](const auto& data)
+			{
+				return data.isEnd;
+			});
 
 		if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_LEFT))
 		{
@@ -92,13 +119,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			cameraAngle -= 0.05f;
 		}
-
-		if (pad && DX_INPUT_KEY_PAD1)
-		{
-
-		}
 		
+		// カメラの３D情報を合わせている
 		Effekseer_Sync3DSetting();
+		// エフェクシアの情報を更新している
+		UpdateEffekseer3D();
+		// エフェクシアを描画している
 		DrawEffekseer3D();
 
 
@@ -128,6 +154,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	DeleteEffekseerEffect(sH);
 
+	Effkseer_End();
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
 
 	return 0;				// ソフトの終了 

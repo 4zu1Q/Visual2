@@ -18,7 +18,7 @@ namespace
 	constexpr float kInitAngle = 3.143059f;
 
 	//モデル用の定数
-	constexpr float kScale = 10.0f;
+	constexpr float kHitEffectScale = 10.0f;
 
 	//HPのファイル名
 	const char* const kHpFilename = "data/image/Hp.png";
@@ -196,7 +196,7 @@ void Player::Init()
 
 	MV1SetPosition(m_modelH, m_pos);
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
-	MV1SetScale(m_modelH, VGet(kScale, kScale, kScale));
+	MV1SetScale(m_modelH, VGet(kHitEffectScale, kHitEffectScale, kHitEffectScale));
 
 	//シャドウマップの初期化
 	//ShadowMapInit();
@@ -270,7 +270,7 @@ void Player::Update()
 	if (!m_isAttack && !m_isSkill && !m_isDown && !m_isCommand)
 	{
 		//攻撃
-		if (Pad::IsPress(PAD_INPUT_3))
+		if (Pad::IsPress(PAD_INPUT_3) && !m_isStamina)
 		{
 			
 			m_isAttack = true;
@@ -287,7 +287,7 @@ void Player::Update()
 		}
 
 		//スキル攻撃
-		if (Pad::IsPress(PAD_INPUT_4) && m_stamina >= 100.0f)
+		if (Pad::IsPress(PAD_INPUT_4) && m_stamina >= 100.0f && !m_isStamina)
 		{
 			m_isSkill = true;
 			ChangeAnim(kSkillAnimIndex);
@@ -346,17 +346,17 @@ void Player::Update()
 		}
 	}
 
-	int soundAttackFrame = 0;
-	int soundSkillFrame = 0;
+	//int soundAttackFrame = 0;
+	//int soundSkillFrame = 0;
 
 	if (m_isAttack)
 	{
-		soundAttackFrame++;
-		if (soundAttackFrame == 5)
-		{
+		//soundAttackFrame++;
+		//if (soundAttackFrame == 5)
+		//{
 			PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
 
-		}
+		//}
 
 		//プレイヤーが攻撃したら生成するためのフラグがtrueになる
 		m_isAttackGeneration = true;
@@ -365,12 +365,12 @@ void Player::Update()
 
 	if (m_isSkill)
 	{
-		soundSkillFrame++;
-		if (soundSkillFrame == 30)
-		{
+		//soundSkillFrame++;
+		//if (soundSkillFrame == 30)
+		//{
 			PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
 
-		}
+		//}
 		//プレイヤーがスキルを使用したら生成するためのフラグがtrueになる
 		m_isSkillGeneration = true;
 	}

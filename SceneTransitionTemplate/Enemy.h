@@ -85,6 +85,10 @@ private:
 	int m_modelH;
 	int m_modelWeponH;
 	int m_hpFlameH;
+
+	int m_sH;
+	int m_pH;
+
 	//シェーダハンドル
 	int m_outlineVsH;
 	int m_outlinePsH;
@@ -136,6 +140,8 @@ private:
 	bool m_isSkillGeneration;
 
 	bool m_isRand;
+
+	bool m_isEffect;
 
 	//フレーム
 	int m_frame;

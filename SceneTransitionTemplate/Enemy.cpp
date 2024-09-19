@@ -2,6 +2,9 @@
 #include "Player.h"
 #include <cmath>
 
+#include <EffekseerForDXLib.h>
+#include <list>
+
 /// <summary>
 /// 定数
 /// </summary>
@@ -55,6 +58,8 @@ Enemy::Enemy() :
 	m_hpFlameH(LoadGraph(kHpFlameFilename)),
 	m_outlinePsH(-1),
 	m_outlineVsH(-1),
+	m_sH(-1),
+	m_pH(-1),
 	m_radius(15.0f),
 	m_skillRadius(43.0f),
 	m_searchRadius(300.0f),
@@ -67,6 +72,7 @@ Enemy::Enemy() :
 	m_attackDir(VGet(0, 0, 0)),
 	m_dirPos(VGet(0, 0, 0)),
 	m_damageFrame(0),
+	m_isEffect(false),
 	m_isDamage(false),
 	m_isIdleAnim(false),
 	m_isRunAnim(false),
@@ -112,6 +118,10 @@ void Enemy::Load()
 	//m_modelHandle[0] = MV1LoadModel(kEnemyModelFilename);
 	m_modelH = MV1LoadModel(kEnemyModelFilename);
 	m_modelWeponH = MV1LoadModel(kWeponModelFilename);
+
+	//エフェクトをロード
+	m_sH = LoadEffekseerEffect("data/effect/syou1.efkefc");
+
 	//ShaderLoad();
 }
 
@@ -124,6 +134,10 @@ void Enemy::Delete()
 	MV1DeleteModel(m_modelWeponH);
 	m_modelH = -1;
 	m_modelWeponH = -1;
+
+	//エフェクトをデリート
+	DeleteEffekseerEffect(m_sH);
+
 }
 
 /// <summary>
@@ -139,6 +153,9 @@ void Enemy::Init()
 	//敵のスケール
 	MV1SetScale(m_modelH, VGet(20, 20, 20));
 	MV1SetScale(m_modelWeponH, VGet(0.1, 0.1, 0.1));
+
+
+
 }
 
 /// <summary>
@@ -146,6 +163,11 @@ void Enemy::Init()
 /// </summary>
 void Enemy::Update(std::shared_ptr<Player> pPlayer)
 {
+
+	//エフェクトのアップデート処理
+	UpdateEffekseer3D();
+
+
 
 	//武器のアタッチ
 	MATRIX transMat;
@@ -194,7 +216,7 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 
 
 
-#if 0
+//#if 0
 	if (m_state == kDeath)
 	{
 		if (!m_isDeadAnim)
@@ -234,7 +256,6 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 			if (m_state == kRun)		//プレイヤーを追っている状態
 			{
 
-				m_frame++;
 
 				m_angle = atan2f(m_direction.x, m_direction.z);
 
@@ -253,17 +274,6 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 				m_isRunAnim = true;
 			}
 		}
-
-
-		//else
-		//{
-		//	if (m_isIdleAnim && m_isRunAnim)
-		//	{
-		//		ChangeAnim(kIdleAnimIndex);
-		//	}
-		//	m_isRunAnim = false;
-		//	m_animIndex = kIdleAnimIndex;
-		//}
 
 
 
@@ -347,8 +357,9 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 			m_isSkillGeneration = false;
 		}
 	}
-#endif // 0
+//#endif // 0
 
+#if 0
 
 	m_isRunAnim = true;
 
@@ -416,11 +427,15 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 		}
 	}
 
+#endif // 0
 
 	
 
-
-
+	
+	if (m_isDeadAnim)
+	{
+		m_frame++;
+	}
 
 
 
@@ -454,7 +469,18 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 	//HPをマイナスにさせないため
 	if (m_hp <= 0) m_hp = 0;
 	
-		
+
+	if (m_frame >= 150)
+	{
+		if (!m_isEffect)
+		{
+			m_pH = PlayEffekseer3DEffect(m_sH);
+			SetScalePlayingEffekseer3DEffect(m_pH, 10, 10, 10);
+			SetPosPlayingEffekseer3DEffect(m_pH, m_pos.x, m_pos.y, m_pos.z);
+			m_isEffect = true;
+		}
+
+	}
 	
 
 	MV1SetPosition(m_modelH, m_pos);
@@ -466,6 +492,13 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 /// </summary>
 void Enemy::Draw()
 {
+	// カメラの３D情報を合わせている
+	Effekseer_Sync3DSetting();
+	// エフェクシアの情報を更新している
+	UpdateEffekseer3D();
+	// エフェクシアを描画している
+	DrawEffekseer3D();
+
 
 	DrawBox(700, 13, 700 + kMaxHp, 50, 0xdc143c, true);
 	DrawBox(700, 13, 700 + m_hp, 50, 0x3cb371, true);
@@ -520,8 +553,13 @@ void Enemy::Draw()
 // % 4 することで012301230123... に変換する
 	if (m_damageFrame % 8 >= 4) return;
 
-	MV1DrawModel(m_modelWeponH);
-	MV1DrawModel(m_modelH);
+	if (m_frame <= 150)
+	{
+		MV1DrawModel(m_modelWeponH);
+		MV1DrawModel(m_modelH);
+	}
+
+
 	
 }
 

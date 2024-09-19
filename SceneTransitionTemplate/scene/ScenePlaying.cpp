@@ -67,12 +67,20 @@ namespace
 	constexpr int kGameClearSceneTime = 600;
 	constexpr int kGameOverSceneTime = 240;
 	constexpr int kOptionSceneTime = 120;
+
+	constexpr float kHitEffectScale = 5.0f;
+	constexpr float kItemEffectScale = 2.0f;
+	constexpr float kAddPos = 8.0f;
 }
 
 /// <summary>
 /// コンストラクタ
 /// </summary>
 ScenePlaying::ScenePlaying() :
+	m_hitSH(-1),
+	m_hitPH(-1),
+	m_itemSH(-1),
+	m_itemPH(-1),
 	m_isInterval(false),
 	m_isPlayerHit(false),
 	m_isPlayerAttackHit(false),
@@ -103,8 +111,10 @@ ScenePlaying::ScenePlaying() :
 	m_frameScene(0),
 	m_playerAttackHitFrame(0),
 	m_playerSkillHitFrame(0),
+	m_playerFrame(0),
 	m_enemyAttackHitFrame(0),
 	m_enemySkillHitFrame(0),
+	m_enemyFrame(0),
 	m_fadeFrameScene(0),
 	m_soundBgmH(-1),
 	m_soundCancelH(-1),
@@ -162,6 +172,8 @@ ScenePlaying::ScenePlaying() :
 	ChangeVolumeSoundMem(128, m_soundSDamageH);
 	ChangeVolumeSoundMem(128, m_soundItemH);
 
+	m_hitSH = LoadEffekseerEffect("data/effect/ToonHit.efkefc");
+	m_itemSH = LoadEffekseerEffect("data/effect/Hit.efkefc");
 
 
 	m_pPlayer->Load();
@@ -194,6 +206,9 @@ ScenePlaying::~ScenePlaying()
 	MV1DeleteModel(m_modelHeartH);
 	m_modelHeartH = -1;
 
+	//エフェクトをデリート
+	DeleteEffekseerEffect(m_hitSH);
+	DeleteEffekseerEffect(m_itemSH);
 }
 
 /// <summary>
@@ -213,6 +228,9 @@ void ScenePlaying::Init()
 /// </summary>
 std::shared_ptr<SceneBase> ScenePlaying::Update()
 {
+	//エフェクトのアップデート処理
+	UpdateEffekseer3D();
+
 	Pad::Update();
 	if (Pad::IsTrigger(PAD_INPUT_8)) m_isMenu = true;
 
@@ -409,6 +427,10 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				}
 				else
 				{
+					m_itemPH = PlayEffekseer3DEffect(m_itemSH);
+					SetScalePlayingEffekseer3DEffect(m_itemPH, kItemEffectScale, kItemEffectScale, kItemEffectScale);
+					SetPosPlayingEffekseer3DEffect(m_itemPH, m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + kAddPos, m_pPlayer->GetPos().z);
+
 
 					PlaySoundMem(m_soundItemH, DX_PLAYTYPE_BACK, true);//アイテム音
 
@@ -431,25 +453,33 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			//攻撃のクールタイム
 			if (!m_isPlayerAttackHitCount)
 			{
-				//プレイヤーの攻撃が敵に入った場合
-				if (m_isPlayerAttackHit)
+				m_playerFrame++;
+				if (m_playerFrame > 20)
 				{
-					PlaySoundMem(m_soundADamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+					//プレイヤーの攻撃が敵に入った場合
+					if (m_isPlayerAttackHit)
+					{
+						PlaySoundMem(m_soundADamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
 
-					//enemyHp -= 100;
-					enemyHp -= 10;
-					m_pEnemy->SetHp(enemyHp);
-					m_isPlayerAttackHitCount = true;
-					m_pEnemy->SetDamage(true);
+						//enemyHp -= 100;
+						enemyHp -= 10;
+						m_pEnemy->SetHp(enemyHp);
+						m_isPlayerAttackHitCount = true;
+						m_pEnemy->SetDamage(true);
 
+						m_hitPH = PlayEffekseer3DEffect(m_hitSH);
+						SetScalePlayingEffekseer3DEffect(m_hitPH, kHitEffectScale, kHitEffectScale, kHitEffectScale);
+						SetPosPlayingEffekseer3DEffect(m_hitPH, m_pEnemy->GetPos().x, m_pEnemy->GetPos().y + kAddPos, m_pEnemy->GetPos().z);
+
+						m_playerFrame = 0;
+					}
 				}
-
 			}
 			else
 			{
 				m_playerAttackHitFrame++;
 
-				if (m_playerAttackHitFrame >= 40)
+				if (m_playerAttackHitFrame >= 50)
 				{
 					m_isPlayerAttackHitCount = false;
 					m_playerAttackHitFrame = 0;
@@ -463,17 +493,27 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 			//スキルのクールタイム
 			if (!m_isPlayerSkillHitCount)
 			{
-
-				//プレイヤーのスキルが敵に入った場合
-				if (m_isPlayerSkillHit)
+				m_playerFrame++;
+				if (m_playerFrame > 30)
 				{
-					PlaySoundMem(m_soundSDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-					enemyHp -= 50;
-					m_pEnemy->SetHp(enemyHp);
-					m_isPlayerSkillHitCount = true;
-					m_pEnemy->SetDamage(true);
-				}
+					//プレイヤーのスキルが敵に入った場合
+					if (m_isPlayerSkillHit)
+					{
+						PlaySoundMem(m_soundSDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+						enemyHp -= 50;
+						//enemyHp -= 300;
 
+						m_pEnemy->SetHp(enemyHp);
+						m_isPlayerSkillHitCount = true;
+						m_pEnemy->SetDamage(true);
+
+						m_hitPH = PlayEffekseer3DEffect(m_hitSH);
+						SetScalePlayingEffekseer3DEffect(m_hitPH, kHitEffectScale, kHitEffectScale, kHitEffectScale);
+						SetPosPlayingEffekseer3DEffect(m_hitPH, m_pEnemy->GetPos().x, m_pEnemy->GetPos().y + kAddPos, m_pEnemy->GetPos().z);
+
+						m_playerFrame = 0;
+					}
+				}
 			}
 			else
 			{
@@ -488,24 +528,34 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 		}
 	}
 
-	
 
 	if (m_pEnemy->GetAttackGeneration() && !m_pEnemy->GetSkillGeneration())
 	{
 		//ダメージのクールタイム
 		if (!m_isEnemyAttackHitCount)
 		{
-			//敵の攻撃を受けた場合
-			if (m_isEnemyAttackHit)
+			m_enemyFrame++;
+			if (m_enemyFrame > 30)
 			{
-				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-				playerHp -= 1;
-				m_pPlayer->SetHp(playerHp);
-				m_isEnemyAttackHitCount = true;
-				m_pPlayer->SetDamage(true);
-				m_pPlayer->SetAnimDamage(true);
+				//敵の攻撃を受けた場合
+				if (m_isEnemyAttackHit)
+				{
+					PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+					playerHp -= 1;
+					m_pPlayer->SetHp(playerHp);
+					m_isEnemyAttackHitCount = true;
+					m_pPlayer->SetDamage(true);
+					m_pPlayer->SetAnimDamage(true);
 
+					m_hitPH = PlayEffekseer3DEffect(m_hitSH);
+					SetScalePlayingEffekseer3DEffect(m_hitPH, kHitEffectScale, kHitEffectScale, kHitEffectScale);
+					SetPosPlayingEffekseer3DEffect(m_hitPH, m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + kAddPos, m_pPlayer->GetPos().z);
+					
+					m_enemyFrame = 0;
+
+				}
 			}
+
 		}
 		else
 		{
@@ -516,6 +566,8 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 				m_isEnemyAttackHitCount = false;
 				m_enemyAttackHitFrame = 0;
 				//m_pEnemy->SetAttackGeneration(false);
+
+				
 			}
 		}
 	}
@@ -525,33 +577,47 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 	if (m_pEnemy->GetSkillGeneration() && !m_pEnemy->GetAttackGeneration())
 	{
-		//ダメージのクールタイム
-		if (!m_isEnemySkillHitCount)
-		{
-			//敵の攻撃を受けた場合
-			if (m_isEnemySkillHit)
-			{
 
-				PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
-				playerHp -= 2;
-				m_pPlayer->SetHp(playerHp);
-				m_isEnemySkillHitCount = true;
-				m_pPlayer->SetDamage(true);
-				m_pPlayer->SetAnimDamage(true);
-			}
-		}
-		else
+		m_enemyFrame++;
+		if (m_enemyFrame > 50)
 		{
-			m_enemySkillHitFrame++;
-
-			if (m_enemySkillHitFrame >= 120)
+			//ダメージのクールタイム
+			if (!m_isEnemySkillHitCount)
 			{
-				m_pEnemy->SetSkillAnim(false);
-				m_isEnemySkillHitCount = false;
-				m_enemySkillHitFrame = 0;
-				//m_pEnemy->SetSkillGeneration(false);
+				//敵の攻撃を受けた場合
+				if (m_isEnemySkillHit)
+				{
+
+					PlaySoundMem(m_soundPlayerDamageH, DX_PLAYTYPE_BACK, true);//ダメージ音
+					playerHp -= 2;
+					m_pPlayer->SetHp(playerHp);
+					m_isEnemySkillHitCount = true;
+					m_pPlayer->SetDamage(true);
+					m_pPlayer->SetAnimDamage(true);
+					m_enemyFrame = 0;
+
+					m_hitPH = PlayEffekseer3DEffect(m_hitSH);
+					SetScalePlayingEffekseer3DEffect(m_hitPH, kHitEffectScale, kHitEffectScale, kHitEffectScale);
+					SetPosPlayingEffekseer3DEffect(m_hitPH, m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + kAddPos, m_pPlayer->GetPos().z);
+
+				}
 			}
+			else
+			{
+				m_enemySkillHitFrame++;
+
+				if (m_enemySkillHitFrame >= 120)
+				{
+					m_pEnemy->SetSkillAnim(false);
+					m_isEnemySkillHitCount = false;
+					m_enemySkillHitFrame = 0;
+					//m_pEnemy->SetSkillGeneration(false);
+				}
+			}
+
+			
 		}
+		
 	}
 
 
@@ -643,6 +709,13 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 /// </summary>
 void ScenePlaying::Draw()
 {
+
+	// カメラの３D情報を合わせている
+	Effekseer_Sync3DSetting();
+	// エフェクシアの情報を更新している
+	UpdateEffekseer3D();
+	// エフェクシアを描画している
+	DrawEffekseer3D();
 
 	m_pSkyDome->Draw();
 	m_pStage->Draw();
