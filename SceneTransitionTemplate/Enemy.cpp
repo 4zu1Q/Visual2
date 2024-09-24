@@ -59,6 +59,7 @@ Enemy::Enemy() :
 	m_outlinePsH(-1),
 	m_outlineVsH(-1),
 	m_sH(-1),
+	m_attackSH(-1),
 	m_pH(-1),
 	m_radius(15.0f),
 	m_skillRadius(43.0f),
@@ -95,6 +96,7 @@ Enemy::Enemy() :
 	m_random(0),
 	m_rand(0),
 	m_workFrame(0),
+	m_effectFrame(0),
 	m_animIndex(kDashAnimIndex),
 	m_attachFramePosition(VGet(0,0,0))
 {
@@ -121,7 +123,8 @@ void Enemy::Load()
 
 	//エフェクトをロード
 	m_sH = LoadEffekseerEffect("data/effect/syou1.efkefc");
-
+	m_attackSH = LoadEffekseerEffect("data/effect/enemyAttack.efkefc");
+	
 	//ShaderLoad();
 }
 
@@ -305,7 +308,24 @@ void Enemy::Update(std::shared_ptr<Player> pPlayer)
 					}
 					else
 					{
+
+						m_effectFrame++;
+
 						ChangeAnim(kSkillAnimIndex);
+
+						m_pH = PlayEffekseer3DEffect(m_attackSH);
+						SetScalePlayingEffekseer3DEffect(m_pH, 10, 10, 10);
+						SetPosPlayingEffekseer3DEffect(m_pH, m_pos.x, m_pos.y, m_pos.z);
+
+						//if (m_effectFrame == 20)
+						//{
+						//	m_pH = PlayEffekseer3DEffect(m_attackSH);
+						//	SetScalePlayingEffekseer3DEffect(m_pH, 10, 10, 10);
+						//	SetPosPlayingEffekseer3DEffect(m_pH, m_pos.x, m_pos.y, m_pos.z);
+						//	m_effectFrame=0;
+						//}
+
+
 						m_isSkillAnim = true;
 						m_isRand = false;
 						m_isMove = true;

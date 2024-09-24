@@ -87,6 +87,7 @@ private:
 	int m_hpFlameH;
 
 	int m_sH;
+	int m_attackSH;
 	int m_pH;
 
 	//シェーダハンドル
@@ -146,6 +147,7 @@ private:
 	//フレーム
 	int m_frame;
 	int m_attackFrame;
+	int m_effectFrame;
 
 	//State変数
 	State m_state;

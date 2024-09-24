@@ -52,6 +52,10 @@ namespace
 
 	//BGMのファイル名
 	const char* const kBgmFilename = "data/sound/bgm/TitleBgm.mp3";
+
+	constexpr int kBgmVolume = 64;
+	constexpr int kSeVolume = 128;
+
 }
 
 SceneTitle::SceneTitle() :
@@ -72,6 +76,7 @@ SceneTitle::SceneTitle() :
 	m_optionH(LoadGraph("data/image/Operation.png")),
 	m_operationH(LoadGraph("data/image/Operator.png")),
 	m_endH(LoadGraph("data/image/End.png")),
+	m_backgroundH(LoadGraph("data/image/")),
 	m_soundBgmH(-1),
 	m_soundCancelH(-1),
 	m_soundDecsionH(-1),
@@ -83,10 +88,10 @@ SceneTitle::SceneTitle() :
 	m_soundDecsionH = LoadSoundMem(kDecisionFilename);	  //決定音
 	m_soundCancelH = LoadSoundMem(kCancelFilename);	  //キャンセル音
 
-	ChangeVolumeSoundMem(64, m_soundBgmH);
-	ChangeVolumeSoundMem(128, m_soundSelectH);
-	ChangeVolumeSoundMem(128, m_soundDecsionH);
-	ChangeVolumeSoundMem(128, m_soundCancelH);
+	ChangeVolumeSoundMem(kBgmVolume, m_soundBgmH);
+	ChangeVolumeSoundMem(kSeVolume, m_soundSelectH);
+	ChangeVolumeSoundMem(kSeVolume, m_soundDecsionH);
+	ChangeVolumeSoundMem(kSeVolume, m_soundCancelH);
 
 	PlaySoundMem(m_soundBgmH, DX_PLAYTYPE_LOOP);
 }
@@ -196,96 +201,9 @@ std::shared_ptr<SceneBase> SceneTitle::Update()
 	{
 		//Bボタンで戻る
 		if (Pad::IsTrigger(PAD_INPUT_2)) m_isOption = false;
-
-		////上方向を押したとき
-		//if (Pad::IsTrigger(PAD_INPUT_UP))
-		//{
-
-		//	if (m_option == kOperator)
-		//	{
-		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
-		//		m_option = kFullScreen;
-		//	}
-		//	else if (m_option == kSound)
-		//	{
-		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
-		//		m_option = kOperator;
-		//	}
-		//	else if (m_option == kFullScreen)
-		//	{
-		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
-		//		m_option = kSound;
-		//	}
-		//}
-
-		////下方向を押したとき
-		//if (Pad::IsTrigger(PAD_INPUT_DOWN))
-		//{
-		//	if (m_option == kOperator)
-		//	{
-		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
-		//		m_option = kSound;
-		//	}
-		//	else if (m_option == kSound)
-		//	{
-		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
-		//		m_option = kFullScreen;
-		//	}
-		//	else if (m_option == kFullScreen)
-		//	{
-		//		//m_pManager->m_pSoundManager.PlaySE("SelectSe");
-		//		m_option = kOperator;
-		//	}
-		//}
-
-		////決定ボタンを押したとき
-		//if (Pad::IsTrigger(PAD_INPUT_1))
-		//{
-		//	if (m_option == kOperator)
-		//	{
-		//		m_isOperator = true;
-		//		//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
-
-		//	}
-		//	else if (m_option == kSound)
-		//	{
-		//		m_isSound = true;
-		//		//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
-		//	}
-		//	else if (m_option == kFullScreen)
-		//	{
-		//		m_isFullScreen = true;
-		//		//m_pManager->m_pSoundManager.PlaySE("DecisionSe");
-		//	}
-		//}
 		
 	}
 
-	//if (Pad::IsTrigger(PAD_INPUT_2))
-	//{
-	//	//操作説明
-	//	if (m_isOperator)
-	//	{
-	//		//m_pManager->m_pSoundManager.PlaySE("CancelSe");
-	//		PlaySoundMem(m_soundCancelH, DX_PLAYTYPE_BACK, true);//キャンセル音
-	//		m_isOperator = false;
-	//	}
-	//	//サウンド関係
-	//	else if (m_isSound)
-	//	{
-	//		//m_pManager->m_pSoundManager.PlaySE("CancelSe");
-	//		PlaySoundMem(m_soundCancelH, DX_PLAYTYPE_BACK, true);//キャンセル音
-	//		m_isSound = false;
-	//	}
-	//	//フルスクリーン
-	//	else if (m_isFullScreen)
-	//	{
-	//		//m_pManager->m_pSoundManager.PlaySE("CancelSe");
-	//		PlaySoundMem(m_soundCancelH, DX_PLAYTYPE_BACK, true);//キャンセル音
-	//		m_isFullScreen = false;
-
-	//	}
-	//}
 
 
 	
@@ -357,23 +275,7 @@ void SceneTitle::Draw()
 
 			DrawExtendGraph(Game::kScreenWidth * 0.1, Game::kScreenHeight * 0.1, Game::kScreenWidth * 0.9, Game::kScreenHeight * 0.9, m_operationH, true);
 
-			////セレクト
-			//if (m_option == kOperator)
-			//{
-			//	DrawExtendGraph(kSelectLeft + m_selectAnimation, kStartTop, kSelectRight + m_selectAnimation, kStartDown, m_selectH, true);
-			//}
-			//else if (m_option == kSound)
-			//{
-			//	DrawExtendGraph(kSelectLeft + m_selectAnimation, kOptionTop, kSelectRight + m_selectAnimation, kOptionDown, m_selectH, true);
-			//}
-			//else if (m_option == kFullScreen)
-			//{
-			//	DrawExtendGraph(kSelectLeft + m_selectAnimation, kEndTop, kSelectRight + m_selectAnimation, kEndDown, m_selectH, true);
-			//}
-
-			//DrawExtendGraph(kLeft, kStartTop, kRight, kStartDown, m_startH, true); //スタート
-			//DrawExtendGraph(kLeft, kOptionTop, kRight, kOptionDown, m_optionH, true);//オプション
-			//DrawExtendGraph(kLeft, kEndTop, kRight, kEndDown, m_endH, true);//ゲーム終了
+			
 	}
 
 

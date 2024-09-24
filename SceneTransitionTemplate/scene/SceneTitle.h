@@ -52,6 +52,7 @@ private:
 	int m_operationH;
 	int m_selectH;
 	int m_backgroundH;
+	
 
 	//ƒtƒŒ[ƒ€•Ï”
 	int m_frameScene;

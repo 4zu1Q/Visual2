@@ -351,12 +351,7 @@ void Player::Update()
 
 	if (m_isAttack)
 	{
-		//soundAttackFrame++;
-		//if (soundAttackFrame == 5)
-		//{
-			PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
-
-		//}
+		PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
 
 		//プレイヤーが攻撃したら生成するためのフラグがtrueになる
 		m_isAttackGeneration = true;
@@ -365,12 +360,8 @@ void Player::Update()
 
 	if (m_isSkill)
 	{
-		//soundSkillFrame++;
-		//if (soundSkillFrame == 30)
-		//{
-			PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
+		PlaySoundMem(m_axeAttackSeH, DX_PLAYTYPE_BACK, true);//アタック
 
-		//}
 		//プレイヤーがスキルを使用したら生成するためのフラグがtrueになる
 		m_isSkillGeneration = true;
 	}
