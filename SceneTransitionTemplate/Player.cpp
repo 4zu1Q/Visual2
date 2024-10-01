@@ -237,12 +237,6 @@ void Player::Update()
 	}
 	UpdateAnim(m_prevAnimNo);
 
-	//‰ñ”ğ“ü‚ê‚½‚¢
-	if (m_isAvoid)
-	{
-
-	}
-
 	//€‚ñ‚¾‚çˆ—
 	if (m_isDown)
 	{

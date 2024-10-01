@@ -83,7 +83,6 @@ void Camera::PlayCameraUpdate(Player& player)
 	//ベクトルの方向(注視点-カメラのポジション)
 	VECTOR posToAim = VSub(playerAimPos, m_pos);
 
-	
 
 	//VECTOR pos = VSub(m_pos,playerAimPos);
 	//pos = VNorm(pos);
@@ -113,7 +112,7 @@ void Camera::PlayCameraUpdate(Player& player)
 	}
 
 	//注視点の座標をプレイヤーの座標に代入
-	m_targetPos = player.GetPos();
+	//m_targetPos = player.GetPos();
 
 	//基準ベクトル
 	//VECTOR Direction = VGet(0.0f, 0.0f, 50.0f);
