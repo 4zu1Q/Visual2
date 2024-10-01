@@ -362,49 +362,55 @@ std::shared_ptr<SceneBase> ScenePlaying::Update()
 
 	if (!m_isPlayerDeath)
 	{
-		//敵の攻撃に当たった場合のフラグ取得
-		m_isEnemyAttackHit = m_pEnemy->EnemyAttackSphereHitFlag(m_pPlayer);
+		if (!m_isMenu)
+		{
+			//敵の攻撃に当たった場合のフラグ取得
+			m_isEnemyAttackHit = m_pEnemy->EnemyAttackSphereHitFlag(m_pPlayer);
 
-		//敵のスキルに当たった場合のフラグ取得
-		m_isEnemySkillHit = m_pEnemy->EnemySkillSphereHitFlag(m_pPlayer);
+			//敵のスキルに当たった場合のフラグ取得
+			m_isEnemySkillHit = m_pEnemy->EnemySkillSphereHitFlag(m_pPlayer);
+		}
 	}
 
 	//敵が死んだら当たり判定を消す
 	if (!m_isEnemyDeath)
 	{
-		//プレイヤーの攻撃に当たった場合のフラグ取得
-		m_isPlayerAttackHit = m_pEnemy->PlayerAttackSphereHitFlag(m_pPlayer);
-
-		//プレイヤーのスキルに当たった場合のフラグ取得
-		m_isPlayerSkillHit = m_pEnemy->PlayerSkillSphereHitFlag(m_pPlayer);
-
-		//敵の索敵範囲に入った場合のフラグ取得
-		m_isEnemySearch = m_pEnemy->SearchSphereFlag(m_pPlayer);
-
-		//敵の止まる範囲に入った場合のフラグ取得
-		m_isEnemyStop = m_pEnemy->StopSphereFlag(m_pPlayer);
-
-		//敵の行動の当たり判定
-		//敵の索敵にプレイヤーがいなかったら
-		if (!m_isEnemySearch && !m_isEnemyStop)
+		if (!m_isMenu)
 		{
-			m_pEnemy->SetState(Enemy::kIdle);
-		}
-		//敵の索敵にプレイヤーがいたら
-		if (m_isEnemySearch && !m_isEnemyStop)
-		{
-			m_pEnemy->SetState(Enemy::kRun);
-		}
-		//敵の攻撃する範囲にプレイヤーがいたら
-		if (m_isEnemyStop)
-		{
-			m_pEnemy->SetState(Enemy::kAttack);
-		}
+			//プレイヤーの攻撃に当たった場合のフラグ取得
+			m_isPlayerAttackHit = m_pEnemy->PlayerAttackSphereHitFlag(m_pPlayer);
 
-		//プレイヤーと敵が当たった場合
-		if (m_isPlayerHit)
-		{
-			Knockback(posVec, moveVec, length);
+			//プレイヤーのスキルに当たった場合のフラグ取得
+			m_isPlayerSkillHit = m_pEnemy->PlayerSkillSphereHitFlag(m_pPlayer);
+
+			//敵の索敵範囲に入った場合のフラグ取得
+			m_isEnemySearch = m_pEnemy->SearchSphereFlag(m_pPlayer);
+
+			//敵の止まる範囲に入った場合のフラグ取得
+			m_isEnemyStop = m_pEnemy->StopSphereFlag(m_pPlayer);
+
+			//敵の行動の当たり判定
+			//敵の索敵にプレイヤーがいなかったら
+			if (!m_isEnemySearch && !m_isEnemyStop)
+			{
+				m_pEnemy->SetState(Enemy::kIdle);
+			}
+			//敵の索敵にプレイヤーがいたら
+			if (m_isEnemySearch && !m_isEnemyStop)
+			{
+				m_pEnemy->SetState(Enemy::kRun);
+			}
+			//敵の攻撃する範囲にプレイヤーがいたら
+			if (m_isEnemyStop)
+			{
+				m_pEnemy->SetState(Enemy::kAttack);
+			}
+
+			//プレイヤーと敵が当たった場合
+			if (m_isPlayerHit)
+			{
+				Knockback(posVec, moveVec, length);
+			}
 		}
 	}
 	else
