@@ -1,24 +1,59 @@
-#pragma once
+ï»¿#pragma once
+#include <list>
 #include <memory>
+#include <windows.h>
 
 class SceneBase;
+
 class SceneManager
 {
 public:
 	SceneManager();
 	virtual ~SceneManager();
 
-	virtual void Init();	//ƒV[ƒ“‚É“ü‚é‚Æ‚«‚Ì‰Šú‰»ˆ—
-	virtual void End();		//ƒV[ƒ“‚ğ”²‚¯‚é‚Æ‚«‚Ìˆ—
+	/// <summary>
+	/// æŒã£ã¦ã„ã‚‹ã‚·ãƒ¼ãƒ³ã®Updateé–¢æ•°ã‚’å‘¼ã³å‡ºã™
+	/// </summary>
+	void Update();	//æ¯ãƒ•ãƒ¬ãƒ¼ãƒ è¡Œã†æ›´æ–°å‡¦ç†
 
-	virtual void Update();	//–ˆƒtƒŒ[ƒ€s‚¤XVˆ—
-	virtual void Draw();	//–ˆƒtƒŒ[ƒ€s‚¤•`‰æˆ—
+	/// <summary>
+	/// æŒã£ã¦ã„ã‚‹ã‚·ãƒ¼ãƒ³ã®Drawé–¢æ•°ã‚’å‘¼ã³å‡ºã™
+	/// </summary>
+	void Draw();	//æ¯ãƒ•ãƒ¬ãƒ¼ãƒ è¡Œã†æç”»å‡¦ç†
+
+	/// <summary>
+	/// å®Ÿè¡Œä¸­ã®ã‚·ãƒ¼ãƒ³ã‚’å¼•æ•°ã§æŒ‡å®šã—ãŸã‚·ãƒ¼ãƒ³ã«åˆ‡ã‚Šæ›¿ãˆã‚‹
+	/// </summary>
+	/// <param name="nextScene"></param>
+	void ChangeScene(std::shared_ptr<SceneBase> nextScene);
+
+	/// <summary>
+	/// Sceneã‚’ã‚¯ãƒªã‚¢ã—ã¦ã‚·ãƒ¼ãƒ³ã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹
+	/// </summary>
+	/// <param name="nextScene"></param>
+	void ChangeAndClearScene(std::shared_ptr<SceneBase> nextScene);
+
+	/// <summary>
+	/// ç¾åœ¨å…ˆé ­ã§å®Ÿè¡Œä¸­ã®ã‚·ãƒ¼ãƒ³ã®ä¸Šã«ã‚·ãƒ¼ãƒ³ã‚’ä¹—ã£ã‘ã‚‹
+	/// </summary>
+	/// <param name="scene"></param>
+	void PushScene(std::shared_ptr<SceneBase> scene);
+
+	/// <summary>
+	/// ç¾åœ¨ã®å…ˆé ­ã‚·ãƒ¼ãƒ³ã‚’å‰Šé™¤ã™ã‚‹
+	/// </summary>
+	void popScene(bool isToTitle = false);
+
+	void DrawDebug();
 
 private:
-	//ƒV[ƒ“‚ÌƒXƒ}[ƒgƒ|ƒCƒ“ƒ^
+
+	std::list<std::shared_ptr<SceneBase>> m_scenes;
+
+	//ã‚·ãƒ¼ãƒ³ã®ã‚¹ãƒãƒ¼ãƒˆãƒã‚¤ãƒ³ã‚¿
 	std::shared_ptr<SceneBase> m_pScene;
 
-	float m_updateTime;	//XV‚É‚©‚©‚éŠÔ
-	float m_drawTime;	//•`‰æ‚É‚©‚©‚éŠÔ
+	float m_updateTime;	//æ›´æ–°ã«ã‹ã‹ã‚‹æ™‚é–“
+	float m_drawTime;	//æç”»ã«ã‹ã‹ã‚‹æ™‚é–“
 };
 

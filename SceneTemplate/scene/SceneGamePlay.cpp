@@ -1,34 +1,37 @@
-#include "SceneGamePlay.h"
-#include "DxLib.h"
+ï»¿#include "DxLib.h"
 
-SceneGamePlay::SceneGamePlay()
+#include "SceneManager.h"
+#include "SceneGamePlay.h"
+
+
+SceneGamePlay::SceneGamePlay(SceneManager& manager) :
+	SceneBase(manager)
 {
 }
 
 SceneGamePlay::~SceneGamePlay()
 {
+
 }
 
-void SceneGamePlay::Init()
-{
-}
 
-void SceneGamePlay::End()
+void SceneGamePlay::Update()
 {
-}
 
-std::shared_ptr<SceneBase> SceneGamePlay::Update()
-{
-	return std::shared_ptr<SceneBase>();
+
+
+
 }
 
 void SceneGamePlay::Draw()
 {
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 
+	DrawGrid();
+
 }
 
-void DrawGrid()
+void SceneGamePlay::DrawGrid()
 {
 	for (int x = -50; x <= 50; x += 10)
 	{
@@ -39,7 +42,7 @@ void DrawGrid()
 		DrawLine3D(VGet(-50, 0, static_cast<float>(z)), VGet(50, 0, static_cast<float>(z)), 0xff0000);
 	}
 
-	// X+-,Z+-‚Ì•ûŒü‚ª•ª‚©‚è‚â‚·‚¢‚æ‚¤‚É•\¦‚ğ’Ç‰Á‚·‚é
+	// X+-,Z+-ã®æ–¹å‘ãŒåˆ†ã‹ã‚Šã‚„ã™ã„ã‚ˆã†ã«è¡¨ç¤ºã‚’è¿½åŠ ã™ã‚‹
 	VECTOR dispPos = ConvWorldPosToScreenPos(VGet(50, 0, 0));
 	DrawStringF(dispPos.x, dispPos.y, "X+", 0xffffff);
 	dispPos = ConvWorldPosToScreenPos(VGet(-50, 0, 0));

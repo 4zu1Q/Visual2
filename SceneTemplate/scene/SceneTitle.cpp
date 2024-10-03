@@ -1,50 +1,108 @@
+Ôªø#include "DxLib.h"
+
+#include "util/Pad.h"
+
+#include "SceneManager.h"
 #include "SceneTitle.h"
 #include "SceneSelect.h"
-#include "DxLib.h"
+#include "SceneOption.h"
 
-//#include "ScenePlaying.h"
 
-SceneTitle::SceneTitle():
-	m_frameCount(0)
+namespace
 {
+	constexpr int kTextX = 64;
+	constexpr int kTextBlankSpaceY = 32;
+	constexpr int kTextIntervalY = 24;
+}
+
+SceneTitle::SceneTitle(SceneManager& manager):
+	SceneBase(manager)
+{
+	m_sceneTrans = e_SceneTrans::kSelect;
 }
 
 SceneTitle::~SceneTitle()
 {
 }
 
-void SceneTitle::Init()
+void SceneTitle::Update()
 {
-}
+	Pad::Update();
+	UpdateFade();
 
-std::shared_ptr<SceneBase> SceneTitle::Update()
-{
-
-
-	m_frameCount++;
-
-	if (m_frameCount > 120)
+	
+	if (!m_isToNextScene)
 	{
-		//ScenePlayingÇ…êÿÇËë÷Ç¶
-		//ScenePlayingÇÃÉÅÉÇÉäÇämï€ÇµÇƒÇªÇÃÉ|ÉCÉìÉ^Çï‘Ç∑
-		//return std::make_shared<SceneSelect>();
+		//
+		if (Pad::IsTrigger(PAD_INPUT_UP))
+		{
+			if (m_sceneTrans != e_SceneTrans::kSelect)
+			{
+				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
+			}
+		}
 
+		//
+		if (Pad::IsTrigger(PAD_INPUT_DOWN))
+		{
+			if (m_sceneTrans != e_SceneTrans::kQuit)
+			{
+				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
+			}
+		}
+
+		//
+		if (Pad::IsTrigger(PAD_INPUT_1))
+		{
+			if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				StartFadeOut();
+				m_isToNextScene = true;
+			}
+
+			if (m_sceneTrans == e_SceneTrans::kOption)
+			{
+				m_pManager.PushScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
+			}
+
+			if (m_sceneTrans == e_SceneTrans::kQuit)
+			{
+				DxLib_End();
+			}
+		}
 	}
 
 
+	//„Ç∑„Éº„É≥„Éï„É©„Ç∞„Åå„Åü„Å£„ÅüÂ†¥Âêà
+	if (m_isToNextScene)
+	{
+		if (!IsFadingOut())
+		{
+			if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+			}
+		}
+	}
 
-	return shared_from_this();
 }
 
 void SceneTitle::Draw()
 {
-	DrawBox(100, 100, 200, 200, 0xffffff, false);
-	DrawCircle(400, 200, 128, 0xfff000, true);
 
-	DrawFormatString(0, 16, 0xffffff, "Frame:%d", m_frameCount);
+#ifdef _DEBUG
+
 	DrawString(0, 0, "Scene Title", 0xffffff, false);
-}
 
-void SceneTitle::End()
-{
+	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "‚Üí");
+
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Scene Debug");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Scene Title");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kQuit) * kTextIntervalY, 0xffffff, "Scene Select");
+
+#endif
+
+
+	DrawFade();
 }

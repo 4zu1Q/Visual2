@@ -1,25 +1,21 @@
-#include "SceneGameClear.h"
-#include "DxLib.h"
+﻿#include "DxLib.h"
 
-SceneGameClear::SceneGameClear()
+#include"SceneManager.h"
+#include "SceneGameClear.h"
+
+SceneGameClear::SceneGameClear(SceneManager& manager) :
+	SceneBase(manager)
 {
+
 }
 
 SceneGameClear::~SceneGameClear()
 {
 }
 
-void SceneGameClear::Init()
+void SceneGameClear::Update()
 {
-}
 
-void SceneGameClear::End()
-{
-}
-
-std::shared_ptr<SceneBase> SceneGameClear::Update()
-{
-	return std::shared_ptr<SceneBase>();
 }
 
 void SceneGameClear::Draw()

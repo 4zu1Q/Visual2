@@ -3,12 +3,12 @@
 #include <vector>
 #include <memory>
 
-class SceneGameClear :
+class ScenePause :
 	public SceneBase
 {
 public:
-	SceneGameClear(SceneManager& manager);
-	virtual ~SceneGameClear();
+	ScenePause(SceneManager& manager);
+	virtual ~ScenePause();
 
 	/// <summary>
 	/// 更新処理
@@ -24,15 +24,11 @@ private:
 	//遷移先
 	enum class e_SceneTrans : int
 	{
-		kSelect,	//セレクト
+		kRestart,	//リスタート
 		kOption,	//オプション
-		kQuit,		//ゲーム終了
+		kSelect,	//セレクト
 	};
 
 	e_SceneTrans m_sceneTrans;
-
-	int m_frameCount;
-
-
 };
 

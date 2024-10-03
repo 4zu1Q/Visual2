@@ -146,8 +146,10 @@
     <ClCompile Include="scene\SceneGameOver.cpp" />
     <ClCompile Include="scene\SceneGamePlay.cpp" />
     <ClCompile Include="scene\SceneManager.cpp" />
+    <ClCompile Include="scene\SceneOption.cpp" />
     <ClCompile Include="scene\SceneSelect.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
+    <ClCompile Include="util\Input.cpp" />
     <ClCompile Include="util\Pad.cpp" />
     <ClCompile Include="util\SoundManager.cpp" />
     <ClCompile Include="util\Time.cpp" />
@@ -160,9 +162,11 @@
     <ClInclude Include="scene\SceneGameOver.h" />
     <ClInclude Include="scene\SceneGamePlay.h" />
     <ClInclude Include="scene\SceneManager.h" />
+    <ClInclude Include="scene\SceneOption.h" />
     <ClInclude Include="scene\SceneSelect.h" />
     <ClInclude Include="scene\SceneTitle.h" />
     <ClInclude Include="util\Game.h" />
+    <ClInclude Include="util\Input.h" />
     <ClInclude Include="util\Pad.h" />
     <ClInclude Include="util\SoundManager.h" />
     <ClInclude Include="util\Time.h" />

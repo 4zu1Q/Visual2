@@ -1,19 +1,40 @@
-#pragma once
+ï»¿#pragma once
 #include "SceneBase.h"
+#include <vector>
+#include <memory>
 
 class SceneDebug :
 	public SceneBase
 {
 public:
-	SceneDebug();
+	SceneDebug(SceneManager& manager);
 	virtual ~SceneDebug();
 
-	virtual void Init();
-	virtual std::shared_ptr<SceneBase> Update();	//–ˆƒtƒŒ[ƒ€s‚¤XVˆ—
-	virtual void Draw();	//–ˆƒtƒŒ[ƒ€s‚¤•`‰æˆ—
-	virtual void End();	//ƒV[ƒ“‚ğ”²‚¯‚é‚Æ‚«‚Ìˆ—
+	/// <summary>
+	/// æ›´æ–°å‡¦ç†
+	/// </summary>
+	virtual void Update() override final;	//æ¯ãƒ•ãƒ¬ãƒ¼ãƒ è¡Œã†æ›´æ–°å‡¦ç†
+
+	/// <summary>
+	/// æç”»å‡¦ç†
+	/// </summary>
+	virtual void Draw() override final;	//æ¯ãƒ•ãƒ¬ãƒ¼ãƒ è¡Œã†æç”»å‡¦ç†
 
 private:
+
+	//é·ç§»å…ˆ
+	enum class e_SceneTrans : int
+	{
+		kDebug,
+		kTitle,
+		kSelect,
+		kGamePlay,
+		kGameClear,
+		kGameOver,
+		kOption,
+	};
+
+	e_SceneTrans m_sceneTrans;
 
 };
 

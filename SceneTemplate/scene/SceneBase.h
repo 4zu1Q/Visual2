@@ -1,44 +1,57 @@
-#pragma once
+ï»¿#pragma once
 #include <memory>
+#include "DxLib.h"
 
+class SceneManager;
 
-class SceneBase :public std::enable_shared_from_this<SceneBase>
+/// <summary>
+/// ã‚·ãƒ¼ãƒ³åŸºåº•ã‚¯ãƒ©ã‚¹
+/// è‰²ã‚“ãªã‚·ãƒ¼ãƒ³ã®åŸºã«ãªã‚‹ã‚¯ãƒ©ã‚¹
+/// </summary>
+class SceneBase
 {
 public:
-	SceneBase() {}
-	virtual ~SceneBase() {}
 
+	/// <summary>
+	/// ç”Ÿæˆæ™‚ã«SceneManagerã®å‚ç…§ã‚’å—ã‘å–ã£ã¦ãŠã
+	/// </summary>
+	/// <param name="manager">SceneManagerã®å‚ç…§</param>
+	SceneBase(SceneManager& manager);
 	
-	virtual void Init() = 0;	//ƒV[ƒ“‚É“ü‚é‚Æ‚«‚Ì‰Šú‰»ˆ—
-	virtual void End() = 0;		//ƒV[ƒ“‚ğ”²‚¯‚é‚Æ‚«‚Ìˆ—
+	/// <summary>
+	/// ã‚·ãƒ¼ãƒ³ã®æ›´æ–°
+	/// </summary>										
+	virtual void Update() = 0;											
 
-														//–ˆƒtƒŒ[ƒ€s‚¤XVˆ—
-	virtual std::shared_ptr<SceneBase> Update() = 0;	//ƒV[ƒ“‚ğ•ÏX‚·‚éê‡‚Í‘JˆÚæ‚ÌƒV[ƒ“‚Ìƒ|ƒCƒ“ƒ^
-														//ƒV[ƒ“•ÏX‚µ‚È‚¢ê‡‚Í©g‚Ìƒ|ƒCƒ“ƒ^
-										
-	virtual void Draw() = 0;	//–ˆƒtƒŒ[ƒ€s‚¤•`‰æˆ—
+	/// <summary>
+	/// ã‚·ãƒ¼ãƒ³ã®æç”»
+	/// </summary>
+	virtual void Draw() = 0;	//æ¯ãƒ•ãƒ¬ãƒ¼ãƒ è¡Œã†æç”»å‡¦ç†
 
-	/*ƒtƒF[ƒhŠÖ˜A*/
-	//void UpdateFade();
-	//void DrawFade() const;
+protected:
 
+	void UpdateFade();
+	void DrawFade() const;
 
-	//ƒV[ƒ“‚Ìí—Ş
-	enum SceneKind
-	{
-		kSceneDebug,		//ƒfƒoƒbƒOƒV[ƒ“
-		kSceneTitle,		//ƒ^ƒCƒgƒ‹ƒV[ƒ“
-		kSceneSelect,		//ƒZƒŒƒNƒgƒV[ƒ“
-		kSceneGamePlay,		//ƒQ[ƒ€ƒvƒŒƒCƒV[ƒ“
-		kSceneGameOver,		//ƒQ[ƒ€ƒI[ƒo[ƒV[ƒ“
-		kSceneGameClear,	//ƒQ[ƒ€ƒNƒŠƒAƒV[ƒ“
-	};
+	void StartFadeOut();	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆé–‹å§‹
+	void StartFadeIn();	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³é–‹å§‹
 
-	SceneKind m_sceneKind;
+	bool IsFadingIn() const;	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³ä¸­
+	bool IsFadingOut() const;	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¢ã‚¦ãƒˆä¸­
+	bool IsFading() const { return IsFadingIn() || IsFadingOut(); }	// ãƒ•ã‚§ãƒ¼ãƒ‰ã‚¤ãƒ³orã‚¢ã‚¦ãƒˆä¸­
+
+	bool IsFinishFadeOut()const;
+
+	void FadeInSkip();
+	void FadeOutSkip();
+
+protected:
+	SceneManager& m_pManager;	//ã‚·ãƒ¼ãƒ³ç®¡ç†ã‚¯ãƒ©ã‚¹ã®å‚ç…§
+	bool m_isToNextScene;
 
 private:
 
-	//ƒtƒF[ƒhŠÖ˜Aˆ—
+	//ãƒ•ã‚§ãƒ¼ãƒ‰é–¢é€£å‡¦ç†
 	int m_fadeColor;
 	int m_fadeBright;
 	int m_fadeSpeed;

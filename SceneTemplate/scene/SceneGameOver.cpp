@@ -1,25 +1,22 @@
-#include "SceneGameOver.h"
-#include "DxLib.h"
+﻿#include "DxLib.h"
 
-SceneGameOver::SceneGameOver()
+#include "SceneManager.h"
+#include "SceneGameOver.h"
+
+
+SceneGameOver::SceneGameOver(SceneManager& manager) :
+	SceneBase(manager)
 {
+
 }
 
 SceneGameOver::~SceneGameOver()
 {
+
 }
 
-void SceneGameOver::Init()
+void SceneGameOver::Update()
 {
-}
-
-void SceneGameOver::End()
-{
-}
-
-std::shared_ptr<SceneBase> SceneGameOver::Update()
-{
-	return std::shared_ptr<SceneBase>();
 }
 
 void SceneGameOver::Draw()

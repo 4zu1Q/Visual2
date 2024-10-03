@@ -1,17 +1,17 @@
-#include "SceneManager.h"
+ï»¿#include "SceneManager.h"
 #include "SceneTitle.h"
 #include "util/Game.h"
 
 namespace
 {
 
-	//à–¾—pˆ—ƒo[‚Ì•¶š‚ÌÀ•W
+	//èª¬æ˜ç”¨å‡¦ç†ãƒãƒ¼ã®æ–‡å­—ã®åº§æ¨™
 	constexpr int kUpdateBarStringPosX = 0;
 	constexpr int kUpdateBarStringPosY = Game::kScreenHeight - 48;
 	constexpr int kDrawBarPosStringPosX = 0;
 	constexpr int kDrawBarPosStringPosY = Game::kScreenHeight - 32;
 
-	//à–¾—pˆ—ƒo[‚ÌÀ•W
+	//èª¬æ˜ç”¨å‡¦ç†ãƒãƒ¼ã®åº§æ¨™
 	constexpr int kExplainUpdateBarPosX1 = 34;
 	constexpr int kExplainUpdateBarPosY1 = Game::kScreenHeight - 46;
 	constexpr int kExplainUpdateBarPosX2 = 62;
@@ -22,16 +22,20 @@ namespace
 	constexpr int kExplainDrawBarPosY2 = Game::kScreenHeight - 18;
 
 
-	//ˆ—ƒo[‚ÌF
+	//å‡¦ç†ãƒãƒ¼ã®è‰²
 	constexpr int kUpdateBarColor = 0x0000ff;
 	constexpr int kDrawBarColor = 0xff0000;
 
-	//ˆ—ƒo[‚ÌÀ•W
+	//å‡¦ç†ãƒãƒ¼ã®åº§æ¨™
 	constexpr int kBarPosX = 0;
 	constexpr int kBarPosY = Game::kScreenHeight - 16;
 }
 
 SceneManager::SceneManager():
+#ifdef _DEBUG
+	m_updateTime(0.0f),
+	m_drawTime(0.0f),
+#endif
 	m_pScene(nullptr)
 {
 }
@@ -40,47 +44,80 @@ SceneManager::~SceneManager()
 {
 }
 
-void SceneManager::Init()
-{
-	//Å‰‚ÌƒV[ƒ“‚Ìƒƒ‚ƒŠ‚ğŠm•Û‚·‚é
-	m_pScene = std::make_shared<SceneTitle>();
-	m_pScene->Init();
-}
-
 void SceneManager::Update()
 {
-	//XV‚Ìƒ[ƒfƒBƒ“ƒOŠÔ‚ğæ“¾
+#ifdef _DEBUG
+	//æ›´æ–°å‰ã®ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°æ™‚é–“å–å¾—
 	LONGLONG start = GetNowHiPerformanceCount();
+#endif
 
-	//SceneBase* pNext = m_pScene->Update();
-	std::shared_ptr<SceneBase>pNext = m_pScene->Update();
-	if (pNext != m_pScene)
-	{
-		//Œ»İˆ—’†‚ÌƒV[ƒ“‚ÌI—¹ˆ—
-		m_pScene->End();
+	//æœ«å°¾ã®ã¿å®Ÿè¡Œ
+	m_scenes.back()->Update();
 
-		//Update‚ª•Ô‚µ‚½V‚µ‚¢ƒV[ƒ“‚É‘JˆÚ‚·‚é
-		m_pScene = pNext;
-		m_pScene->Init();
-
-	}
+#ifdef _DEBUG
+	//æ›´æ–°å¾Œã®ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°æ™‚é–“ã‹ã‚‰æ›´æ–°å‰ã®ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°æ™‚é–“ã‚’å¼•ã„ãŸå€¤ã‚’å–å¾—
+	m_updateTime = static_cast<float>(GetNowHiPerformanceCount() - start);
+#endif
 }
 
 void SceneManager::Draw()
 {
+
+#ifdef _DEBUG
+	//æ›´æ–°å‰ã®ãƒ­ãƒ¼ãƒ‡ã‚£ãƒ³ã‚°æ™‚é–“å–å¾—
 	LONGLONG start = GetNowHiPerformanceCount();
+#endif
+	//m_pScene->Draw();
 
-
-	m_pScene->Draw();
+	//å…ˆé ­ã‹ã‚‰é †ã«æç”»
+	//æœ€å¾Œã«ç©ã‚“ã ã‚‚ã®ãŒæœ€å¾Œã«æç”»ã•ã‚Œã‚‹
+	for (auto& scenes : m_scenes)
+	{
+		scenes->Draw();
+	}
 
 #ifdef _DEBUG
 	m_drawTime = static_cast<float>(GetNowHiPerformanceCount() - start);
+	DrawDebug();
+#endif
+}
 
-	//ˆ—ƒo[‚Ì•\¦@
-	//à–¾
-	DrawString(kUpdateBarStringPosX, kUpdateBarStringPosY, "ˆ—", 0xffffff, 0x000000);
+void SceneManager::ChangeScene(std::shared_ptr<SceneBase> nextScene)
+{
+	if (m_scenes.empty())	//ãƒªã‚¹ãƒˆãŒï½ã ã£ãŸã‚‰å…¥ã‚Œæ›¿ãˆãšã«
+	{
+		m_scenes.push_back(nextScene);	//æœ«å°¾ã«è¿½åŠ 
+	}
+	else
+	{
+		m_scenes.back() = nextScene;	//æ—¢ã«ä¸€ã¤ä»¥ä¸Šã§ã‚ã‚Œã°æœ«å°¾ã‚’
+	}
+}
+
+void SceneManager::ChangeAndClearScene(std::shared_ptr<SceneBase> nextScene)
+{
+	m_scenes.clear();
+
+	m_scenes.push_back(nextScene);
+}
+
+void SceneManager::PushScene(std::shared_ptr<SceneBase> scene)
+{
+	m_scenes.push_back(scene);
+}
+
+void SceneManager::popScene(bool isToTitle)
+{
+	m_scenes.pop_back();
+}
+
+void SceneManager::DrawDebug()
+{
+	//å‡¦ç†ãƒãƒ¼ã®è¡¨ç¤ºã€€
+	//èª¬æ˜
+	DrawString(kUpdateBarStringPosX, kUpdateBarStringPosY, "å‡¦ç†", 0xffffff, 0x000000);
 	DrawBox(kExplainUpdateBarPosX1, kExplainUpdateBarPosY1, kExplainUpdateBarPosX2, kExplainUpdateBarPosY2, kUpdateBarColor, true);
-	DrawString(kDrawBarPosStringPosX, kDrawBarPosStringPosY, "•`‰æ", 0xffffff, 0x000000);
+	DrawString(kDrawBarPosStringPosX, kDrawBarPosStringPosY, "æç”»", 0xffffff, 0x000000);
 	DrawBox(kExplainDrawBarPosX1, kExplainDrawBarPosY1, kExplainDrawBarPosX2, kExplainDrawBarPosY2, kDrawBarColor, true);
 
 	float rate = static_cast<float>(m_updateTime + m_drawTime) / 16666.6f;
@@ -90,10 +127,4 @@ void SceneManager::Draw()
 	rate = static_cast<float>(m_updateTime) / 16666.6f;
 	width = static_cast<float>(Game::kScreenWidth * rate);
 	DrawBox(kBarPosX, kBarPosY, static_cast<int>(width), Game::kScreenHeight, kUpdateBarColor, true);
-#endif
-}
-
-void SceneManager::End()
-{
-	m_pScene->End();
 }

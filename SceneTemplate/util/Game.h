@@ -1,22 +1,22 @@
-#pragma once
+ï»¿#pragma once
 #include "DxLib.h"
 
-// ƒQ[ƒ€‘S‘Ì‚Åg—p‚·‚é’è”‚Ì’è‹`
+// ã‚²ãƒ¼ãƒ å…¨ä½“ã§ä½¿ç”¨ã™ã‚‹å®šæ•°ã®å®šç¾©
 namespace Game
 {
 
-	//ƒEƒBƒ“ƒhƒEƒ‚[ƒhİ’è
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰è¨­å®š
 #ifdef _DEBUG 
 	constexpr bool kWindowMode = false;
 #else
 	constexpr bool kWindowMode = false;
 #endif
 
-	//ƒEƒBƒ“ƒhƒE–¼
-	const char* const kTitleText = "ƒQ[ƒ€–¼";
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦å
+	const char* const kTitleText = "ã‚²ãƒ¼ãƒ å";
 
 
-	//ƒEƒBƒ“ƒhƒEƒTƒCƒY
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚µã‚¤ã‚º
 	constexpr int kScreenWidth = 1280;
 	constexpr int kScreenHeight = 720;
 
@@ -24,7 +24,7 @@ namespace Game
 	//constexpr int kScreenHeight = 1080;
 
 
-	//ƒEƒBƒ“ƒhƒEƒJƒ‰[ƒ‚[ƒh
+	//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚«ãƒ©ãƒ¼ãƒ¢ãƒ¼ãƒ‰
 	constexpr int kColorDepth = 32; //16 or 32
 
 }
