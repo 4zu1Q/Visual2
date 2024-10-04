@@ -24,16 +24,8 @@ public:
 	void DrawGrid();
 
 private:
-	//遷移先
-	enum class e_SceneTrans : int
-	{
-		kSelect,	//セレクト
-		kOption,	//オプション
-		kQuit,		//ゲーム終了
-	};
 
-	e_SceneTrans m_sceneTrans;
-
+	float m_cameraAngle;
 
 };
 

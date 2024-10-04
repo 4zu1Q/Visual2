@@ -12,7 +12,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	m_pManager(manager)
 {
 	//初期設定はフェードアウト状態
-	m_fadeColor = 0x000000;
+	m_fadeColor = 0xff00ff;
 	m_fadeBright = 255;
 	m_fadeSpeed = -kFadeSpeed;
 	m_isToNextScene = false;

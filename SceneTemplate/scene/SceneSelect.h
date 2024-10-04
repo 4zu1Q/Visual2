@@ -24,9 +24,11 @@ private:
 	//遷移先
 	enum class e_SceneTrans : int
 	{
-		kSelect,	//セレクト
-		kOption,	//オプション
-		kQuit,		//ゲーム終了
+		kPowerTypeBoss,		//パワータイプのボス
+		kSpeedTypeBoss,		//スピードタイプのボス
+		kShooterTypeBoss,	//遠距離タイプのボス
+		kHookShotTypeBoss,	//フックショットタイプのボス
+		kRastBoss,			//ラスボス
 	};
 
 	e_SceneTrans m_sceneTrans;

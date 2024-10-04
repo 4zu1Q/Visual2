@@ -21,16 +21,15 @@ public:
 	virtual void Draw() override final;	//毎フレーム行う描画処理
 
 private:
+
 	//遷移先
 	enum class e_SceneTrans : int
 	{
 		kSelect,	//セレクト
-		kOption,	//オプション
-		kQuit,		//ゲーム終了
+		kTitle,		//オプション
 	};
 
 	e_SceneTrans m_sceneTrans;
-
 
 };
 

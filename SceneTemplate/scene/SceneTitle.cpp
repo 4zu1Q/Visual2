@@ -33,7 +33,7 @@ void SceneTitle::Update()
 	
 	if (!m_isToNextScene)
 	{
-		//
+		//上を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_UP))
 		{
 			if (m_sceneTrans != e_SceneTrans::kSelect)
@@ -42,7 +42,7 @@ void SceneTitle::Update()
 			}
 		}
 
-		//
+		//下を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_DOWN))
 		{
 			if (m_sceneTrans != e_SceneTrans::kQuit)
@@ -51,9 +51,10 @@ void SceneTitle::Update()
 			}
 		}
 
-		//
+		//Aボタンを押した場合
 		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
+			//enum変数が同じだった場合
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
 				StartFadeOut();
@@ -62,7 +63,7 @@ void SceneTitle::Update()
 
 			if (m_sceneTrans == e_SceneTrans::kOption)
 			{
-				m_pManager.PushScene(std::make_shared<SceneSelect>(m_pManager));
+				m_pManager.PushScene(std::make_shared<SceneOption>(m_pManager));
 				return;
 			}
 
@@ -97,9 +98,9 @@ void SceneTitle::Draw()
 
 	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Scene Debug");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Scene Title");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kQuit) * kTextIntervalY, 0xffffff, "Scene Select");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kQuit) * kTextIntervalY, 0xffffff, "Quit");
 
 #endif
 

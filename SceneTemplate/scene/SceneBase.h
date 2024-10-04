@@ -46,6 +46,7 @@ protected:
 	void FadeOutSkip();
 
 protected:
+
 	SceneManager& m_pManager;	//シーン管理クラスの参照
 	bool m_isToNextScene;
 

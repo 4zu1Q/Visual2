@@ -31,7 +31,6 @@ private:
 		kGamePlay,
 		kGameClear,
 		kGameOver,
-		kOption,
 	};
 
 	e_SceneTrans m_sceneTrans;

@@ -20,22 +20,26 @@ public:
 
 private:
 
-	enum Item : int
+	enum e_Item : int
 	{
 		kBgm,
 		kSe,
 		kSensitivity,
 		kFullScreen
+		//バイブレーションも欲しいかも？
 	};
 
-	Item m_nowItem;
+	e_Item m_nowItem;
 
 	int m_bgmScale;
 	int m_seScale;
 	int m_sensitivityScale;
 	bool m_isFullScreen;
 
-	//void (SceneOption::* m_updateFunc)
+	int m_pushCount;
+
+	//更新メンバ関数ポインタ
+	void (SceneOption::* m_updateFunc)();
 
 	//BGM
 	void BgmUpdate();

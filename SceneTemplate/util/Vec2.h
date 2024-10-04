@@ -1,10 +1,11 @@
-#pragma once
+ï»¿#pragma once
 
 #include <cmath>
 
-// 2ŸŒ³ƒxƒNƒgƒ‹
+// 2æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 class Vec2
 {
+
 public:
 	float x;
 	float y;
@@ -76,13 +77,13 @@ public:
 		return temp;
 	}
 
-	// ’·‚³‚Ìæ“¾
+	// é•·ã•ã®å–å¾—
 	float length()
 	{
 		return sqrtf((x * x) + (y * y));
 	}
 
-	// ³‹K‰» Vec2 = Vec2.normalize()
+	// æ­£è¦åŒ– Vec2 = Vec2.normalize()
 	Vec2 normalize()
 	{
 		float len = length();
