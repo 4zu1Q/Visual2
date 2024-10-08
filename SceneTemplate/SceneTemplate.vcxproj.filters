@@ -31,6 +31,12 @@
     <Filter Include="ソース ファイル\object">
       <UniqueIdentifier>{c65f7591-fe62-47a0-b7d8-7f07dbae06ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\ui">
+      <UniqueIdentifier>{fdc75016-ec61-4df4-83e4-626090a30cca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\ui">
+      <UniqueIdentifier>{8b5d3e3f-e322-42e2-b2be-953696603440}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">

@@ -119,7 +119,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			//ベクトルの方向(注視点-カメラのポジション)
 			VECTOR posToAim = VSub(aimPos, cameraPos2);
 
-			VECTOR scalePosToAim = VScale(posToAim, 0.9f);
+			VECTOR scalePosToAim = VScale(posToAim, 0.1f);
 
 			//アナログスティックを使って移動
 			int analogCameraX = 0;
@@ -163,6 +163,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		DrawSphere3D(playerPos, radius, 8, 0xffffff, 0xffffff, false);
 		DrawSphere3D(enemyPos, radius, 8, 0x00ff00, 0x00ff00, false);
 		DrawSphere3D(cameraPos2, radius, 8, 0x00ffff, 0x00ffff, false);
+
+		DrawFormatString(0, 0, 0xffffff, "Camera:%f,%f,%f", cameraPos2.x, cameraPos2.y, cameraPos2.z);
+
 
 		//裏画面を表画面を入れ替える
 		ScreenFlip();
