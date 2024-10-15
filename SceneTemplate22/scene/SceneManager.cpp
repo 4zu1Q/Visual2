@@ -23,8 +23,8 @@ namespace
 
 
 	//処理バーの色
-	constexpr int kUpdateBarColor = 0x0000ff;
-	constexpr int kDrawBarColor = 0xff0000;
+	constexpr int kUpdateBarColor = 0xff00ff;
+	constexpr int kDrawBarColor = 0x00ffff;
 
 	//処理バーの座標
 	constexpr int kBarPosX = 0;

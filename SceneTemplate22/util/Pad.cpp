@@ -1,61 +1,104 @@
-﻿#include "Pad.h"
-#include "DxLib.h"
+﻿#include "DxLib.h"
+#include "Pad.h"
+#include <vector>
 
 namespace
 {
-	// 前のフレームのパッド押し下げ状態
-	int lastPad = 0;
-	// このフレームのパッド押し下げ状態
-	int nowPad = 0;
+	// ログ記録フレーム数
+	constexpr int kLogNum = 16;
+	// パッド最大数
+	constexpr int kMaxPad = 2;
+	// 
+	constexpr int kUsePadData[kMaxPad] =
+	{
+		DX_INPUT_KEY_PAD1,
+		DX_INPUT_PAD2
+	};
+
+	// 入力ログ	0が最新の状態
+	int padLog[kMaxPad][kLogNum];
+
+	// キーログ
+	bool				isRecordLog = false;
+	int					playLogNo = -1;	// キーログ再生フレーム数
+	std::vector<int>	keyLog;
 }
 
 namespace Pad
 {
+	// パッドの入力状態取得
 	void Update()
 	{
-		// 前のフレームに取得したパッド情報を一つ古い情報にする
-		lastPad = nowPad;
-		// 現在のパッドの情報を取得する
-		nowPad = GetJoypadInputState(DX_INPUT_KEY_PAD1);
+		for (int padNo = 0; padNo < kMaxPad; padNo++)
+		{
+			// 現在のパッドの状態を取得
+			int padState = GetJoypadInputState(kUsePadData[padNo]);
+			if ((playLogNo >= 0) && (padNo == 0))
+			{
+				if (keyLog.size() > playLogNo)
+				{
+					padState = keyLog[playLogNo];
+					playLogNo++;
+				}
+				else
+				{
+					playLogNo = -1;
+				}
+			}
+
+			// ログの更新
+			for (int i = kLogNum - 1; i >= 1; i--)
+			{
+				padLog[padNo][i] = padLog[padNo][i - 1];
+			}
+			// 最新の状態
+			padLog[padNo][0] = padState;
+
+			// キーログ
+			if (isRecordLog)
+			{
+				if (padNo == 0)
+				{
+					keyLog.push_back(padState);
+				}
+			}
+		}
 	}
 
-	bool IsPress(int key)
+	// 押し下げ判定
+	bool IsPress(int button, int padNo)
 	{
-		return (nowPad & key);
+		return (padLog[padNo][0] & button);
+	}
+	// トリガー判定
+	bool IsTrigger(int button, int padNo)
+	{
+		bool isNow = (padLog[padNo][0] & button);	// 現在の状態
+		bool isLast = (padLog[padNo][1] & button);	// １フレーム前の状態
+		return (isNow && !isLast);
+	}
+	//離した判定
+	bool IsRelase(int button, int padNo) {
+		bool isNow = (padLog[padNo][0] & button);	//現在の状態
+		bool isLast = (padLog[padNo][1] & button);	//1フレーム前の状態
+		return (!isNow && isLast);
+	}
+	void startRecordLog()
+	{
+		isRecordLog = true;
+		keyLog.clear();
 	}
 
-	bool IsTrigger(int key)
+	void endRecordLog()
 	{
-		if (nowPad)
-		{
-			int i = 0;
-		}
-
-		bool isLast = (lastPad & key);	// 前のフレーム
-		bool isNow = (nowPad & key);	// このフレーム
-		//return !isLast && isNow;		// これでいいけど理解しにくいので分かりやすく
-
-
-
-		if (isNow &&		// このフレームに押されていて
-			!isLast)	// 前回のフレームに押されていない
-		{
-			return true;
-		}
-		return false;
+		isRecordLog = false;
 	}
-	bool IsRelase(int key)
+	void startPlayLog()
 	{
-		bool isNow = (nowPad & key);	// このフレーム
-		bool isLast = (lastPad & key);	// 前のフレーム
-		//return isLast && !isNow;
-
-		if (!isNow &&	// このフレームには押されていなくて
-			isLast)		// 前回のフレームは押されていた
-		{
-			return true;
-		}
-
-		return false;
+		playLogNo = 0;
+	}
+	void endPlayLog()
+	{
+		playLogNo = -1;
 	}
 }

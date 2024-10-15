@@ -13,6 +13,9 @@ namespace
 	constexpr int kTextX = 64;
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
+
+	//ポーズの背景アルファ値
+	constexpr int kAlpha = 200;
 }
 
 ScenePause::ScenePause(SceneManager& manager) :
@@ -75,7 +78,8 @@ void ScenePause::Update()
 			}
 		}
 
-		if (Pad::IsTrigger(PAD_INPUT_2))
+		//スタートボタンを押した場合
+		if (Pad::IsTrigger(PAD_INPUT_8))
 		{
 			m_pManager.popScene();
 		}
@@ -101,7 +105,7 @@ void ScenePause::Draw()
 
 #ifdef _DEBUG
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 

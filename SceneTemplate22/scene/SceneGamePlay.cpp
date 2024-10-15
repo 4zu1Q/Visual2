@@ -7,6 +7,9 @@
 #include "object/player/PlayerBase.h"
 #include "object/SkyDome.h"
 
+#include "ui/HpBar.h"
+#include "ui/FaceUi.h"
+
 #include "util/Pad.h"
 
 namespace
@@ -34,6 +37,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 {
 	m_pPlayer = std::make_shared<PlayerBase>();
 	m_pSkyDome = std::make_shared<SkyDome>();
+	m_pHpBar = std::make_shared<HpBar>();
+	m_pFaceUi = std::make_shared<FaceUi>();
 
 	m_playerPos = VGet(0, 0, 0);
 	m_cameraPos = VGet(0, 0, 0);
@@ -62,55 +67,11 @@ void SceneGamePlay::Update()
 
 	m_pSkyDome->Update();
 	m_pPlayer->Update();
+	m_pFaceUi->Update();
+	m_pHpBar->Update();
 
 #ifdef _DEBUG
 
-//	/*プレイヤーの移動*/
-//
-//	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
-//	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
-//	float len = VSize(move);
-//	float rate = len / kAnalogInputMax;
-//
-//	//アナログスティック無効な範囲を除外する
-//	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-//	rate = min(rate, 1.0f);
-//	rate = max(rate, 0.0f);
-//
-//	//速度が決定できるので移動ベクトルに反映する
-//	move = VNorm(move);
-//	float speed = kMaxSpeed * rate;
-//	move = VScale(move, speed);
-//
-//	m_playerPos = VAdd(m_playerPos, move);
-//
-//	/*テスト中のカメラ移動*/
-//
-//	VECTOR aimPos = VGet(m_playerPos.x, m_playerPos.y, m_playerPos.z);
-//	//ベクトルの方向(注視点-カメラのポジション)
-//	VECTOR posToAim = VSub(aimPos, m_cameraPos);
-//
-//	VECTOR scalePosToAim = VScale(posToAim, 0.1f);
-//
-//	//アナログスティックを使って移動
-//	int analogCameraX = 0;
-//	int analogCameraY = 0;
-//
-//	GetJoypadAnalogInputRight(&analogCameraX, &analogCameraY, DX_INPUT_PAD1);
-//
-//	if (analogCameraX >= 10) m_cameraAngle -= 0.05f;
-//	if (analogCameraX <= -10) m_cameraAngle += 0.05f;
-//
-//	m_cameraPos.x += cosf(m_cameraAngle) * 36;
-//	m_cameraPos.y += 0;
-//	m_cameraPos.z += sinf(m_cameraAngle) * 36;
-//
-//
-//	m_cameraPos = VAdd(m_cameraPos, posToAim);
-//
-//
-//
-//
 	if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_5))
 	{
 		m_cameraAngle += 0.05f;
@@ -123,10 +84,10 @@ void SceneGamePlay::Update()
 	SetCameraNearFar(0.1f, 580.0f);
 	VECTOR cameraPos;
 	cameraPos.x = cosf(m_cameraAngle) * kCameraDist;
-	cameraPos.y = kCameraHeight;
+	cameraPos.y = 20;
 	cameraPos.z = sinf(m_cameraAngle) * kCameraDist;
+
 	SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0, 0, 0));
-//
 
 #endif 
 	
@@ -139,12 +100,12 @@ void SceneGamePlay::Draw()
 
 	m_pSkyDome->Draw();
 	m_pPlayer->Draw();
-
-	//DrawSphere3D(m_playerPos, m_radius, 8, 0xff00ff, 0xffffff, false);
-	//DrawSphere3D(m_cameraPos, m_radius, 8, 0x00ffff, 0x00ffff, false);
+	m_pFaceUi->Draw();
+	m_pHpBar->Draw();
 
 	DrawGrid();
 	DrawFade();
+	
 }
 
 void SceneGamePlay::DrawGrid()

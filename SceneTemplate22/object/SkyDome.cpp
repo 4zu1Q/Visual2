@@ -29,10 +29,6 @@ void SkyDome::Update()
 	//回転
 	m_rot += kRotSpeed;
 
-	//1回転したら値をリセット
-	//if (m_rot >= DX_PI_F) m_rot = 0.0f;
-
-
 	//スカイドームを更新
 	MV1SetRotationXYZ(m_handle, VGet(0, m_rot, 0));
 	MV1SetPosition(m_handle, m_pos);

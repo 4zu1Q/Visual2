@@ -5,16 +5,20 @@ class PlayerBase
 {
 public:
 
+	//プレイヤーの特殊攻撃の種類(顔の種類)
 	enum class e_PlayerKind : int
 	{
-		kNormalPlayer,
-		kPowerPlayer,
-		kSpeedPlayer,
-		kHuckShotPlayer
+		kNormalPlayer,		//通常時
+		kPowerPlayer,		//パワー型
+		kSpeedPlayer,		//スピード型
+		kShotPlayer,		//弾を撃つ
+		kHuckShotPlayer,	//フックショット
+		kStrongestPlayer	//ラスボス型
 	};
 
 
 public:
+
 	PlayerBase();
 	virtual ~PlayerBase();
 
@@ -23,6 +27,22 @@ public:
 
 	void Update();
 	void Draw();
+
+	//プレイヤーの座標を取得
+	const VECTOR& GetPos() const { return m_pos; }
+	void SetPos(const VECTOR pos) { m_pos = pos; }
+
+	//プレイヤーの攻撃座標を取得
+	const VECTOR& GetAttackPos() const { return m_attackPos; }
+	void SetAttackPos(const VECTOR attackPos) { m_attackPos = attackPos; }
+
+	//プレイヤーのHPを取得
+	const int& GetHp() const { return m_hp; }
+	void SetHp(const int hp) { m_hp = hp; }
+
+	//プレイヤーの顔の種類
+	const e_PlayerKind& GetFaceKind() const { return m_playerKind; }
+	void SetFaceKind(const e_PlayerKind playerKind) { m_playerKind = playerKind; }
 
 
 
@@ -37,6 +57,11 @@ private:
 	/// プレイヤーの攻撃時の関数
 	/// </summary>
 	void Attack();
+
+	/// <summary>
+	/// プレイヤーの特殊攻撃時の関数
+	/// </summary>
+	void FaceAttack();
 	
 	/// <summary>
 	/// プレイヤーがガード時の関数
@@ -49,11 +74,14 @@ private:
 	void Avoid();
 
 	/// <summary>
+	/// プレイヤーがジャンプする時の関数
+	/// </summary>
+	void Jump();
+
+	/// <summary>
 	/// プレイヤーが顔を使用時の関数
 	/// </summary>
 	void FaceSelect();
-
-
 
 protected:
 
@@ -65,7 +93,8 @@ protected:
 
 	//プレイヤの座標
 	VECTOR m_pos;
-	VECTOR m_pos2;
+
+	VECTOR m_avoid;
 	
 	VECTOR m_attackDir;
 	VECTOR m_attackPos;
@@ -78,6 +107,7 @@ protected:
 	int m_analogX;
 	int m_analogZ;
 
+	bool m_isFaceUse;
 	
 };
 

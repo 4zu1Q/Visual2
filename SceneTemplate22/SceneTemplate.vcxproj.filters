@@ -111,6 +111,18 @@
     <ClCompile Include="object\SkyDome.cpp">
       <Filter>ソース ファイル\object</Filter>
     </ClCompile>
+    <ClCompile Include="object\enemy\BossBase.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\HpBar.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\FaceUi.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="object\Camera.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -171,6 +183,18 @@
       <Filter>ヘッダー ファイル\object\player</Filter>
     </ClInclude>
     <ClInclude Include="object\SkyDome.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+    <ClInclude Include="object\enemy\BossBase.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\HpBar.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\FaceUi.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="object\Camera.h">
       <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
   </ItemGroup>

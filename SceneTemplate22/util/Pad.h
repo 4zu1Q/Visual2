@@ -1,14 +1,24 @@
-#pragma once
+ï»¿#pragma once
+
 namespace Pad
 {
-	// ƒpƒbƒh‚ÌXVˆ— 1ƒtƒŒ[ƒ€‚É1‰ñs‚¤
+
+	// ãƒ‘ãƒƒãƒ‰ã®å…¥åŠ›çŠ¶æ…‹å–å¾—
 	void Update();
 
-	// ‰Ÿ‚³‚ê‚Ä‚¢‚é‚©‚ğæ“¾
-	bool IsPress(int key);
-	// ‰Ÿ‚³‚ê‚½uŠÔ‚ğæ“¾
-	bool IsTrigger(int key);
-	// ˜b‚µ‚½uŠÔ‚ğæ“¾
-	bool IsRelase(int key);
-};
+	// æŠ¼ã—ä¸‹ã’åˆ¤å®š
+	bool IsPress(int button, int padNo = 0);
+	// ãƒˆãƒªã‚¬ãƒ¼åˆ¤å®š
+	bool IsTrigger(int button, int padNo = 0);
+	//é›¢ã—ãŸåˆ¤å®š
+	bool IsRelase(int button, int padNo = 0);
 
+	// ãƒ­ã‚°è¨˜éŒ²é–‹å§‹ã€çµ‚äº†
+	void startRecordLog();
+	void endRecordLog();
+
+	// ãƒ­ã‚°å†ç”Ÿé–‹å§‹ã€çµ‚äº†
+	void startPlayLog();
+	void endPlayLog();
+
+}

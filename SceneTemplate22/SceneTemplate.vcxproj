@@ -140,6 +140,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="object\Camera.cpp" />
+    <ClCompile Include="object\enemy\BossBase.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
     <ClCompile Include="object\player\PlayerBase.cpp" />
     <ClCompile Include="object\SkyDome.cpp" />
@@ -153,6 +155,8 @@
     <ClCompile Include="scene\ScenePause.cpp" />
     <ClCompile Include="scene\SceneSelect.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
+    <ClCompile Include="ui\FaceUi.cpp" />
+    <ClCompile Include="ui\HpBar.cpp" />
     <ClCompile Include="util\Input.cpp" />
     <ClCompile Include="util\Pad.cpp" />
     <ClCompile Include="util\SoundManager.cpp" />
@@ -161,6 +165,8 @@
     <ClCompile Include="util\Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="object\Camera.h" />
+    <ClInclude Include="object\enemy\BossBase.h" />
     <ClInclude Include="object\player\Player.h" />
     <ClInclude Include="object\player\PlayerBase.h" />
     <ClInclude Include="object\SkyDome.h" />
@@ -174,6 +180,8 @@
     <ClInclude Include="scene\ScenePause.h" />
     <ClInclude Include="scene\SceneSelect.h" />
     <ClInclude Include="scene\SceneTitle.h" />
+    <ClInclude Include="ui\FaceUi.h" />
+    <ClInclude Include="ui\HpBar.h" />
     <ClInclude Include="util\Game.h" />
     <ClInclude Include="util\Input.h" />
     <ClInclude Include="util\Pad.h" />

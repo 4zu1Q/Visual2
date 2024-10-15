@@ -4,6 +4,7 @@
 #include "util/Pad.h"
 
 #include <cmath>
+#include <cassert>
 
 namespace
 {
@@ -14,6 +15,8 @@ namespace
 	constexpr float kAnalogRangeMax = 0.8f;
 
 	constexpr float kAnalogInputMax = 1000.0f;
+
+	constexpr float kJumpPower = 10.0f;
 }
 
 PlayerBase::PlayerBase() :
@@ -23,101 +26,118 @@ PlayerBase::PlayerBase() :
 	m_move(VGet(0, 0, 0)),
 	m_attackPos(VGet(0, 0, 0)),
 	m_attackDir(VGet(0, 0, 0)),
+	m_avoid(VGet(0, 0, 0)),
 	m_analogX(0),
-	m_analogZ(0)
+	m_analogZ(0),
+	m_hp(10),
+	m_isFaceUse(false)
 {
-	m_modelH = MV1LoadModel("Data/Model/Enemy.mv1");
+	m_modelH = MV1LoadModel("Data/Model/Player/Player.mv1");
+	assert(m_modelH > -1);
+
 	m_playerKind = e_PlayerKind::kNormalPlayer;
 
-	m_pos2 = VAdd(m_pos, VGet(0, 4, 0));
 
 }
 
 PlayerBase::~PlayerBase()
 {
+
 	Finalize();
+
 }
 
 void PlayerBase::Initialize()
 {
-
+	MV1SetScale(m_modelH, VGet(5, 5, 5));
 }
 
 void PlayerBase::Finalize()
 {
-
+	MV1DeleteModel(m_modelH);
+	m_modelH = -1;
 }
 
 void PlayerBase::Update()
 {
-	Pad::Update();
+	//仮重力
 
-	int pov = GetJoypadPOVState(DX_INPUT_PAD1, 0);
+	m_pos.y -= 2.0f;
 
-	Move();
-
-	//Aボタンを押した場合
-	if (Pad::IsPress(PAD_INPUT_1))
+	if (m_pos.y < 0)
 	{
-		//ジャンプする関数を呼び出す
-
+		m_pos.y = 0;
 	}
 
+
+	////パッドの十字キーを取得
+	//int pov = 0;
+	//pov = GetJoypadPOVState(PAD_INPUT_1, pov);
+
+	//if (Pad::IsTrigger(pov))
+	//{
+	//	printfDx("juji");
+	//}
+
+	//移動関数
+	Move();
+
+	//顔を選択する関数
+	FaceSelect();
+
+
+	//Aボタンを押した場合
+	if (Pad::IsTrigger(PAD_INPUT_1))
+	{
+		//ジャンプする関数を呼び出す
+		Jump();
+	}
+
+	//Bボタンを押した場合
 	if (Pad::IsTrigger(PAD_INPUT_2))
 	{
 		//回避する関数を呼び出す
 		Avoid();
 	}
 
-	if (Pad::IsPress(PAD_INPUT_3))
+	//Xボタンを押した場合
+	if (Pad::IsTrigger(PAD_INPUT_3))
 	{
 		//攻撃する関数を呼び出す
 		Attack();
 	}
 
-	if (Pad::IsPress(PAD_INPUT_4))
+	//Yボタンを押した場合
+	if (Pad::IsTrigger(PAD_INPUT_4))
 	{
-		//特殊攻撃
-		if (m_playerKind == e_PlayerKind::kNormalPlayer)
-		{
-
-		}
-		else if (m_playerKind == e_PlayerKind::kPowerPlayer)
-		{
-
-		}
-		else if (m_playerKind == e_PlayerKind::kSpeedPlayer)
-		{
-
-		}
-		else if (m_playerKind == e_PlayerKind::kHuckShotPlayer)
-		{
-
-		}
-
+		//特殊攻撃する関数を呼び出す
+		FaceAttack();
 	}
 
 	
-	if (Pad::IsTrigger(PAD_INPUT_8))
-	{
-		//顔使用
-		FaceSelect();
-	}
 
 
-	m_pos2 = VAdd(m_pos, VGet(0, 4, 0));
 
+
+
+	MV1SetPosition(m_modelH, m_pos);
+	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
 }
 
 void PlayerBase::Draw()
 {
-	//DrawSphere3D(m_pos, m, 8, 0xff00ff, 0xffffff, false);
+	MV1DrawModel(m_modelH);
 
-	DrawSphere3D(m_attackPos, m_radius , 8, 0xff00ff, 0xffffff, false);
-	DrawCapsule3D(m_pos, m_pos2, m_radius, 16, 0xffffff, 0xffffff, false);
 
-	DrawFormatString(0, 48, 0xffffff, "playerPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
-	DrawFormatString(0, 64, 0xffffff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
+
+
+	DrawSphere3D(m_attackPos, m_radius, 8, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_pos, m_radius, 8, 0xff00ff, 0xffffff, false);
+
+	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
+	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
+	
+	DrawFormatString(0, 80, 0xff0fff, " PlayerKind : %d ", m_playerKind);
 }
 
 void PlayerBase::Move()
@@ -137,8 +157,8 @@ void PlayerBase::Move()
 	//速度が決定できるので移動ベクトルに反映する
 	move = VNorm(move);
 
-	//スティックの押し加減でプレイヤーのスピードを変える
 	
+	//スティックの押し加減でプレイヤーのスピードを変える
 	//歩き
 	if (rate <= 0.8f && rate >= 0.0f);
 	{
@@ -156,27 +176,66 @@ void PlayerBase::Move()
 
 	m_move = move;
 
-#ifdef _DEBUG
-
-	DrawFormatString(0, 32, 0xffffff, "analog:%f", rate);
-
-#endif
-
-
-	if (VSquareSize(m_move) > 0.0f)
+	//動いている
+	if (VSquareSize(move) > 0.0f)
 	{
-		m_attackDir = VNorm(m_move);
+		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+		m_attackDir = VNorm(move);
+		m_avoid = VNorm(move);
 	}
 
 	VECTOR attackMove = VScale(m_attackDir, 10.0f);
 
 	m_attackPos = VAdd(m_pos, attackMove);
 
+
 }
 
 void PlayerBase::Attack()
 {
 
+	//攻撃
+
+}
+
+void PlayerBase::FaceAttack()
+{
+	//通常時
+	if (m_playerKind == e_PlayerKind::kNormalPlayer && m_isFaceUse)
+	{
+
+		printfDx("kNormalPlayer");
+	}
+	//特殊1
+	else if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+
+		printfDx("kPowerPlayer");
+	}
+	//特殊2
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+
+		printfDx("kSpeedPlayer");
+	}
+	//特殊3
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+
+		printfDx("kShotPlayer");
+	}
+	//特殊4
+	else if (m_playerKind == e_PlayerKind::kHuckShotPlayer && m_isFaceUse)
+	{
+
+		printfDx("kHuckShotPlayer");
+	}
+	//特殊5
+	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+
+		printfDx("kStrongestPlayer");
+	}
 
 }
 
@@ -187,10 +246,43 @@ void PlayerBase::Gard()
 
 void PlayerBase::Avoid()
 {
-	m_pos = VAdd(m_pos, VGet(0, 0, 5));
+
+
+	VECTOR avoid = VScale(m_avoid, 10.0f);
+
+	m_pos = VAdd(m_pos, avoid);
+}
+
+void PlayerBase::Jump()
+{
+	m_pos.y = kJumpPower;
 }
 
 void PlayerBase::FaceSelect()
 {
 
+	//顔を選択
+	if (Pad::IsTrigger(PAD_INPUT_6) && !m_isFaceUse)
+	{
+		if (m_playerKind != e_PlayerKind::kStrongestPlayer)
+		{
+			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) + 1);
+		}
+	}
+	if (Pad::IsTrigger(PAD_INPUT_5) && !m_isFaceUse)
+	{
+		if (m_playerKind != e_PlayerKind::kNormalPlayer)
+		{
+			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) - 1);
+		}
+	}
+
+	//顔を決定する
+	if (Pad::IsTrigger(PAD_INPUT_4))
+	{
+		m_isFaceUse = !m_isFaceUse;
+	}
+
 }
+
+

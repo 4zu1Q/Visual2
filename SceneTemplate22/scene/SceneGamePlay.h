@@ -5,6 +5,8 @@
 
 class PlayerBase;
 class SkyDome;
+class HpBar;
+class FaceUi;
 
 class SceneGamePlay :
 	public SceneBase
@@ -32,6 +34,8 @@ private:
 
 	std::shared_ptr<PlayerBase> m_pPlayer;
 	std::shared_ptr<SkyDome> m_pSkyDome;
+	std::shared_ptr<HpBar> m_pHpBar;
+	std::shared_ptr<FaceUi> m_pFaceUi;
 
 	VECTOR m_playerPos;
 	VECTOR m_cameraPos;
@@ -43,7 +47,6 @@ private:
 	float m_angle;
 
 #endif 
-
 
 
 	float m_cameraAngle;

@@ -1,8 +1,12 @@
 ﻿#include "DxLib.h"
-#include "util/Game.h"
+
 #include "SceneManager.h"
 #include "SceneDebug.h"
 #include "SceneTitle.h"
+
+#include "util/Game.h"
+#include "util/Pad.h"
+
 #include <memory>
 
 // プログラムは WinMain から始まります

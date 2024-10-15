@@ -17,6 +17,10 @@ namespace
 	constexpr int kTextPosY[4] = { 180, 280, 380, 480 };
 
 	constexpr int kPushWaitCount = 30;
+
+	//オプションの背景アルファ値
+	constexpr int kAlpha = 200;
+	
 }
 
 SceneOption::SceneOption(SceneManager& manager) :
@@ -35,6 +39,7 @@ SceneOption::SceneOption(SceneManager& manager) :
 
 SceneOption::~SceneOption()
 {
+
 }
 
 void SceneOption::Update()
@@ -53,7 +58,7 @@ void SceneOption::Draw()
 {
 	DrawFade();
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
