@@ -30,7 +30,7 @@ public:
 
 private:
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 
 	std::shared_ptr<PlayerBase> m_pPlayer;
 	std::shared_ptr<SkyDome> m_pSkyDome;
@@ -46,7 +46,7 @@ private:
 	int m_radius;
 	float m_angle;
 
-#endif 
+//#endif 
 
 
 	float m_cameraAngle;

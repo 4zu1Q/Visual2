@@ -33,10 +33,10 @@ void HpBar::Finalize()
 
 }
 
-void HpBar::Update()
+void HpBar::Update(PlayerBase& player)
 {
 
-	m_playerHp = m_pPlayer->GetHp();
+	m_playerHp = player.GetHp();
 	m_bossHp = m_pBoss->GetHp();
 
 

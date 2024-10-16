@@ -1,13 +1,15 @@
 ﻿#include "DxLib.h"
 
 #include "SceneManager.h"
-#include "SceneDebug.h"
 #include "SceneTitle.h"
 
 #include "util/Game.h"
 #include "util/Pad.h"
 
 #include <memory>
+
+//デバッグ用include
+#include "SceneDebug.h"
 
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)

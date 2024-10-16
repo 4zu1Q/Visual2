@@ -66,7 +66,6 @@ void SceneManager::Draw()
 	//更新前のローディング時間取得
 	LONGLONG start = GetNowHiPerformanceCount();
 #endif
-	//m_pScene->Draw();
 
 	//先頭から順に描画
 	//最後に積んだものが最後に描画される
@@ -83,7 +82,7 @@ void SceneManager::Draw()
 
 void SceneManager::ChangeScene(std::shared_ptr<SceneBase> nextScene)
 {
-	if (m_scenes.empty())	//リストが～だったら入れ替えずに
+	if (m_scenes.empty())	//リストが空だったら入れ替えずに
 	{
 		m_scenes.push_back(nextScene);	//末尾に追加
 	}
@@ -105,7 +104,7 @@ void SceneManager::PushScene(std::shared_ptr<SceneBase> scene)
 	m_scenes.push_back(scene);
 }
 
-void SceneManager::popScene(bool isToTitle)
+void SceneManager::PopScene(bool isToTitle)
 {
 	m_scenes.pop_back();
 }

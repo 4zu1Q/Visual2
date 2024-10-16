@@ -77,10 +77,12 @@ void SceneGameOver::Update()
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
 			}
 			if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneTitle>(m_pManager));
+				return;
 			}
 		}
 	}

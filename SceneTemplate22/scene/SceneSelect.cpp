@@ -75,8 +75,8 @@ void SceneSelect::Update()
 			}
 			if (m_sceneTrans == e_SceneTrans::kRastBoss)
 			{
-				m_pManager.PushScene(std::make_shared<SceneSelect>(m_pManager));
-				return;
+				StartFadeOut();
+				m_isToNextScene = true;
 			}
 		}
 	}
@@ -90,26 +90,31 @@ void SceneSelect::Update()
 			if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
 			}
 			
 			if (m_sceneTrans == e_SceneTrans::kSpeedTypeBoss)
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
 			}
 			
 			if (m_sceneTrans == e_SceneTrans::kShooterTypeBoss)
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kHookShotTypeBoss)
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kRastBoss)
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
 			}
 		}
 	}
@@ -119,7 +124,7 @@ void SceneSelect::Update()
 void SceneSelect::Draw()
 {
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 
 	DrawString(0, 0, "Scene Select", 0xffffff, false);
 
@@ -131,7 +136,7 @@ void SceneSelect::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kHookShotTypeBoss) * kTextIntervalY, 0xffffff, "HookShot Boss");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRastBoss) * kTextIntervalY, 0xffffff, "Rast Boss");
 
-#endif
+//#endif
 
 	DrawFade();
 }

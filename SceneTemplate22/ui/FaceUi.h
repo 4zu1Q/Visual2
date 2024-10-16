@@ -12,11 +12,10 @@ public:
 	virtual ~FaceUi();
 
 	void Update();
-	void Draw();
+	void Draw(PlayerBase& player);
 
 private:
 
-	std::shared_ptr<PlayerBase> m_pPlayer;
 
 	
 

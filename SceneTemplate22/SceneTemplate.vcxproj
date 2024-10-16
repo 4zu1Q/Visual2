@@ -142,8 +142,10 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="object\Camera.cpp" />
     <ClCompile Include="object\enemy\BossBase.cpp" />
+    <ClCompile Include="object\enemy\BossPower.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
     <ClCompile Include="object\player\PlayerBase.cpp" />
+    <ClCompile Include="object\player\PlayerWeapon.cpp" />
     <ClCompile Include="object\SkyDome.cpp" />
     <ClCompile Include="scene\SceneBase.cpp" />
     <ClCompile Include="scene\SceneDebug.cpp" />
@@ -167,8 +169,10 @@
   <ItemGroup>
     <ClInclude Include="object\Camera.h" />
     <ClInclude Include="object\enemy\BossBase.h" />
+    <ClInclude Include="object\enemy\BossPower.h" />
     <ClInclude Include="object\player\Player.h" />
     <ClInclude Include="object\player\PlayerBase.h" />
+    <ClInclude Include="object\player\PlayerWeapon.h" />
     <ClInclude Include="object\SkyDome.h" />
     <ClInclude Include="scene\SceneBase.h" />
     <ClInclude Include="scene\SceneDebug.h" />

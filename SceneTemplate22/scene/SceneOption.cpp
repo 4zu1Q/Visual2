@@ -49,7 +49,7 @@ void SceneOption::Update()
 
 	if (Pad::IsTrigger(PAD_INPUT_2))
 	{
-		m_pManager.popScene();
+		m_pManager.PopScene();
 	}
 
 }

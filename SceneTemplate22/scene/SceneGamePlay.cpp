@@ -68,18 +68,36 @@ void SceneGamePlay::Update()
 	m_pSkyDome->Update();
 	m_pPlayer->Update();
 	m_pFaceUi->Update();
-	m_pHpBar->Update();
+	m_pHpBar->Update(*m_pPlayer);
 
 #ifdef _DEBUG
 
-	if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_5))
-	{
-		m_cameraAngle += 0.05f;
-	}
-	if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_6))
+	//アナログスティックを使って移動
+	int analogX = 0;
+	int analogY = 0;
+
+	GetJoypadAnalogInputRight(&analogX, &analogY, DX_INPUT_PAD1);
+
+	if (analogX >= 10)
 	{
 		m_cameraAngle -= 0.05f;
+
 	}
+
+	if (analogX <= -10)
+	{
+		m_cameraAngle += 0.05f;
+
+	}
+
+	//if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_5))
+	//{
+	//	m_cameraAngle += 0.05f;
+	//}
+	//if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_6))
+	//{
+	//	m_cameraAngle -= 0.05f;
+	//}
 
 	SetCameraNearFar(0.1f, 580.0f);
 	VECTOR cameraPos;
@@ -96,14 +114,14 @@ void SceneGamePlay::Update()
 
 void SceneGamePlay::Draw()
 {
+	DrawGrid();
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 
 	m_pSkyDome->Draw();
 	m_pPlayer->Draw();
-	m_pFaceUi->Draw();
+	m_pFaceUi->Draw(*m_pPlayer);
 	m_pHpBar->Draw();
 
-	DrawGrid();
 	DrawFade();
 	
 }

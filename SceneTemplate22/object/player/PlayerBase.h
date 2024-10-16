@@ -1,5 +1,8 @@
 ﻿#pragma once
 #include "DxLib.h"
+#include <memory>
+
+class PlayerWeapon;
 
 class PlayerBase
 {
@@ -27,6 +30,10 @@ public:
 
 	void Update();
 	void Draw();
+
+	//プレイヤーのモデルハンドルを取得
+	const int& GetModelHandle() const { return m_modelH; }
+	void SetModelHandle(const int modelH) { m_modelH = modelH; }
 
 	//プレイヤーの座標を取得
 	const VECTOR& GetPos() const { return m_pos; }
@@ -85,21 +92,25 @@ private:
 
 protected:
 
-	int m_hp;
+	std::shared_ptr<PlayerWeapon> m_pWeapon;
+
 
 	e_PlayerKind m_playerKind;
 	
+	//仮HP
+	int m_hp;
+
 	int m_modelH;
 
 	//プレイヤの座標
 	VECTOR m_pos;
 
-	VECTOR m_avoid;
-	
-	VECTOR m_attackDir;
 	VECTOR m_attackPos;
-
+	VECTOR m_attackDir;
+	
+	VECTOR m_avoid;
 	VECTOR m_move;
+
 
 	float m_angle;
 	float m_radius;
@@ -109,5 +120,7 @@ protected:
 
 	bool m_isFaceUse;
 	
+	int m_frame;
+
 };
 

@@ -7,6 +7,8 @@
 #include "SceneGamePlay.h"
 #include "SceneGameClear.h"
 #include "SceneGameOver.h"
+#include "SceneOption.h"
+#include "ScenePause.h"
 
 
 #include "util/Pad.h"
@@ -46,7 +48,7 @@ void SceneDebug::Update()
 	//
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
 	{
-		if (m_sceneTrans != e_SceneTrans::kGameOver)
+		if (m_sceneTrans != e_SceneTrans::kPause)
 		{
 			m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 		}
@@ -58,33 +60,48 @@ void SceneDebug::Update()
 		if (m_sceneTrans == e_SceneTrans::kDebug)
 		{
 			m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
+			return;
 		}
 
 		if (m_sceneTrans == e_SceneTrans::kTitle)
 		{
 			m_pManager.ChangeScene(std::make_shared<SceneTitle>(m_pManager));
+			return;
 		}
 
 		if (m_sceneTrans == e_SceneTrans::kSelect)
 		{
 			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+			return;
 		}
 
 		if (m_sceneTrans == e_SceneTrans::kGamePlay)
 		{
 			m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+			return;
 		}
 
 		if (m_sceneTrans == e_SceneTrans::kGameClear)
 		{
 			m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
+			return;
 		}
 
 		if (m_sceneTrans == e_SceneTrans::kGameOver)
 		{
 			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager));
+			return;
 		}
 
+		if (m_sceneTrans == e_SceneTrans::kOption)
+		{
+			m_pManager.PushScene(std::make_shared<SceneOption>(m_pManager));
+		}
+
+		if (m_sceneTrans == e_SceneTrans::kPause)
+		{
+			m_pManager.PushScene(std::make_shared<ScenePause>(m_pManager));
+		}
 	}
 
 }
@@ -102,4 +119,6 @@ void SceneDebug::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Scene Game Play");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGameClear) * kTextIntervalY, 0xffffff, "Scene Game Clear");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGameOver) * kTextIntervalY, 0xffffff, "Scene Game Over");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Scene Option");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kPause) * kTextIntervalY, 0xffffff, "Scene Pause");
 }

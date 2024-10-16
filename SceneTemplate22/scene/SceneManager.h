@@ -42,8 +42,13 @@ public:
 	/// <summary>
 	/// 現在の先頭シーンを削除する
 	/// </summary>
-	void popScene(bool isToTitle = false);
+	void PopScene(bool isToTitle = false);
 
+private:
+
+	/// <summary>
+	/// デバッグ用の描画
+	/// </summary>
 	void DrawDebug();
 
 private:

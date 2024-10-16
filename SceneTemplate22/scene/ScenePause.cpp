@@ -65,7 +65,7 @@ void ScenePause::Update()
 			//enum変数が同じだった場合
 			if (m_sceneTrans == e_SceneTrans::kRestart)
 			{
-				m_pManager.popScene();
+				m_pManager.PopScene();
 			}
 			if (m_sceneTrans == e_SceneTrans::kOption)
 			{
@@ -81,7 +81,7 @@ void ScenePause::Update()
 		//スタートボタンを押した場合
 		if (Pad::IsTrigger(PAD_INPUT_8))
 		{
-			m_pManager.popScene();
+			m_pManager.PopScene();
 		}
 	}
 
@@ -94,6 +94,7 @@ void ScenePause::Update()
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
 				m_pManager.ChangeAndClearScene(std::make_shared<SceneTitle>(m_pManager));
+				return;
 			}
 		}
 	}
