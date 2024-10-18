@@ -17,7 +17,7 @@ namespace
 	constexpr float kCameraDist = 56;
 	constexpr float kCameraHeight = 32;
 
-	constexpr float kMaxSpeed = 0.9f;
+	constexpr float kMaxSpeedN = 0.9f;
 
 	constexpr float kAnalogRangeMin = 0.1f;
 	constexpr float kAnalogRangeMax = 0.8f;

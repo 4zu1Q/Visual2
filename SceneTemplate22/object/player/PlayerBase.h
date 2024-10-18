@@ -17,8 +17,10 @@ public:
 		kStrongestPlayer	//ラスボス型
 	};
 
+private:
+
 	//プレイヤーのアニメーションの種類
-	enum class e_AnimKind : int
+	const enum e_AnimIndex : int
 	{
 
 		kNone = -1,				//なし
@@ -91,16 +93,16 @@ public:
 	void SetIsPowerFace(const bool isPowerFace) { m_isPowerFace = isPowerFace; }
 
 	//Speed型のBossを倒したかどうかのフラグを取得
-	const bool& GetIsPowerFace() const { return m_isPowerFace; }
-	void SetIsPowerFace(const bool isPowerFace) { m_isPowerFace = isPowerFace; }
+	const bool& GetIsSpeedFace() const { return m_isSpeedFace; }
+	void SetIsSpeedFace(const bool isSpeedFace) { m_isSpeedFace = isSpeedFace; }
 
 	//Shot型のBossを倒したかどうかのフラグを取得
-	const bool& GetIsPowerFace() const { return m_isPowerFace; }
-	void SetIsPowerFace(const bool isPowerFace) { m_isPowerFace = isPowerFace; }
+	const bool& GetIsShotFace() const { return m_isShotFace; }
+	void SetIsShotFace(const bool isShotFace) { m_isShotFace = isShotFace; }
 
 	//Strongest型のBossを倒したかどうかのフラグを取得
-	const bool& GetIsPowerFace() const { return m_isPowerFace; }
-	void SetIsPowerFace(const bool isPowerFace) { m_isPowerFace = isPowerFace; }
+	const bool& GetIsStrongestFace() const { return m_isStrongestFace; }
+	void SetIsStrongestFace(const bool isStrongestFace) { m_isStrongestFace = isStrongestFace; }
 
 private:
 
@@ -143,7 +145,7 @@ private:
 	/// アニメーションの更新処理する関数
 	/// </summary>
 	/// <param name="attachNo">進行させたいアニメーション番号</param>
-	/// <param name="startTime"></param>
+	/// <param name="startTime">スタートする時間</param>
 	/// <returns>ループしたかどうか</returns>
 	bool IsUpdateAnim(int attachNo, float startTime = 0.0f);
 
@@ -151,18 +153,21 @@ private:
 	/// アニメーションの変更する関数
 	/// </summary>
 	/// <param name="animIndex">変更後のアニメーション番号</param>
-	/// <param name="animSpeed"></param>
+	/// <param name="animSpeed">アニメーションを進行させるスピード</param>
 	void ChangeAnim(int animIndex, float animSpeed = 0.8f);
 
 protected:
 
 	std::shared_ptr<PlayerWeapon> m_pWeapon;
 
+	//プレイヤーの顔の種類
 	e_PlayerKind m_playerKind;
 	
+	//プレイヤーのアニメーション
+	e_AnimIndex m_nowAnimIndex;
+
 	//仮HP
 	float m_hp;
-
 	int m_modelH;
 
 	//プレイヤの座標
@@ -174,16 +179,29 @@ protected:
 	VECTOR m_avoid;
 	VECTOR m_move;
 
-
 	float m_angle;
 	float m_radius;
 
+	//死んだかどうかを判定
+	bool m_isDead;
+
+	//アナログスティック用の変数
 	int m_analogX;
 	int m_analogZ;
 
-	bool m_isFaceUse;
-	
-	int m_frame;
+	//顔を装着しているかしていないかの変数
+	bool m_isFaceUse;	
+
+	/*アニメーション情報*/
+	//int m_equipAnimNo;	//装備しているアニメ番号
+	int m_prevAnimNo;	//前のアニメ番号
+	int m_currentAnimNo;//現在のアニメ番号
+	//0.0f:prevが再生
+	//1.0f:currntが再生
+
+	float m_animSpeed;			//アニメの速度を
+	float m_animBlendRate;		//アニメーションブレンド
+	bool m_isAnimationFinish;	//アニメーションが終わったかどうか
 
 	//顔の保持しているかどうかのフラグ
 	bool m_isPowerFace;

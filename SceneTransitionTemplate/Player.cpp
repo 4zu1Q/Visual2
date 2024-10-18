@@ -495,8 +495,10 @@ bool Player::UpdateAnim(int attachNo)
 	if (attachNo == -1) return false;
 
 	//アニメーションを進行させる
+	
 	float now = MV1GetAttachAnimTime(m_modelH, attachNo);	//現在の再生カウントを取得
 	bool isLoop = false;
+
 	now += 0.7f;	// アニメーションを進める
 
 	//現在再生中のアニメーションの総カウントを取得する
