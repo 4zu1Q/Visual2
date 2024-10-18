@@ -1,4 +1,7 @@
 ﻿#pragma once
+
+#include "util/Vec2.h"
+
 #include <memory>
 
 class PlayerBase;
@@ -30,7 +33,7 @@ private:
 	std::shared_ptr<PlayerBase> m_pPlayer;
 	std::shared_ptr<BossBase> m_pBoss;
 
-	int m_playerHp;
+	float m_playerHp;
 	int m_bossHp;
 
 	int m_playerHpH;

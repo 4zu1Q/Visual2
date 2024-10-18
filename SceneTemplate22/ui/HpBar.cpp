@@ -2,7 +2,7 @@
 #include "DxLib.h"
 
 #include "object/player/PlayerBase.h"
-#include "object/enemy/BossBase.h"
+#include "object/boss/BossBase.h"
 
 namespace
 {
@@ -44,10 +44,9 @@ void HpBar::Update(PlayerBase& player)
 
 void HpBar::Draw()
 {
-	for (int i = 1; i <= m_playerHp; i++)
+	for (int i = 1; i <= static_cast<int>(m_playerHp); i++)
 	{
 		DrawCircle(18 * i, 32, 8, 0xff00ff, true);
-
 	}
 
 	//DrawBox(10, 48, 10 + 300, 48 + 16, 0xffff00, true);

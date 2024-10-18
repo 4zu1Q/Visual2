@@ -140,9 +140,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="object\boss\BossBase.cpp" />
+    <ClCompile Include="object\boss\BossPower.cpp" />
     <ClCompile Include="object\Camera.cpp" />
-    <ClCompile Include="object\enemy\BossBase.cpp" />
-    <ClCompile Include="object\enemy\BossPower.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
     <ClCompile Include="object\player\PlayerBase.cpp" />
     <ClCompile Include="object\player\PlayerWeapon.cpp" />
@@ -167,9 +167,9 @@
     <ClCompile Include="util\Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="object\boss\BossBase.h" />
+    <ClInclude Include="object\boss\BossPower.h" />
     <ClInclude Include="object\Camera.h" />
-    <ClInclude Include="object\enemy\BossBase.h" />
-    <ClInclude Include="object\enemy\BossPower.h" />
     <ClInclude Include="object\player\Player.h" />
     <ClInclude Include="object\player\PlayerBase.h" />
     <ClInclude Include="object\player\PlayerWeapon.h" />

@@ -4,7 +4,7 @@
 namespace
 {
 	//フェード速度
-	constexpr int kFadeSpeed = 10;
+	constexpr int kFadeSpeed = 1;
 }
 
 
@@ -23,7 +23,7 @@ void SceneBase::UpdateFade()
 
 	m_fadeBright += m_fadeSpeed;
 
-
+	//
 	if (m_fadeBright >= 255)
 	{
 		m_fadeBright = 255;
@@ -33,6 +33,7 @@ void SceneBase::UpdateFade()
 		}
 	}
 
+	//
 	if (m_fadeBright <= 255)
 	{
 		m_fadeBright = 0;

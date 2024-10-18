@@ -1,29 +1,33 @@
 ﻿#include "PlayerWeapon.h"
 
+#include "PlayerBase.h"
+
 namespace
 {
 	//武器のファイル名
 	const char* const kSwordModelFileName = "Data/Model/Weapon/Player_Sword.mv1";
-	const char* const kLongSwordModelFileName = "Data/Model/Weapon/Player_LongSword.mv1";
 	const char* const kAxeModelFileName = "Data/Model/Weapon/Player_Axe.mv1";
-	const char* const kMagicWandModelFileName = "Data/Model/Weapon/Player_MagicWand.mv1";
 	const char* const kDaggerModelFileName = "Data/Model/Weapon/Player_Dagger.mv1";
+	const char* const kMagicWandModelFileName = "Data/Model/Weapon/Player_MagicWand.mv1";
+	const char* const kLongSwordModelFileName = "Data/Model/Weapon/Player_LongSword.mv1";
 	const char* const kShiledModelFileName = "Data/Model/Weapon/Player_Shiled.mv1";
-
-	//プレイヤーの手のフレーム
-	constexpr int kPlayerRightModelFrame = 14;
-	constexpr int kPlayerLeftModelFrame = 9;
 
 	//モデルのスケール値
 	constexpr float kModelScale = 1.0f;
 }
 
 PlayerWeapon::PlayerWeapon():
+	m_modelH(-1),
+	m_swordModelH(-1),
+	m_axeModelH(-1),
+	m_daggerRightModelH(-1),
+	m_daggerLeftModelH(-1),
+	m_magicWandModelH(-1),
+	m_longSwordModelH(-1),
+	m_modelRightFrame(0),
+	m_modelLeftFrame(0),
 	m_attachFramePos(VGet(0, 0, 0))
 {
-	//モデルのロード
-	m_rightModelH = MV1LoadModel(kDaggerModelFileName);
-	m_leftModelH = MV1LoadModel(kDaggerModelFileName);
 }
 
 PlayerWeapon::~PlayerWeapon()
@@ -31,45 +35,126 @@ PlayerWeapon::~PlayerWeapon()
 	Finalize();
 }
 
-void PlayerWeapon::Initialize()
+void PlayerWeapon::Load()
 {
+	//モデルのロード
+	m_swordModelH = MV1LoadModel(kSwordModelFileName);
+	m_axeModelH = MV1LoadModel(kAxeModelFileName);
+	m_daggerRightModelH = MV1LoadModel(kDaggerModelFileName);
+	m_daggerLeftModelH = MV1LoadModel(kDaggerModelFileName);
+	m_magicWandModelH = MV1LoadModel(kMagicWandModelFileName);
+	m_longSwordModelH = MV1LoadModel(kLongSwordModelFileName);
+
+}
+
+void PlayerWeapon::Initialize(int modelH, int modelRightFrame, int modelLeftFrame)
+{
+	//代入
+	m_modelH = modelH;
+	m_modelRightFrame = modelRightFrame;
+	m_modelLeftFrame = modelLeftFrame;
+
 	//武器のモデルのスケール値を設定
-	MV1SetScale(m_rightModelH, VGet(kModelScale, kModelScale, kModelScale));
-	MV1SetScale(m_leftModelH, VGet(kModelScale, kModelScale, kModelScale));
+	//MV1SetScale(m_axeModelH, VGet(kModelScale, kModelScale, kModelScale));
+
+	//MV1SetScale(m_daggerModelH, VGet(kModelScale, kModelScale, kModelScale));
 }
 
 void PlayerWeapon::Finalize()
 {
 	//モデルのデリート
-	MV1DeleteModel(m_rightModelH);
-	MV1DeleteModel(m_leftModelH);
 
-	m_rightModelH = -1;
-	m_leftModelH = -1;
+	MV1DeleteModel(m_swordModelH);
+	MV1DeleteModel(m_axeModelH);
+	MV1DeleteModel(m_daggerRightModelH);
+	MV1DeleteModel(m_daggerLeftModelH);
+	MV1DeleteModel(m_magicWandModelH);
+	MV1DeleteModel(m_longSwordModelH);
+
+	m_axeModelH = -1;
+	m_swordModelH = -1;
+	m_daggerRightModelH = -1;
+	m_daggerLeftModelH = -1;
+	m_magicWandModelH = -1;
+	m_longSwordModelH = -1;
 }
 
-void PlayerWeapon::OneHandUpdate(int modelH)
+
+
+void PlayerWeapon::SwordUpdate()
+{
+	OneHandUpdate(m_swordModelH);
+}
+
+void PlayerWeapon::AxeUpdate()
+{
+	OneHandUpdate(m_axeModelH);
+}
+
+void PlayerWeapon::DaggerUpdate()
+{
+	BothHandsUpdate(m_daggerRightModelH, m_daggerLeftModelH);
+}
+
+void PlayerWeapon::MagicWandUpdate()
+{
+	OneHandUpdate(m_magicWandModelH);
+}
+
+void PlayerWeapon::LongSwordUpdate()
+{
+	OneHandUpdate(m_longSwordModelH);
+}
+
+
+void PlayerWeapon::SwordDraw()
+{
+	OneHandDraw(m_swordModelH);
+}
+
+void PlayerWeapon::AxeDraw()
+{
+	OneHandDraw(m_axeModelH);
+}
+
+void PlayerWeapon::DaggerDraw()
+{
+	BothHandsDraw(m_daggerRightModelH,m_daggerLeftModelH);
+}
+
+void PlayerWeapon::MagicWandDraw()
+{
+	OneHandDraw(m_magicWandModelH);
+}
+
+void PlayerWeapon::LongSwordDraw()
+{
+	OneHandDraw(m_longSwordModelH);
+}
+
+void PlayerWeapon::OneHandUpdate(int weaponModelH)
 {
 	//武器のアタッチ
 	MATRIX transMat;
 	MATRIX attachFrameMat;
 	MATRIX mixMatrix;
 
-	//アタッチするモデルのMV1SetMatrixの設定を無効にする
-	MV1SetMatrix(m_rightModelH, MGetIdent());
 
-	m_attachFramePos = MV1GetFramePosition(m_rightModelH, 0);
+	//アタッチするモデルのMV1SetMatrixの設定を無効にする
+	MV1SetMatrix(weaponModelH, MGetIdent());
+
+	m_attachFramePos = MV1GetFramePosition(weaponModelH, 0);
 
 	transMat = MGetTranslate(VScale(m_attachFramePos, -1.0f));
 
-	attachFrameMat = MV1GetFrameLocalWorldMatrix(modelH, kPlayerRightModelFrame);
+	attachFrameMat = MV1GetFrameLocalWorldMatrix(m_modelH, m_modelRightFrame);
 
 	mixMatrix = MMult(transMat, attachFrameMat);
 
-	MV1SetMatrix(m_rightModelH, mixMatrix);
+	MV1SetMatrix(weaponModelH, mixMatrix);
 }
 
-void PlayerWeapon::BothHandsUpdate(int modelH)
+void PlayerWeapon::BothHandsUpdate(int rightWeaponModelH,int leftWeaponModelH)
 {
 	//武器のアタッチ
 	MATRIX transMat;
@@ -81,29 +166,31 @@ void PlayerWeapon::BothHandsUpdate(int modelH)
 	MATRIX leftMixMatrix;
 
 	//アタッチするモデルのMV1SetMatrixの設定を無効にする
-	MV1SetMatrix(m_rightModelH, MGetIdent());
+	MV1SetMatrix(rightWeaponModelH, MGetIdent());
+	MV1SetMatrix(leftWeaponModelH, MGetIdent());
 
-	m_attachFramePos = MV1GetFramePosition(m_rightModelH, 0);
+	m_attachFramePos = MV1GetFramePosition(rightWeaponModelH, 0);
+	m_attachFramePos = MV1GetFramePosition(leftWeaponModelH, 0);
 
 	transMat = MGetTranslate(VScale(m_attachFramePos, -1.0f));
 
-	rightAttachFrameMat = MV1GetFrameLocalWorldMatrix(modelH, kPlayerRightModelFrame);
-	leftAttachFrameMat = MV1GetFrameLocalWorldMatrix(modelH, kPlayerLeftModelFrame);
+	rightAttachFrameMat = MV1GetFrameLocalWorldMatrix(m_modelH, m_modelRightFrame);
+	leftAttachFrameMat = MV1GetFrameLocalWorldMatrix(m_modelH, m_modelLeftFrame);
 
 	rightMixMatrix = MMult(transMat, rightAttachFrameMat);
 	leftMixMatrix = MMult(transMat, leftAttachFrameMat);
 
-	MV1SetMatrix(m_rightModelH, rightMixMatrix);
-	MV1SetMatrix(m_leftModelH, leftMixMatrix);
+	MV1SetMatrix(rightWeaponModelH, rightMixMatrix);
+	MV1SetMatrix(leftWeaponModelH, leftMixMatrix);
 }
 
-void PlayerWeapon::OneHandDraw()
+void PlayerWeapon::OneHandDraw(int weaponModelH)
 {
-	MV1DrawModel(m_rightModelH);
+	MV1DrawModel(weaponModelH);
 }
 
-void PlayerWeapon::BothHandsDraw()
+void PlayerWeapon::BothHandsDraw(int rightWeaponModelH, int leftWeaponModelH)
 {
-	MV1DrawModel(m_rightModelH);
-	MV1DrawModel(m_leftModelH);
+	MV1DrawModel(rightWeaponModelH);
+	MV1DrawModel(leftWeaponModelH);
 }

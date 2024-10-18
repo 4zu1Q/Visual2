@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "DxLib.h"
+#include "util/Vec2.h"
 #include <memory>
 
 class PlayerBase;

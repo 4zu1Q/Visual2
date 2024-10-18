@@ -33,12 +33,7 @@ void FaceUi::Draw(PlayerBase& player)
 {
 
 	//プレイヤーの仮面UI
-	if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kNormalPlayer)
-	{
-		DrawCircle(kFacePosX, kFacePosY, kRadius, 0xffffff, true, true);
-
-	}
-	else if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kPowerPlayer)
+	if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kPowerPlayer)
 	{
 		DrawCircle(kFacePosX, kFacePosY, kRadius, 0xffff0f, true, true);
 
@@ -51,11 +46,6 @@ void FaceUi::Draw(PlayerBase& player)
 	else if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kShotPlayer)
 	{
 		DrawCircle(kFacePosX, kFacePosY, kRadius, 0xff0fff, true, true);
-
-	}
-	else if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kHuckShotPlayer)
-	{
-		DrawCircle(kFacePosX, kFacePosY, kRadius, 0xf0ffff, true, true);
 
 	}
 	else if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kStrongestPlayer)

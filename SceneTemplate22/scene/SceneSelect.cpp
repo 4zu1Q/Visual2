@@ -32,7 +32,7 @@ void SceneSelect::Update()
 
 	if (!m_isToNextScene)
 	{
-		//
+		//上に移動した場合
 		if (Pad::IsTrigger(PAD_INPUT_UP))
 		{
 			if (m_sceneTrans != e_SceneTrans::kPowerTypeBoss)
@@ -41,7 +41,7 @@ void SceneSelect::Update()
 			}
 		}
 
-		//
+		//下に移動した場合
 		if (Pad::IsTrigger(PAD_INPUT_DOWN))
 		{
 			if (m_sceneTrans != e_SceneTrans::kRastBoss)
@@ -50,7 +50,7 @@ void SceneSelect::Update()
 			}
 		}
 
-		//
+		//決定ボタンを押した場合
 		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
 			if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)

@@ -9,7 +9,7 @@
 namespace
 {
 	//プレイヤーのモデルファイル名
-	const char* const kEnemyModelFilename = "Data/Model/Player/Player.mv1";
+	const char* const kModelFilename = "Data/Model/Player/Player.mv1";
 
 	//移動速度
 	constexpr float kMaxSpeed = 2.0f;
@@ -26,6 +26,10 @@ namespace
 
 	//モデルのスケール値
 	constexpr float kModelScale = 5.0f;
+
+	//プレイヤーの手のフレーム
+	constexpr int kRightModelFrame = 14;
+	constexpr int kLeftModelFrame = 9;
 }
 
 PlayerBase::PlayerBase() :
@@ -40,16 +44,20 @@ PlayerBase::PlayerBase() :
 	m_analogZ(0),
 	m_hp(10),
 	m_isFaceUse(false),
+	m_isPowerFace(false),
+	m_isSpeedFace(false),
+	m_isShotFace(false),
+	m_isStrongestFace(false),
 	m_frame(0)
 {
-	m_modelH = MV1LoadModel("Data/Model/Player/Player.mv1");
+	m_modelH = MV1LoadModel(kModelFilename);
 	assert(m_modelH > -1);
 
-	m_playerKind = e_PlayerKind::kNormalPlayer;
+	m_playerKind = e_PlayerKind::kPowerPlayer;
 
 	m_pWeapon = std::make_shared<PlayerWeapon>();
-
-
+	m_pWeapon->Load();
+	
 }
 
 PlayerBase::~PlayerBase()
@@ -64,7 +72,7 @@ void PlayerBase::Initialize()
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
-	m_pWeapon->Initialize();
+	m_pWeapon->Initialize(m_modelH, kRightModelFrame, kLeftModelFrame);
 }
 
 void PlayerBase::Finalize()
@@ -78,8 +86,13 @@ void PlayerBase::Finalize()
 
 void PlayerBase::Update()
 {
-	//武器をアタッチするアップデート関数
-	m_pWeapon->BothHandsUpdate(m_modelH);
+	//フレームにアタッチするための更新処理
+	m_pWeapon->SwordUpdate();
+	m_pWeapon->AxeUpdate();
+	m_pWeapon->DaggerUpdate();
+	m_pWeapon->MagicWandUpdate();
+	m_pWeapon->LongSwordUpdate();
+
 
 	//仮重力
 	m_pos.y -= 2.0f;
@@ -96,6 +109,7 @@ void PlayerBase::Update()
 	//顔を選択する関数
 	FaceSelect();
 
+	
 
 	//Aボタンを押した場合
 	if (Pad::IsTrigger(PAD_INPUT_1))
@@ -132,8 +146,36 @@ void PlayerBase::Update()
 
 void PlayerBase::Draw()
 {
-	//武器の描画
-	m_pWeapon->BothHandsDraw();
+
+	//顔を付けている場合
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->AxeDraw();
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->DaggerDraw();
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->MagicWandDraw();
+	}
+	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->LongSwordDraw();
+	}
+
+
+	//顔を付けていない場合
+	if (!m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->SwordDraw();
+	}
 
 	//モデルの描画
 	MV1DrawModel(m_modelH);
@@ -214,14 +256,9 @@ void PlayerBase::Attack()
 
 void PlayerBase::FaceAttack()
 {
-	//通常時
-	if (m_playerKind == e_PlayerKind::kNormalPlayer && m_isFaceUse)
-	{
 
-		printfDx("kNormalPlayer");
-	}
 	//特殊1
-	else if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 	{
 
 		printfDx("kPowerPlayer");
@@ -239,12 +276,6 @@ void PlayerBase::FaceAttack()
 		printfDx("kShotPlayer");
 	}
 	//特殊4
-	else if (m_playerKind == e_PlayerKind::kHuckShotPlayer && m_isFaceUse)
-	{
-
-		printfDx("kHuckShotPlayer");
-	}
-	//特殊5
 	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
 	{
 
@@ -286,7 +317,7 @@ void PlayerBase::FaceSelect()
 	}
 	if (Pad::IsTrigger(PAD_INPUT_5) && !m_isFaceUse)
 	{
-		if (m_playerKind != e_PlayerKind::kNormalPlayer)
+		if (m_playerKind != e_PlayerKind::kPowerPlayer)
 		{
 			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) - 1);
 		}
@@ -298,6 +329,17 @@ void PlayerBase::FaceSelect()
 		m_isFaceUse = !m_isFaceUse;
 	}
 
+
+
+}
+
+bool PlayerBase::IsUpdateAnim(int attachNo, float startTime)
+{
+	return false;
+}
+
+void PlayerBase::ChangeAnim(int animIndex, float animSpeed)
+{
 }
 
 

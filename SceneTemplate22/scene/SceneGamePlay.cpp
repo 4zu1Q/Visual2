@@ -14,7 +14,7 @@
 
 namespace
 {
-	constexpr float kCameraDist = 96;
+	constexpr float kCameraDist = 56;
 	constexpr float kCameraHeight = 32;
 
 	constexpr float kMaxSpeed = 0.9f;
@@ -33,6 +33,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_radius(5),
 	m_angle(0.0f),
 #endif 
+	m_isFadingOut(false),
 	m_cameraAngle(0.0f)
 {
 	m_pPlayer = std::make_shared<PlayerBase>();
@@ -54,6 +55,15 @@ SceneGamePlay::~SceneGamePlay()
 
 void SceneGamePlay::Update()
 {
+	if (m_isFadingOut)
+	{
+		if (IsFadingOut())
+		{
+			SceneBase::StartFadeIn();
+			m_isFadingOut = false;
+		}
+	}
+
 	UpdateFade();
 	Pad::Update();
 
@@ -99,7 +109,7 @@ void SceneGamePlay::Update()
 	//	m_cameraAngle -= 0.05f;
 	//}
 
-	SetCameraNearFar(0.1f, 580.0f);
+	SetCameraNearFar(0.1f, 1180.0f);
 	VECTOR cameraPos;
 	cameraPos.x = cosf(m_cameraAngle) * kCameraDist;
 	cameraPos.y = 20;
@@ -124,6 +134,12 @@ void SceneGamePlay::Draw()
 
 	DrawFade();
 	
+}
+
+void SceneGamePlay::StartFadeOut()
+{
+	SceneBase::StartFadeOut();
+	m_isFadingOut = true;
 }
 
 void SceneGamePlay::DrawGrid()

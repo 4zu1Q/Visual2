@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include "SceneBase.h"
+
 #include <vector>
 #include <memory>
+#include <List>
 
 class PlayerBase;
 class SkyDome;
@@ -25,6 +27,7 @@ public:
 	/// </summary>
 	virtual void Draw() override final;	//毎フレーム行う描画処理
 
+	void StartFadeOut();
 
 	void DrawGrid();
 
@@ -48,6 +51,7 @@ private:
 
 //#endif 
 
+	bool m_isFadingOut;
 
 	float m_cameraAngle;
 

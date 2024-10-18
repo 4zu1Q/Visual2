@@ -30,19 +30,58 @@ public:
 
 protected:
 
+	/// <summary>
+	/// フェードのアップデート関数
+	/// </summary>
 	void UpdateFade();
+
+	/// <summary>
+	/// フェードの描画関数
+	/// </summary>
 	void DrawFade() const;
 
-	void StartFadeOut();	// フェードアウト開始
-	void StartFadeIn();	// フェードイン開始
+	/// <summary>
+	/// フェードアウト開始
+	/// </summary>
+	void StartFadeOut();
 
-	bool IsFadingIn() const;	// フェードイン中
-	bool IsFadingOut() const;	// フェードアウト中
-	bool IsFading() const { return IsFadingIn() || IsFadingOut(); }	// フェードインorアウト中
+	/// <summary>
+	/// フェードイン開始
+	/// </summary>
+	void StartFadeIn();
 
+	/// <summary>
+	/// フェードイン中
+	/// </summary>
+	/// <returns></returns>
+	bool IsFadingIn() const;
+
+	/// <summary>
+	/// フェードアウト中
+	/// </summary>
+	/// <returns></returns>
+	bool IsFadingOut() const;	
+
+	/// <summary>
+	/// フェードインorアウト中
+	/// </summary>
+	/// <returns></returns>
+	bool IsFading() const { return IsFadingIn() || IsFadingOut(); }	
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns></returns>
 	bool IsFinishFadeOut()const;
 
+	/// <summary>
+	/// フェードインをスキップする関数
+	/// </summary>
 	void FadeInSkip();
+
+	/// <summary>
+	/// フェードアウトをスキップする関数
+	/// </summary>
 	void FadeOutSkip();
 
 protected:
