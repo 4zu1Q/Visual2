@@ -129,6 +129,12 @@
     <ClCompile Include="object\boss\BossPower.cpp">
       <Filter>ソース ファイル\object\boss</Filter>
     </ClCompile>
+    <ClCompile Include="object\boss\BossSpeed.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="object\boss\BossShot.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -207,6 +213,12 @@
       <Filter>ヘッダー ファイル\object\boss</Filter>
     </ClInclude>
     <ClInclude Include="object\boss\BossBase.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossSpeed.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossShot.h">
       <Filter>ヘッダー ファイル\object\boss</Filter>
     </ClInclude>
   </ItemGroup>

@@ -36,7 +36,6 @@ private:
 		kDown = 27,				//プレイヤーのHPが無くなった状態
 		kDownPause = 28,		//プレイヤーのHPがなくなった状態のポーズ
 
-
 		kNormalAttack = 4,				//攻撃 : Normal型
 		kNormalSkill = 12,				//スキル : Normal型
 
@@ -81,6 +80,10 @@ public:
 	const float& GetHp() const { return m_hp; }
 	void SetHp(const float hp) { m_hp = hp; }
 
+	//プレイヤーのHPを取得
+	const float& GetMp() const { return m_mp; }
+	void SetMp(const float mp) { m_mp = mp; }
+
 	//プレイヤーの顔の種類
 	const e_PlayerKind& GetFaceKind() const { return m_playerKind; }
 	void SetFaceKind(const e_PlayerKind playerKind) { m_playerKind = playerKind; }
@@ -120,11 +123,6 @@ private:
 	/// プレイヤーの特殊攻撃時の関数
 	/// </summary>
 	void FaceAttack();
-	
-	/// <summary>
-	/// プレイヤーがガード時の関数
-	/// </summary>
-	void Gard();
 
 	/// <summary>
 	/// プレイヤーが回避時の関数
@@ -168,6 +166,7 @@ protected:
 
 	//仮HP
 	float m_hp;
+	float m_mp;
 	int m_modelH;
 
 	//プレイヤの座標

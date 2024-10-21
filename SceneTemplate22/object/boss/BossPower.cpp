@@ -1,4 +1,4 @@
-#include "BossPower.h"
+﻿#include "BossPower.h"
 
 BossPower::BossPower()
 {

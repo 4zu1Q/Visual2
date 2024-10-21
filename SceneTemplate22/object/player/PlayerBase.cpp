@@ -45,7 +45,7 @@ namespace
 	constexpr float kMinSpeedS = 1.5f;
 
 	//ジャンプ力
-	constexpr float kJumpPower = 40.0f;
+	constexpr float kJumpPower = 10.0f;
 
 }
 
@@ -72,10 +72,12 @@ PlayerBase::PlayerBase() :
 	m_isShotFace = false;
 	m_isStrongestFace = false;
 #else
+
 	m_isPowerFace = false;
 	m_isSpeedFace = false;
 	m_isShotFace = false;
 	m_isStrongestFace = false;
+
 #endif
 
 	/*アニメーション情報初期化*/
@@ -162,7 +164,6 @@ void PlayerBase::Update()
 	m_pWeapon->MagicWandUpdate();
 	m_pWeapon->LongSwordUpdate();
 
-
 	//仮重力
 	m_pos.y -= 2.0f;
 
@@ -174,15 +175,14 @@ void PlayerBase::Update()
 
 	//移動関数
 	Move();
-
 	//顔を選択する関数
 	FaceSelect();
-
-	
 
 	//Aボタンを押した場合
 	if (Pad::IsTrigger(PAD_INPUT_1))
 	{
+		ChangeAnim(e_AnimIndex::kJump);
+
 		//ジャンプする関数を呼び出す
 		Jump();
 	}
@@ -190,6 +190,8 @@ void PlayerBase::Update()
 	//Bボタンを押した場合
 	if (Pad::IsTrigger(PAD_INPUT_2))
 	{
+		ChangeAnim(e_AnimIndex::kAvoid);
+
 		//回避する関数を呼び出す
 		Avoid();
 	}
@@ -197,6 +199,8 @@ void PlayerBase::Update()
 	//Xボタンを押した場合
 	if (Pad::IsTrigger(PAD_INPUT_3))
 	{
+		ChangeAnim(e_AnimIndex::kNormalAttack);
+
 		//攻撃する関数を呼び出す
 		Attack();
 	}
@@ -204,6 +208,8 @@ void PlayerBase::Update()
 	//Yボタンを押した場合
 	if (Pad::IsTrigger(PAD_INPUT_4))
 	{
+		ChangeAnim(e_AnimIndex::kNormalSkill);
+
 		//特殊攻撃する関数を呼び出す
 		FaceAttack();
 	}
@@ -319,7 +325,6 @@ void PlayerBase::Move()
 void PlayerBase::Attack()
 {
 	//攻撃
-
 }
 
 void PlayerBase::FaceAttack()
@@ -349,11 +354,6 @@ void PlayerBase::FaceAttack()
 		//ここにストロンゲストアタック用の処理を入れる予定
 		printfDx("kStrongestPlayer");
 	}
-
-}
-
-void PlayerBase::Gard()
-{
 
 }
 
