@@ -24,21 +24,23 @@ namespace
 
 	//アニメーションブレンド率の最大
 	constexpr float kAnimBlendRateMax = 1.0f;
-
+	
+	//アニメーションをスタートさせた時のフレーム
 	constexpr float kAimAnimStartFrame = 9.0f;
+
 
 	//アナログスティック関連
 	constexpr float kAnalogRangeMin = 0.1f;		//アナログスティックの入力判定範囲
 	constexpr float kAnalogRangeMax = 0.8f;
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
-	//移動速度：ノーマル & ストロンゲスト & マジック
+	//移動速度：ノーマル
 	constexpr float kMaxSpeedN = 2.0f;
 	constexpr float kMinSpeedN = 1.0f;
 
 	//移動速度：パワー
-	constexpr float kMaxSpeedP = 2.0f;
-	constexpr float kMinSpeedP = 1.0f;
+	constexpr float kMaxSpeedP = 1.5f;
+	constexpr float kMinSpeedP = 0.8f;
 
 	//移動速度：スピード
 	constexpr float kMaxSpeedS = 3.0f;
@@ -69,8 +71,8 @@ PlayerBase::PlayerBase() :
 #ifdef _DEBUG
 	m_isPowerFace = true;
 	m_isSpeedFace = true;
-	m_isShotFace = false;
-	m_isStrongestFace = false;
+	m_isShotFace = true;
+	m_isStrongestFace = true;
 #else
 
 	m_isPowerFace = false;
@@ -81,7 +83,6 @@ PlayerBase::PlayerBase() :
 #endif
 
 	/*アニメーション情報初期化*/
-	//m_equipAnimNo = -1;
 	m_currentAnimNo = -1;
 	m_prevAnimNo = -1;
 
@@ -222,35 +223,8 @@ void PlayerBase::Update()
 void PlayerBase::Draw()
 {
 
-	//顔を付けている場合
-	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse )
-	{
-		//武器をアタッチする描画関数
-		m_pWeapon->AxeDraw();
-	}
-	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse )
-	{
-		//武器をアタッチする描画関数
-		m_pWeapon->DaggerDraw();
-	}
-	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse )
-	{
-		//武器をアタッチする描画関数
-		m_pWeapon->MagicWandDraw();
-	}
-	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse )
-	{
-		//武器をアタッチする描画関数
-		m_pWeapon->LongSwordDraw();
-	}
-
-
-	//顔を付けていない場合
-	if (!m_isFaceUse)
-	{
-		//武器をアタッチする描画関数
-		m_pWeapon->SwordDraw();
-	}
+	//武器の描画
+	WeaponDraw();
 
 	//モデルの描画
 	MV1DrawModel(m_modelH);
@@ -268,6 +242,39 @@ void PlayerBase::Draw()
 
 #endif
 
+}
+
+void PlayerBase::WeaponDraw()
+{
+	//顔を付けている場合
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->AxeDraw();
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->DaggerDraw();
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->MagicWandDraw();
+	}
+	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->LongSwordDraw();
+	}
+
+
+	//顔を付けていない場合
+	if (!m_isFaceUse)
+	{
+		//武器をアタッチする描画関数
+		m_pWeapon->SwordDraw();
+	}
 }
 
 void PlayerBase::Move()
@@ -394,36 +401,8 @@ void PlayerBase::FaceSelect()
 	//顔を決定する	ここはZRで決定にする
 	if (Pad::IsTrigger(PAD_INPUT_4))
 	{
-
-		//if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPowerFace)
-		//{
-		//	m_isFaceUse = true;
-
-		//}
-		//else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isSpeedFace)
-		//{
-		//	m_isFaceUse = true;
-
-		//}
-		//else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isShotFace)
-		//{
-		//	m_isFaceUse = true;
-
-		//}
-		//else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isStrongestFace)
-		//{
-		//	m_isFaceUse = true;
-
-		//}
-
 		m_isFaceUse = !m_isFaceUse;
 	}
-
-	//if (Pad::IsTrigger(PAD_INPUT_4) && m_isFaceUse)
-	//{
-	//	m_isFaceUse = false;
-	//}
-
 
 }
 

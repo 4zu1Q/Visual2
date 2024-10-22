@@ -109,6 +109,9 @@ public:
 
 private:
 
+
+	void WeaponDraw();
+
 	/// <summary>
 	/// プレイヤーの移動時の関数
 	/// </summary>
@@ -198,7 +201,7 @@ protected:
 	//0.0f:prevが再生
 	//1.0f:currntが再生
 
-	float m_animSpeed;			//アニメの速度を
+	float m_animSpeed;			//アニメの速度を変えるやつ
 	float m_animBlendRate;		//アニメーションブレンド
 	bool m_isAnimationFinish;	//アニメーションが終わったかどうか
 

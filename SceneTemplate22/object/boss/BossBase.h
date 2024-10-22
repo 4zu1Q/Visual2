@@ -26,6 +26,7 @@ public:
 	void PlayerLockOn(PlayerBase player);
 
 protected:
+
 	int m_hp;
 
 	VECTOR m_pos;
