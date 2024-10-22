@@ -88,6 +88,9 @@ public:
 	const e_PlayerKind& GetFaceKind() const { return m_playerKind; }
 	void SetFaceKind(const e_PlayerKind playerKind) { m_playerKind = playerKind; }
 
+	//カメラの方向を取得
+	void SetCameraAngle(float angle) { m_cameraAngle = angle; }
+
 
 	/*プレイヤーがボスを倒したかどうかのフラグを取得する関数*/
 
@@ -183,6 +186,9 @@ protected:
 
 	float m_angle;
 	float m_radius;
+
+	//カメラの回転情報
+	float m_cameraAngle;
 
 	//死んだかどうかを判定
 	bool m_isDead;

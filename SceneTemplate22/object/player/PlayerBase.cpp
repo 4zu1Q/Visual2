@@ -62,6 +62,7 @@ PlayerBase::PlayerBase() :
 	m_analogX(0),
 	m_analogZ(0),
 	m_hp(10),
+	m_cameraAngle(0.0f),
 	m_isDead(false)
 {
 
@@ -216,6 +217,7 @@ void PlayerBase::Update()
 	}
 
 
+
 	MV1SetPosition(m_modelH, m_pos);
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
 }
@@ -285,15 +287,19 @@ void PlayerBase::Move()
 	float len = VSize(move);
 	float rate = len / kAnalogInputMax;
 
-	//アナログスティック無効な範囲を除外する
-	//あってもなくてもどっちでもよい
-	//rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	//rate = min(rate, 1.0f);
-	//rate = max(rate, 0.0f);
-
 	//速度が決定できるので移動ベクトルに反映する
 	move = VNorm(move);
 
+	//アナログスティック無効な範囲を除外する
+	//あってもなくてもどっちでもよい
+	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	rate = min(rate, 1.0f);
+	rate = max(rate, 0.0f);
+
+	//カメラのいる場所(角度)から
+	//コントローラーによる移動方向を決定する
+	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
+	move = VTransform(move, mtx);
 	
 	//スティックの押し加減でプレイヤーのスピードを変える
 	//歩き
@@ -310,7 +316,6 @@ void PlayerBase::Move()
 	}
 
 	m_pos = VAdd(m_pos, move);
-
 	m_move = move;
 
 	//動いている間

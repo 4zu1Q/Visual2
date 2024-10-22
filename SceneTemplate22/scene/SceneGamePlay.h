@@ -6,6 +6,7 @@
 #include <List>
 
 class PlayerBase;
+class Camera;
 class SkyDome;
 class HpBar;
 class FaceUi;
@@ -36,6 +37,7 @@ private:
 //#ifdef _DEBUG
 
 	std::shared_ptr<PlayerBase> m_pPlayer;
+	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	std::shared_ptr<HpBar> m_pHpBar;
 	std::shared_ptr<FaceUi> m_pFaceUi;

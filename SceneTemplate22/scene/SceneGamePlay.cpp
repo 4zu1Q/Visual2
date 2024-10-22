@@ -6,6 +6,7 @@
 
 #include "object/player/PlayerBase.h"
 #include "object/SkyDome.h"
+#include "object/Camera.h"
 
 #include "ui/HpBar.h"
 #include "ui/FaceUi.h"
@@ -37,6 +38,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_cameraAngle(0.0f)
 {
 	m_pPlayer = std::make_shared<PlayerBase>();
+	m_pCamera = std::make_shared<Camera>();
 	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
@@ -65,7 +67,6 @@ void SceneGamePlay::Update()
 	}
 
 	UpdateFade();
-	Pad::Update();
 
 	if (!IsFading())
 	{
@@ -75,50 +76,11 @@ void SceneGamePlay::Update()
 		}
 	}
 
+	m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
 	m_pPlayer->Update();
 	m_pFaceUi->Update();
-	m_pHpBar->Update(*m_pPlayer);
-
-#ifdef _DEBUG
-
-	//アナログスティックを使って移動
-	int analogX = 0;
-	int analogY = 0;
-
-	GetJoypadAnalogInputRight(&analogX, &analogY, DX_INPUT_PAD1);
-
-	if (analogX >= 10)
-	{
-		m_cameraAngle -= 0.05f;
-
-	}
-
-	if (analogX <= -10)
-	{
-		m_cameraAngle += 0.05f;
-
-	}
-
-	//if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_5))
-	//{
-	//	m_cameraAngle += 0.05f;
-	//}
-	//if ((GetJoypadInputState(DX_INPUT_KEY_PAD1) & PAD_INPUT_6))
-	//{
-	//	m_cameraAngle -= 0.05f;
-	//}
-
-	SetCameraNearFar(0.1f, 1180.0f);
-	VECTOR cameraPos;
-	cameraPos.x = cosf(m_cameraAngle) * kCameraDist;
-	cameraPos.y = 20;
-	cameraPos.z = sinf(m_cameraAngle) * kCameraDist;
-
-	SetCameraPositionAndTarget_UpVecY(cameraPos, VGet(0, 0, 0));
-
-#endif 
-	
+	m_pHpBar->Update(*m_pPlayer);	
 
 }
 
@@ -127,6 +89,7 @@ void SceneGamePlay::Draw()
 	DrawGrid();
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 
+	m_pCamera->Draw();
 	m_pSkyDome->Draw();
 	m_pPlayer->Draw();
 	m_pFaceUi->Draw(*m_pPlayer);
@@ -144,22 +107,5 @@ void SceneGamePlay::StartFadeOut()
 
 void SceneGamePlay::DrawGrid()
 {
-	for (int x = -350; x <= 350; x += 5)
-	{
-		DrawLine3D(VGet(static_cast<float>(x), 0, -350), VGet(static_cast<float>(x), 0, 350), 0xffff00);
-	}
-	for (int z = -350; z <= 350; z += 5)
-	{
-		DrawLine3D(VGet(-350, 0, static_cast<float>(z)), VGet(350, 0, static_cast<float>(z)), 0xff0000);
-	}
 
-	// X+-,Z+-の方向が分かりやすいように表示を追加する
-	VECTOR dispPos = ConvWorldPosToScreenPos(VGet(50, 0, 0));
-	DrawStringF(dispPos.x, dispPos.y, "X+", 0xffffff);
-	dispPos = ConvWorldPosToScreenPos(VGet(-50, 0, 0));
-	DrawStringF(dispPos.x, dispPos.y, "X-", 0xffffff);
-	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, 50));
-	DrawStringF(dispPos.x, dispPos.y, "Z+", 0xffffff);
-	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -50));
-	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
 }
