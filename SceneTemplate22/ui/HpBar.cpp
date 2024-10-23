@@ -1,7 +1,7 @@
 ﻿#include "HpBar.h"
 #include "DxLib.h"
 
-#include "object/player/PlayerBase.h"
+#include "object/player/Player.h"
 #include "object/boss/BossBase.h"
 
 namespace
@@ -13,7 +13,7 @@ HpBar::HpBar():
 	m_playerHp(0),
 	m_bossHp(0)
 {
-	m_pPlayer = std::make_shared<PlayerBase>();
+	m_pPlayer = std::make_shared<Player>();
 	m_pBoss = std::make_shared<BossBase>();
 
 }
@@ -33,7 +33,7 @@ void HpBar::Finalize()
 
 }
 
-void HpBar::Update(PlayerBase& player)
+void HpBar::Update(Player& player)
 {
 
 	m_playerHp = player.GetHp();

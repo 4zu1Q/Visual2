@@ -49,6 +49,12 @@
     <Filter Include="ヘッダー ファイル\object\boss">
       <UniqueIdentifier>{135e1ad1-d56e-4e5e-b88e-79057e065fe1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\object\item">
+      <UniqueIdentifier>{1800bdca-3dc7-4e50-ac91-0009b3e3d60e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\item">
+      <UniqueIdentifier>{abb822f2-c72f-477b-bbb6-b3284ac053a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -105,9 +111,6 @@
     <ClCompile Include="object\player\Player.cpp">
       <Filter>ソース ファイル\object\player</Filter>
     </ClCompile>
-    <ClCompile Include="object\player\PlayerBase.cpp">
-      <Filter>ソース ファイル\object\player</Filter>
-    </ClCompile>
     <ClCompile Include="object\SkyDome.cpp">
       <Filter>ソース ファイル\object</Filter>
     </ClCompile>
@@ -134,6 +137,24 @@
     </ClCompile>
     <ClCompile Include="object\boss\BossShot.cpp">
       <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="object\CharaBase.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="util\ActionTime.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="object\item\ItemBase.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
+    <ClCompile Include="object\item\ItemMp.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
+    <ClCompile Include="object\item\ItemHp.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Collision.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -188,9 +209,6 @@
     <ClInclude Include="scene\ScenePause.h">
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
-    <ClInclude Include="object\player\PlayerBase.h">
-      <Filter>ヘッダー ファイル\object\player</Filter>
-    </ClInclude>
     <ClInclude Include="object\player\Player.h">
       <Filter>ヘッダー ファイル\object\player</Filter>
     </ClInclude>
@@ -220,6 +238,24 @@
     </ClInclude>
     <ClInclude Include="object\boss\BossShot.h">
       <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\CharaBase.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+    <ClInclude Include="util\ActionTime.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemBase.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemMp.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemHp.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Collision.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 ﻿#include "FaceUi.h"
 
-#include "object/player/PlayerBase.h"
+#include "object/player/Player.h"
 
 namespace
 {
@@ -29,26 +29,26 @@ void FaceUi::Update()
 
 }
 
-void FaceUi::Draw(PlayerBase& player)
+void FaceUi::Draw(Player& player)
 {
 
 	//プレイヤーの仮面UI
-	if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kPowerPlayer)
+	if (player.GetFaceKind() == Player::e_PlayerKind::kPowerPlayer)
 	{
 		DrawCircle(kFacePosX, kFacePosY, kRadius, 0xffff0f, true, true);
 
 	}
-	else if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kSpeedPlayer)
+	else if (player.GetFaceKind() == Player::e_PlayerKind::kSpeedPlayer)
 	{
 		DrawCircle(kFacePosX, kFacePosY, kRadius, 0xfff0ff, true, true);
 
 	}
-	else if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kShotPlayer)
+	else if (player.GetFaceKind() == Player::e_PlayerKind::kShotPlayer)
 	{
 		DrawCircle(kFacePosX, kFacePosY, kRadius, 0xff0fff, true, true);
 
 	}
-	else if (player.GetFaceKind() == PlayerBase::e_PlayerKind::kStrongestPlayer)
+	else if (player.GetFaceKind() == Player::e_PlayerKind::kStrongestPlayer)
 	{
 		DrawCircle(kFacePosX, kFacePosY, kRadius, 0x0fffff, true, true);
 

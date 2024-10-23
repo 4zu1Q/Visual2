@@ -1,19 +1,22 @@
 ﻿#include "Camera.h"
-#include "object/player/PlayerBase.h"
+#include "object/player/Player.h"
 
 #include "util/Pad.h"
 
 namespace
 {
-	constexpr float kCameraDist = 66;
-	constexpr float kCameraHeight = 5;
+
+	//カメラの距離
+	constexpr float kCameraDist = 30;
+	//カメラの高さ
+	constexpr float kCameraHeight = 10;
 
 	constexpr float kAngleSpeed = 0.05f;	//旋回速度
 	constexpr float kCameraPlayerTargetHeight = 400.0f;	//プレイヤー座標からどれだけ高い位置を注視点とするか
 	constexpr float kToPlayerLength = 1600.0f;	//プレイヤーとの距離
 	constexpr float kCollisionSize = 50.0f;		//カメラの当たり判定サイズ
 
-	//アナログスティックによる移動関連
+	/*アナログスティックによる移動関連*/
 	constexpr float kMaxSpeed = 0.5f;		//プレイヤーの最大移動速度
 	constexpr float kAnalogRangeMin = 0.1;	//アナログスティックの入力判定範囲
 	constexpr float kAnalogRangeMax = 0.8;
@@ -43,7 +46,7 @@ void Camera::Finalize()
 {
 }
 
-void Camera::Update(PlayerBase& player)
+void Camera::Update(Player& player)
 {
 	//アナログスティックを使ってカメラ回転
 	int analogX = 0;
@@ -54,22 +57,21 @@ void Camera::Update(PlayerBase& player)
 
 	// カメラに位置を反映
 	//注視点の座標
-	VECTOR playerAimPos = VGet(player.GetPos().x, player.GetPos().y + 20.0f, player.GetPos().z);
+	VECTOR playerAimPos = VGet(player.GetPosDown().x, player.GetPosDown().y, player.GetPosDown().z);
 	//ベクトルの方向(注視点-カメラのポジション)
 	VECTOR posToAim = VSub(playerAimPos, m_pos);
 
 	//右スティックを右に押した場合
 	if (analogX >= 10)
 	{
-		//回転する
 		m_angle -= 0.05f;
 	}
 	else if (analogX <= -10)
-	{
-		//回転する
+	{	
 		m_angle += 0.05f;
 	}
 
+	//カメラの回転
 	m_pos.x += cosf(m_angle) * kCameraDist;
 	m_pos.y += kCameraHeight;
 	m_pos.z += sinf(m_angle) * kCameraDist;
@@ -78,7 +80,7 @@ void Camera::Update(PlayerBase& player)
 	m_pos = VAdd(m_pos, posToAim);
 
 
-	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPos());
+	SetCameraPositionAndTarget_UpVecY(m_pos, player.GetPosDown());
 }
 
 void Camera::Draw()
@@ -89,6 +91,31 @@ void Camera::Draw()
 	DrawGrid();
 
 #endif
+}
+
+void Camera::DebugUpdate()
+{
+	//アナログスティックを使ってカメラ回転
+	int analogX = 0;
+	int analogZ = 0;
+
+	//アナログスティックを取得
+	GetJoypadAnalogInputRight(&analogX, &analogZ, DX_INPUT_PAD1);
+
+	//右スティックを右に押した場合
+	if (analogX >= 10)
+	{
+		m_angle -= 0.05f;
+	}
+	else if (analogX <= -10)
+	{	
+		m_angle += 0.05f;
+	}
+
+	//カメラの回転
+	m_pos.x += cosf(m_angle) * kCameraDist;
+	m_pos.y += kCameraHeight;
+	m_pos.z += sinf(m_angle) * kCameraDist;
 }
 
 void Camera::DrawGrid()

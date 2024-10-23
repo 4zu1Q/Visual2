@@ -1,5 +1,5 @@
 ﻿#include "BossBase.h"
-#include "object/player/PlayerBase.h"
+#include "object/player/Player.h"
 
 namespace
 {
@@ -39,7 +39,7 @@ void BossBase::Draw()
 
 }
 
-void BossBase::PlayerLockOn(PlayerBase player)
+void BossBase::PlayerLockOn(Player& player)
 {
 
 }

@@ -4,7 +4,7 @@
 
 #include <memory>
 
-class PlayerBase;
+class Player;
 class BossBase;
 
 class HpBar
@@ -25,12 +25,12 @@ public:
 	void Initialize();
 	void Finalize();
 
-	void Update(PlayerBase& player);
+	void Update(Player& player);
 	void Draw();
 
 private:
 
-	std::shared_ptr<PlayerBase> m_pPlayer;
+	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<BossBase> m_pBoss;
 
 	float m_playerHp;

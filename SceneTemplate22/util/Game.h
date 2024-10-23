@@ -16,7 +16,7 @@ namespace Game
 #endif
 
 	//ウィンドウ名
-	const char* const kTitleText = "ゲーム名";
+	const char* const kTitleText = "マイフェイス";
 
 
 	//ウィンドウサイズ

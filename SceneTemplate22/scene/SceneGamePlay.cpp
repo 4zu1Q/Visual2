@@ -4,7 +4,8 @@
 #include "SceneGamePlay.h"
 #include "ScenePause.h"
 
-#include "object/player/PlayerBase.h"
+#include "object/player/Player.h"
+#include "object/item/ItemBase.h"
 #include "object/SkyDome.h"
 #include "object/Camera.h"
 
@@ -15,8 +16,6 @@
 
 namespace
 {
-	constexpr float kCameraDist = 56;
-	constexpr float kCameraHeight = 32;
 
 	constexpr float kMaxSpeedN = 0.9f;
 
@@ -37,16 +36,18 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_isFadingOut(false),
 	m_cameraAngle(0.0f)
 {
-	m_pPlayer = std::make_shared<PlayerBase>();
+	m_pPlayer = std::make_shared<Player>();
 	m_pCamera = std::make_shared<Camera>();
 	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
+	m_pItem = std::make_shared<ItemBase>();
 
 	m_playerPos = VGet(0, 0, 0);
 	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize();
+	
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -57,6 +58,11 @@ SceneGamePlay::~SceneGamePlay()
 
 void SceneGamePlay::Update()
 {
+	Pad::Update();
+
+	//カメラのアングルをセットする
+	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
+
 	if (m_isFadingOut)
 	{
 		if (IsFadingOut())
@@ -77,10 +83,13 @@ void SceneGamePlay::Update()
 	}
 
 	m_pCamera->Update(*m_pPlayer);
+	//m_pCamera->DebugUpdate();
 	m_pSkyDome->Update();
 	m_pPlayer->Update();
 	m_pFaceUi->Update();
-	m_pHpBar->Update(*m_pPlayer);	
+	m_pHpBar->Update(*m_pPlayer);
+
+	m_pItem->Update();
 
 }
 
@@ -94,6 +103,8 @@ void SceneGamePlay::Draw()
 	m_pPlayer->Draw();
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pHpBar->Draw();
+
+	m_pItem->Draw();
 
 	DrawFade();
 	

@@ -23,6 +23,7 @@ public:
 
 	//カメラの座標を取得
 	const VECTOR& GetPos() const { return m_pos; }
+
 	//注視点の座標を取得
 	const VECTOR& GetTargetPos() const { return m_targetPos; }
 

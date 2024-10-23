@@ -82,6 +82,7 @@ public:
 	/// <returns> true = 流れている , false = 流れていない </returns>
 	bool isPlayingSound(std::string name);
 
+	//
 	void ChangeBGMVolume(float volume);
 	void ChangeSEVolume(float volume);
 

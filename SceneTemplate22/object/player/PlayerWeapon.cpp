@@ -1,6 +1,6 @@
-﻿#include "PlayerWeapon.h"
-
-#include "PlayerBase.h"
+﻿
+#include "PlayerWeapon.h"
+#include "Player.h"
 
 namespace
 {
@@ -10,7 +10,6 @@ namespace
 	const char* const kDaggerModelFileName = "Data/Model/Weapon/Player_Dagger.mv1";
 	const char* const kMagicWandModelFileName = "Data/Model/Weapon/Player_MagicWand.mv1";
 	const char* const kLongSwordModelFileName = "Data/Model/Weapon/Player_LongSword.mv1";
-	const char* const kShiledModelFileName = "Data/Model/Weapon/Player_Shiled.mv1";
 
 	//モデルのスケール値
 	constexpr float kModelScale = 1.0f;
@@ -63,7 +62,6 @@ void PlayerWeapon::Initialize(int modelH, int modelRightFrame, int modelLeftFram
 void PlayerWeapon::Finalize()
 {
 	//モデルのデリート
-
 	MV1DeleteModel(m_swordModelH);
 	MV1DeleteModel(m_axeModelH);
 	MV1DeleteModel(m_daggerRightModelH);
@@ -71,8 +69,8 @@ void PlayerWeapon::Finalize()
 	MV1DeleteModel(m_magicWandModelH);
 	MV1DeleteModel(m_longSwordModelH);
 
-	m_axeModelH = -1;
 	m_swordModelH = -1;
+	m_axeModelH = -1;
 	m_daggerRightModelH = -1;
 	m_daggerLeftModelH = -1;
 	m_magicWandModelH = -1;

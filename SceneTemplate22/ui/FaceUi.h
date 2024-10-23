@@ -3,7 +3,7 @@
 #include "util/Vec2.h"
 #include <memory>
 
-class PlayerBase;
+class Player;
 
 class FaceUi
 {
@@ -13,11 +13,12 @@ public:
 	virtual ~FaceUi();
 
 	void Update();
-	void Draw(PlayerBase& player);
+	void Draw(Player& player);
 
 private:
 
-
+	int m_hpHandle;
+	int m_hpLostHandle;
 	
 
 };

@@ -5,11 +5,12 @@
 #include <memory>
 #include <List>
 
-class PlayerBase;
+class Player;
 class Camera;
 class SkyDome;
 class HpBar;
 class FaceUi;
+class ItemBase;
 
 class SceneGamePlay :
 	public SceneBase
@@ -36,12 +37,15 @@ private:
 
 //#ifdef _DEBUG
 
-	std::shared_ptr<PlayerBase> m_pPlayer;
+	//スマートポインタ
+	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	std::shared_ptr<HpBar> m_pHpBar;
 	std::shared_ptr<FaceUi> m_pFaceUi;
+	std::shared_ptr<ItemBase> m_pItem;
 
+	//
 	VECTOR m_playerPos;
 	VECTOR m_cameraPos;
 
@@ -54,7 +58,6 @@ private:
 //#endif 
 
 	bool m_isFadingOut;
-
 	float m_cameraAngle;
 
 };

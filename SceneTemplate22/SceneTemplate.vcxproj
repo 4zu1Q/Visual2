@@ -145,8 +145,11 @@
     <ClCompile Include="object\boss\BossShot.cpp" />
     <ClCompile Include="object\boss\BossSpeed.cpp" />
     <ClCompile Include="object\Camera.cpp" />
+    <ClCompile Include="object\CharaBase.cpp" />
+    <ClCompile Include="object\item\ItemBase.cpp" />
+    <ClCompile Include="object\item\ItemHp.cpp" />
+    <ClCompile Include="object\item\ItemMp.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
-    <ClCompile Include="object\player\PlayerBase.cpp" />
     <ClCompile Include="object\player\PlayerWeapon.cpp" />
     <ClCompile Include="object\SkyDome.cpp" />
     <ClCompile Include="scene\SceneBase.cpp" />
@@ -161,6 +164,8 @@
     <ClCompile Include="scene\SceneTitle.cpp" />
     <ClCompile Include="ui\FaceUi.cpp" />
     <ClCompile Include="ui\HpBar.cpp" />
+    <ClCompile Include="util\ActionTime.cpp" />
+    <ClCompile Include="util\Collision.cpp" />
     <ClCompile Include="util\Input.cpp" />
     <ClCompile Include="util\Pad.cpp" />
     <ClCompile Include="util\SoundManager.cpp" />
@@ -174,8 +179,11 @@
     <ClInclude Include="object\boss\BossShot.h" />
     <ClInclude Include="object\boss\BossSpeed.h" />
     <ClInclude Include="object\Camera.h" />
+    <ClInclude Include="object\CharaBase.h" />
+    <ClInclude Include="object\item\ItemBase.h" />
+    <ClInclude Include="object\item\ItemHp.h" />
+    <ClInclude Include="object\item\ItemMp.h" />
     <ClInclude Include="object\player\Player.h" />
-    <ClInclude Include="object\player\PlayerBase.h" />
     <ClInclude Include="object\player\PlayerWeapon.h" />
     <ClInclude Include="object\SkyDome.h" />
     <ClInclude Include="scene\SceneBase.h" />
@@ -190,6 +198,8 @@
     <ClInclude Include="scene\SceneTitle.h" />
     <ClInclude Include="ui\FaceUi.h" />
     <ClInclude Include="ui\HpBar.h" />
+    <ClInclude Include="util\ActionTime.h" />
+    <ClInclude Include="util\Collision.h" />
     <ClInclude Include="util\Game.h" />
     <ClInclude Include="util\Input.h" />
     <ClInclude Include="util\Pad.h" />

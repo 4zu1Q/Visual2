@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "DxLib.h"
 
-class PlayerBase;
+class Player;
 class BossBase
 {
 public:
@@ -23,15 +23,19 @@ public:
 	void SetHp(const int hp) { m_hp = hp; }
 
 
-	void PlayerLockOn(PlayerBase player);
+	void PlayerLockOn(Player& player);
 
 protected:
 
+	//HP
 	int m_hp;
 
+	//モデルハンドル
+	int m_modelH;
+
+	//座標
 	VECTOR m_pos;
 	VECTOR m_attackPos;
-
 
 
 };
