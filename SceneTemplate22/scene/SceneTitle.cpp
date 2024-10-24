@@ -105,6 +105,15 @@ void SceneTitle::Draw()
 
 //#endif
 
+	//タイトル画面の座標
+	DrawBox(40, 40, 540, 240, 0xff00ff, true);
+
+	//スタート
+	DrawBox(1200, 320, 1260, 120, 0xffffff, true);
+	//オプション
+	DrawBox(20, 20, 320, 120, 0xffffff, true);
+	//エンド
+	DrawBox(20, 20, 320, 120, 0xffffff, true);
 
 	DrawFade();
 }

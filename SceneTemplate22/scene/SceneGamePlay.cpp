@@ -27,6 +27,8 @@ namespace
 
 SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	SceneBase(manager),
+	m_isMpHit(false),
+	m_isHpHit(false),
 #ifdef _DEBUG
 	m_analogX(0),
 	m_analogZ(0),
@@ -91,6 +93,16 @@ void SceneGamePlay::Update()
 
 	m_pItem->Update();
 
+	//プレイヤーとアイテムの当たり判定のフラグを代入
+	m_isMpHit = m_pItem->ItemHit(m_pPlayer);
+
+	//プレイヤーとアイテムが当たった場合
+	if (m_isMpHit)
+	{
+		printfDx("当たった");
+	}
+
+
 }
 
 void SceneGamePlay::Draw()
@@ -104,7 +116,7 @@ void SceneGamePlay::Draw()
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pHpBar->Draw();
 
-	m_pItem->Draw();
+	m_pItem->Draw(m_pPlayer);
 
 	DrawFade();
 	

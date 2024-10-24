@@ -2,7 +2,7 @@
 
 namespace
 {
-	const char* const kItemHpModelFilename = "Data/Model/Obj/Potion.mv1";
+	const char* const kItemHpModelFilename = "Data/Model/Obj/Heart.mv1";
 
 	constexpr float kSinSpeed = 0.01f;
 	constexpr float kHeightSize = 0.01f;
@@ -34,7 +34,6 @@ void ItemHp::Finalize()
 
 void ItemHp::Update()
 {
-
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_rot, 0));
 	MV1SetPosition(m_modelH, m_pos);
 }

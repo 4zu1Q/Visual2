@@ -60,5 +60,11 @@ private:
 	bool m_isFadingOut;
 	float m_cameraAngle;
 
+
+	//当たり判定フラグ
+	bool m_isHpHit;
+	bool m_isMpHit;
+	
+
 };
 

@@ -154,7 +154,7 @@
       <Filter>ソース ファイル\object\item</Filter>
     </ClCompile>
     <ClCompile Include="util\Collision.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -255,7 +255,7 @@
       <Filter>ヘッダー ファイル\object\item</Filter>
     </ClInclude>
     <ClInclude Include="util\Collision.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

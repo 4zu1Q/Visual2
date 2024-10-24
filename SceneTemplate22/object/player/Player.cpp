@@ -52,12 +52,19 @@ namespace
 	//ジャンプ力
 	constexpr float kJumpPower = 40.0f;
 
+	//初期位置
+	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
+
+	//カプセルの上の座標
+	constexpr VECTOR kUpPos = { 0.0f,8.0f,0.0f };
+
 }
 
 Player::Player() :
 	m_modelH(-1),
-	m_radius(5),
-	m_posDown(VGet(0, 0, 0)),
+	m_radius(2),
+	m_posDown(kInitPos),
+	m_posUp(kInitPos),
 	m_move(VGet(0, 0, 0)),
 	m_attackPos(VGet(0, 0, 0)),
 	m_attackDir(VGet(0, 0, 0)),
@@ -232,6 +239,8 @@ void Player::Update()
 		//FaceAttack();
 	}
 
+
+	m_posUp = VGet(m_posDown.x, m_posDown.y + 8.0f, m_posDown.z);
 
 	//モデルに座標をセットする
 	MV1SetPosition(m_modelH, m_posDown);

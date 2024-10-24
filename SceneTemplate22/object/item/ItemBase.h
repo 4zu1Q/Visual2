@@ -15,7 +15,7 @@ public:
 	void Start(VECTOR pos) { m_pos = pos; }
 
 	virtual void Update();
-	virtual void Draw();
+	virtual void Draw(std::shared_ptr<Player> pPlayer);
 
 	//アイテムが消える処理
 	void ItemLost();
@@ -29,7 +29,7 @@ public:
 	/// </summary>
 	/// <param name="pPlayer"></param>
 	/// <returns></returns>
-	bool ItemSphereFlag(std::shared_ptr<Player> pPlayer);
+	bool ItemHit(std::shared_ptr<Player> pPlayer);
 
 protected:
 
