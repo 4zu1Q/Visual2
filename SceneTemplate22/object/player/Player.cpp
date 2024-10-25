@@ -121,8 +121,11 @@ Player::~Player()
 	Finalize();
 }
 
-void Player::Initialize()
+void Player::Initialize(VECTOR pos)
 {
+	//初期位置を代入
+	m_posDown = pos;
+
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
@@ -151,8 +154,6 @@ void Player::Finalize()
 
 void Player::Update()
 {
-
-
 
 	/*アニメーションの切り替え*/
 	if (m_prevAnimNo != -1)
@@ -238,6 +239,7 @@ void Player::Update()
 		//特殊攻撃する関数を呼び出す
 		//FaceAttack();
 	}
+
 
 
 	m_posUp = VGet(m_posDown.x, m_posDown.y + 8.0f, m_posDown.z);

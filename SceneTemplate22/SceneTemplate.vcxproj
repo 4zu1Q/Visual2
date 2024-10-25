@@ -152,6 +152,7 @@
     <ClCompile Include="object\player\Player.cpp" />
     <ClCompile Include="object\player\PlayerWeapon.cpp" />
     <ClCompile Include="object\SkyDome.cpp" />
+    <ClCompile Include="object\Tomb.cpp" />
     <ClCompile Include="scene\SceneBase.cpp" />
     <ClCompile Include="scene\SceneDebug.cpp" />
     <ClCompile Include="scene\SceneGameClear.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="object\player\Player.h" />
     <ClInclude Include="object\player\PlayerWeapon.h" />
     <ClInclude Include="object\SkyDome.h" />
+    <ClInclude Include="object\Tomb.h" />
     <ClInclude Include="scene\SceneBase.h" />
     <ClInclude Include="scene\SceneDebug.h" />
     <ClInclude Include="scene\SceneGameClear.h" />

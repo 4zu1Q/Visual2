@@ -1,6 +1,7 @@
 ﻿#include "DxLib.h"
 
 #include "util/Pad.h"
+#include "util/Game.h"
 
 #include "SceneManager.h"
 #include "SceneTitle.h"
@@ -31,8 +32,8 @@ void SceneTitle::Update()
 	UpdateFade();
 
 	
-	if (!m_isToNextScene)
-	{
+	//if (!m_isToNextScene)
+	//{
 		//上を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_UP))
 		{
@@ -59,6 +60,9 @@ void SceneTitle::Update()
 			{
 				StartFadeOut();
 				m_isToNextScene = true;
+
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kOption)
@@ -72,7 +76,7 @@ void SceneTitle::Update()
 				DxLib_End();
 			}
 		}
-	}
+	//}
 
 
 	//シーンフラグがたった場合
@@ -82,8 +86,6 @@ void SceneTitle::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-				return;
 			}
 		}
 	}
@@ -92,6 +94,19 @@ void SceneTitle::Update()
 
 void SceneTitle::Draw()
 {
+	//背景座標
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+
+	//タイトル画面の座標
+	DrawBox(40, 40, 740, 240, 0xff00ff, true);
+
+	//スタート
+	DrawBox(900, 320, 1260, 420, 0xffffff, true);
+	//オプション
+	DrawBox(900, 440, 1260, 540, 0xffffff, true);
+	//エンド
+	DrawBox(900, 560, 1260, 660, 0xffffff, true);
+
 
 //#ifdef _DEBUG
 
@@ -99,21 +114,13 @@ void SceneTitle::Draw()
 
 	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Start");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kQuit) * kTextIntervalY, 0xffffff, "Quit");
 
 //#endif
 
-	//タイトル画面の座標
-	DrawBox(40, 40, 540, 240, 0xff00ff, true);
 
-	//スタート
-	DrawBox(1200, 320, 1260, 120, 0xffffff, true);
-	//オプション
-	DrawBox(20, 20, 320, 120, 0xffffff, true);
-	//エンド
-	DrawBox(20, 20, 320, 120, 0xffffff, true);
 
 	DrawFade();
 }

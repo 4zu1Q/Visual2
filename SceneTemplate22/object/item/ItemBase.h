@@ -12,6 +12,7 @@ public:
 	//メンバー変数にアクセスする
 	void SetModelHandle(int modelH) { m_modelH = modelH; }
 
+	//スタートするポジションをセットする
 	void Start(VECTOR pos) { m_pos = pos; }
 
 	virtual void Update();

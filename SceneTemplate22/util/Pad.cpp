@@ -22,6 +22,13 @@ namespace
 	bool				isRecordLog = false;
 	int					playLogNo = -1;	// キーログ再生フレーム数
 	std::vector<int>	keyLog;
+
+	//コントローラーの入力情報
+	XINPUT_STATE* XInputState;
+
+	//トリガーボタンのデッドゾーン
+	constexpr int kTriggerDeadZone = 60;
+
 }
 
 namespace Pad
@@ -63,6 +70,9 @@ namespace Pad
 				}
 			}
 		}
+
+		//ZR,ZL,スティックの入力を取得
+		GetJoypadXInputState(DX_INPUT_PAD1, XInputState);
 	}
 
 	// 押し下げ判定
@@ -83,6 +93,33 @@ namespace Pad
 		bool isLast = (padLog[padNo][1] & button);	//1フレーム前の状態
 		return (!isNow && isLast);
 	}
+	//bool GetIsPushedTriggerButton(bool isRight)
+	//{
+	//	if (isRight)
+	//	{
+	//		//ZRの入力情報を返す
+	//		if (XInputState->RightTrigger > kTriggerDeadZone)
+	//		{
+	//			return true;
+	//		}
+	//		else
+	//		{
+	//			return false;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		//ZRの入力情報を返す
+	//		if (XInputState->LeftTrigger > kTriggerDeadZone)
+	//		{
+	//			return true;
+	//		}
+	//		else
+	//		{
+	//			return false;
+	//		}
+	//	}
+	//}
 	void startRecordLog()
 	{
 		isRecordLog = true;

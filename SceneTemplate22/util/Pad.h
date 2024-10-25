@@ -13,6 +13,7 @@ namespace Pad
 	//離した判定
 	bool IsRelase(int button, int padNo = 0);
 
+
 	// ログ記録開始、終了
 	void startRecordLog();
 	void endRecordLog();

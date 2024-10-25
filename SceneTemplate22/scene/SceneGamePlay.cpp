@@ -45,10 +45,11 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pFaceUi = std::make_shared<FaceUi>();
 	m_pItem = std::make_shared<ItemBase>();
 
-	m_playerPos = VGet(0, 0, 0);
+	m_playerPos = VGet(0, 0, 20);
 	m_cameraPos = VGet(0, 0, 0);
 
-	m_pPlayer->Initialize();
+	//初期位置をセット
+	m_pPlayer->Initialize(m_playerPos);
 	
 }
 

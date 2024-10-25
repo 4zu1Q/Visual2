@@ -58,7 +58,7 @@ public:
 	Player();
 	virtual ~Player();
 
-	void Initialize();
+	void Initialize(VECTOR pos);
 	void Finalize();
 
 	void Update();
