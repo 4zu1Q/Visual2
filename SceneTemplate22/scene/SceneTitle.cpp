@@ -14,6 +14,16 @@ namespace
 	constexpr int kTextX = 64;
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
+
+	//タイトルロゴのポジション
+	constexpr VECTOR kTitleLogoPos = { 40.0f , 40.0f };
+	
+	//スタートのポジション
+	constexpr VECTOR kStartPos = { 40.0f , 40.0f };
+	//オプションのポジション
+	constexpr VECTOR kOptionPos = { 40.0f , 40.0f };
+	//やめるのポジション
+	constexpr VECTOR kQuitPos = { 40.0f , 40.0f };
 }
 
 SceneTitle::SceneTitle(SceneManager& manager):

@@ -14,6 +14,7 @@
 
 #include "object/SkyDome.h"
 #include "object/Camera.h"
+#include "object/Tomb.h"
 
 #include "ui/HpBar.h"
 #include "ui/FaceUi.h"
@@ -31,7 +32,10 @@ namespace
 SceneSelect::SceneSelect(SceneManager& manager) :
 	SceneBase(manager),
 	m_isMpHit(false),
-	m_isHpHit(false)
+	m_isHpHit(false),
+	m_isTombHitP(false),
+	m_isTombHitS(false),
+	m_isTombHitR(false)
 {
 	m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
 
@@ -44,6 +48,9 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 
 	m_pItemHp = std::make_shared<ItemHp>();
 	m_pItemMp = std::make_shared<ItemMp>();
+
+	m_pTomb = std::make_shared<Tomb>();
+
 
 	m_playerPos = VGet(0, 0, -20);
 	m_cameraPos = VGet(0, 0, 0);
@@ -83,7 +90,6 @@ void SceneSelect::Update()
 	}
 
 	m_pCamera->Update(*m_pPlayer);
-	//m_pCamera->DebugUpdate();
 	m_pSkyDome->Update();
 	m_pPlayer->Update();
 	m_pFaceUi->Update();
@@ -92,10 +98,16 @@ void SceneSelect::Update()
 	m_pItem->Update();
 	m_pItemMp->Update();
 	m_pItemHp->Update();
+	m_pTomb->Update();
 
 	//プレイヤーとアイテムの当たり判定のフラグを代入
 	m_isMpHit = m_pItemMp->MpHit(m_pPlayer);
 	m_isHpHit = m_pItemHp->HpHit(m_pPlayer);
+
+	m_isTombHitP = m_pTomb->TombPHit(m_pPlayer);
+	m_isTombHitS = m_pTomb->TombSHit(m_pPlayer);
+	m_isTombHitR = m_pTomb->TombRHit(m_pPlayer);
+
 
 
 	//プレイヤーとアイテムが当たった場合
@@ -110,6 +122,28 @@ void SceneSelect::Update()
 		printfDx("Hp");
 	}
 
+	//プレイヤーと墓が当たった場合
+
+	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitP)
+	{
+		printfDx("パワーボス");
+		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+		return;
+	}
+
+	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitS)
+	{
+		printfDx("スピードボス");
+		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+		return;
+	}
+
+	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitR)
+	{
+		printfDx("ラスボス");
+		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+		return;
+	}
 
 	//if (!m_isToNextScene)
 	//{
@@ -214,6 +248,7 @@ void SceneSelect::Draw()
 	m_pItem->Draw(m_pPlayer);
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
+	m_pTomb->Draw();
 
 //#ifdef _DEBUG
 

@@ -67,6 +67,7 @@ void ItemHp::Update()
 void ItemHp::Draw()
 {
 	MV1DrawModel(m_modelH);
+	DrawSphere3D(m_pos, m_radius, 32, 0xffffff, 0xff0000, false);
 
 }
 

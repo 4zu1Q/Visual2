@@ -12,6 +12,7 @@ class FaceUi;
 class ItemBase;
 class ItemMp;
 class ItemHp;
+class Tomb;
 
 class SceneSelect :
 	public SceneBase
@@ -43,6 +44,7 @@ private:
 
 	std::shared_ptr<ItemMp> m_pItemMp;
 	std::shared_ptr<ItemHp> m_pItemHp;
+	std::shared_ptr<Tomb> m_pTomb;
 
 	//遷移先
 	enum class e_SceneTrans : int
@@ -70,9 +72,16 @@ private:
 	float m_cameraAngle;
 
 
-	//当たり判定フラグ
+	/* 当たり判定フラグ */
+
+	//アイテムの当たり判定フラグ
 	bool m_isHpHit;
 	bool m_isMpHit;
+
+	//墓の当たり判定フラグ
+	bool m_isTombHitP;
+	bool m_isTombHitS;
+	bool m_isTombHitR;
 
 
 };

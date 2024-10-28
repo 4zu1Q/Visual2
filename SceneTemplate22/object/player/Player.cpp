@@ -38,19 +38,19 @@ namespace
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
 	//移動速度：ノーマル
-	constexpr float kMaxSpeedN = 1.3f;
-	constexpr float kMinSpeedN = 0.5f;
+	constexpr float kMaxSpeedN = 1.5f;
+	constexpr float kMinSpeedN = 0.6f;
 
 	//移動速度：パワー
-	constexpr float kMaxSpeedP = 1.5f;
-	constexpr float kMinSpeedP = 0.8f;
+	constexpr float kMaxSpeedP = 0.8f;
+	constexpr float kMinSpeedP = 0.3f;
 
 	//移動速度：スピード
 	constexpr float kMaxSpeedS = 3.0f;
 	constexpr float kMinSpeedS = 1.5f;
 
 	//ジャンプ力
-	constexpr float kJumpPower = 40.0f;
+	constexpr float kJumpPower = 10.0f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
@@ -101,7 +101,17 @@ Player::Player() :
 	m_animBlendRate = 1.0f;
 	m_isAnimationFinish = false;
 
-	m_nowAnimIndex = e_AnimIndex::kIdle;
+	m_animIndex = e_AnimIndex::kIdle;
+
+	m_isAnimIdle = false;
+	m_isAnimAttack = false;
+	m_isAnimWalk = false;
+	m_isAnimDash = false;
+	m_isAnimAttackX = false;
+	m_isAnimAttackY = false;
+	m_isAnimDamage = false;
+	m_isAnimDown = false;
+
 
 	//モデルのロード
 	m_modelH = MV1LoadModel(kModelFilename);
@@ -170,17 +180,18 @@ void Player::Update()
 		MV1SetAttachAnimBlendRate(m_modelH, m_currentAnimNo, m_animBlendRate);
 	}
 
-	m_isAnimationFinish = IsUpdateAnim(m_currentAnimNo);
 
+	m_isAnimationFinish = IsUpdateAnim(m_currentAnimNo);
+	//アニメーションを進める
 	if (m_isAnimationFinish)
 	{
-		ChangeAnim(m_nowAnimIndex);
+		ChangeAnim(m_animIndex);
 	}
 	IsUpdateAnim(m_prevAnimNo);
 
 
 	//仮重力
-	m_posDown.y = -2.0f;
+	m_posDown.y -= 2.2f;
 
 	//m_upPower = max(m_upPower - (0.8f * 0.5f), -1.0f);
 	//m_pos.y = m_upPower;
@@ -324,10 +335,56 @@ void Player::Move()
 	rate = max(rate, 0.0f);
 
 	//スティックの押し加減でプレイヤーのスピードを変える
-	//歩き
-	if (rate <= 0.8f && rate > 0.0f);
+
+
+	
+	//ノーマル時
+	if (rate <= 0.8f && rate > 0.0f && !m_isFaceUse);
 	{
 		float speed = kMinSpeedN * rate;
+		move = VScale(move, speed);
+	}
+
+	if (rate >= 0.8f && !m_isFaceUse)
+	{
+		float speed = kMaxSpeedN * rate;
+		move = VScale(move, speed);
+	}
+
+	//歩きのアニメーション
+	if (VSize(move) != 0.0f)
+	{
+		if (!m_isAnimWalk)
+		{
+			ChangeAnim(e_AnimIndex::kWalk);
+			m_animIndex = e_AnimIndex::kWalk;
+		}
+		m_isAnimWalk = true;
+	}
+	else
+	{
+		m_isAnimWalk = false;
+	}
+
+	if (VSize(move) > 0.8f)
+	{
+		if (!m_isAnimDash)
+		{
+			ChangeAnim(e_AnimIndex::kDash);
+			m_animIndex = e_AnimIndex::kDash;
+		}
+		m_isAnimDash = true;
+	}
+	else
+	{
+		m_isAnimDash = false;
+	}
+
+		 
+	//スピード時
+	if (rate <= 0.8f && rate > 0.0f && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse);
+	{
+		float speed = kMinSpeedS * rate;
 		move = VScale(move, speed);
 
 		//歩いている間アニメーション
@@ -335,10 +392,30 @@ void Player::Move()
 		//m_nowAnimIndex = e_AnimIndex::kWalk;
 
 	}
-	//走り
-	if (rate >= 0.8f)
+	if (rate >= 0.8f && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
-		float speed = kMaxSpeedN * rate;
+		float speed = kMaxSpeedS * rate;
+		move = VScale(move, speed);
+
+		//走っている間アニメーション
+		//ChangeAnim(e_AnimIndex::kRun);
+		//m_nowAnimIndex = e_AnimIndex::kRun;
+	}
+
+	//スピード時
+	if (rate <= 0.8f && rate > 0.0f && m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse);
+	{
+		float speed = kMinSpeedP * rate;
+		move = VScale(move, speed);
+
+		//歩いている間アニメーション
+		//ChangeAnim(e_AnimIndex::kWalk);
+		//m_nowAnimIndex = e_AnimIndex::kWalk;
+
+	}
+	if (rate >= 0.8f && m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		float speed = kMaxSpeedP * rate;
 		move = VScale(move, speed);
 
 		//走っている間アニメーション
@@ -421,7 +498,8 @@ void Player::Avoid()
 
 void Player::Jump()
 {
-	//m_pos.y = kJumpPower;
+	m_posDown = VAdd(m_posDown, VGet(0, kJumpPower, 0));
+	//m_posDown.y = kJumpPower;
 	ChangeAnim(e_AnimIndex::kJump);
 }
 

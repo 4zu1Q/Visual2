@@ -28,7 +28,7 @@ private:
 		kSpawn = 74,			//セレクトシーンで最初の演出用
 		kIdle = 41,				//待機
 		kWalk = 90,				//歩き
-		kRun = 54,				//走り
+		kDash = 54,				//走り
 		kSuperRun = 56,			//走り : Speed型のみ
 		kAvoid = 33,			//回避
 		kJump = 45,				//ジャンプ
@@ -180,9 +180,6 @@ protected:
 	//プレイヤーの顔の種類
 	e_PlayerKind m_playerKind;
 
-	//プレイヤーのアニメーション
-	e_AnimIndex m_nowAnimIndex;
-
 	//メンバ関数ポインタ
 	using UpdateFunc_t = void(Player::*)(/*引数書く*/);
 	UpdateFunc_t m_updaFunc;
@@ -223,6 +220,10 @@ protected:
 	bool m_isFaceUse;
 
 	/*アニメーション情報*/
+
+	//プレイヤーのアニメーション
+	e_AnimIndex m_animIndex;
+
 	//int m_equipAnimNo;	//装備しているアニメ番号
 	int m_prevAnimNo;	//前のアニメ番号
 	int m_currentAnimNo;//現在のアニメ番号
@@ -232,6 +233,17 @@ protected:
 	float m_animSpeed;			//アニメの速度を変えるやつ
 	float m_animBlendRate;		//アニメーションブレンド
 	bool m_isAnimationFinish;	//アニメーションが終わったかどうか
+
+	/*アニメーションフラグ*/
+	bool m_isAnimIdle;
+	bool m_isAnimAttack;
+	bool m_isAnimWalk;
+	bool m_isAnimDash;
+	bool m_isAnimAttackX;
+	bool m_isAnimAttackY;
+	bool m_isAnimDamage;
+	bool m_isAnimDown;
+
 
 	//顔の保持しているかどうかのフラグ
 	bool m_isPowerFace;
