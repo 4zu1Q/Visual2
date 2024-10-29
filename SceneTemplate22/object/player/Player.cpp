@@ -37,17 +37,12 @@ namespace
 	constexpr float kAnalogRangeMax = 0.8f;
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
-	//移動速度：ノーマル
-	constexpr float kMaxSpeedN = 1.5f;
+	//移動速度
+	constexpr float kMaxSpeedN = 1.0f;
 	constexpr float kMinSpeedN = 0.6f;
 
-	//移動速度：パワー
-	constexpr float kMaxSpeedP = 0.8f;
-	constexpr float kMinSpeedP = 0.3f;
-
-	//移動速度：スピード
-	constexpr float kMaxSpeedS = 3.0f;
-	constexpr float kMinSpeedS = 1.5f;
+	//ダッシュスピード
+	constexpr float kDashSpeed = 1.5f;
 
 	//ジャンプ力
 	constexpr float kJumpPower = 10.0f;
@@ -73,7 +68,8 @@ Player::Player() :
 	m_analogZ(0),
 	m_hp(10),
 	m_cameraAngle(0.0f),
-	m_isDead(false)
+	m_isDead(false),
+	m_isMove(false)
 {
 
 	/*マスク関連の初期化*/
@@ -104,14 +100,13 @@ Player::Player() :
 	m_animIndex = e_AnimIndex::kIdle;
 
 	m_isAnimIdle = false;
-	m_isAnimAttack = false;
 	m_isAnimWalk = false;
 	m_isAnimDash = false;
 	m_isAnimAttackX = false;
 	m_isAnimAttackY = false;
 	m_isAnimDamage = false;
 	m_isAnimDown = false;
-
+	m_isAnimJump = false;
 
 	//モデルのロード
 	m_modelH = MV1LoadModel(kModelFilename);
@@ -143,11 +138,10 @@ void Player::Initialize(VECTOR pos)
 	m_pWeapon->Load();
 	m_pWeapon->Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
 
-	//攻撃するアニメーションを設定
-	//m_equipAnimNo = MV1AttachAnim(m_modelH, e_AnimIndex::kNormalAttack);
-
 	//待機アニメーションを設定
-	m_currentAnimNo = MV1AttachAnim(m_modelH, e_AnimIndex::kIdle);
+	m_currentAnimNo = MV1AttachAnim(m_modelH, e_AnimIndex::kIdle, -1, false);
+	m_prevAnimNo = -1;
+	m_animBlendRate = 1.0f;
 
 	// メンバ関数ポインタ = &クラス名::入れたい関数
 	m_updaFunc = &Player::Move;
@@ -191,16 +185,17 @@ void Player::Update()
 
 
 	//仮重力
-	m_posDown.y -= 2.2f;
+	m_posDown.y -= 1.2f;
 
-	//m_upPower = max(m_upPower - (0.8f * 0.5f), -1.0f);
-	//m_pos.y = m_upPower;
 
 	//仮地面
 	if (m_posDown.y < 0)
 	{
 		m_posDown.y = 0;
 	}
+	
+	//顔を選択する関数
+	FaceSelect();
 
 	/*フレームにアタッチするための更新処理*/
 	m_pWeapon->SwordUpdate();
@@ -210,49 +205,96 @@ void Player::Update()
 	m_pWeapon->LongSwordUpdate();
 
 	//アップデート
-	(this->*m_updaFunc)(/*引数入れる*/);
-
-	//移動関数
-	m_updaFunc = &Player::Move;
-	//Move();
+	//(this->*m_updaFunc)(/*引数入れる*/);
 	
-
-	//顔を選択する関数
-	FaceSelect();
-
-	//Aボタンを押した場合
-	if (Pad::IsTrigger(PAD_INPUT_1))
+	if (!m_isAnimAttackX && !m_isAnimAttackY /*&& !m_isAnimAvoid*/ && !m_isAnimDamage)
 	{
-		//ジャンプする関数を呼び出す
-		m_updaFunc = &Player::Jump;
+		//攻撃X
+		if (Pad::IsTrigger(PAD_INPUT_3) && !m_isAnimJump)
+		{
+			//m_updaFunc = &Player::AttackX;
+			//ノーマル時のX攻撃
+			ChangeAnim(e_AnimIndex::kNormalAttack);
+			m_isAnimAttackX = true;
+			m_isMove = true;
+		}
+		else
+		{
+			if (m_isMove)
+			{
+				Move();
+			}
+		}
+
+		//攻撃Y
+		if (Pad::IsTrigger(PAD_INPUT_4) && !m_isAnimJump)
+		{
+
+			//m_updaFunc = &Player::AttackY;
+			//ノーマル時のY攻撃
+			ChangeAnim(e_AnimIndex::kNormalSkill);
+			m_isAnimAttackY = true;
+			m_isMove = false;
+
+		}
+		else
+		{
+			if (!m_isMove)
+			{
+				Move();
+
+			}
+		}
+
+	}
+	else
+	{
+		//攻撃アニメーションが終了したら待機アニメーションを再生する
+		if (m_isAnimationFinish)
+		{
+			m_isAnimAttackX = false;
+			m_isAnimAttackY = false;
+			m_isAnimDash = false;
+		}
 	}
 
 	//Bボタンを押した場合
 	if (Pad::IsTrigger(PAD_INPUT_2))
 	{
+		ChangeAnim(e_AnimIndex::kJump);
+		m_isAnimJump = true;
+		//Jump();
+		Avoid();
+
 		//回避する関数を呼び出す
-		m_updaFunc = &Player::Avoid;
+		//m_updaFunc = &Player::Avoid;
 	}
-
-	//Xボタンを押した場合
-	if (Pad::IsTrigger(PAD_INPUT_3))
+	else
 	{
-		//攻撃する関数を呼び出す
-		m_updaFunc = &Player::Attack;
+		//アニメーションが終わったら
+		if (m_isAnimationFinish)
+		{
+			m_isAnimJump = false;
+		}
 	}
 
-	//Yボタンを押した場合
-	if (Pad::IsTrigger(PAD_INPUT_4))
+
+	//ダメージを受けた時のアニメーション
+	if (m_isAnimDamage)
 	{
-		//m_updaFunc = &PlayerBase::Move;
-		//ChangeAnim(e_AnimIndex::kNormalSkill);
-
-		//特殊攻撃する関数を呼び出す
-		//FaceAttack();
+		ChangeAnim(e_AnimIndex::kJump);
+		m_isAnimAvoid = true;
+	}
+	else
+	{
+		//アニメーションが終わったら
+		if (m_isAnimationFinish)
+		{
+			m_isAnimDamage = false;
+		}
 	}
 
-
-
+	//カプセル用のポジション
 	m_posUp = VGet(m_posDown.x, m_posDown.y + 8.0f, m_posDown.z);
 
 	//モデルに座標をセットする
@@ -335,26 +377,22 @@ void Player::Move()
 	rate = max(rate, 0.0f);
 
 	//スティックの押し加減でプレイヤーのスピードを変える
-
-
-	
-	//ノーマル時
-	if (rate <= 0.8f && rate > 0.0f && !m_isFaceUse);
+	if (rate <= 0.6f && rate > 0.0f && !m_isFaceUse);
 	{
 		float speed = kMinSpeedN * rate;
 		move = VScale(move, speed);
 	}
-
-	if (rate >= 0.8f && !m_isFaceUse)
+	if (rate >= 0.6f && !m_isFaceUse)
 	{
 		float speed = kMaxSpeedN * rate;
 		move = VScale(move, speed);
 	}
 
+
 	//歩きのアニメーション
 	if (VSize(move) != 0.0f)
 	{
-		if (!m_isAnimWalk)
+		if (!m_isAnimWalk && !m_isAnimJump)
 		{
 			ChangeAnim(e_AnimIndex::kWalk);
 			m_animIndex = e_AnimIndex::kWalk;
@@ -366,61 +404,27 @@ void Player::Move()
 		m_isAnimWalk = false;
 	}
 
-	if (VSize(move) > 0.8f)
+	if (Pad::IsPress(PAD_INPUT_1) /*&& m_stamina >= 0.0f*/ && VSize(move) != 0.0f )
 	{
-		if (!m_isAnimDash)
+		float speed = kDashSpeed * rate;
+		move = VScale(move, speed);
+
+		if (!m_isAnimDash && !m_isAnimJump)
 		{
 			ChangeAnim(e_AnimIndex::kDash);
 			m_animIndex = e_AnimIndex::kDash;
 		}
 		m_isAnimDash = true;
+
 	}
 	else
 	{
+		if (m_isAnimDash && m_isAnimWalk && !m_isAnimJump)
+		{
+			ChangeAnim(e_AnimIndex::kWalk);
+			m_animIndex = e_AnimIndex::kWalk;
+		}
 		m_isAnimDash = false;
-	}
-
-		 
-	//スピード時
-	if (rate <= 0.8f && rate > 0.0f && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse);
-	{
-		float speed = kMinSpeedS * rate;
-		move = VScale(move, speed);
-
-		//歩いている間アニメーション
-		//ChangeAnim(e_AnimIndex::kWalk);
-		//m_nowAnimIndex = e_AnimIndex::kWalk;
-
-	}
-	if (rate >= 0.8f && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		float speed = kMaxSpeedS * rate;
-		move = VScale(move, speed);
-
-		//走っている間アニメーション
-		//ChangeAnim(e_AnimIndex::kRun);
-		//m_nowAnimIndex = e_AnimIndex::kRun;
-	}
-
-	//スピード時
-	if (rate <= 0.8f && rate > 0.0f && m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse);
-	{
-		float speed = kMinSpeedP * rate;
-		move = VScale(move, speed);
-
-		//歩いている間アニメーション
-		//ChangeAnim(e_AnimIndex::kWalk);
-		//m_nowAnimIndex = e_AnimIndex::kWalk;
-
-	}
-	if (rate >= 0.8f && m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		float speed = kMaxSpeedP * rate;
-		move = VScale(move, speed);
-
-		//走っている間アニメーション
-		//ChangeAnim(e_AnimIndex::kRun);
-		//m_nowAnimIndex = e_AnimIndex::kRun;
 	}
 
 	//カメラのいる場所(角度)から
@@ -444,63 +448,60 @@ void Player::Move()
 
 	m_attackPos = VAdd(m_posDown, attackMove);
 
+	//キャラクターが移動していない場合
+	if (!m_isAnimDash && !m_isAnimWalk && !m_isAnimIdle)
+	{
+		ChangeAnim(e_AnimIndex::kIdle);
+		m_animIndex = e_AnimIndex::kIdle;
+		m_isAnimIdle = true;
+	}
+	else
+	{
+		if (m_isAnimationFinish)
+		{
+			m_isAnimIdle = false;
+		}
+	}
+
+	//HPがゼロより下にいった場合
+	if (m_hp <= 0)
+	{
+		m_hp = 0;
+	}
 
 }
 
-void Player::Attack()
+void Player::AttackX()
 {
-	//攻撃
-	ChangeAnim(e_AnimIndex::kNormalAttack);
 
 }
 
-void Player::FaceAttack()
+void Player::AttackY()
 {
-
-	//特殊1
-	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		//ここにパワーアタック用の処理を入れる予定
-		printfDx("kPowerPlayer");
-	}
-	//特殊2
-	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		//ここにスピードアタック用の処理を入れる予定
-		printfDx("kSpeedPlayer");
-	}
-	//特殊3
-	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		//ここにショットアタック用の処理を入れる予定
-		printfDx("kShotPlayer");
-	}
-	//特殊4
-	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
-	{
-		//ここにストロンゲストアタック用の処理を入れる予定
-		printfDx("kStrongestPlayer");
-	}
 
 }
 
 void Player::Avoid()
 {
 
-	VECTOR avoid = VScale(m_avoid, 10.0f);
-	m_move = VAdd(m_move, avoid);
+	//VECTOR avoid = VScale(m_avoid, 10.0f);
+	//m_move = VAdd(m_move, avoid);
 
-	//m_pos = VAdd(m_pos, m_move);
+	////m_pos = VAdd(m_pos, m_move);
 
-	ChangeAnim(e_AnimIndex::kAvoid);
+	//ChangeAnim(e_AnimIndex::kAvoid);
 
+	//VECTOR avoid = VScale(m_avoid, 10.0f);
+	//m_move = VAdd(m_move, avoid);
+
+	//m_posDown = VAdd(m_posDown, m_move);
 }
 
 void Player::Jump()
 {
 	m_posDown = VAdd(m_posDown, VGet(0, kJumpPower, 0));
 	//m_posDown.y = kJumpPower;
-	ChangeAnim(e_AnimIndex::kJump);
+	//ChangeAnim(e_AnimIndex::kJump);
 }
 
 void Player::FaceSelect()

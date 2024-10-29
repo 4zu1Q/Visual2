@@ -316,6 +316,7 @@ void Player::Update()
 	
 
 	//ShaderUpdate();
+	
 
 	//Hpのアニメーション
 	static float SinCount = 0;

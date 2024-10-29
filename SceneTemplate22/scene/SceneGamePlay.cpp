@@ -5,6 +5,7 @@
 #include "ScenePause.h"
 
 #include "object/player/Player.h"
+#include "object/boss/BossPower.h"
 #include "object/item/ItemBase.h"
 #include "object/SkyDome.h"
 #include "object/Camera.h"
@@ -44,13 +45,15 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
 	m_pItem = std::make_shared<ItemBase>();
+	m_pBoss = std::make_shared<BossPower>();
 
 	m_playerPos = VGet(0, 0, 20);
 	m_cameraPos = VGet(0, 0, 0);
 
 	//初期位置をセット
 	m_pPlayer->Initialize(m_playerPos);
-	
+	m_pBoss->Initialize();
+
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -89,6 +92,7 @@ void SceneGamePlay::Update()
 	//m_pCamera->DebugUpdate();
 	m_pSkyDome->Update();
 	m_pPlayer->Update();
+	m_pBoss->Update();
 	m_pFaceUi->Update();
 	m_pHpBar->Update(*m_pPlayer);
 
@@ -114,6 +118,7 @@ void SceneGamePlay::Draw()
 	m_pCamera->Draw();
 	m_pSkyDome->Draw();
 	m_pPlayer->Draw();
+	m_pBoss->Draw();
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pHpBar->Draw();
 

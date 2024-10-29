@@ -11,6 +11,7 @@ class SkyDome;
 class HpBar;
 class FaceUi;
 class ItemBase;
+class BossPower;
 
 class SceneGamePlay :
 	public SceneBase
@@ -44,6 +45,7 @@ private:
 	std::shared_ptr<HpBar> m_pHpBar;
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<ItemBase> m_pItem;
+	std::shared_ptr<BossPower> m_pBoss;
 
 	//
 	VECTOR m_playerPos;

@@ -134,12 +134,12 @@ private:
 	/// <summary>
 	/// プレイヤーの攻撃時の関数
 	/// </summary>
-	void Attack();
+	void AttackX();
 
 	/// <summary>
 	/// プレイヤーの特殊攻撃時の関数
 	/// </summary>
-	void FaceAttack();
+	void AttackY();
 
 	/// <summary>
 	/// プレイヤーが回避時の関数
@@ -208,6 +208,9 @@ protected:
 	//死んだかどうかを判定
 	bool m_isDead;
 
+	//動けるか動けないかのフラグ
+	bool m_isMove;
+
 	//
 	float m_lange;
 
@@ -236,9 +239,10 @@ protected:
 
 	/*アニメーションフラグ*/
 	bool m_isAnimIdle;
-	bool m_isAnimAttack;
 	bool m_isAnimWalk;
 	bool m_isAnimDash;
+	bool m_isAnimJump;
+	bool m_isAnimAvoid;
 	bool m_isAnimAttackX;
 	bool m_isAnimAttackY;
 	bool m_isAnimDamage;
