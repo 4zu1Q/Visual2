@@ -78,6 +78,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;$(ProjectDir)scene;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -95,6 +96,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;$(ProjectDir)scene;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -112,6 +114,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;$(ProjectDir)scene;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -129,6 +132,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>C:\DxLib_VC\プロジェクトに追加すべきファイル_VC用;$(ProjectDir)scene;$(ProjectDir)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -166,10 +170,11 @@
     <ClCompile Include="ui\FaceUi.cpp" />
     <ClCompile Include="ui\HpBar.cpp" />
     <ClCompile Include="util\ActionTime.cpp" />
+    <ClCompile Include="util\AnimController.cpp" />
     <ClCompile Include="util\Collision.cpp" />
-    <ClCompile Include="util\Input.cpp" />
     <ClCompile Include="util\Pad.cpp" />
     <ClCompile Include="util\SoundManager.cpp" />
+    <ClCompile Include="util\StringUtility.cpp" />
     <ClCompile Include="util\Time.cpp" />
     <ClCompile Include="util\Vec2.cpp" />
     <ClCompile Include="util\Vec3.cpp" />
@@ -201,11 +206,12 @@
     <ClInclude Include="ui\FaceUi.h" />
     <ClInclude Include="ui\HpBar.h" />
     <ClInclude Include="util\ActionTime.h" />
+    <ClInclude Include="util\AnimController.h" />
     <ClInclude Include="util\Collision.h" />
     <ClInclude Include="util\Game.h" />
-    <ClInclude Include="util\Input.h" />
     <ClInclude Include="util\Pad.h" />
     <ClInclude Include="util\SoundManager.h" />
+    <ClInclude Include="util\StringUtility.h" />
     <ClInclude Include="util\Time.h" />
     <ClInclude Include="util\Vec2.h" />
     <ClInclude Include="util\Vec3.h" />

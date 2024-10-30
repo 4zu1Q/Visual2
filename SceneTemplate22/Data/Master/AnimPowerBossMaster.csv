@@ -1,0 +1,16 @@
+ID,名前,スピード
+Idle,Idle,1
+Spawn,Spawn_Ground_Skeletons,1
+Walk,Walking_B,1
+Dash,Running_A,1
+Jump,Jump_Start,1
+Jumping,Jump_Idle,1
+NormalAttackX,1H_Melee_Attack_Slice_Diagonal,1
+NormalAttackY,1H_Melee_Attack_Stab,1
+PowerAttackX,2H_Melee_Attack_Slice,1
+PowerAttackY,2H_MeleeAttack_Stab,1
+SpeedAttackX,Dualwield_Melee_Attack_Chop,1
+SpeedAttackY,Dualwield_Melee_Attack_Stab,1
+Hit,Hit_A,1
+Down,Death_B,1
+DownPose,Death_B_Pose,1

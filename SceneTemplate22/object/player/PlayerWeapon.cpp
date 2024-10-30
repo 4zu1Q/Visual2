@@ -53,10 +53,6 @@ void PlayerWeapon::Initialize(int modelH, int modelRightFrame, int modelLeftFram
 	m_modelRightFrame = modelRightFrame;
 	m_modelLeftFrame = modelLeftFrame;
 
-	//武器のモデルのスケール値を設定
-	//MV1SetScale(m_axeModelH, VGet(kModelScale, kModelScale, kModelScale));
-
-	//MV1SetScale(m_daggerModelH, VGet(kModelScale, kModelScale, kModelScale));
 }
 
 void PlayerWeapon::Finalize()

@@ -15,9 +15,7 @@ public:
 
 	////
 	//bool ItemSphereFlag(std::shared_ptr<Player> pPlayer, std::shared_ptr<BossBase> pBoss);
-
 	//bool ItemSphereFlag(std::shared_ptr<Player> pPlayer);
-
 	//bool ItemSphereFlag(std::shared_ptr<Player> pPlayer);
 
 

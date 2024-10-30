@@ -3,6 +3,7 @@
 #include <memory>
 
 class PlayerWeapon;
+class AnimController;
 
 class Player
 {
@@ -18,40 +19,6 @@ public:
 	};
 
 private:
-
-	//プレイヤーのアニメーションの種類
-	const enum e_AnimIndex : int
-	{
-
-		kNone = -1,				//なし
-		kUnknown,				//不明
-		kSpawn = 74,			//セレクトシーンで最初の演出用
-		kIdle = 41,				//待機
-		kWalk = 90,				//歩き
-		kDash = 54,				//走り
-		kSuperRun = 56,			//走り : Speed型のみ
-		kAvoid = 33,			//回避
-		kJump = 45,				//ジャンプ
-		kHit = 39,				//ダメージが入った時
-		kDown = 27,				//プレイヤーのHPが無くなった状態
-		kDownPause = 28,		//プレイヤーのHPがなくなった状態のポーズ
-
-		kNormalAttack = 4,				//攻撃 : Normal型
-		kNormalSkill = 12,				//スキル : Normal型
-
-		kPowerAttack = 14,				//攻撃 : Power型
-		kPowerSkill = 10,				//スキル : Power型
-
-		kSpeedAttack = 36,				//攻撃 : Speed型
-		kSpeedSkill = 38,				//スキル : Speed型
-
-		kShotAttack = 16,				//攻撃 : Shot型
-		kShotSkill = 8,					//スキル : Shot型
-
-		kStrongestAttack = 11,			//攻撃 : Strongest型
-		kStrongestSkill = 14,			//スキル : Strongest型 
-
-	};
 
 public:
 
@@ -121,61 +88,39 @@ public:
 
 private:
 
-	/// <summary>
-	/// 武器の描画関数
-	/// </summary>
+	/*アップデート処理*/
+	void IdleUpdate();
+
+	void WalkUpdate();
+	void DashUpdate();
+	void JumpUpdate();
+	void AttackXUpdate();
+	void AttackYUpdate();
+	void HitUpdate();
+	void DeadUpdate();
+
+	/*アップデート処理に移動させるための関数*/
+	void OnIdle();
+	void OnWalk();
+	void OnDash();
+	void OnJump();
+	void OnAttackX();
+	void OnAttackY();
+	void OnHit();
+	void OnDown();
+
+	//武器を描画するだけの関数
 	void WeaponDraw();
-
-	/// <summary>
-	/// プレイヤーの移動時の関数
-	/// </summary>
-	void Move();
-
-	/// <summary>
-	/// プレイヤーの攻撃時の関数
-	/// </summary>
-	void AttackX();
-
-	/// <summary>
-	/// プレイヤーの特殊攻撃時の関数
-	/// </summary>
-	void AttackY();
-
-	/// <summary>
-	/// プレイヤーが回避時の関数
-	/// </summary>
-	void Avoid();
-
-	/// <summary>
-	/// プレイヤーがジャンプする時の関数
-	/// </summary>
-	void Jump();
-
+	
 	/// <summary>
 	/// プレイヤーが顔を使用時の関数
 	/// </summary>
 	void FaceSelect();
 
-	/// <summary>
-	/// アニメーションの更新処理する関数
-	/// </summary>
-	/// <param name="attachNo">進行させたいアニメーション番号</param>
-	/// <param name="startTime">スタートする時間</param>
-	/// <returns>ループしたかどうか</returns>
-	bool IsUpdateAnim(int attachNo, float startTime = 0.0f);
-
-	/// <summary>
-	/// アニメーションの変更する関数
-	/// </summary>
-	/// <param name="animIndex">変更後のアニメーション番号</param>
-	/// <param name="animSpeed">アニメーションを進行させるスピード</param>
-	void ChangeAnim(int animIndex);
-
-
-
-protected:
+private:
 
 	std::shared_ptr<PlayerWeapon> m_pWeapon;
+	std::shared_ptr<AnimController> m_pAnim;
 
 	//プレイヤーの顔の種類
 	e_PlayerKind m_playerKind;
@@ -198,6 +143,7 @@ protected:
 
 	VECTOR m_avoid;
 	VECTOR m_move;
+	float m_rate;
 
 	//回転
 	float m_angle;
@@ -221,21 +167,6 @@ protected:
 
 	//顔を装着しているかしていないかの変数
 	bool m_isFaceUse;
-
-	/*アニメーション情報*/
-
-	//プレイヤーのアニメーション
-	e_AnimIndex m_animIndex;
-
-	//int m_equipAnimNo;	//装備しているアニメ番号
-	int m_prevAnimNo;	//前のアニメ番号
-	int m_currentAnimNo;//現在のアニメ番号
-	//0.0f:prevが再生
-	//1.0f:currntが再生
-
-	float m_animSpeed;			//アニメの速度を変えるやつ
-	float m_animBlendRate;		//アニメーションブレンド
-	bool m_isAnimationFinish;	//アニメーションが終わったかどうか
 
 	/*アニメーションフラグ*/
 	bool m_isAnimIdle;

@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "BossBase.h"
+
 class BossPower :
 	public BossBase
 {

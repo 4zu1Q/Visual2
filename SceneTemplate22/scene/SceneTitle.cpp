@@ -19,11 +19,11 @@ namespace
 	constexpr VECTOR kTitleLogoPos = { 40.0f , 40.0f };
 	
 	//スタートのポジション
-	constexpr VECTOR kStartPos = { 40.0f , 40.0f };
+	constexpr VECTOR kStartPos = { 900.0f , 320.0f };
 	//オプションのポジション
-	constexpr VECTOR kOptionPos = { 40.0f , 40.0f };
+	constexpr VECTOR kOptionPos = { 900.0f , 440.0f };
 	//やめるのポジション
-	constexpr VECTOR kQuitPos = { 40.0f , 40.0f };
+	constexpr VECTOR kQuitPos = { 900.0f , 560.0f };
 }
 
 SceneTitle::SceneTitle(SceneManager& manager):

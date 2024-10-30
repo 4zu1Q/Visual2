@@ -34,6 +34,13 @@ namespace Game
 	//ウィンドウカラーモード
 	constexpr int kColorDepth = 32; //16 or 32
 
+	//ステージ名
+	enum class e_StageKind
+	{
+		kPowerPlayer,		//パワー型
+		kSpeedPlayer,		//スピード型
+		kShotPlayer,		//ラスボス型
+	};
 
 
 }

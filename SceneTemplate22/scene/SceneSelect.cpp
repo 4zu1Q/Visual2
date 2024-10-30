@@ -52,7 +52,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pTomb = std::make_shared<Tomb>();
 
 
-	m_playerPos = VGet(0, 0, -20);
+	m_playerPos = VGet(0, 0, -120);
 	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize(m_playerPos);

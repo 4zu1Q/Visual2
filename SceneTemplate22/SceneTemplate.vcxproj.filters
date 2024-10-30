@@ -102,9 +102,6 @@
     <ClCompile Include="util\Vec3.cpp">
       <Filter>ソース ファイル\util</Filter>
     </ClCompile>
-    <ClCompile Include="util\Input.cpp">
-      <Filter>ソース ファイル\util</Filter>
-    </ClCompile>
     <ClCompile Include="scene\ScenePause.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
@@ -159,6 +156,12 @@
     <ClCompile Include="object\Tomb.cpp">
       <Filter>ソース ファイル\object</Filter>
     </ClCompile>
+    <ClCompile Include="util\AnimController.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\StringUtility.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -204,9 +207,6 @@
       <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
     <ClInclude Include="util\Vec3.h">
-      <Filter>ヘッダー ファイル\util</Filter>
-    </ClInclude>
-    <ClInclude Include="util\Input.h">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
     <ClInclude Include="scene\ScenePause.h">
@@ -262,6 +262,12 @@
     </ClInclude>
     <ClInclude Include="object\Tomb.h">
       <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+    <ClInclude Include="util\AnimController.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\StringUtility.h">
+      <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
