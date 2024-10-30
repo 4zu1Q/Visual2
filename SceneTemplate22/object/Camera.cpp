@@ -48,6 +48,8 @@ void Camera::Finalize()
 
 void Camera::Update(Player& player)
 {
+
+
 	//アナログスティックを使ってカメラ回転
 	int analogX = 0;
 	int analogZ = 0;
@@ -57,7 +59,7 @@ void Camera::Update(Player& player)
 
 	// カメラに位置を反映
 	//注視点の座標
-	VECTOR playerAimPos = VGet(player.GetPosDown().x, player.GetPosDown().y, player.GetPosDown().z);
+	VECTOR playerAimPos = VGet(player.GetPosDown().x , player.GetPosDown().y, player.GetPosDown().z);
 	//ベクトルの方向(注視点-カメラのポジション)
 	VECTOR posToAim = VSub(playerAimPos, m_pos);
 

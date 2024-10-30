@@ -144,7 +144,9 @@ void Player::Initialize(VECTOR pos)
 	m_animBlendRate = 1.0f;
 
 	// メンバ関数ポインタ = &クラス名::入れたい関数
-	m_updaFunc = &Player::Move;
+	//m_updaFunc = &Player::Move;
+
+
 }
 
 void Player::Finalize()
@@ -154,6 +156,7 @@ void Player::Finalize()
 	m_modelH = -1;
 
 	m_pWeapon->Finalize();
+
 }
 
 void Player::Update()
@@ -305,7 +308,6 @@ void Player::Update()
 
 void Player::Draw()
 {
-
 	//武器の描画
 	WeaponDraw();
 

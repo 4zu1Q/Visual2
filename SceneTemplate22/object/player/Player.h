@@ -199,6 +199,7 @@ protected:
 	VECTOR m_avoid;
 	VECTOR m_move;
 
+	//回転
 	float m_angle;
 	float m_radius;
 
@@ -212,8 +213,7 @@ protected:
 	bool m_isMove;
 
 	//
-	float m_lange;
-
+	float m_range;
 
 	//アナログスティック用の変数
 	int m_analogX;
@@ -247,7 +247,6 @@ protected:
 	bool m_isAnimAttackY;
 	bool m_isAnimDamage;
 	bool m_isAnimDown;
-
 
 	//顔の保持しているかどうかのフラグ
 	bool m_isPowerFace;
