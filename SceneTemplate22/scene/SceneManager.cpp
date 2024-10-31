@@ -113,6 +113,8 @@ void SceneManager::DrawDebug()
 {
 	//処理バーの表示　
 	//説明
+#ifdef _DEBUG
+
 	DrawString(kUpdateBarStringPosX, kUpdateBarStringPosY, "処理", 0xffffff, 0x000000);
 	DrawBox(kExplainUpdateBarPosX1, kExplainUpdateBarPosY1, kExplainUpdateBarPosX2, kExplainUpdateBarPosY2, kUpdateBarColor, true);
 	DrawString(kDrawBarPosStringPosX, kDrawBarPosStringPosY, "描画", 0xffffff, 0x000000);
@@ -125,4 +127,7 @@ void SceneManager::DrawDebug()
 	rate = static_cast<float>(m_updateTime) / 16666.6f;
 	width = static_cast<float>(Game::kScreenWidth * rate);
 	DrawBox(kBarPosX, kBarPosY, static_cast<int>(width), Game::kScreenHeight, kUpdateBarColor, true);
+
+#endif
+
 }

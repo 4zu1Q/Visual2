@@ -254,14 +254,7 @@ void SceneSelect::Draw()
 
 	DrawString(0, 0, "Scene Select", 0xffffff, false);
 
-	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
-
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kPowerTypeBoss) * kTextIntervalY, 0xffffff, "Power Boss");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSpeedTypeBoss) * kTextIntervalY, 0xffffff, "Speed Boss");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kShooterTypeBoss) * kTextIntervalY, 0xffffff, "Shooter Boss");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRastBoss) * kTextIntervalY, 0xffffff, "Rast Boss");
-
 //#endif
 
-	DrawFade();
+	DrawBlackFade();
 }

@@ -36,9 +36,14 @@ protected:
 	void UpdateFade();
 
 	/// <summary>
-	/// フェードの描画関数
+	/// 黒いフェードの描画関数
 	/// </summary>
-	void DrawFade() const;
+	void DrawBlackFade() const;
+
+	/// <summary>
+	/// 白いフェードの描画関数
+	/// </summary>
+	void DrawWhiteFade() const;
 
 	/// <summary>
 	/// フェードアウト開始

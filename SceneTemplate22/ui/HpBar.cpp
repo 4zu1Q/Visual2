@@ -37,7 +37,6 @@ void HpBar::Update(Player& player)
 {
 
 	m_playerHp = player.GetHp();
-	m_bossHp = m_pBoss->GetHp();
 
 
 }

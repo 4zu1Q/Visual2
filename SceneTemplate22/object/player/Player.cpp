@@ -25,11 +25,11 @@ namespace
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
 	//移動速度
-	constexpr float kMaxSpeedN = 1.0f;
-	constexpr float kMinSpeedN = 0.6f;
+	constexpr float kMaxSpeedN = 0.7f;
+	constexpr float kMinSpeedN = 0.5f;
 
 	//ダッシュスピード
-	constexpr float kDashSpeed = 1.5f;
+	constexpr float kDashSpeed = 1.0f;
 
 	//ジャンプ力
 	constexpr float kJumpPower = 10.0f;
@@ -58,17 +58,18 @@ namespace
 	const char* const kAnimSpeedAttackY = "SpeedAttackY";
 	
 	const char* const kAnimJump = "Jump";
-	const char* const kAnimJumping = "Jumping";
+	const char* const kAnimAir = "Jumping";
 
 	const char* const kAnimHit = "Hit";
-	const char* const kAnimDown = "Down";
-	const char* const kAnimDownPose = "DownPose";
+	const char* const kAnimDead = "Down";
+	const char* const kAnimDeadPose = "DownPose";
 
 
 }
 
 Player::Player() :
 	m_modelH(-1),
+	m_weaponH(-1),
 	m_radius(2),
 	m_posDown(kInitPos),
 	m_posUp(kInitPos),
@@ -109,7 +110,9 @@ Player::Player() :
 	m_isAnimAttackY = false;
 	m_isAnimDamage = false;
 	m_isAnimDown = false;
-	m_isAnimJump = false;
+
+
+	m_isJump = false;
 
 	//モデルのロード
 	m_modelH = MV1LoadModel(kModelFilename);
@@ -159,9 +162,19 @@ void Player::Finalize()
 
 void Player::Update()
 {
+
 	//アップデート
 	(this->*m_updaFunc)();
 
+	/*フレームにアタッチするための更新処理*/
+	m_pWeapon->SwordUpdate();
+	m_pWeapon->AxeUpdate();
+	m_pWeapon->DaggerUpdate();
+	m_pWeapon->MagicWandUpdate();
+	m_pWeapon->LongSwordUpdate();
+
+
+	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
 	//仮重力
@@ -171,64 +184,21 @@ void Player::Update()
 	if (m_posDown.y < 0)
 	{
 		m_posDown.y = 0;
+		m_isJump = false;
 	}
-	
-	/*プレイヤーの移動*/
-	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
-	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
-	float len = VSize(move);
-	float rate = len / kAnalogInputMax;
+	else
+	{
+		m_isJump = true;
+	}
 
-	//速度が決定できるので移動ベクトルに反映する
-	move = VNorm(move);
-	m_move = move;
-
-	//アナログスティック無効な範囲を除外する
-	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	rate = min(rate, 1.0f);
-	rate = max(rate, 0.0f);
-
-	//
-	m_rate = rate;
 
 	//顔を選択する関数
 	FaceSelect();
 
-	/*フレームにアタッチするための更新処理*/
-	m_pWeapon->SwordUpdate();
-	m_pWeapon->AxeUpdate();
-	m_pWeapon->DaggerUpdate();
-	m_pWeapon->MagicWandUpdate();
-	m_pWeapon->LongSwordUpdate();
-
-	//ジャンプ
-	if (Pad::IsTrigger(PAD_INPUT_2))
-	{
-		OnJump();
-	}
-
-	//Xアタック
-	if (Pad::IsPress(PAD_INPUT_3))
-	{
-		OnAttackX();
-	}
-
-	//Yアタック
-	if (Pad::IsTrigger(PAD_INPUT_4))
-	{
-		OnAttackY();
-	}
-
-	//歩き
-	if (VSize(move) != 0.0f)
-	{
-		OnWalk();
-	}
-
 
 
 	//カプセル用のポジション
-	m_posUp = VGet(m_posDown.x, m_posDown.y + 8.0f, m_posDown.z);
+	m_posUp = VGet(m_posDown.x, m_posDown.y + kUpPos.y, m_posDown.z);
 
 	//モデルのポジションを合わせるよう
 	VECTOR modelPos = VGet(m_posDown.x, m_posDown.y, m_posDown.z);
@@ -253,17 +223,20 @@ void Player::Draw()
 
 	//モデルの描画
 	MV1DrawModel(m_modelH);
+	MV1DrawModel(m_weaponH);
 
 #ifdef _DEBUG
 
 	DrawSphere3D(m_attackPos, m_radius, 8, 0xff00ff, 0xffffff, false);
 	DrawSphere3D(m_posDown, m_radius, 8, 0xff00ff, 0xffffff, false);
 
-	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
+	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_posDown.x, m_posDown.y, m_posDown.z);
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
 
 	DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
 	DrawFormatString(0, 280, 0x000fff, " PlayerHp : %d ", m_hp);
+
+	DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 
 #endif
 
@@ -271,75 +244,199 @@ void Player::Draw()
 
 void Player::IdleUpdate()
 {
-	
-}
+	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
+	VECTOR input = VGet(m_analogX, 0.0f, -m_analogZ);
 
-//void Player::MoveUpdate()
-//{
-//	/*プレイヤーの移動*/
-//	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
-//	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
-//	float len = VSize(move);
-//	float rate = len / kAnalogInputMax;
-//
-//	//速度が決定できるので移動ベクトルに反映する
-//	move = VNorm(move);
-//
-//	//アナログスティック無効な範囲を除外する
-//	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-//	rate = min(rate, 1.0f);
-//	rate = max(rate, 0.0f);
-//
-//	//スティックの押し加減でプレイヤーのスピードを変える
-//	if (rate <= 0.6f && rate > 0.0f);
-//	{
-//		float speed = kMinSpeedN * rate;
-//		move = VScale(move, speed);
-//	}
-//	if (rate >= 0.6f)
-//	{
-//		float speed = kMaxSpeedN * rate;
-//		move = VScale(move, speed);
-//	}
-//
-//	if (Pad::IsPress(PAD_INPUT_1) && VSize(move) != 0.0f)
-//	{
-//		float speed = kDashSpeed * rate;
-//		move = VScale(move, speed);
-//	
-//	}
-//
-//	//カメラのいる場所(角度)から
-//	//コントローラーによる移動方向を決定する
-//	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
-//	move = VTransform(move, mtx);
-//
-//	m_posDown = VAdd(m_posDown, move);
-//	m_move = move;
-//
-//	//動いている間
-//	if (VSquareSize(move) > 0.0f)
-//	{
-//		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-//		m_attackDir = VNorm(move);
-//		m_avoid = VNorm(move);
-//	}
-//	//動かなかったらアイドル状態へ
-//	else
-//	{
-//		OnIdle();
-//	}
-//
-//	VECTOR attackMove = VScale(m_attackDir, 10.0f);
-//
-//	m_attackPos = VAdd(m_posDown, attackMove);
-//
-//}
+	if (VSquareSize(input) != 0.0f)
+	{
+		OnWalk();
+		return;
+	}
+
+	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
+	{
+		OnJump();
+		return;
+	}
+
+	if (Pad::IsTrigger(PAD_INPUT_3))
+	{
+		OnAttackX();
+		return;
+		m_hp -= 1;
+	}
+
+	if (Pad::IsTrigger(PAD_INPUT_4))
+	{
+		OnAttackY();
+		return;
+	}
+
+	//HPがゼロより下にいった場合
+	if (m_hp < 0)
+	{
+		OnDead();
+		return;
+	}
+}
 
 void Player::WalkUpdate()
 {
 	/*プレイヤーの移動*/
+	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
+	float len = VSize(move);
+
+	float rate = len / kAnalogInputMax;
+
+	//アナログスティック無効な範囲を除外する
+	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	rate = min(rate, 1.0f);
+	rate = max(rate, 0.0f);
+
+	//動いている間
+	if (len > 0.0f)
+	{
+
+		//速度が決定できるので移動ベクトルに反映する
+		move = VNorm(move);
+
+		//スティックの押し加減でプレイヤーのスピードを変える
+		if (rate <= 0.6f && rate > 0.0f);
+		{
+			float speed = kMinSpeedN * rate;
+			move = VScale(move, speed);
+		}
+		if (rate >= 0.6f)
+		{
+			float speed = kMaxSpeedN * rate;
+			move = VScale(move, speed);
+		}
+
+		//カメラのいる場所(角度)から
+		//コントローラーによる移動方向を決定する
+		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
+		move = VTransform(move, mtx);
+
+		m_posDown = VAdd(m_posDown, move);
+		m_move = move;
+
+		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+		m_attackDir = VNorm(move);
+		m_avoid = VNorm(move);
+	}
+	//動かなかったらアイドル状態へ
+	else
+	{
+		OnIdle();
+		return;
+	}
+
+	//攻撃X
+	if (Pad::IsTrigger(PAD_INPUT_3))
+	{
+		OnAttackX();
+		return;
+	}
+
+	//攻撃Y
+	if (Pad::IsTrigger(PAD_INPUT_4))
+	{
+		OnAttackY();
+		return;
+	}
+
+	//ダッシュ
+	if (Pad::IsPress(PAD_INPUT_1))
+	{
+		OnDash();
+		return;
+	}
+
+	//ジャンプ
+	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
+	{
+		OnJump();
+		return;
+	}
+}
+
+void Player::DashUpdate()
+{
+	//アナログスティックを取得
+	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
+	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
+
+	float len = VSize(move);
+
+	float rate = len / kAnalogInputMax;
+
+	//アナログスティック無効な範囲を除外する
+	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	rate = min(rate, 1.0f);
+	rate = max(rate, 0.0f);
+
+	//動いている間
+	if (VSquareSize(move) > 0.0f)
+	{
+
+		//速度が決定できるので移動ベクトルに反映する
+		move = VNorm(move);
+
+		//ダッシュ
+		float speed = kDashSpeed * rate;
+		move = VScale(move, speed);
+
+		//カメラのいる場所(角度)から
+		//コントローラーによる移動方向を決定する
+		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
+		move = VTransform(move, mtx);
+
+		m_posDown = VAdd(m_posDown, move);
+
+		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+		m_attackDir = VNorm(move);
+		m_avoid = VNorm(move);
+
+		if (Pad::IsRelase(PAD_INPUT_1))
+		{
+			OnWalk();
+		}
+	}
+
+	//攻撃X
+	if (Pad::IsTrigger(PAD_INPUT_3))
+	{
+		OnAttackX();
+	}
+
+	//攻撃Y
+	if (Pad::IsTrigger(PAD_INPUT_4))
+	{
+		OnAttackY();
+	}
+
+	//ジャンプ
+	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
+	{
+		OnJump();
+	}
+
+}
+
+void Player::JumpUpdate()
+{
+	//仮重力
+	m_posDown.y -= 1.2f;
+
+	if (m_pAnim->IsLoop())
+	{
+		OnAir();
+	}
+	//アナログスティックを取得
+	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
+	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
+
 	float len = VSize(move);
 	float rate = len / kAnalogInputMax;
 
@@ -351,17 +448,9 @@ void Player::WalkUpdate()
 	rate = min(rate, 1.0f);
 	rate = max(rate, 0.0f);
 
-	//スティックの押し加減でプレイヤーのスピードを変える
-	if (rate <= 0.6f && rate > 0.0f);
-	{
-		float speed = kMinSpeedN * rate;
-		move = VScale(move, speed);
-	}
-	if (rate >= 0.6f)
-	{
-		float speed = kMaxSpeedN * rate;
-		move = VScale(move, speed);
-	}
+	//ダッシュ
+	float speed = kDashSpeed * rate;
+	move = VScale(move, speed);
 
 	//カメラのいる場所(角度)から
 	//コントローラーによる移動方向を決定する
@@ -369,7 +458,6 @@ void Player::WalkUpdate()
 	move = VTransform(move, mtx);
 
 	m_posDown = VAdd(m_posDown, move);
-	m_move = move;
 
 	//動いている間
 	if (VSquareSize(move) > 0.0f)
@@ -378,22 +466,25 @@ void Player::WalkUpdate()
 		m_attackDir = VNorm(move);
 		m_avoid = VNorm(move);
 	}
-	//動かなかったらアイドル状態へ
-	else
+
+
+
+	m_posDown = VAdd(m_posDown, VGet(0, kJumpPower, 0));
+
+	//仮重力
+	//m_posDown.y = kJumpPower;
+}
+
+void Player::AirUpdate()
+{
+	//仮重力
+	m_posDown.y -= 1.2f;
+
+	if (!m_isJump)
 	{
 		OnIdle();
 	}
 
-	//ダッシュ
-	if (Pad::IsPress(PAD_INPUT_1))
-	{
-		OnDash();
-	}
-}
-
-void Player::DashUpdate()
-{
-	/*プレイヤーの移動*/
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
 	float len = VSize(move);
 	float rate = len / kAnalogInputMax;
@@ -416,51 +507,55 @@ void Player::DashUpdate()
 	move = VTransform(move, mtx);
 
 	m_posDown = VAdd(m_posDown, move);
-	m_move = move;
 
-	//動いている間
-	if (VSquareSize(move) > 0.0f)
-	{
-		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		m_attackDir = VNorm(move);
-		m_avoid = VNorm(move);
-	}
-	//動かなかったらアイドル状態へ
-	else
-	{
-		OnIdle();
-	}
-}
-
-void Player::JumpUpdate()
-{
-	//m_posDown = VAdd(m_posDown, VGet(0, kJumpPower, 0));
-
-	//m_posDown.y -= 1.2f;
-	//m_posDown = VAdd(m_posDown, VGet(0, kJumpPower, 0));
-
-	//仮重力
-	//m_posDown.y = kJumpPower;
-	//ChangeAnim(e_AnimIndex::kJump);
 }
 
 void Player::AttackXUpdate()
 {
+	if (m_pAnim->IsLoop())
+	{
+		OnIdle();
+	}
 
 }
 
 void Player::AttackYUpdate()
 {
+	if (m_pAnim->IsLoop())
+	{
+		OnIdle();
+	}
 
 }
 
 void Player::HitUpdate()
 {
+	if (m_pAnim->IsLoop())
+	{
+		OnIdle();
+	}
+
 }
 
 void Player::DeadUpdate()
 {
+	if (m_pAnim->IsLoop())
+	{
+		OnDeadPose();
+	}
+}
 
+void Player::DeadPoseUpadte()
+{
+
+}
+
+void Player::SpawnUpdate()
+{
+	if (m_pAnim->IsLoop())
+	{
+		OnIdle();
+	}
 }
 
 void Player::WeaponDraw()
@@ -495,158 +590,47 @@ void Player::WeaponDraw()
 	}
 }
 
-//void Player::OnMove()
-//{
-//	m_pAnim->ChangeAnim(kAnimWalk);
-	//m_updaFunc = &Player::MoveUpdate;
-
-	/*プレイヤーの移動*/
-	//GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
-	//VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
-	//float len = VSize(move);
-	//float rate = len / kAnalogInputMax;
-
-	////速度が決定できるので移動ベクトルに反映する
-	//move = VNorm(move);
-
-	////アナログスティック無効な範囲を除外する
-	//rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	//rate = min(rate, 1.0f);
-	//rate = max(rate, 0.0f);
-
-//#if
-//	//スティックの押し加減でプレイヤーのスピードを変える
-//	if (rate <= 0.6f && rate > 0.0f && !m_isFaceUse);
-//	{
-//		float speed = kMinSpeedN * rate;
-//		move = VScale(move, speed);
-//	}
-//	if (rate >= 0.6f && !m_isFaceUse)
-//	{
-//		float speed = kMaxSpeedN * rate;
-//		move = VScale(move, speed);
-//	}
-//
-//
-//	//歩きのアニメーション
-//	if (VSize(move) != 0.0f)
-//	{
-//		//m_updaFunc = &Player::Walk;		
-//		m_pAnim->ChangeAnim(kAnimWalk);
-//
-//	}
-//	else
-//	{
-//		m_isAnimWalk = false;
-//	}
-//
-//
-//	if (Pad::IsPress(PAD_INPUT_1) && VSize(move) != 0.0f)
-//	{
-//		float speed = kDashSpeed * rate;
-//		move = VScale(move, speed);
-//
-//
-//		m_pAnim->ChangeAnim(kAnimDash);
-//
-//
-//
-//		//if (!m_isAnimDash && !m_isAnimJump)
-//		//{
-//		//	//ChangeAnim(e_AnimIndex::kDash);
-//		//	//m_animIndex = e_AnimIndex::kDash;
-//		//}
-//		//m_isAnimDash = true;
-//
-//	}
-//	//else
-//	//{
-//	//	//if (m_isAnimDash && m_isAnimWalk && !m_isAnimJump)
-//	//	//{
-//	//	//	//ChangeAnim(e_AnimIndex::kWalk);
-//	//	//	//m_animIndex = e_AnimIndex::kWalk;
-//	//	//}
-//	//	//m_isAnimDash = false;
-//	//}
-//
-//	//カメラのいる場所(角度)から
-//	//コントローラーによる移動方向を決定する
-//	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
-//	move = VTransform(move, mtx);
-//
-//	m_posDown = VAdd(m_posDown, move);
-//	m_move = move;
-//
-//	//動いている間
-//	if (VSquareSize(move) > 0.0f)
-//	{
-//		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-//		m_attackDir = VNorm(move);
-//		m_avoid = VNorm(move);
-//
-//	}
-//
-//	VECTOR attackMove = VScale(m_attackDir, 10.0f);
-//
-//	m_attackPos = VAdd(m_posDown, attackMove);
-//
-//	//キャラクターが移動していない場合
-//	//if (!m_isAnimDash && !m_isAnimWalk && !m_isAnimIdle)
-//	//{
-//	//	//ChangeAnim(e_AnimIndex::kIdle);
-//	//	//m_animIndex = e_AnimIndex::kIdle;
-//	//	//m_isAnimIdle = true;
-//	//}
-//	//else
-//	//{
-//	//	if (m_isAnimationFinish)
-//	//	{
-//	//		m_isAnimIdle = false;
-//	//	}
-//	//}
-//
-//#endif
-//}
+void Player::OnIdle()
+{
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updaFunc = &Player::IdleUpdate;
+}
 
 void Player::OnWalk()
 {
-	m_isAnimWalk = true;
 	m_pAnim->ChangeAnim(kAnimWalk);
 	m_updaFunc = &Player::WalkUpdate;
 }
 
 void Player::OnDash()
 {
-	m_isAnimDash = true;
 	m_pAnim->ChangeAnim(kAnimDash);
 	m_updaFunc = &Player::DashUpdate;
 }
 
-void Player::OnIdle()
-{
-	m_pAnim->ChangeAnim(kAnimIdle);
-	m_updaFunc = &Player::IdleUpdate;
-
-}
 
 void Player::OnAttackX()
 {
-	m_pAnim->ChangeAnim(kAnimNormalAttackX);
+	m_pAnim->ChangeAnim(kAnimNormalAttackX,true,true,true);
 	m_updaFunc = &Player::AttackXUpdate;
-	
 }
 
 void Player::OnAttackY()
 {
-	m_pAnim->ChangeAnim(kAnimNormalAttackY);
+	m_pAnim->ChangeAnim(kAnimNormalAttackY,true, true, true);
 	m_updaFunc = &Player::AttackYUpdate;
-
 }
 
 void Player::OnJump()
 {
-	m_pAnim->ChangeAnim(kAnimJump);
+	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
 	m_updaFunc = &Player::JumpUpdate;
+}
+
+void Player::OnAir()
+{
+	m_pAnim->ChangeAnim(kAnimAir);
+	m_updaFunc = &Player::AirUpdate;
 }
 
 void Player::OnHit()
@@ -655,11 +639,22 @@ void Player::OnHit()
 	m_updaFunc = &Player::HitUpdate;
 }
 
-void Player::OnDown()
+void Player::OnDead()
 {
-	m_pAnim->ChangeAnim(kAnimDown);
+	m_pAnim->ChangeAnim(kAnimDead);
 	m_updaFunc = &Player::DeadUpdate;
+}
 
+void Player::OnDeadPose()
+{
+	m_pAnim->ChangeAnim(kAnimDeadPose);
+	m_updaFunc = &Player::DeadPoseUpadte;
+}
+
+void Player::OnSpawn()
+{
+	m_pAnim->ChangeAnim(kAnimSpawn);
+	m_updaFunc = &Player::SpawnUpdate;
 }
 
 void Player::FaceSelect()
@@ -681,9 +676,14 @@ void Player::FaceSelect()
 	}
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(PAD_INPUT_4))
+	if (Pad::IsTrigger(PAD_INPUT_9))
 	{
 		m_isFaceUse = !m_isFaceUse;
 	}
+
+}
+
+void Player::Move(VECTOR move)
+{
 
 }

@@ -4,7 +4,9 @@
 namespace
 {
 	//フェード速度
-	constexpr int kFadeSpeed = 1;
+	constexpr int kFadeSpeed = 5;
+
+	constexpr int kFadeColor = 0xffffff;
 }
 
 
@@ -12,7 +14,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	m_pManager(manager)
 {
 	//初期設定はフェードアウト状態
-	m_fadeColor = 0xff00ff;
+	m_fadeColor = 0x000000;
 	m_fadeBright = 255;
 	m_fadeSpeed = -kFadeSpeed;
 	m_isToNextScene = false;
@@ -34,7 +36,7 @@ void SceneBase::UpdateFade()
 	}
 
 	//
-	if (m_fadeBright <= 255)
+	if (m_fadeBright <= 0)
 	{
 		m_fadeBright = 0;
 		if (m_fadeSpeed < 0)
@@ -45,10 +47,17 @@ void SceneBase::UpdateFade()
 	}
 }
 
-void SceneBase::DrawFade() const
+void SceneBase::DrawBlackFade() const
 {
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeBright);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, m_fadeColor, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void SceneBase::DrawWhiteFade() const
+{
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeBright);
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, kFadeColor, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 

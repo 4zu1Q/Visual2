@@ -60,18 +60,12 @@ void SceneGameOver::Update()
 			{
 				StartFadeOut();
 				m_isToNextScene = true;
-
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-				return;
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				StartFadeOut();
 				m_isToNextScene = true;
-
-				m_pManager.ChangeScene(std::make_shared<SceneTitle>(m_pManager));
-				return;
 			}
 		}
 	}
@@ -81,16 +75,17 @@ void SceneGameOver::Update()
 	{
 		if (!IsFadingOut())
 		{
-			//if (m_sceneTrans == e_SceneTrans::kSelect)
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-			//	return;
-			//}
-			//if (m_sceneTrans == e_SceneTrans::kTitle)
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneTitle>(m_pManager));
-			//	return;
-			//}
+			if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
+			}
+
+			if (m_sceneTrans == e_SceneTrans::kTitle)
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneTitle>(m_pManager));
+				return;
+			}
 		}
 	}
 
@@ -111,5 +106,5 @@ void SceneGameOver::Draw()
 #endif
 
 
-	DrawFade();
+	DrawBlackFade();
 }

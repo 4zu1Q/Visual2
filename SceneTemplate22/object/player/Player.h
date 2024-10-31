@@ -18,8 +18,6 @@ public:
 		kStrongestPlayer	//ラスボス型
 	};
 
-private:
-
 public:
 
 	Player();
@@ -88,26 +86,31 @@ public:
 
 private:
 
-	/*アップデート処理*/
+	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
-
 	void WalkUpdate();
 	void DashUpdate();
 	void JumpUpdate();
+	void AirUpdate();
 	void AttackXUpdate();
 	void AttackYUpdate();
 	void HitUpdate();
 	void DeadUpdate();
+	void DeadPoseUpadte();
+	void SpawnUpdate();
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
 	void OnWalk();
 	void OnDash();
 	void OnJump();
+	void OnAir();
 	void OnAttackX();
 	void OnAttackY();
 	void OnHit();
-	void OnDown();
+	void OnDead();
+	void OnDeadPose();
+	void OnSpawn();
 
 	//武器を描画するだけの関数
 	void WeaponDraw();
@@ -116,6 +119,8 @@ private:
 	/// プレイヤーが顔を使用時の関数
 	/// </summary>
 	void FaceSelect();
+
+	void Move(VECTOR move);
 
 private:
 
@@ -133,6 +138,7 @@ private:
 	float m_hp;
 	float m_mp;
 	int m_modelH;
+	int m_weaponH;
 
 	//プレイヤの座標
 	VECTOR m_posDown;
@@ -158,9 +164,6 @@ private:
 	//動けるか動けないかのフラグ
 	bool m_isMove;
 
-	//
-	float m_range;
-
 	//アナログスティック用の変数
 	int m_analogX;
 	int m_analogZ;
@@ -172,7 +175,7 @@ private:
 	bool m_isAnimIdle;
 	bool m_isAnimWalk;
 	bool m_isAnimDash;
-	bool m_isAnimJump;
+	bool m_isJump;
 	bool m_isAnimAvoid;
 	bool m_isAnimAttackX;
 	bool m_isAnimAttackY;

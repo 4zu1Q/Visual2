@@ -168,6 +168,7 @@
     <ClCompile Include="scene\SceneSelect.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
     <ClCompile Include="ui\FaceUi.cpp" />
+    <ClCompile Include="ui\HeartHp.cpp" />
     <ClCompile Include="ui\HpBar.cpp" />
     <ClCompile Include="util\ActionTime.cpp" />
     <ClCompile Include="util\AnimController.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="scene\SceneSelect.h" />
     <ClInclude Include="scene\SceneTitle.h" />
     <ClInclude Include="ui\FaceUi.h" />
+    <ClInclude Include="ui\HeartHp.h" />
     <ClInclude Include="ui\HpBar.h" />
     <ClInclude Include="util\ActionTime.h" />
     <ClInclude Include="util\AnimController.h" />

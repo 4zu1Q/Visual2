@@ -5,6 +5,7 @@
 
 #include "util/Game.h"
 #include "util/Pad.h"
+#include "util/SoundManager.h"
 
 #include <memory>
 
@@ -46,6 +47,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//ポリゴンの裏面を描画しない
 	SetUseBackCulling(true);
+
+	//SoundManager::GetInstance().ChangeBGMVolume()
 
 	//std::shared_ptr<SceneManager> pSceneManager = std::make_shared<SceneManager>();
 	SceneManager pSceneManager;

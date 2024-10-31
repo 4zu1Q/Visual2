@@ -8,6 +8,8 @@
 #include "SceneSelect.h"
 #include "SceneOption.h"
 
+#include "util/SoundManager.h"
+
 
 namespace
 {
@@ -30,6 +32,9 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	SceneBase(manager)
 {
 	m_sceneTrans = e_SceneTrans::kSelect;
+
+
+	//SoundManager::GetInstance().Load("")
 }
 
 SceneTitle::~SceneTitle()
@@ -42,8 +47,8 @@ void SceneTitle::Update()
 	UpdateFade();
 
 	
-	//if (!m_isToNextScene)
-	//{
+	if (!m_isToNextScene)
+	{
 		//上を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_UP))
 		{
@@ -71,8 +76,7 @@ void SceneTitle::Update()
 				StartFadeOut();
 				m_isToNextScene = true;
 
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-				return;
+
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kOption)
@@ -86,7 +90,7 @@ void SceneTitle::Update()
 				DxLib_End();
 			}
 		}
-	//}
+	}
 
 
 	//シーンフラグがたった場合
@@ -96,6 +100,8 @@ void SceneTitle::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				return;
 			}
 		}
 	}
@@ -118,7 +124,7 @@ void SceneTitle::Draw()
 	DrawBox(900, 560, 1260, 660, 0xffffff, true);
 
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 
 	DrawString(0, 0, "Scene Title", 0xffffff, false);
 
@@ -128,9 +134,9 @@ void SceneTitle::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kQuit) * kTextIntervalY, 0xffffff, "Quit");
 
-//#endif
+#endif
 
 
 
-	DrawFade();
+	DrawBlackFade();
 }

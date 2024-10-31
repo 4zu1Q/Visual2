@@ -56,7 +56,7 @@ void SceneOption::Update()
 
 void SceneOption::Draw()
 {
-	DrawFade();
+	DrawBlackFade();
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);

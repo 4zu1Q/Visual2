@@ -75,9 +75,6 @@ void ScenePause::Update()
 			{
 				m_isToNextScene = true;
 				StartFadeOut();	//フェードアウト開始
-
-				m_pManager.ChangeAndClearScene(std::make_shared<SceneTitle>(m_pManager));
-				return;
 			}
 		}
 
@@ -94,18 +91,18 @@ void ScenePause::Update()
 		//フェードアウトのフラグがたっていない場合
 		if (!IsFadingOut())
 		{
-			//if (m_sceneTrans == e_SceneTrans::kSelect)
-			//{
-			//	m_pManager.ChangeAndClearScene(std::make_shared<SceneTitle>(m_pManager));
-			//	return;
-			//}
+			if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_pManager.ChangeAndClearScene(std::make_shared<SceneTitle>(m_pManager));
+				return;
+			}
 		}
 	}
 }
 
 void ScenePause::Draw()
 {
-	DrawFade();
+	//DrawBlackFade();
 
 #ifdef _DEBUG
 
@@ -122,5 +119,7 @@ void ScenePause::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 
 #endif
+
+	DrawWhiteFade();
 
 }

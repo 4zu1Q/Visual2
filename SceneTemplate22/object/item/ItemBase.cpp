@@ -56,7 +56,7 @@ void ItemBase::Draw(std::shared_ptr<Player> pPlayer)
 {
 	MV1DrawModel(m_modelH);
 
-	DrawCapsule3D(pPlayer->GetPosDown(), pPlayer->GetPosUp(), pPlayer->GetRadius() , 32, 0xffffff, 0xffffff, false);
+	//DrawCapsule3D(pPlayer->GetPosDown(), pPlayer->GetPosUp(), pPlayer->GetRadius() , 32, 0xffffff, 0xffffff, false);
 	DrawSphere3D(m_pos, m_radius, 32, 0xffffff, 0xff0000, false);
 
 
