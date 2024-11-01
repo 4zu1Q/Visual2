@@ -32,7 +32,7 @@ namespace
 	constexpr float kDashSpeed = 1.0f;
 
 	//ジャンプ力
-	constexpr float kJumpPower = 10.0f;
+	constexpr float kJumpPower = 3.0f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };

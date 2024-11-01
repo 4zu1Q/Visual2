@@ -1,4 +1,5 @@
 ﻿#include "BossPower.h"
+#include "object/player/Player.h"
 
 #include "util/AnimController.h"
 #include "util/ActionTime.h"
@@ -12,6 +13,9 @@ namespace
 	const char* const kModelFilename = "Data/Model/Boss/BossPower.mv1";
 	//モデルのスケール値
 	constexpr float kModelScale = 8.0f;
+
+	constexpr float kSpeed = 1.0f;
+
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,200.0f };
@@ -38,22 +42,30 @@ namespace
 BossPower::BossPower():
 	m_posDown(kInitPos),
 	m_posUp(kInitPos),
+	m_direction(VGet(0,0,0)),
+	m_velocity(VGet(0,0,0)),
+	m_angle(0.0f),
 	m_radius(5)
 {
 
 	m_modelH = MV1LoadModel(kModelFilename);
 
 	m_pAnim = std::make_shared<AnimController>();
-	//m_wlakTime = std::make_shared<ActionTime>();
 
+	//時間のタイマーセット
+	m_pOnIdleTime = std::make_shared<ActionTime>(120);
+	m_pOnWlakTime = std::make_shared<ActionTime>(300);
+	m_pOnDashTime = std::make_shared<ActionTime>(120);
+	m_pOnDownTime = std::make_shared<ActionTime>(240);
+	m_pOnAttackTime = std::make_shared<ActionTime>(120);
+
+	m_pPlayer = std::make_shared<Player>();
 }
 
 BossPower::~BossPower()
 {
 	MV1DeleteModel(m_modelH);
 	m_modelH = -1;
-
-
 }
 
 void BossPower::Initialize()
@@ -82,6 +94,8 @@ void BossPower::Update()
 	//アップデート
 	(this->*m_updaFunc)();
 
+	m_pos = m_pPlayer->GetPosDown();
+
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 	
@@ -89,6 +103,8 @@ void BossPower::Update()
 
 	//モデルに座標をセットする
 	MV1SetPosition(m_modelH, m_posDown);
+	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));
+
 }
 
 void BossPower::Draw()
@@ -101,27 +117,57 @@ void BossPower::Draw()
 
 void BossPower::IdleUpdate()
 {
-	if (m_pAnim->IsLoop())
+
+	//プレイヤーと離れていた場合歩き状態に移動
+
+	if (m_pOnWlakTime->IsUpdate())
 	{
+		m_pOnWlakTime->Reset();
 		OnWalk();
 	}
+
+	//プレイヤーと距離が離れていない場合攻撃状態に移動
+	//ランダム関数などを使用して三つの攻撃を使う
+
+	
+	//プレイヤーへの向きを取得
+	m_direction = VSub(m_pos, m_posDown);
+	m_direction = VNorm(m_direction);
+
+	m_angle = atan2f(m_direction.x, m_direction.z);
+
 }
 
 void BossPower::WalkUpdate()
 {
-	if (0 > 120)
+
+
+	//プレイヤーと距離が離れていない場合攻撃状態に移動
+	//ランダム関数などを使用して三つの攻撃を使う
+
+	if (m_pOnAttackTime->IsUpdate())
 	{
-		OnDash();
+		m_pOnWlakTime->Reset();
+		OnAttack3();
 	}
 
-}
+	//プレイヤーへの向きを取得
+	m_direction = VSub(m_pos, m_posDown);
+	m_direction = VNorm(m_direction);
 
-void BossPower::DashUpdate()
-{
+	m_angle = atan2f(m_direction.x, m_direction.z);
+
+	//ベクトルを、正規化し、向きだけを保存させる
+	m_velocity = VScale(m_direction, kSpeed);
+
+	//敵の移動
+	m_posDown = VAdd(m_posDown, m_velocity);
 }
 
 void BossPower::Attack1Update()
 {
+
+	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -130,6 +176,8 @@ void BossPower::Attack1Update()
 
 void BossPower::Attack2Update()
 {
+
+	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -138,6 +186,8 @@ void BossPower::Attack2Update()
 
 void BossPower::Attack3Update()
 {
+
+	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -146,6 +196,11 @@ void BossPower::Attack3Update()
 
 void BossPower::DownUpdate()
 {
+	//アニメーションが終わったらアイドル状態に戻る
+	if (m_pAnim->IsLoop())
+	{
+		OnIdle();
+	}
 }
 
 void BossPower::DeadUpdate()
@@ -156,7 +211,7 @@ void BossPower::DeadUpdate()
 
 void BossPower::OnIdle()
 {
-	m_pAnim->ChangeAnim(kAnimIdle,true,true,true,-1.0f);
+	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updaFunc = &BossPower::IdleUpdate;
 }
 
@@ -166,25 +221,21 @@ void BossPower::OnWalk()
 	m_updaFunc = &BossPower::WalkUpdate;
 }
 
-void BossPower::OnDash()
-{
-}
-
 void BossPower::OnAttack1()
 {
-	m_pAnim->ChangeAnim(kAnimDead, true, true, true);
+	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
 	m_updaFunc = &BossPower::Attack1Update;
 }
 
 void BossPower::OnAttack2()
 {
-	m_pAnim->ChangeAnim(kAnimDead, true, true, true);
+	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
 	m_updaFunc = &BossPower::Attack2Update;
 }
 
 void BossPower::OnAttack3()
 {
-	m_pAnim->ChangeAnim(kAnimDead, true, true, true);
+	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updaFunc = &BossPower::Attack3Update;
 }
 

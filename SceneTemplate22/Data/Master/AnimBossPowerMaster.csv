@@ -1,9 +1,8 @@
 ID,名前,スピード
 Idle,Armature|Idle2,1
-Walk,Armature|Walk,0.5
-Dash,Armature|Dash,1
-Attack1,Armature|Attack1,1
-Attack2,Armature|Attack2,1
-Attack3,Armature|Attack3,1
+Walk,Armature|Dash,0.5
+Attack1,Armature|Attack1,0.4
+Attack2,Armature|Attack2,0.3
+Attack3,Armature|Attack3,0.4
 Down,Armature|Idle2,0.2
 Dead,Armature|Dead2,1

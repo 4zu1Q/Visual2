@@ -6,6 +6,8 @@
 class AnimController;
 class ActionTime;
 
+class Player;
+
 class BossPower :
 	public BossBase
 {
@@ -24,7 +26,6 @@ private:
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
 	void WalkUpdate();
-	void DashUpdate();
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
@@ -34,20 +35,17 @@ private:
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
 	void OnWalk();
-	void OnDash();
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
 	void OnDown();
 	void OnDead();
 
-
 private:
 
 	//スマートポインタ
 	std::shared_ptr<AnimController> m_pAnim;
-	std::shared_ptr<ActionTime> m_wlakTime;
-
+	std::shared_ptr<Player> m_pPlayer;
 
 	//メンバ関数ポインタ
 	using UpdateFunc_t = void(BossPower::*)(/*引数書く*/);
@@ -56,17 +54,27 @@ private:
 	//モデルハンドル
 	int m_modelH;
 
-
+	//タイマー関連の変数
+	std::shared_ptr<ActionTime> m_pOnWlakTime;
+	std::shared_ptr<ActionTime> m_pOnDashTime;
+	std::shared_ptr<ActionTime> m_pOnIdleTime;
+	std::shared_ptr<ActionTime> m_pOnDownTime;
+	std::shared_ptr<ActionTime> m_pOnAttackTime;
 
 	//当たり判定の半径
 	float m_radius;
 	//攻撃判定の半径
 	float m_attackRadius;
 
+	float m_angle;
+
+
 	//座標
 	VECTOR m_posDown;
 	VECTOR m_posUp;
 
+	VECTOR m_direction;
+	VECTOR m_velocity;
 
 };
 
