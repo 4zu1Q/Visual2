@@ -44,7 +44,7 @@ BossPower::BossPower():
 	m_modelH = MV1LoadModel(kModelFilename);
 
 	m_pAnim = std::make_shared<AnimController>();
-	m_wlakTime = std::make_shared<ActionTime>();
+	//m_wlakTime = std::make_shared<ActionTime>();
 
 }
 

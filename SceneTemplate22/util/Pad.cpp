@@ -71,8 +71,7 @@ namespace Pad
 			}
 		}
 
-		//ZR,ZL,スティックの入力を取得
-		GetJoypadXInputState(DX_INPUT_PAD1, XInputState);
+
 	}
 
 	// 押し下げ判定
