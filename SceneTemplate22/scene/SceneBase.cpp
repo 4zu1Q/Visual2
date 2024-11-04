@@ -47,19 +47,19 @@ void SceneBase::UpdateFade()
 	}
 }
 
-void SceneBase::DrawBlackFade() const
+void SceneBase::DrawFade(int fadeColor) const
 {
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeBright);
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, m_fadeColor, true);
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, fadeColor, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
-void SceneBase::DrawWhiteFade() const
-{
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeBright);
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, kFadeColor, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-}
+//void SceneBase::DrawWhiteFade() const
+//{
+//	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeBright);
+//	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, kFadeColor, true);
+//	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+//}
 
 void SceneBase::StartFadeOut()
 {

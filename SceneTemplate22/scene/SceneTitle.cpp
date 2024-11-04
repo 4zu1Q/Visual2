@@ -138,5 +138,5 @@ void SceneTitle::Draw()
 
 
 
-	DrawBlackFade();
+	DrawFade(0x000000);
 }

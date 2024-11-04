@@ -36,14 +36,15 @@ protected:
 	void UpdateFade();
 
 	/// <summary>
-	/// 黒いフェードの描画関数
+	/// フェードの描画処理とフェードの色
 	/// </summary>
-	void DrawBlackFade() const;
+	/// <param name="fadeColor"></param>
+	void DrawFade(int fadeColor) const;
 
 	/// <summary>
 	/// 白いフェードの描画関数
 	/// </summary>
-	void DrawWhiteFade() const;
+	//void DrawWhiteFade() const;
 
 	/// <summary>
 	/// フェードアウト開始
@@ -88,6 +89,8 @@ protected:
 	/// フェードアウトをスキップする関数
 	/// </summary>
 	void FadeOutSkip();
+
+
 
 protected:
 

@@ -120,6 +120,6 @@ void ScenePause::Draw()
 
 #endif
 
-	DrawWhiteFade();
+	DrawFade(0x000000);
 
 }

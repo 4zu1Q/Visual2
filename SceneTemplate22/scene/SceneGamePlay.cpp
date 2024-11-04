@@ -124,7 +124,7 @@ void SceneGamePlay::Draw()
 
 	m_pItem->Draw(m_pPlayer);
 
-	DrawBlackFade();
+	DrawFade(0xffffff);
 	
 }
 

@@ -105,5 +105,5 @@ void SceneGameClear::Draw()
 #endif
 
 
-	DrawBlackFade();
+	DrawFade(0xffffff);
 }

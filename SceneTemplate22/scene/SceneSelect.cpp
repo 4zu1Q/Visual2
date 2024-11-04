@@ -127,22 +127,23 @@ void SceneSelect::Update()
 	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitP)
 	{
 		printfDx("パワーボス");
-		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
-		return;
+		StartFadeOut();
+		m_isToNextScene = true;
+
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitS)
 	{
 		printfDx("スピードボス");
-		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
-		return;
+		StartFadeOut();
+		m_isToNextScene = true;
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitR)
 	{
 		printfDx("ラスボス");
-		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
-		return;
+		StartFadeOut();
+		m_isToNextScene = true;
 	}
 
 	//if (!m_isToNextScene)
@@ -209,29 +210,11 @@ void SceneSelect::Update()
 	{
 		if (!IsFadingOut())
 		{
-			//if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-			//	return;
-			//}
-			//
-			//if (m_sceneTrans == e_SceneTrans::kSpeedTypeBoss)
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-			//	return;
-			//}
-			//
-			//if (m_sceneTrans == e_SceneTrans::kShooterTypeBoss)
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-			//	return;
-			//}
-
-			//if (m_sceneTrans == e_SceneTrans::kRastBoss)
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-			//	return;
-			//}
+			if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+				return;
+			}
 		}
 	}
 
@@ -256,5 +239,7 @@ void SceneSelect::Draw()
 
 //#endif
 
-	DrawBlackFade();
+
+
+	DrawFade(0x000000);
 }

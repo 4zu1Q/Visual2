@@ -295,7 +295,7 @@ void Player::WalkUpdate()
 	rate = max(rate, 0.0f);
 
 	//動いている間
-	if (len > 0.0f)
+	if (len != 0.0f)
 	{
 
 		//速度が決定できるので移動ベクトルに反映する
@@ -398,10 +398,12 @@ void Player::DashUpdate()
 		m_attackDir = VNorm(move);
 		m_avoid = VNorm(move);
 
-		if (Pad::IsRelase(PAD_INPUT_1))
-		{
-			OnWalk();
-		}
+	}
+
+	//歩き
+	if (Pad::IsRelase(PAD_INPUT_1) || VSquareSize(move) == 0.0f)
+	{
+		OnWalk();
 	}
 
 	//攻撃X

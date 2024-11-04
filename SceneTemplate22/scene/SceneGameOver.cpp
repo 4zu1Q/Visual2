@@ -106,5 +106,5 @@ void SceneGameOver::Draw()
 #endif
 
 
-	DrawBlackFade();
+	DrawFade(0x000000);
 }
