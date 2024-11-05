@@ -1,11 +1,13 @@
 ﻿#pragma once
 #include "DxLib.h"
+#include "myLib/Collidable.h"
 #include <memory>
 
 class PlayerWeapon;
+class Collidable;
 class AnimController;
 
-class Player
+class Player /*: public MyLib::Collidable*/
 {
 public:
 
@@ -23,11 +25,14 @@ public:
 	Player();
 	virtual ~Player();
 
-	void Initialize(VECTOR pos);
+	void Initialize(/*MyLib::Physics* physics, */VECTOR pos);
 	void Finalize();
 
 	void Update();
 	void Draw();
+
+	// 衝突したとき
+	//void OnCollide(const Collidable& colider) override;
 
 	//プレイヤーのモデルハンドルを取得
 	const int& GetModelHandle() const { return m_modelH; }
@@ -119,8 +124,6 @@ private:
 	/// プレイヤーが顔を使用時の関数
 	/// </summary>
 	void FaceSelect();
-
-	void Move(VECTOR move);
 
 private:
 

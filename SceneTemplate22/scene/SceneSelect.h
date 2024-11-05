@@ -13,6 +13,7 @@ class ItemBase;
 class ItemMp;
 class ItemHp;
 class Tomb;
+class Physics;
 
 class SceneSelect :
 	public SceneBase
@@ -45,6 +46,9 @@ private:
 	std::shared_ptr<ItemMp> m_pItemMp;
 	std::shared_ptr<ItemHp> m_pItemHp;
 	std::shared_ptr<Tomb> m_pTomb;
+
+
+	//std::shared_ptr<Physics> m_pPhysics;
 
 	//遷移先
 	enum class e_SceneTrans : int

@@ -55,6 +55,12 @@
     <Filter Include="ヘッダー ファイル\object\item">
       <UniqueIdentifier>{abb822f2-c72f-477b-bbb6-b3284ac053a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\myLib">
+      <UniqueIdentifier>{e5362394-e213-4770-88d6-1248e0af1da6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\myLib">
+      <UniqueIdentifier>{f4bf15a2-b8e1-4f06-b113-494134f39c37}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -171,6 +177,18 @@
     <ClCompile Include="util\EffectManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="myLib\Collidable.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\Physics.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\Rigidbody.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\DebugDraw.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -286,6 +304,27 @@
     </ClInclude>
     <ClInclude Include="util\EffectManager.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Collidable.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\ColliderData.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\MathHelper.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Physics.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Rigidbody.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\YuiLib.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\DebugDraw.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

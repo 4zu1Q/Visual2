@@ -30,9 +30,7 @@ public:
 	/// </summary>
 	virtual void Draw() override final;	//毎フレーム行う描画処理
 
-	void StartFadeOut();
-
-	void DrawGrid();
+	//void StartFadeOut();
 
 private:
 

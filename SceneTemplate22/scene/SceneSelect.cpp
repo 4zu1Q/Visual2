@@ -21,6 +21,8 @@
 
 #include "util/Pad.h"
 
+#include "myLib/Physics.h"
+
 namespace
 {
 	constexpr int kTextX = 64;
@@ -51,6 +53,8 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 
 	m_pTomb = std::make_shared<Tomb>();
 
+	//m_pPhysics = std::make_shared<Physics>();
+
 
 	m_playerPos = VGet(0, 0, -120);
 	m_cameraPos = VGet(0, 0, 0);
@@ -60,6 +64,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 
 SceneSelect::~SceneSelect()
 {
+
 }
 
 void SceneSelect::Update()
@@ -129,7 +134,7 @@ void SceneSelect::Update()
 		printfDx("パワーボス");
 		StartFadeOut();
 		m_isToNextScene = true;
-
+		
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitS)
@@ -137,6 +142,7 @@ void SceneSelect::Update()
 		printfDx("スピードボス");
 		StartFadeOut();
 		m_isToNextScene = true;
+
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitR)
@@ -144,66 +150,8 @@ void SceneSelect::Update()
 		printfDx("ラスボス");
 		StartFadeOut();
 		m_isToNextScene = true;
+
 	}
-
-	//if (!m_isToNextScene)
-	//{
-		////上に移動した場合
-		//if (Pad::IsTrigger(PAD_INPUT_UP))
-		//{
-		//	if (m_sceneTrans != e_SceneTrans::kPowerTypeBoss)
-		//	{
-		//		m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
-		//	}
-		//}
-
-		////下に移動した場合
-		//if (Pad::IsTrigger(PAD_INPUT_DOWN))
-		//{
-		//	if (m_sceneTrans != e_SceneTrans::kRastBoss)
-		//	{
-		//		m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
-		//	}
-		//}
-
-		////決定ボタンを押した場合
-		//if (Pad::IsTrigger(PAD_INPUT_1))
-		//{
-		//	if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)
-		//	{
-		//		StartFadeOut();
-		//		m_isToNextScene = true;
-
-		//		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
-		//		return;
-		//	}
-		//	if (m_sceneTrans == e_SceneTrans::kSpeedTypeBoss)
-		//	{
-		//		StartFadeOut();
-		//		m_isToNextScene = true;
-
-		//		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
-		//		return;
-		//	}
-		//	if (m_sceneTrans == e_SceneTrans::kShooterTypeBoss)
-		//	{
-		//		StartFadeOut();
-		//		m_isToNextScene = true;
-
-		//		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
-		//		return;
-		//	}
-		//	if (m_sceneTrans == e_SceneTrans::kRastBoss)
-		//	{
-		//		StartFadeOut();
-		//		m_isToNextScene = true;
-
-		//		m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
-		//		return;
-		//	}
-		//}
-	//}
-
 
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
@@ -239,7 +187,13 @@ void SceneSelect::Draw()
 
 //#endif
 
+	if (!m_isFadeColor)
+	{
+		DrawFade(0x000000);
+	}
+	else
+	{
+		DrawFade(0xffffff);
+	}
 
-
-	DrawFade(0x000000);
 }

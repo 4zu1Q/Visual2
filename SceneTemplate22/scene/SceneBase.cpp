@@ -18,6 +18,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	m_fadeBright = 255;
 	m_fadeSpeed = -kFadeSpeed;
 	m_isToNextScene = false;
+	m_isFadeColor = false;
 }
 
 void SceneBase::UpdateFade()

@@ -110,6 +110,9 @@ void ScenePause::Draw()
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
+	DrawBox(0, 0, Game::kScreenWidthHalf, Game::kScreenHeightHalf, 0xffffff, false);
+
+
 	DrawString(0, 0, "Scene Pause", 0xffffff, false);
 
 	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");

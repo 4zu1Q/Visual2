@@ -21,6 +21,7 @@ public:
 	virtual void Draw() override final;	//毎フレーム行う描画処理
     
 private:
+
 	//遷移先
 	enum class e_SceneTrans : int
 	{
@@ -30,9 +31,6 @@ private:
 	};
 
 	e_SceneTrans m_sceneTrans;
-
-
-	
 
 };
 

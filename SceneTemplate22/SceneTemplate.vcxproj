@@ -144,6 +144,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="myLib\Collidable.cpp" />
+    <ClCompile Include="myLib\DebugDraw.cpp" />
+    <ClCompile Include="myLib\Physics.cpp" />
+    <ClCompile Include="myLib\Rigidbody.cpp" />
     <ClCompile Include="object\boss\BossBase.cpp" />
     <ClCompile Include="object\boss\BossPower.cpp" />
     <ClCompile Include="object\boss\BossShot.cpp" />
@@ -183,6 +187,13 @@
     <ClCompile Include="util\Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="myLib\Collidable.h" />
+    <ClInclude Include="myLib\ColliderData.h" />
+    <ClInclude Include="myLib\DebugDraw.h" />
+    <ClInclude Include="myLib\MathHelper.h" />
+    <ClInclude Include="myLib\Physics.h" />
+    <ClInclude Include="myLib\Rigidbody.h" />
+    <ClInclude Include="myLib\YuiLib.h" />
     <ClInclude Include="object\boss\BossBase.h" />
     <ClInclude Include="object\boss\BossPower.h" />
     <ClInclude Include="object\boss\BossShot.h" />

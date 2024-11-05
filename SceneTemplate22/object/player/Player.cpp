@@ -4,6 +4,8 @@
 #include "util/Pad.h"
 #include "util/AnimController.h"
 
+#include "myLib/ColliderData.h"
+
 #include <cmath>
 #include <cassert>
 
@@ -68,6 +70,7 @@ namespace
 }
 
 Player::Player() :
+	//Collidable(Collidable::e_Priority::High, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::Capsule3D, false),
 	m_modelH(-1),
 	m_weaponH(-1),
 	m_radius(2),
@@ -132,8 +135,12 @@ Player::~Player()
 	Finalize();
 }
 
-void Player::Initialize(VECTOR pos)
+void Player::Initialize(/*MyLib::Physics* physics,*/ VECTOR pos)
 {
+
+	//
+	//Collidable::Initialize(physics);
+
 	//初期位置を代入
 	m_posDown = pos;
 
@@ -152,6 +159,8 @@ void Player::Initialize(VECTOR pos)
 	m_updaFunc = &Player::IdleUpdate;
 
 }
+
+
 
 void Player::Finalize()
 {
@@ -210,9 +219,11 @@ void Player::Update()
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
 
 	//HPがゼロより下にいった場合
-	if (m_hp <= 0)
+	if (m_hp < 0)
 	{
 		m_hp = 0;
+
+		OnDead();
 	}
 }
 
@@ -242,6 +253,31 @@ void Player::Draw()
 
 }
 
+//void Player::OnCollide(const Collidable& colider)
+//{
+//	std::string message = "プレイヤーが";
+//	auto tag = colider.GetTag();
+//	switch (tag)
+//	{
+//	case Game::e_GameObjectTag::kPlayer:
+//		message += "プレイヤー";
+//		break;
+//	case Game::e_GameObjectTag::kBoss:
+//		message += "ボス";
+//		break;
+//	case Game::e_GameObjectTag::kSystemWall:
+//		message += "システム壁";
+//		break;
+//	case Game::e_GameObjectTag::kStepGround:
+//		message += "足場";
+//		break;
+//	default:
+//		break;
+//	}
+//	message += "と当たった！\n";
+//	printfDx(message.c_str());
+//}
+
 void Player::IdleUpdate()
 {
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
@@ -262,20 +298,13 @@ void Player::IdleUpdate()
 	if (Pad::IsTrigger(PAD_INPUT_3))
 	{
 		OnAttackX();
+		m_hp = m_hp - 1;
 		return;
-		m_hp -= 1;
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_4))
 	{
 		OnAttackY();
-		return;
-	}
-
-	//HPがゼロより下にいった場合
-	if (m_hp < 0)
-	{
-		OnDead();
 		return;
 	}
 }
@@ -469,8 +498,6 @@ void Player::JumpUpdate()
 		m_avoid = VNorm(move);
 	}
 
-
-
 	m_posDown = VAdd(m_posDown, VGet(0, kJumpPower, 0));
 
 	//仮重力
@@ -514,6 +541,8 @@ void Player::AirUpdate()
 
 void Player::AttackXUpdate()
 {
+
+	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -523,6 +552,8 @@ void Player::AttackXUpdate()
 
 void Player::AttackYUpdate()
 {
+
+	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -532,6 +563,7 @@ void Player::AttackYUpdate()
 
 void Player::HitUpdate()
 {
+	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -541,6 +573,7 @@ void Player::HitUpdate()
 
 void Player::DeadUpdate()
 {
+	//アニメーションが終わったら死んでいるポーズ画面に遷移
 	if (m_pAnim->IsLoop())
 	{
 		OnDeadPose();
@@ -549,7 +582,7 @@ void Player::DeadUpdate()
 
 void Player::DeadPoseUpadte()
 {
-
+	// 死んでいるので何も操作できない
 }
 
 void Player::SpawnUpdate()
@@ -685,7 +718,3 @@ void Player::FaceSelect()
 
 }
 
-void Player::Move(VECTOR move)
-{
-
-}

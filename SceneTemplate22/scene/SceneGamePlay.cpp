@@ -18,12 +18,6 @@
 namespace
 {
 
-	constexpr float kMaxSpeedN = 0.9f;
-
-	constexpr float kAnalogRangeMin = 0.1f;
-	constexpr float kAnalogRangeMax = 0.8f;
-
-	constexpr float kAnalogInputMax = 1000.0f;
 }
 
 SceneGamePlay::SceneGamePlay(SceneManager& manager) :
@@ -47,7 +41,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pItem = std::make_shared<ItemBase>();
 	m_pBoss = std::make_shared<BossPower>();
 
-	m_playerPos = VGet(0, 0, 20);
+	m_playerPos = VGet(30, 0, 20);
 	m_cameraPos = VGet(0, 0, 0);
 
 	//初期位置をセット
@@ -85,11 +79,11 @@ void SceneGamePlay::Update()
 		if (Pad::IsTrigger(PAD_INPUT_8))
 		{
 			m_pManager.PushScene(std::make_shared<ScenePause>(m_pManager));
+
 		}
 	}
 
 	m_pCamera->Update(*m_pPlayer);
-	//m_pCamera->DebugUpdate();
 	m_pSkyDome->Update();
 	m_pPlayer->Update();
 	m_pBoss->Update();
@@ -112,7 +106,6 @@ void SceneGamePlay::Update()
 
 void SceneGamePlay::Draw()
 {
-	DrawGrid();
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 
 	m_pCamera->Draw();
@@ -128,13 +121,8 @@ void SceneGamePlay::Draw()
 	
 }
 
-void SceneGamePlay::StartFadeOut()
-{
-	SceneBase::StartFadeOut();
-	m_isFadingOut = true;
-}
-
-void SceneGamePlay::DrawGrid()
-{
-
-}
+//void SceneGamePlay::StartFadeOut()
+//{
+//	SceneBase::StartFadeOut();
+//	m_isFadingOut = true;
+//}

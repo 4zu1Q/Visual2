@@ -37,10 +37,20 @@ namespace Game
 	//ステージ名
 	enum class e_StageKind
 	{
-		kPowerPlayer,		//パワー型
-		kSpeedPlayer,		//スピード型
-		kShotPlayer,		//ラスボス型
+		kPowerStage,		//パワーステージ
+		kSpeedStage,		//スピードステージ
+		kRastStage,			//ラスボスステージ
 	};
 
+	// 当たったものの判別を行うためのタグ
+	enum class e_GameObjectTag
+	{
+		kPlayer,			// プレイヤー
+		kBoss,			// ボス
+		kItem,			// アイテム
+		kShot,			// 弾		//できればやりたい…
+		kSystemWall,		// システム壁
+		kStepGround,		// 足場の地面
+	};
 
 }
