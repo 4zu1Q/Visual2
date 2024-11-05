@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "myLib/Collidable.h"
+
 #include <list>
 #include <vector>
 

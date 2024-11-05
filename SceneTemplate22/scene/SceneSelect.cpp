@@ -59,7 +59,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_playerPos = VGet(0, 0, -120);
 	m_cameraPos = VGet(0, 0, 0);
 
-	m_pPlayer->Initialize(m_playerPos);
+	m_pPlayer->Initialize(m_pPhysics);
 }
 
 SceneSelect::~SceneSelect()
@@ -69,6 +69,7 @@ SceneSelect::~SceneSelect()
 
 void SceneSelect::Update()
 {
+
 	Pad::Update();
 	UpdateFade();
 

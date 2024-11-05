@@ -189,6 +189,9 @@
     <ClCompile Include="myLib\DebugDraw.cpp">
       <Filter>ソース ファイル\myLib</Filter>
     </ClCompile>
+    <ClCompile Include="util\ColliderDataSphere.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -320,10 +323,13 @@
     <ClInclude Include="myLib\Rigidbody.h">
       <Filter>ヘッダー ファイル\myLib</Filter>
     </ClInclude>
-    <ClInclude Include="myLib\YuiLib.h">
+    <ClInclude Include="myLib\DebugDraw.h">
       <Filter>ヘッダー ファイル\myLib</Filter>
     </ClInclude>
-    <ClInclude Include="myLib\DebugDraw.h">
+    <ClInclude Include="myLib\ColliderDataSphere.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\MyLib.h">
       <Filter>ヘッダー ファイル\myLib</Filter>
     </ClInclude>
   </ItemGroup>

@@ -45,7 +45,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_cameraPos = VGet(0, 0, 0);
 
 	//初期位置をセット
-	m_pPlayer->Initialize(m_playerPos);
+	m_pPlayer->Initialize(m_pPhysics);
 	m_pBoss->Initialize();
 
 }

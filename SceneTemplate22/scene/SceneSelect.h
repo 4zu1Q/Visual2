@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "SceneBase.h"
+#include "myLib/Physics.h"
+
 
 #include <vector>
 #include <memory>
@@ -49,6 +51,9 @@ private:
 
 
 	//std::shared_ptr<Physics> m_pPhysics;
+
+	MyLib::Physics* m_pPhysics = new MyLib::Physics;
+
 
 	//遷移先
 	enum class e_SceneTrans : int

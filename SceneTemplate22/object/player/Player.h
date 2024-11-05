@@ -7,8 +7,9 @@ class PlayerWeapon;
 class Collidable;
 class AnimController;
 
-class Player /*: public MyLib::Collidable*/
+class Player : public MyLib::Collidable
 {
+
 public:
 
 	//プレイヤーの特殊攻撃の種類(顔の種類)
@@ -25,14 +26,14 @@ public:
 	Player();
 	virtual ~Player();
 
-	void Initialize(/*MyLib::Physics* physics, */VECTOR pos);
+	void Initialize(MyLib::Physics* physics);
 	void Finalize();
 
 	void Update();
 	void Draw();
 
 	// 衝突したとき
-	//void OnCollide(const Collidable& colider) override;
+	void OnCollide(const Collidable& colider) override;
 
 	//プレイヤーのモデルハンドルを取得
 	const int& GetModelHandle() const { return m_modelH; }

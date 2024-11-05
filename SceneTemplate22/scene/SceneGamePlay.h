@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "SceneBase.h"
+#include "myLib/Physics.h"
 
 #include <vector>
 #include <memory>
@@ -12,6 +13,7 @@ class HpBar;
 class FaceUi;
 class ItemBase;
 class BossPower;
+class Physics;
 
 class SceneGamePlay :
 	public SceneBase
@@ -44,6 +46,9 @@ private:
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<ItemBase> m_pItem;
 	std::shared_ptr<BossPower> m_pBoss;
+
+	MyLib::Physics* m_pPhysics = new MyLib::Physics;
+
 
 	//
 	VECTOR m_playerPos;

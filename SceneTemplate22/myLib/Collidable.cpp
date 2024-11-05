@@ -96,15 +96,15 @@ ColliderData* Collidable::CreateColliderData(ColliderData::e_Kind kind, bool isT
 	}
 	switch (kind)
 	{
-	//case ColliderData::Kind::Circle2D:
-	//	colliderData = new ColliderDataCircle2D(isTrigger);
-	//	break;
-	//case ColliderData::Kind::Line2D :
-	//	colliderData = new ColliderDataLine2D(isTrigger);
-	//	break;
-	//case ColliderData::Kind::OneWayLine2D:
-	//	colliderData = new ColliderDataOneWayLine2D(isTrigger);
-	//	break;
+	case ColliderData::e_Kind::Circle3D:
+		colliderData = new ColliderDataCircle2D(isTrigger);
+		break;
+	case ColliderData::e_Kind::Capsule3D:
+		colliderData = new ColliderDataLine2D(isTrigger);
+		break;
+	case ColliderData::e_Kind::Line2D:
+		colliderData = new ColliderDataOneWayLine2D(isTrigger);
+		break;
 	default:
 		assert(0 && "colliderData作成に失敗。");
 		break;

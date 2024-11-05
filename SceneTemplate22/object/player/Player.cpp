@@ -70,7 +70,7 @@ namespace
 }
 
 Player::Player() :
-	//Collidable(Collidable::e_Priority::High, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::Capsule3D, false),
+	Collidable(Collidable::e_Priority::High, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::Capsule3D, false),
 	m_modelH(-1),
 	m_weaponH(-1),
 	m_radius(2),
@@ -135,14 +135,13 @@ Player::~Player()
 	Finalize();
 }
 
-void Player::Initialize(/*MyLib::Physics* physics,*/ VECTOR pos)
+void Player::Initialize(MyLib::Physics* physics)
 {
+	Collidable::Initialize(physics);
 
-	//
-	//Collidable::Initialize(physics);
-
-	//初期位置を代入
-	m_posDown = pos;
+	// 物理挙動の初期化
+	rigidbody.Initialize(true);
+	rigidbody.SetPos(VGet(2.0f, 0.0f, 0.0f));
 
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
@@ -154,13 +153,10 @@ void Player::Initialize(/*MyLib::Physics* physics,*/ VECTOR pos)
 	//アニメーションの初期化
 	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimIdle);
 
-	// メンバ関数ポインタ = &クラス名::入れたい関数
 	// メンバ関数ポインタの初期化
 	m_updaFunc = &Player::IdleUpdate;
 
 }
-
-
 
 void Player::Finalize()
 {
@@ -203,7 +199,6 @@ void Player::Update()
 
 	//顔を選択する関数
 	FaceSelect();
-
 
 
 	//カプセル用のポジション
@@ -253,30 +248,30 @@ void Player::Draw()
 
 }
 
-//void Player::OnCollide(const Collidable& colider)
-//{
-//	std::string message = "プレイヤーが";
-//	auto tag = colider.GetTag();
-//	switch (tag)
-//	{
-//	case Game::e_GameObjectTag::kPlayer:
-//		message += "プレイヤー";
-//		break;
-//	case Game::e_GameObjectTag::kBoss:
-//		message += "ボス";
-//		break;
-//	case Game::e_GameObjectTag::kSystemWall:
-//		message += "システム壁";
-//		break;
-//	case Game::e_GameObjectTag::kStepGround:
-//		message += "足場";
-//		break;
-//	default:
-//		break;
-//	}
-//	message += "と当たった！\n";
-//	printfDx(message.c_str());
-//}
+void Player::OnCollide(const Collidable& colider)
+{
+	std::string message = "プレイヤーが";
+	auto tag = colider.GetTag();
+	switch (tag)
+	{
+	case Game::e_GameObjectTag::kPlayer:
+		message += "プレイヤー";
+		break;
+	case Game::e_GameObjectTag::kBoss:
+		message += "ボス";
+		break;
+	case Game::e_GameObjectTag::kSystemWall:
+		message += "システム壁";
+		break;
+	case Game::e_GameObjectTag::kStepGround:
+		message += "足場";
+		break;
+	default:
+		break;
+	}
+	message += "と当たった！\n";
+	printfDx(message.c_str());
+}
 
 void Player::IdleUpdate()
 {

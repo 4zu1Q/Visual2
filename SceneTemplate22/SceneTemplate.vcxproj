@@ -176,6 +176,7 @@
     <ClCompile Include="ui\HpBar.cpp" />
     <ClCompile Include="util\ActionTime.cpp" />
     <ClCompile Include="util\AnimController.cpp" />
+    <ClCompile Include="util\ColliderDataSphere.cpp" />
     <ClCompile Include="util\Collision.cpp" />
     <ClCompile Include="util\EffectManager.cpp" />
     <ClCompile Include="util\OnAttackFrame.cpp" />
@@ -189,11 +190,12 @@
   <ItemGroup>
     <ClInclude Include="myLib\Collidable.h" />
     <ClInclude Include="myLib\ColliderData.h" />
+    <ClInclude Include="myLib\ColliderDataSphere.h" />
     <ClInclude Include="myLib\DebugDraw.h" />
     <ClInclude Include="myLib\MathHelper.h" />
+    <ClInclude Include="myLib\MyLib.h" />
     <ClInclude Include="myLib\Physics.h" />
     <ClInclude Include="myLib\Rigidbody.h" />
-    <ClInclude Include="myLib\YuiLib.h" />
     <ClInclude Include="object\boss\BossBase.h" />
     <ClInclude Include="object\boss\BossPower.h" />
     <ClInclude Include="object\boss\BossShot.h" />

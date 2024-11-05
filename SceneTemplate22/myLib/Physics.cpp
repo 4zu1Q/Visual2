@@ -29,19 +29,7 @@ void Physics::Entry(Collidable* collidable)
 /// 衝突物の登録解除
 /// </summary>
 void Physics::Exit(Collidable* collidable)
-{
-	//// 登録解除(erace)
-	//for (std::list<Collidable*>::const_iterator iterator = collidables.begin();
-	//	iterator != collidables.end();
-	//	++iterator)
-	//{
-	//	if ((*iterator) == collidable)
-	//	{
-	//		collidables.erase(iterator);
-	//		break;
-	//	}
-	//}
-	
+{	
 	// 登録解除(remove)
 	bool found = (std::find(collidables.begin(), collidables.end(), collidable) != collidables.end());
 	if (found)
