@@ -2,6 +2,7 @@
 
 #include "util/Pad.h"
 #include "util/Game.h"
+#include "util/Vec2.h"
 
 #include "SceneManager.h"
 #include "SceneTitle.h"
@@ -17,8 +18,8 @@ namespace
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
 
-	//タイトルロゴのポジション
-	constexpr VECTOR kTitleLogoPos = { 40.0f , 40.0f };
+	//タイトルロゴのポジション　※この型で画像などの移動を行っていく
+	const Vec2 kTitleLogoPos = { 40.0f , 40.0f };
 	
 	//スタートのポジション
 	constexpr VECTOR kStartPos = { 900.0f , 320.0f };
