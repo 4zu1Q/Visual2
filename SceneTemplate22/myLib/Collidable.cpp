@@ -1,18 +1,18 @@
 ﻿// 2024 Takeru Yui All Rights Reserved.
 #include <cassert> 
 #include "DxLib.h"
-#include "YuiLib.h"
+#include "MyLib.h"
 
 using namespace MyLib;
 
 /// <summary>
 /// コンストラクタ
 /// </summary>
-Collidable::Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderData::e_Kind colliderKind, bool isTrigger)
-	: priority		(priority)
-	, tag			(tag)
-	, colliderData	(nullptr)
-	, nextPos		(VGet(0,0,0))
+Collidable::Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderData::e_Kind colliderKind, bool isTrigger):
+	m_priority(priority),
+	m_tag(tag),
+	m_colliderData(nullptr),
+	m_nextPos(VGet(0,0,0))
 {
 	CreateColliderData(colliderKind, isTrigger);
 }
@@ -22,10 +22,10 @@ Collidable::Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderD
 /// </summary>
 Collidable::~Collidable()
 {
-	if (colliderData != nullptr)
+	if (m_colliderData != nullptr)
 	{
-		delete colliderData;
-		colliderData = nullptr;
+		delete m_colliderData;
+		m_colliderData = nullptr;
 	}
 }
 
@@ -50,14 +50,19 @@ void Collidable::Finalize(MyLib::Physics* physics)
 /// </summary>
 void Collidable::AddThroughTag(Game::e_GameObjectTag tag)
 {
-	bool found = (std::find(throughTags.begin(), throughTags.end(), tag) != throughTags.end());
+
+	//当たり判定を無視するタグのリストに追加予定のタグが存在するかを確認
+	bool found = (std::find(m_throughTags.begin(), m_throughTags.end(), tag) != m_throughTags.end());
+
+	//リストの中に既に存在していたら警告を出す
 	if (found)
 	{
 		assert(0 && "指定タグは既に追加されています");
 	}
+	//存在していなかったら追加する
 	else
 	{
-		throughTags.emplace_back(tag);
+		m_throughTags.emplace_back(tag);
 	}
 }
 
@@ -66,21 +71,26 @@ void Collidable::AddThroughTag(Game::e_GameObjectTag tag)
 /// </summary>
 void Collidable::RemoveThroughTag(Game::e_GameObjectTag tag)
 {
-	bool found = (std::find(throughTags.begin(), throughTags.end(), tag) != throughTags.end());
+	//当たり判定を無視するタグのリストに追加予定のタグが存在するかを確認
+	bool found = (std::find(m_throughTags.begin(), m_throughTags.end(), tag) != m_throughTags.end());
+
+	//存在していなかったら警告を出す
 	if (!found)
 	{
 		assert(0 && "指定タグは存在しません");
 	}
+	//存在していたら削除する
 	else
 	{
-		throughTags.remove(tag);
+		m_throughTags.remove(tag);
 	}
 }
 
 // 当たり判定を無視（スルー）する対象かどうか
 bool Collidable::IsThroughTarget(const Collidable* target) const
 {
-	bool found = (std::find(throughTags.begin(), throughTags.end(), target->GetTag()) != throughTags.end());
+	//確認したい当たり判定のタグが無視するタグのリストに含まれているかどうか調べる
+	bool found = (std::find(m_throughTags.begin(), m_throughTags.end(), target->GetTag()) != m_throughTags.end());
 	return found;
 }
 
@@ -89,25 +99,25 @@ bool Collidable::IsThroughTarget(const Collidable* target) const
 /// </summary>
 ColliderData* Collidable::CreateColliderData(ColliderData::e_Kind kind, bool isTrigger)
 {
-	if (colliderData != nullptr)
+	if (m_colliderData != nullptr)
 	{
 		assert(0 && "colliderDataは既に作られています。");
-		return colliderData;
+		return m_colliderData;
 	}
 	switch (kind)
 	{
-	case ColliderData::e_Kind::Circle3D:
-		colliderData = new ColliderDataCircle2D(isTrigger);
+	case ColliderData::e_Kind::kSphere:
+		m_colliderData = new ColliderDataSphere(isTrigger);
 		break;
-	case ColliderData::e_Kind::Capsule3D:
-		colliderData = new ColliderDataLine2D(isTrigger);
+	case ColliderData::e_Kind::kCapsule:
+		m_colliderData = new ColliderDataCapsule(isTrigger);
 		break;
-	case ColliderData::e_Kind::Line2D:
-		colliderData = new ColliderDataOneWayLine2D(isTrigger);
+	case ColliderData::e_Kind::kLine:
+		m_colliderData = new ColliderDataLine(isTrigger);
 		break;
 	default:
 		assert(0 && "colliderData作成に失敗。");
 		break;
 	}
-	return colliderData;
+	return m_colliderData;
 }

@@ -1,5 +1,7 @@
 ﻿#include "DxLib.h"
 
+#include "myLib/MyLib.h"
+
 #include "EffekseerForDXLib.h"
 
 #include "SceneManager.h"
@@ -91,8 +93,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		pSceneManager.Draw();
 
 
+
+
 		// 画面が切り替わるのを待つ
 		ScreenFlip();
+
+#ifdef _DEBUG
 
 		// escキーでゲーム終了
 		if (CheckHitKey(KEY_INPUT_ESCAPE))
@@ -100,9 +106,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			break;
 		}
 
+#endif
+
 		// FPS60に固定する
 		while (GetNowHiPerformanceCount() - time < 16667)
 		{
+
 		}
 
 

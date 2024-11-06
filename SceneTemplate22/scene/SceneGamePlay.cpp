@@ -1,5 +1,7 @@
 ﻿#include "DxLib.h"
 
+#include "myLib/MyLib.h"
+
 #include "SceneManager.h"
 #include "SceneGamePlay.h"
 #include "ScenePause.h"
@@ -41,6 +43,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pItem = std::make_shared<ItemBase>();
 	m_pBoss = std::make_shared<BossPower>();
 
+
 	m_playerPos = VGet(30, 0, 20);
 	m_cameraPos = VGet(0, 0, 0);
 
@@ -52,13 +55,23 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 
 SceneGamePlay::~SceneGamePlay()
 {
-	
+	m_pPlayer->Finalize(m_pPhysics);
 }
 
 
 void SceneGamePlay::Update()
 {
+#ifdef _DEBUG
+	MyLib::DebugDraw::Draw();
+#endif
+
+#ifdef _DEBUG
+	MyLib::DebugDraw::Clear();
+#endif
+
 	Pad::Update();
+	UpdateFade();
+
 
 	//カメラのアングルをセットする
 	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
@@ -72,8 +85,6 @@ void SceneGamePlay::Update()
 		}
 	}
 
-	UpdateFade();
-
 	if (!IsFading())
 	{
 		if (Pad::IsTrigger(PAD_INPUT_8))
@@ -85,21 +96,20 @@ void SceneGamePlay::Update()
 
 	m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
-	m_pPlayer->Update();
+	m_pPlayer->Update(m_pPhysics);
 	m_pBoss->Update();
+	m_pItem->Update();
+
+	m_pPhysics->Update();
+
 	m_pFaceUi->Update();
 	m_pHpBar->Update(*m_pPlayer);
 
-	m_pItem->Update();
 
 	//プレイヤーとアイテムの当たり判定のフラグを代入
 	m_isMpHit = m_pItem->ItemHit(m_pPlayer);
 
-	//プレイヤーとアイテムが当たった場合
-	if (m_isMpHit)
-	{
-		printfDx("当たった");
-	}
+	
 
 
 }

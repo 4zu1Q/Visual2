@@ -1,5 +1,4 @@
-﻿// 2024 Takeru Yui All Rights Reserved.
-#include "DxLib.h"
+﻿#include "DxLib.h"
 #include "Rigidbody.h"
 
 using namespace MyLib;
@@ -7,11 +6,11 @@ using namespace MyLib;
 /// <summary>
 /// コンストラクタ
 /// </summary>
-Rigidbody::Rigidbody()
-	: pos		 (VGet(0, 0, 0))
-	, dir		 (VGet(0, 0, 0))
-	, velocity	 (VGet(0, 0, 0))
-	, useGravity (false)
+Rigidbody::Rigidbody() :
+	m_pos (VGet(0, 0, 0)),
+	m_dir (VGet(0, 0, 0)),
+	m_velocity (VGet(0, 0, 0)),
+	m_isUseGravity (false)
 {
 	// 処理なし
 }
@@ -21,10 +20,10 @@ Rigidbody::Rigidbody()
 /// </summary>
 void Rigidbody::Initialize(bool useGravity)
 {
-	pos = VGet(0, 0, 0);
-	dir = VGet(0, 0, 0);
-	velocity = VGet(0, 0, 0);
-	this->useGravity = useGravity;
+	m_pos = VGet(0, 0, 0);
+	m_dir = VGet(0, 0, 0);
+	m_velocity = VGet(0, 0, 0);
+	this->m_isUseGravity = useGravity;
 }
 
 /// <summary>
@@ -32,7 +31,7 @@ void Rigidbody::Initialize(bool useGravity)
 /// </summary>
 void Rigidbody::AddForce(const VECTOR& force)
 {
-	velocity = VAdd(velocity, force);
+	m_velocity = VAdd(m_velocity, force);
 }
 
 /// <summary>
@@ -40,9 +39,9 @@ void Rigidbody::AddForce(const VECTOR& force)
 /// </summary>
 void Rigidbody::SetVelocity(const VECTOR& set)
 {
-	velocity = set;
-	if (VSquareSize(velocity) > 0)
+	m_velocity = set;
+	if (VSquareSize(m_velocity) > 0)
 	{
-		dir = VNorm(velocity);
+		m_dir = VNorm(m_velocity);
 	}
 }

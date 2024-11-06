@@ -48,6 +48,7 @@ private:
 	std::shared_ptr<BossPower> m_pBoss;
 
 	MyLib::Physics* m_pPhysics = new MyLib::Physics;
+	//std::shared_ptr<Physics*> m_pPhysics;
 
 
 	//

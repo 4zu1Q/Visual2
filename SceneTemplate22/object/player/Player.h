@@ -26,10 +26,10 @@ public:
 	Player();
 	virtual ~Player();
 
-	void Initialize(MyLib::Physics* physics);
-	void Finalize();
+	void Initialize(MyLib::Physics* physics) override;
+	void Finalize(MyLib::Physics* physics) override;
 
-	void Update();
+	void Update(MyLib::Physics* physics);
 	void Draw();
 
 	// 衝突したとき
@@ -40,8 +40,10 @@ public:
 	void SetModelHandle(const int modelH) { m_modelH = modelH; }
 
 	//プレイヤー下の座標を取得
-	const VECTOR& GetPosDown() const { return m_posDown; }
-	void SetPosDown(const VECTOR pos) { m_posDown = pos; }
+//	const VECTOR& GetPosDown() const { return m_posDown; }
+	const VECTOR& GetPosDown() const;
+//	void SetPosDown(const VECTOR pos) { m_posDown = pos; }
+	void SetPosDown(const VECTOR pos);
 
 	//プレイヤー上の座標を取得
 	const VECTOR& GetPosUp() const { return m_posUp; }
@@ -145,7 +147,7 @@ private:
 	int m_weaponH;
 
 	//プレイヤの座標
-	VECTOR m_posDown;
+//	VECTOR m_posDown;
 	VECTOR m_posUp;
 
 	VECTOR m_attackPos;
@@ -171,6 +173,8 @@ private:
 	//アナログスティック用の変数
 	int m_analogX;
 	int m_analogZ;
+
+	float m_speed;
 
 	//顔を装着しているかしていないかの変数
 	bool m_isFaceUse;

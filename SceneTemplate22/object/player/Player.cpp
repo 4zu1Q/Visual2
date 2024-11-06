@@ -4,7 +4,7 @@
 #include "util/Pad.h"
 #include "util/AnimController.h"
 
-#include "myLib/ColliderData.h"
+#include "myLib/MyLib.h"
 
 #include <cmath>
 #include <cassert>
@@ -70,11 +70,10 @@ namespace
 }
 
 Player::Player() :
-	Collidable(Collidable::e_Priority::High, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::Capsule3D, false),
+	Collidable(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kSphere, false),
 	m_modelH(-1),
 	m_weaponH(-1),
 	m_radius(2),
-	m_posDown(kInitPos),
 	m_posUp(kInitPos),
 	m_move(VGet(0, 0, 0)),
 	m_attackPos(VGet(0, 0, 0)),
@@ -128,11 +127,12 @@ Player::Player() :
 	m_pAnim = std::make_shared<AnimController>();
 
 
+	auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>(m_colliderData);
+	circleColliderData->m_radius = 5.0f;
 }
 
 Player::~Player()
 {
-	Finalize();
 }
 
 void Player::Initialize(MyLib::Physics* physics)
@@ -140,8 +140,9 @@ void Player::Initialize(MyLib::Physics* physics)
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
-	rigidbody.Initialize(true);
-	rigidbody.SetPos(VGet(2.0f, 0.0f, 0.0f));
+	m_rigidbody.Initialize(true);
+	m_rigidbody.SetPos(kInitPos);
+	m_speed = 0.1f;
 
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
@@ -153,19 +154,22 @@ void Player::Initialize(MyLib::Physics* physics)
 	//アニメーションの初期化
 	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimIdle);
 
+
 	// メンバ関数ポインタの初期化
 	m_updaFunc = &Player::IdleUpdate;
 
 }
 
-void Player::Finalize()
+void Player::Finalize(MyLib::Physics* physics)
 {
 	//モデルをデリートする
 	MV1DeleteModel(m_modelH);
 	m_modelH = -1;
+
+	Collidable::Finalize(physics);
 }
 
-void Player::Update()
+void Player::Update(MyLib::Physics* physics)
 {
 
 	//アップデート
@@ -182,33 +186,21 @@ void Player::Update()
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
-	//仮重力
-	m_posDown.y -= 1.2f;
-
-	//仮地面
-	if (m_posDown.y < 0)
-	{
-		m_posDown.y = 0;
-		m_isJump = false;
-	}
-	else
-	{
-		m_isJump = true;
-	}
-
-
 	//顔を選択する関数
 	FaceSelect();
 
 
 	//カプセル用のポジション
-	m_posUp = VGet(m_posDown.x, m_posDown.y + kUpPos.y, m_posDown.z);
+	auto pos = m_rigidbody.GetPos();
+
+
+	m_posUp = VGet(pos.x, pos.y + kUpPos.y, pos.z);
 
 	//モデルのポジションを合わせるよう
-	VECTOR modelPos = VGet(m_posDown.x, m_posDown.y, m_posDown.z);
+	VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
 
 	//モデルに座標をセットする
-	MV1SetPosition(m_modelH, m_posDown);
+	MV1SetPosition(m_modelH, pos);
 
 	//モデルに回転をセットする
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
@@ -233,16 +225,12 @@ void Player::Draw()
 
 #ifdef _DEBUG
 
-	DrawSphere3D(m_attackPos, m_radius, 8, 0xff00ff, 0xffffff, false);
-	DrawSphere3D(m_posDown, m_radius, 8, 0xff00ff, 0xffffff, false);
-
-	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_posDown.x, m_posDown.y, m_posDown.z);
+	auto pos = m_rigidbody.GetPos();
+	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", pos.x, pos.y, pos.z);
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
 
 	DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
 	DrawFormatString(0, 280, 0x000fff, " PlayerHp : %d ", m_hp);
-
-	DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 
 #endif
 
@@ -271,6 +259,16 @@ void Player::OnCollide(const Collidable& colider)
 	}
 	message += "と当たった！\n";
 	printfDx(message.c_str());
+}
+
+const VECTOR& Player::GetPosDown() const
+{
+	return m_rigidbody.GetPos();
+}
+
+void Player::SetPosDown(const VECTOR pos)
+{
+	m_rigidbody.SetPos(pos);
 }
 
 void Player::IdleUpdate()
@@ -342,7 +340,8 @@ void Player::WalkUpdate()
 		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 		move = VTransform(move, mtx);
 
-		m_posDown = VAdd(m_posDown, move);
+		move.y = m_rigidbody.GetVelocity().y;
+		m_rigidbody.SetVelocity(move);
 		m_move = move;
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
@@ -416,7 +415,8 @@ void Player::DashUpdate()
 		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 		move = VTransform(move, mtx);
 
-		m_posDown = VAdd(m_posDown, move);
+		move.y = m_rigidbody.GetVelocity().y;
+		m_rigidbody.SetVelocity(move);
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
 		m_attackDir = VNorm(move);
@@ -452,8 +452,6 @@ void Player::DashUpdate()
 
 void Player::JumpUpdate()
 {
-	//仮重力
-	m_posDown.y -= 1.2f;
 
 	if (m_pAnim->IsLoop())
 	{
@@ -483,7 +481,8 @@ void Player::JumpUpdate()
 	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 	move = VTransform(move, mtx);
 
-	m_posDown = VAdd(m_posDown, move);
+	move.y = m_rigidbody.GetVelocity().y;
+	m_rigidbody.SetVelocity(move);
 
 	//動いている間
 	if (VSquareSize(move) > 0.0f)
@@ -492,17 +491,10 @@ void Player::JumpUpdate()
 		m_attackDir = VNorm(move);
 		m_avoid = VNorm(move);
 	}
-
-	m_posDown = VAdd(m_posDown, VGet(0, kJumpPower, 0));
-
-	//仮重力
-	//m_posDown.y = kJumpPower;
 }
 
 void Player::AirUpdate()
 {
-	//仮重力
-	m_posDown.y -= 1.2f;
 
 	if (!m_isJump)
 	{
@@ -530,8 +522,8 @@ void Player::AirUpdate()
 	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 	move = VTransform(move, mtx);
 
-	m_posDown = VAdd(m_posDown, move);
-
+	move.y = m_rigidbody.GetVelocity().y;
+	m_rigidbody.SetVelocity(move);
 }
 
 void Player::AttackXUpdate()
@@ -622,6 +614,7 @@ void Player::WeaponDraw()
 
 void Player::OnIdle()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updaFunc = &Player::IdleUpdate;
 }
@@ -653,6 +646,11 @@ void Player::OnAttackY()
 
 void Player::OnJump()
 {
+	//地面と接触しているかどうか
+	//m_isJump = true;
+	auto vel = m_rigidbody.GetVelocity();
+	vel.y = kJumpPower;
+	m_rigidbody.SetVelocity(vel);
 	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
 	m_updaFunc = &Player::JumpUpdate;
 }

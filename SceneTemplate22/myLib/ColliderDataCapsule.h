@@ -9,18 +9,18 @@ namespace MyLib
 	/// <summary>
 	/// 当たり判定データ:3Dの球
 	/// </summary>
-	class ColliderDataSphere : public ColliderData
+	class ColliderDataCapsule : public ColliderData
 	{
 	public:
 
 		//コンストラクタ
-		ColliderDataSphere(bool isTrigger);
+		ColliderDataCapsule(bool isTrigger);
 
 		float m_radius;	//円の半径
-		VECTOR m_center;//円の中心
+
+		VECTOR m_posDown;	//カプセルの下座標
+		VECTOR m_posUp;	//カプセルの上座標
 
 	};
 
 }
-
-

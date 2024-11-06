@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "DxLib.h"
 
-namespace MyLib {
+namespace MyLib 
+{
 
 	/// <summary>
 	/// 線分に対する最近接点を求める

@@ -108,7 +108,7 @@ void SceneDebug::Update()
 
 void SceneDebug::Draw()
 {
-	DrawFade(0xffffff);
+	DrawFade(0x000000);
 	DrawString(0, 0, "Scene Debug", 0xffffff, false);
 
 	DrawFormatString(kTextX * 0.5f, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");

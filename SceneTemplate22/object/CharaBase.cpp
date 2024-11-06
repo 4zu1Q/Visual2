@@ -30,7 +30,4 @@ void CharaBase::Draw()
 
 }
 
-void CharaBase::Gravity()
-{
 
-}

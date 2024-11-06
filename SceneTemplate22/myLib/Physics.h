@@ -5,7 +5,8 @@
 #include <list>
 #include <vector>
 
-namespace MyLib{
+namespace MyLib
+{
 
 	class Collidable;
 
@@ -26,22 +27,19 @@ namespace MyLib{
 		std::list<Collidable*> IsCollideLine(const VECTOR& start, const VECTOR& end) const;
 
 		// 重力と最大重力加速度
-		static constexpr float Gravity = -0.01f;
-		static constexpr float MaxGravityAccel = -0.15f;
+		static constexpr float m_kGravity = -0.1f;
+		static constexpr float m_kMaxGravityAccel = -0.65f;
 
 	private:
-		static const int BeforeFixInfoColor = 0x0000ff;	// 補正前情報色
-		static const int AimInfoColor = 0x0000aa;	// 補正前予定情報色
-		static const int AfterFixInfoColor = 0xff00ff;	// 補正後情報色
 
 		std::list<Collidable*> collidables;	// 登録されたCollidableのリスト
 
 		// OnCollideの遅延通知のためのデータ
 		struct OnCollideInfo
 		{
-			Collidable* owner;
-			Collidable* colider;
-			void OnCollide() { owner->OnCollide(*colider); }
+			Collidable* owner_;
+			Collidable* colider_;
+			void OnCollide() { owner_->OnCollide(*colider_); }
 		};
 
 		// 当たり判定チェック

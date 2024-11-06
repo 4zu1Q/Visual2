@@ -1,10 +1,18 @@
 ﻿// 2024 Takeru Yui All Rights Reserved.
 #include <cassert>
 #include "DxLib.h"
-#include "YuiLib.h"
+#include "MyLib.h"
 #include "MathHelper.h"
 
 using namespace MyLib;
+
+namespace
+{
+	constexpr int kBeforeFixInfoColor = 0x0000ff;	// 補正前情報色
+	constexpr int kAimInfoColor = 0x0000aa;			// 補正前予定情報色
+	constexpr int kAfterFixInfoColor = 0xff00ff;		// 補正後情報色
+
+}
 
 /// <summary>
 /// 衝突物の登録
@@ -16,7 +24,6 @@ void Physics::Entry(Collidable* collidable)
 	if(!found)
 	{
 		collidables.emplace_back(collidable);
-		//collidables.push_back(collidable);
 	}
 	// 既に登録されてたらエラー
 	else
@@ -52,47 +59,60 @@ void Physics::Update()
 	for (auto& item : collidables)
 	{
 		// ポジションに移動力を足す
-		VECTOR pos = item->rigidbody.GetPos();
-		VECTOR velocity = item->rigidbody.GetVelocity();
+		VECTOR pos = item->m_rigidbody.GetPos();
+		VECTOR velocity = item->m_rigidbody.GetVelocity();
 
 		// 重力を利用する設定なら、重力を追加する
-		if (item->rigidbody.UseGravity())
+		if (item->m_rigidbody.UseGravity())
 		{
-			velocity = VAdd(velocity, VGet(0, Gravity, 0));
+			velocity = VAdd(velocity, VGet(0, m_kGravity, 0));
 
 			// 最大重力加速度より大きかったらクランプ
-			if (velocity.y < MaxGravityAccel)
+			if (velocity.y < m_kMaxGravityAccel)
 			{
-				velocity = VGet(velocity.x, MaxGravityAccel, velocity.z);
+				velocity = VGet(velocity.x, m_kMaxGravityAccel, velocity.z);
 			}
 		}
 
 		VECTOR nextPos = VAdd(pos, velocity);
 
-		item->rigidbody.SetVelocity(velocity);
+		item->m_rigidbody.SetVelocity(velocity);
 
 		// もともとの情報、予定情報をデバッグ表示
 #if _DEBUG
-		auto kind = item->colliderData->GetKind();
-		//if (kind == ColliderData::Kind::Circle3D)
-		//{
-		//	ColliderDataCircle3D* circleData;
-		//	circleData = dynamic_cast<ColliderDataCircle3D*>(item->colliderData);
-		//	float radius = circleData->radius;
-		//	DebugDraw::DrawCircle(pos, radius, BeforeFixInfoColor);
-		//	DebugDraw::DrawLine(pos, nextPos, AimInfoColor);
-		//	DebugDraw::DrawCircle(nextPos, radius, AimInfoColor);
-		//}
-		//else if (kind == ColliderData::Kind::Line2D || kind == ColliderData::Kind::OneWayLine2D)
-		//{
-		//	// lineはstaticなので確定色で描く
-		//	auto lineData = dynamic_cast<ColliderDataLine2D*>(item->colliderData);
-		//	DebugDraw::DrawLine(lineData->startPoint, lineData->endPoint, AfterFixInfoColor);
-		//}
+
+		auto kind = item->m_colliderData->GetKind();
+
+		if (kind == ColliderData::e_Kind::kSphere)
+		{
+			ColliderDataSphere* sphereData;
+			sphereData = dynamic_cast<ColliderDataSphere*>(item->m_colliderData);
+			float radius = sphereData->m_radius;
+			DebugDraw::DrawSphere(pos, radius, kBeforeFixInfoColor);
+			DebugDraw::DrawSphere(nextPos, radius, kAimInfoColor);
+
+		}
+		else if (kind == ColliderData::e_Kind::kCapsule)
+		{
+			ColliderDataCapsule* capsuleData;
+			capsuleData = dynamic_cast<ColliderDataCapsule*>(item->m_colliderData);
+			float radius = capsuleData->m_radius;
+			VECTOR upPos = capsuleData->m_posUp;
+			
+
+			DebugDraw::DrawCapsule(pos, upPos, radius, kBeforeFixInfoColor);
+			DebugDraw::DrawCapsule(nextPos, upPos, radius, kAimInfoColor);
+		}
+		else if (kind == ColliderData::e_Kind::kLine)
+		{
+			// lineはstaticなので確定色で描く
+			auto lineData = dynamic_cast<ColliderDataLine*>(item->m_colliderData);
+			DebugDraw::DrawLine(lineData->m_startPos, lineData->m_endPos, kAfterFixInfoColor);
+		}
 #endif
 
 		// 予定ポジション設定
-		item->nextPos = nextPos;
+		item->m_nextPos = nextPos;
 	}
 
 	// 当たり判定チェック（nextPos指定）
@@ -104,7 +124,7 @@ void Physics::Update()
 	// 当たり通知
 	for (auto& item : onCollideInfo)
 	{
-		item.owner->OnCollide(*item.colider);
+		item.owner_->OnCollide(*item.colider_);
 	}
 }
 
@@ -140,7 +160,7 @@ std::vector<Physics::OnCollideInfo> Physics::CheckColide() const
 						Collidable* secondary = objB;
 
 						// どちらもトリガーでなければ次目標位置修正
-						bool isTriggerAorB = objA->colliderData->IsTrigger() || objB->colliderData->IsTrigger();
+						bool isTriggerAorB = objA->m_colliderData->IsTrigger() || objB->m_colliderData->IsTrigger();
 						if (!isTriggerAorB)
 						{
 							// プライオリティの低いほうを移動
@@ -159,11 +179,11 @@ std::vector<Physics::OnCollideInfo> Physics::CheckColide() const
 						for (const auto& item : onCollideInfo)
 						{
 							// 既に通知リストに含まれていたら呼ばない
-							if (item.owner == primary)
+							if (item.owner_ == primary)
 							{
 								hasPrimaryInfo = true;
 							}
-							if (item.owner == secondary)
+							if (item.owner_ == secondary)
 							{
 								hasSecondaryInfo = true;
 							}
@@ -214,29 +234,35 @@ std::list<Collidable*> Physics::IsCollideLine(const VECTOR& start, const VECTOR&
 	std::list<Collidable*> ret;
 	for (auto& obj : collidables)
 	{
-		//// collidableの種類によって、当たり判定を分ける
-		//auto kind = obj->colliderData->GetKind();
-		//// ラインとラインor一方通行ライン
-		//if (kind == ColliderData::Kind::Line2D || kind == ColliderData::Kind::OneWayLine2D)
-		//{
-		//	auto lineColliderData = dynamic_cast<ColliderDataLine2D*>(obj->colliderData);
-		//	// 2つのライン同士の最短距離が0だと当たっている
-		//	float minLength = Segment_Segment_MinLength(start, end, lineColliderData->startPoint, lineColliderData->endPoint);
-		//	if (minLength < 0.001f)	// float誤差を許容
-		//	{
- 	//			ret.emplace_back(obj);
-		//	}
-		//}
-		//// ラインと円
-		//else if (kind == ColliderData::Kind::Circle3D)
-		//{
-		//	auto circleColliderData = dynamic_cast<ColliderDataCircle3D*>(obj->colliderData);
-		//	bool isHit = (Segment_Point_MinLength(start, end, obj->rigidbody.GetPos()) < circleColliderData->radius);
-		//	if (isHit)
-		//	{
-		//		ret.emplace_back(obj);
-		//	}
-		//}
+		// collidableの種類によって、当たり判定を分ける
+		auto kind = obj->m_colliderData->GetKind();
+		// ラインとラインor一方通行ライン
+		if (kind == ColliderData::e_Kind::kLine)
+		{
+			auto lineColliderData = dynamic_cast<ColliderDataLine*>(obj->m_colliderData);
+			// 2つのライン同士の最短距離が0だと当たっている
+			float minLength = Segment_Segment_MinLength(start, end, lineColliderData->m_startPos, lineColliderData->m_endPos);
+			if (minLength < 0.001f)	// float誤差を許容
+			{
+ 				ret.emplace_back(obj);
+			}
+		}
+		// ラインと円
+		else if (kind == ColliderData::e_Kind::kSphere)
+		{
+			auto sphereColliderData = dynamic_cast<ColliderDataSphere*>(obj->m_colliderData);
+			bool isHit = (Segment_Point_MinLength(start, end, obj->m_rigidbody.GetPos()) < sphereColliderData->m_radius);
+			if (isHit)
+			{
+				ret.emplace_back(obj);
+			}
+		}
+		//ラインとカプセル
+		else if (kind == ColliderData::e_Kind::kCapsule)
+		{
+
+		}
+
 	}
 	return ret;
 }
@@ -255,21 +281,35 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 	}
 
 	// collidableの種類によって、当たり判定を分ける
-	auto aKind = objA->colliderData->GetKind();
-	auto bKind = objB->colliderData->GetKind();
+	auto aKind = objA->m_colliderData->GetKind();
+	auto bKind = objB->m_colliderData->GetKind();
 
 	// 当たり判定を分ける
 	// 円同士
-	//if (aKind == ColliderData::Kind::Circle3D && bKind == ColliderData::Kind::Circle3D)
-	//{
-	//	auto atob = VSub(objB->nextPos, objA->nextPos);
-	//	auto atobLength = VSize(atob);
+	if (aKind == ColliderData::e_Kind::kSphere && bKind == ColliderData::e_Kind::kSphere)
+	{
+		auto atob = VSub(objB->m_nextPos, objA->m_nextPos);
+		auto atobLength = VSize(atob);
 
-	//	// お互いの距離が、それぞれの半径を足したものより小さければ当たる
-	//	auto objAColliderData = dynamic_cast<ColliderDataCircle3D*>(objA->colliderData);
-	//	auto objBColliderData = dynamic_cast<ColliderDataCircle3D*>(objB->colliderData);
-	//	isHit = (atobLength < objAColliderData->radius + objBColliderData->radius);
-	//}
+		// お互いの距離が、それぞれの半径を足したものより小さければ当たる
+		auto objAColliderData = dynamic_cast<ColliderDataSphere*>(objA->m_colliderData);
+		auto objBColliderData = dynamic_cast<ColliderDataSphere*>(objB->m_colliderData);
+		isHit = (atobLength < objAColliderData->m_radius + objBColliderData->m_radius);
+	}
+	//カプセル同士
+	else if (aKind == ColliderData::e_Kind::kCapsule && bKind == ColliderData::e_Kind::kCapsule)
+	{
+
+	}
+	//円とカプセル
+	else if (aKind == ColliderData::e_Kind::kCapsule && bKind == ColliderData::e_Kind::kSphere
+				||
+			 aKind == ColliderData::e_Kind::kSphere && bKind == ColliderData::e_Kind::kCapsule)
+	{
+
+	}
+	
+
 	//// 円とライン
 	//else if (
 	//	(aKind == ColliderData::Kind::Line2D && bKind == ColliderData::Kind::Circle3D)
@@ -359,22 +399,22 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 void Physics::FixNextPosition(Collidable* primary, Collidable* secondary) const
 {
 	// 当たり判定の種別ごとに補正方法を変える
-	auto primaryKind = primary->colliderData->GetKind();
-	auto secondaryKind = secondary->colliderData->GetKind();
+	auto primaryKind = primary->m_colliderData->GetKind();
+	auto secondaryKind = secondary->m_colliderData->GetKind();
 
 	// 円同士の位置補正
-	if (primaryKind == ColliderData::e_Kind::Circle3D && secondaryKind == ColliderData::e_Kind::Circle3D)
+	if (primaryKind == ColliderData::e_Kind::kSphere && secondaryKind == ColliderData::e_Kind::kSphere)
 	{
-		//VECTOR primaryToSecondary = VSub(secondary->nextPos, primary->nextPos);
-		//VECTOR primaryToSecondaryN = VNorm(primaryToSecondary);
+		VECTOR primaryToSecondary = VSub(secondary->m_nextPos, primary->m_nextPos);
+		VECTOR primaryToSecondaryN = VNorm(primaryToSecondary);
 
-		//auto primaryColliderData = dynamic_cast<ColliderDataCircle3D*>(primary->colliderData);
-		//auto secondaryColliderData = dynamic_cast<ColliderDataCircle3D*>(secondary->colliderData);
-		//float  awayDist = primaryColliderData->radius + secondaryColliderData->radius + 0.0001f;	// そのままだとちょうど当たる位置になるので少し余分に離す
+		auto primaryColliderData = dynamic_cast<ColliderDataSphere*>(primary->m_colliderData);
+		auto secondaryColliderData = dynamic_cast<ColliderDataSphere*>(secondary->m_colliderData);
+		float  awayDist = primaryColliderData->m_radius + secondaryColliderData->m_radius + 0.0001f;	// そのままだとちょうど当たる位置になるので少し余分に離す
 
-		//VECTOR primaryToNewSecondaryPos = VScale(primaryToSecondaryN, awayDist);
-		//VECTOR fixedPos = VAdd(primary->nextPos, primaryToNewSecondaryPos);
-		//secondary->nextPos = fixedPos;
+		VECTOR primaryToNewSecondaryPos = VScale(primaryToSecondaryN, awayDist);
+		VECTOR fixedPos = VAdd(primary->m_nextPos, primaryToNewSecondaryPos);
+		secondary->m_nextPos = fixedPos;
 	}
 	// ラインと円の位置補正
 	// HACK:現状lineは必ずstaticなのでprimaryにline,secondaryにcircleがくる。そうでないときはエラーを吐く
@@ -437,19 +477,21 @@ void Physics::FixPosition()
 	{
 #if _DEBUG
 		// 補正後の位置をデバッグ表示
-		DebugDraw::DrawLine(item->rigidbody.GetPos(), item->nextPos, AfterFixInfoColor);
+		//DebugDraw::DrawLine(item->rigidbody.GetPos(), item->nextPos, AfterFixInfoColor);
 
-		if (item->colliderData->GetKind() == ColliderData::e_Kind::Circle3D)
+		if (item->m_colliderData->GetKind() == ColliderData::e_Kind::kSphere)
 		{
-			//auto itemCircleData = dynamic_cast<ColliderDataCircle3D*>(item->colliderData);
-			//DebugDraw::DrawCircle(item->nextPos, itemCircleData->radius, AfterFixInfoColor);
+			auto itemCircleData = dynamic_cast<ColliderDataSphere*>(item->m_colliderData);
+			DebugDraw::DrawSphere(item->m_nextPos, itemCircleData->m_radius, kAfterFixInfoColor);
 		}
+
+
 #endif
 		// Posを更新するので、velocityもそこに移動するvelocityに修正
-		VECTOR toFixedPos = VSub(item->nextPos, item->rigidbody.GetPos());
-		item->rigidbody.SetVelocity(toFixedPos);
+		VECTOR toFixedPos = VSub(item->m_nextPos, item->m_rigidbody.GetPos());
+		item->m_rigidbody.SetVelocity(toFixedPos);
 
 		// 位置確定
-		item->rigidbody.SetPos(item->nextPos);
+		item->m_rigidbody.SetPos(item->m_nextPos);
 	}
 }

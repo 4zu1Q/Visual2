@@ -1,8 +1,13 @@
 ﻿#pragma once
 #include "DxLib.h"
+#include "ObjectBase.h"
 
-class CharaBase
+class CharaBase 
 {
+public:
+
+
+
 public:
 
 	CharaBase();
@@ -16,10 +21,7 @@ public:
 
 
 
-	/// <summary>
-	/// 継承しているものに重量を与える関数
-	/// </summary>
-	void Gravity();
+
 
 private:
 

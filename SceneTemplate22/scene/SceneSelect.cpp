@@ -60,18 +60,29 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize(m_pPhysics);
+	m_pItemHp->Initialize();
 }
 
 SceneSelect::~SceneSelect()
 {
-
+	m_pPlayer->Finalize(m_pPhysics);
+	m_pItemHp->Finalize();
 }
 
 void SceneSelect::Update()
 {
 
+#ifdef _DEBUG
+	MyLib::DebugDraw::Draw();
+#endif
+
+#ifdef _DEBUG
+	MyLib::DebugDraw::Clear();
+#endif
+
 	Pad::Update();
 	UpdateFade();
+
 
 	//カメラのアングルをセットする
 	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
@@ -97,13 +108,16 @@ void SceneSelect::Update()
 
 	m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
-	m_pPlayer->Update();
-	m_pFaceUi->Update();
-	m_pHpBar->Update(*m_pPlayer);
-
+	m_pPlayer->Update(m_pPhysics);
 	m_pItem->Update();
 	m_pItemMp->Update();
 	m_pItemHp->Update();
+
+	m_pPhysics->Update();
+
+	m_pFaceUi->Update();
+	m_pHpBar->Update(*m_pPlayer);
+
 	m_pTomb->Update();
 
 	//プレイヤーとアイテムの当たり判定のフラグを代入
@@ -116,17 +130,6 @@ void SceneSelect::Update()
 
 
 
-	//プレイヤーとアイテムが当たった場合
-
-	if (m_isMpHit)
-	{
-		printfDx("Mp");
-	}
-
-	if (m_isHpHit)
-	{
-		printfDx("Hp");
-	}
 
 	//プレイヤーと墓が当たった場合
 

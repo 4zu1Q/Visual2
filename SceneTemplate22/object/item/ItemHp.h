@@ -1,19 +1,25 @@
 ﻿#pragma once
 #include "DxLib.h"
+#include "myLib/MyLib.h"
 #include <memory>
 
+class Colidable;
 class Player;
-class ItemHp
+
+class ItemHp/* : public MyLib::Collidable*/
 {
 public:
 	ItemHp();
 	virtual ~ItemHp();
 
-	void Initialize();
-	void Finalize();
+	void Initialize(/*MyLib::Physics* physics*/);
+	void Finalize(/*MyLib::Physics* physics*/);
 
-	void Update();
+	void Update(/*MyLib::Physics* physics*/);
 	void Draw();
+
+	// 衝突したとき
+	//void OnCollide(const Collidable& colider) override;
 
 	/// <summary>
 	/// 球と球の当たり判定

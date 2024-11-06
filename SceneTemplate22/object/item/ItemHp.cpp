@@ -1,5 +1,7 @@
 ﻿#include "ItemHp.h"
 
+#include "myLib/MyLib.h"
+
 #include "object/player/Player.h"
 
 namespace
@@ -21,6 +23,7 @@ namespace
 }
 
 ItemHp::ItemHp():
+	//Collidable(Collidable::e_Priority::kLow, Game::e_GameObjectTag::kItem, MyLib::ColliderData::e_Kind::kSphere, false),
 	m_modelH(-1),
 	m_pos(kModelInitPos),
 	m_move(VGet(0, 0, 0)),
@@ -29,6 +32,9 @@ ItemHp::ItemHp():
 {
 	m_modelH = MV1LoadModel(kItemHpModelFilename);
 	MV1SetScale(m_modelH, kModelScale);
+
+	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>(m_colliderData);
+	//circleColliderData->m_radius = 5.0f;
 }
 
 ItemHp::~ItemHp()
@@ -36,19 +42,30 @@ ItemHp::~ItemHp()
 
 }
 
-void ItemHp::Initialize()
+void ItemHp::Initialize(/*MyLib::Physics* physics*/)
 {
+	//Collidable::Initialize(physics);
 
+	//// 物理挙動の初期化
+	//m_rigidbody.Initialize(false);
+	//m_rigidbody.SetPos(kModelInitPos);
 }
 
-void ItemHp::Finalize()
+void ItemHp::Finalize(/*MyLib::Physics* physics*/)
 {
+	//モデルをデリートする
+	MV1DeleteModel(m_modelH);
+	m_modelH = -1;
 
+	//Collidable::Finalize(physics);
 }
 
-void ItemHp::Update()
+void ItemHp::Update(/*MyLib::Physics* physics*/)
 {
 	m_rot += kRotSpeed;
+
+	//auto pos = m_rigidbody.GetPos();
+
 
 	//1回転したら値をリセット
 	if (m_rot >= DX_PI_F) m_rot = 0.0f;
@@ -67,7 +84,7 @@ void ItemHp::Update()
 void ItemHp::Draw()
 {
 	MV1DrawModel(m_modelH);
-	DrawSphere3D(m_pos, m_radius, 32, 0xffffff, 0xff0000, false);
+	//DrawSphere3D(m_pos, m_radius, 32, 0xffffff, 0xff0000, false);
 
 }
 

@@ -145,6 +145,9 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="myLib\Collidable.cpp" />
+    <ClCompile Include="myLib\ColliderDataCapsule.cpp" />
+    <ClCompile Include="myLib\ColliderDataLine.cpp" />
+    <ClCompile Include="myLib\ColliderDataSphere.cpp" />
     <ClCompile Include="myLib\DebugDraw.cpp" />
     <ClCompile Include="myLib\Physics.cpp" />
     <ClCompile Include="myLib\Rigidbody.cpp" />
@@ -157,6 +160,7 @@
     <ClCompile Include="object\item\ItemBase.cpp" />
     <ClCompile Include="object\item\ItemHp.cpp" />
     <ClCompile Include="object\item\ItemMp.cpp" />
+    <ClCompile Include="object\ObjectBase.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
     <ClCompile Include="object\player\PlayerWeapon.cpp" />
     <ClCompile Include="object\SkyDome.cpp" />
@@ -176,7 +180,6 @@
     <ClCompile Include="ui\HpBar.cpp" />
     <ClCompile Include="util\ActionTime.cpp" />
     <ClCompile Include="util\AnimController.cpp" />
-    <ClCompile Include="util\ColliderDataSphere.cpp" />
     <ClCompile Include="util\Collision.cpp" />
     <ClCompile Include="util\EffectManager.cpp" />
     <ClCompile Include="util\OnAttackFrame.cpp" />
@@ -190,6 +193,8 @@
   <ItemGroup>
     <ClInclude Include="myLib\Collidable.h" />
     <ClInclude Include="myLib\ColliderData.h" />
+    <ClInclude Include="myLib\ColliderDataCapsule.h" />
+    <ClInclude Include="myLib\ColliderDataLine.h" />
     <ClInclude Include="myLib\ColliderDataSphere.h" />
     <ClInclude Include="myLib\DebugDraw.h" />
     <ClInclude Include="myLib\MathHelper.h" />
@@ -205,6 +210,7 @@
     <ClInclude Include="object\item\ItemBase.h" />
     <ClInclude Include="object\item\ItemHp.h" />
     <ClInclude Include="object\item\ItemMp.h" />
+    <ClInclude Include="object\ObjectBase.h" />
     <ClInclude Include="object\player\Player.h" />
     <ClInclude Include="object\player\PlayerWeapon.h" />
     <ClInclude Include="object\SkyDome.h" />

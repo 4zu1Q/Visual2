@@ -1,6 +1,9 @@
 ﻿#include "BossBase.h"
 #include "object/player/Player.h"
 
+#include "myLib/MyLib.h"
+
+
 namespace
 {
 

@@ -1,14 +1,13 @@
-﻿#include "ColliderDataSphere.h"
-#include "myLib/MyLib"
+﻿#include "DxLib.h"
+#include "myLib/MyLib.h"
 
 using namespace MyLib;
 
-/// <summary>
-/// コンストラクタ
-/// </summary>
-ColliderDataSphere::ColliderDataSphere(bool isTirgger)
-	: ColiderData(ColliderData::e_Kind::kCircle3D,isTirgger)
-	, m_radius(0.0f)
+ColliderDataSphere::ColliderDataSphere(bool isTrigger):
+	ColliderData(ColliderData::e_Kind::Sphere, isTrigger),
+	radius(0.0f)
 {
-	//処理なし
+
+	//　処理なし
+
 }

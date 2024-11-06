@@ -174,9 +174,6 @@
     <ClCompile Include="util\OnAttackFrame.cpp">
       <Filter>ソース ファイル\util</Filter>
     </ClCompile>
-    <ClCompile Include="util\EffectManager.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="myLib\Collidable.cpp">
       <Filter>ソース ファイル\myLib</Filter>
     </ClCompile>
@@ -189,8 +186,20 @@
     <ClCompile Include="myLib\DebugDraw.cpp">
       <Filter>ソース ファイル\myLib</Filter>
     </ClCompile>
-    <ClCompile Include="util\ColliderDataSphere.cpp">
+    <ClCompile Include="myLib\ColliderDataSphere.cpp">
       <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\ColliderDataCapsule.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="util\EffectManager.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\ColliderDataLine.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="object\ObjectBase.cpp">
+      <Filter>ソース ファイル\object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -305,9 +314,6 @@
     <ClInclude Include="util\OnAttackFrame.h">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
-    <ClInclude Include="util\EffectManager.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="myLib\Collidable.h">
       <Filter>ヘッダー ファイル\myLib</Filter>
     </ClInclude>
@@ -331,6 +337,18 @@
     </ClInclude>
     <ClInclude Include="myLib\MyLib.h">
       <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\ColliderDataCapsule.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="util\EffectManager.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\ColliderDataLine.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="object\ObjectBase.h">
+      <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
