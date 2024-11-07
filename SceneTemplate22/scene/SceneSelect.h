@@ -15,6 +15,7 @@ class ItemBase;
 class ItemMp;
 class ItemHp;
 class Tomb;
+class Field;
 class Physics;
 
 class SceneSelect :
@@ -48,6 +49,7 @@ private:
 	std::shared_ptr<ItemMp> m_pItemMp;
 	std::shared_ptr<ItemHp> m_pItemHp;
 	std::shared_ptr<Tomb> m_pTomb;
+	std::shared_ptr<Field> m_pField;
 
 
 	//std::shared_ptr<Physics> m_pPhysics;

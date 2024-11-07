@@ -4,6 +4,7 @@
 #include "MyLib.h"
 #include "MathHelper.h"
 
+
 using namespace MyLib;
 
 namespace
@@ -11,6 +12,28 @@ namespace
 	constexpr int kBeforeFixInfoColor = 0x0000ff;	// 補正前情報色
 	constexpr int kAimInfoColor = 0x0000aa;			// 補正前予定情報色
 	constexpr int kAfterFixInfoColor = 0xff00ff;		// 補正後情報色
+
+
+	//最大当たり判定ポリゴン数
+	constexpr int kMaxColHitPolyNum = 2000;
+	//壁押し出し処理の最大試行回数
+	constexpr int kMaxColHitTryNum = 16;
+	//壁押し出し時にスライドさせる距離
+	constexpr float kColHitSlideLength = 1.0f;
+
+	//壁ポリゴンか床ポリゴンかを判断するための変数
+	constexpr float kWallPolyBorder = 0.4f;
+	//壁ポリゴンと判断するための高さ変数
+	constexpr float kWallPolyHeight = 5.0f;
+
+	//頭の高さを設定
+	constexpr float kHeadHeight = 40.0f;
+}
+
+MyLib::Physics::Physics()
+{
+
+	m_pField = std::make_shared<Field>();
 
 }
 
@@ -20,10 +43,10 @@ namespace
 void Physics::Entry(Collidable* collidable)
 {
 	// 登録
-	bool found = (std::find(collidables.begin(), collidables.end(), collidable) != collidables.end());
+	bool found = (std::find(m_collidables.begin(), m_collidables.end(), collidable) != m_collidables.end());
 	if(!found)
 	{
-		collidables.emplace_back(collidable);
+		m_collidables.emplace_back(collidable);
 	}
 	// 既に登録されてたらエラー
 	else
@@ -38,10 +61,10 @@ void Physics::Entry(Collidable* collidable)
 void Physics::Exit(Collidable* collidable)
 {	
 	// 登録解除(remove)
-	bool found = (std::find(collidables.begin(), collidables.end(), collidable) != collidables.end());
+	bool found = (std::find(m_collidables.begin(), m_collidables.end(), collidable) != m_collidables.end());
 	if (found)
 	{
-		collidables.remove(collidable);
+		m_collidables.remove(collidable);
 	}
 	// 登録されてなかったらエラー
 	else
@@ -56,7 +79,7 @@ void Physics::Exit(Collidable* collidable)
 void Physics::Update()
 {
 	// 移動
-	for (auto& item : collidables)
+	for (auto& item : m_collidables)
 	{
 		// ポジションに移動力を足す
 		VECTOR pos = item->m_rigidbody.GetPos();
@@ -65,12 +88,12 @@ void Physics::Update()
 		// 重力を利用する設定なら、重力を追加する
 		if (item->m_rigidbody.UseGravity())
 		{
-			velocity = VAdd(velocity, VGet(0, m_kGravity, 0));
+			velocity = VAdd(velocity, VGet(0, m_gravity, 0));
 
 			// 最大重力加速度より大きかったらクランプ
-			if (velocity.y < m_kMaxGravityAccel)
+			if (velocity.y < m_maxGravityAccel)
 			{
-				velocity = VGet(velocity.x, m_kMaxGravityAccel, velocity.z);
+				velocity = VGet(velocity.x, m_maxGravityAccel, velocity.z);
 			}
 		}
 
@@ -113,10 +136,26 @@ void Physics::Update()
 
 		// 予定ポジション設定
 		item->m_nextPos = nextPos;
+
+		auto sphere = dynamic_cast<ColliderDataSphere*>(item->m_colliderData);
+
+
+		// プレイヤーの周囲にあるステージポリゴンを取得する
+		// ( 検出する範囲は移動距離も考慮する )
+		m_hitDim = MV1CollCheck_Sphere(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos() , sphere->m_radius);
+
+		//壁と床の当たり判定を行う
+		CheckWallAndFloor(item);
+		//壁との当たり判定処理
+		FixPositionWithWall();
+		//床との当たり判定処理
+		FixNowPositionWithFloor();
 	}
 
 	// 当たり判定チェック（nextPos指定）
 	std::vector<OnCollideInfo> onCollideInfo = CheckColide();
+
+
 
 	// 位置確定
 	FixPosition();
@@ -144,9 +183,9 @@ std::vector<Physics::OnCollideInfo> Physics::CheckColide() const
 
 		// 2重ループで全オブジェクト当たり判定
 		// FIXME: 重いので近いオブジェクト同士のみ当たり判定するなど工夫がいる
-		for (auto& objA : collidables)
+		for (auto& objA : m_collidables)
 		{
-			for (auto& objB : collidables)
+			for (auto& objB : m_collidables)
 			{
 				if (objA != objB)
 				{
@@ -232,11 +271,12 @@ std::vector<Physics::OnCollideInfo> Physics::CheckColide() const
 std::list<Collidable*> Physics::IsCollideLine(const VECTOR& start, const VECTOR& end) const
 {
 	std::list<Collidable*> ret;
-	for (auto& obj : collidables)
+
+	for (auto& obj : m_collidables)
 	{
 		// collidableの種類によって、当たり判定を分ける
 		auto kind = obj->m_colliderData->GetKind();
-		// ラインとラインor一方通行ライン
+		// ラインとライン
 		if (kind == ColliderData::e_Kind::kLine)
 		{
 			auto lineColliderData = dynamic_cast<ColliderDataLine*>(obj->m_colliderData);
@@ -247,7 +287,7 @@ std::list<Collidable*> Physics::IsCollideLine(const VECTOR& start, const VECTOR&
  				ret.emplace_back(obj);
 			}
 		}
-		// ラインと円
+		// ラインと球体
 		else if (kind == ColliderData::e_Kind::kSphere)
 		{
 			auto sphereColliderData = dynamic_cast<ColliderDataSphere*>(obj->m_colliderData);
@@ -308,6 +348,7 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 	{
 
 	}
+	
 	
 
 	//// 円とライン
@@ -473,7 +514,7 @@ void Physics::FixNextPosition(Collidable* primary, Collidable* secondary) const
 /// </summary>
 void Physics::FixPosition()
 {
-	for (auto& item : collidables)
+	for (auto& item : m_collidables)
 	{
 #if _DEBUG
 		// 補正後の位置をデバッグ表示
@@ -494,4 +535,252 @@ void Physics::FixPosition()
 		// 位置確定
 		item->m_rigidbody.SetPos(item->m_nextPos);
 	}
+}
+
+void MyLib::Physics::CheckWallAndFloor(std::shared_ptr<Collidable>& col)
+{
+	// 壁ポリゴンと床ポリゴンの数を初期化する
+	m_wallNum = 0;
+	m_floorNum = 0;
+
+	// 検出されたポリゴンの数だけ繰り返し
+	for (int i = 0; i < m_hitDim.HitNum; i++)
+	{
+		// ポリゴンの法線のＹ成分が壁ポリゴンボーダーに達っしているかどうかで壁ポリゴンか床ポリゴンかを判断する
+		if (m_hitDim.Dim[i].Normal.y < kWallPolyBorder && m_hitDim.Dim[i].Normal.y > -kWallPolyBorder)
+		{
+			// 壁ポリゴンと判断された場合でも、プレイヤーのＹ座標より高いポリゴンのみ当たり判定を行う
+			if (m_hitDim.Dim[i].Position[0].y > col->m_rigidbody.GetPos().y + kWallPolyHeight ||
+				m_hitDim.Dim[i].Position[1].y > col->m_rigidbody.GetPos().y + kWallPolyHeight ||
+				m_hitDim.Dim[i].Position[2].y > col->m_rigidbody.GetPos().y + kWallPolyHeight)
+			{
+				// ポリゴンの数が限界数に達していなかったらポリゴンを配列に追加
+				if (m_wallNum < ColInfo::kMaxColHitPolyNum)
+				{
+					// ポリゴンの構造体のアドレスを壁ポリゴンポインタ配列に保存する
+					m_pWallPoly[m_wallNum] = &m_hitDim.Dim[i];
+
+					// 壁ポリゴンの数を加算する
+					m_wallNum++;
+				}
+			}
+		}
+		else
+		{
+			// ポリゴンの数が限界数に達していなかったらポリゴンを配列に追加
+			if (m_floorNum < ColInfo::kMaxColHitPolyNum)
+			{
+				// ポリゴンの構造体のアドレスを床ポリゴンポインタ配列に保存する
+				m_pFloorPoly[m_floorNum] = &m_hitDim.Dim[i];
+
+				// 床ポリゴンの数を加算する
+				m_floorNum++;
+			}
+		}
+	}
+}
+
+void MyLib::Physics::FixPositionWithWall(std::shared_ptr<Collidable>& col)
+{	
+
+	auto sphere = dynamic_cast<ColliderDataSphere*>(col->m_colliderData);
+
+	// 壁ポリゴンがない場合は何もしない
+	if (m_wallNum == 0) return;
+
+	// 壁ポリゴンとの当たり判定処理
+	// 壁に当たったかどうかのフラグは初期状態では「当たっていない」にしておく
+	m_isHitFlag = false;
+
+	// 移動したかどうかで処理を分岐
+	if (VSize(col->m_rigidbody.GetDir()) != 0.0f)
+	{
+		// 壁ポリゴンの数だけ繰り返し
+		for (int i = 0; i < m_wallNum; i++)
+		{
+			// i番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
+			m_pPoly = m_pWallPoly[i];
+
+			// ポリゴンとプレイヤーが当たっていなかったら次のカウントへ
+			if (!HitCheck_Capsule_Triangle(col->m_nextPos, VAdd(col->m_nextPos,
+				VGet(0.0f, sphere->m_radius, 0.0f)),
+				sphere->m_radius,
+				m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2])) continue;
+
+			// ここにきたらポリゴンとプレイヤーが当たっているということなので、ポリゴンに当たったフラグを立てる
+			m_isHitFlag = true;
+
+			//壁を考慮した移動を外積を使って算出
+			VECTOR SlideVec;
+
+			// 進行方向ベクトルと壁ポリゴンの法線ベクトルに垂直なベクトルを算出
+			SlideVec = VCross(col->m_rigidbody.GetDir() , m_pPoly->Normal);
+
+			// 算出したベクトルと壁ポリゴンの法線ベクトルに垂直なベクトルを算出、これが
+			// 元の移動成分から壁方向の移動成分を抜いたベクトル
+			SlideVec = VCross(m_pPoly->Normal, SlideVec);
+
+			// それを移動前の座標に足したものを新たな座標とする
+			col->m_nextPos = VAdd(col->m_rigidbody.GetPos(), SlideVec);
+
+
+			// 新たな移動座標で壁ポリゴンと当たっていないかどうかを判定する
+			bool isHitWallPolygon = false;
+			for (int j = 0; j < m_wallNum; j++)
+			{
+				// j番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
+				m_pPoly = m_pWallPoly[j];
+
+				// 当たっていたらループから抜ける
+				if (HitCheck_Capsule_Triangle(col->m_nextPos, VAdd(col->m_nextPos,
+					VGet(0.0f, sphere->m_radius, 0.0f)),
+					sphere->m_radius,
+					m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]))
+				{
+					//trueにする
+					isHitWallPolygon = true;
+					break;
+				}
+			}
+
+			// 全てのポリゴンと当たっていなかったらここでループ終了
+			if (!isHitWallPolygon)
+			{
+				//ヒットフラグを倒す
+				m_isHitFlag = false;
+				break;
+			}
+		}
+	}
+	else
+	{
+		// 移動していない場合の処理
+
+		// 壁ポリゴンの数だけ繰り返し
+		for (int i = 0; i < m_wallNum; i++)
+		{
+			// i番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
+			m_pPoly = m_pWallPoly[i];
+
+			// ポリゴンに当たっていたら当たったフラグを立てた上でループから抜ける
+			if (HitCheck_Sphere_Triangle(
+				col->m_nextPos,		//球体の座標 
+				sphere->m_radius,	//球体の半径
+				m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
+				m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
+				m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
+			{
+				m_isHitFlag = true;
+				break;
+			}
+		}
+	}
+
+	// 壁に当たっていたら壁から押し出す処理を行う
+	if (m_isHitFlag)
+	{
+		FixPositionWithWallInternal(col);
+	}
+}
+
+void MyLib::Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable>& col)
+{
+	// 壁からの押し出し処理を試みる最大数だけ繰り返し
+	for (int i = 0; i < ColInfo::kMaxColHitTryNum; i++)
+	{
+		// 当たる可能性のある壁ポリゴンを全て見る
+		bool isHitWall = false;
+		// 壁ポリゴンの数だけ繰り返し
+		for (int j = 0; j < m_wallNum; j++)
+		{
+			// i番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
+			m_pPoly = m_pWallPoly[j];
+
+			// プレイヤーと当たっているかを判定
+			auto sphere = dynamic_cast<ColliderDataSphere*>(col->m_colliderData);
+			
+			if (!HitCheck_Sphere_Triangle(
+				col->m_nextPos,			//球体の座標
+				sphere->m_radius,		//球体の半径
+				m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
+				m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
+				m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
+				continue;
+
+			// 当たっていたら規定距離分プレイヤーを壁の法線方向に移動させる
+			col->m_nextPos = VAdd(col->m_nextPos, VScale(m_pPoly->Normal, kColHitSlideLength));
+
+			// 移動した上で壁ポリゴンと接触しているかどうかを判定
+			for (int k = 0; k < m_wallNum; k++)
+			{
+				// 当たっていたらループを抜ける
+				m_pPoly = m_pWallPoly[k];
+				if (HitCheck_Sphere_Triangle(col->m_nextPos,
+					sphere->m_radius,
+					m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]))
+				{
+					isHitWall = true;
+					break;
+				}
+			}
+
+			// 全てのポリゴンと当たっていなかったらここでループ終了
+			if (!isHitWall) break;
+		}
+
+		//ループ終了
+		if (!isHitWall) break;
+	}
+}
+
+void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
+{
+	//床ポリゴンがない場合は何もしない
+	if (m_floorNum == 0) return;
+
+	// 床ポリゴンとの当たり判定処理
+	//あたったかどうかのフラグ初期化
+	bool IsHitFlag = false;
+
+	 //床ポリゴンとの当たり判定
+
+	//一番高い床ポリゴンにぶつける為の判定用変数を初期化
+	float PolyMaxPosY = 0.0f;
+
+	//床ポリゴンに当たったかどうかのフラグを倒しておく
+	m_isHitFlag = false;
+
+	////床ポリゴンの数だけ繰り返し
+	for (int i = 0; i < m_floorNum; i++)
+	{
+
+		//i番目の床ポリゴンのアドレスを床ポリゴンポインタ配列から取得
+		m_pPoly = m_pFloorPoly[i];
+
+		//頭から足元まででポリゴンと当たっているかを判定
+		m_lineRes = HitCheck_Line_Triangle(VAdd(col->m_nextPos, VGet(0.0f, kHeadHeight, 0.0f)),
+			col->m_nextPos, m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]);
+
+		//当たっていなかったら何もしない
+		if (!m_lineRes.HitFlag) continue;
+
+		//既に当たったポリゴンがあり、且つ今まで検出した床ポリゴンより低い場合は何もしない
+		if (m_isHitFlag && PolyMaxPosY > m_lineRes.Position.y) continue;
+
+		//ポリゴンに当たったフラグを立てる
+		m_isHitFlag = true;
+
+		//接触したＹ座標を保存する
+		PolyMaxPosY = m_lineRes.Position.y;
+	}
+
+	//床ポリゴンの当たり判定かつ、ジャンプ力が0よりも小さい(下降中の場合)どうかで処理を分岐
+	if (m_isHitFlag)
+	{
+		// 接触したポリゴンで一番高いＹ座標をプレイヤーのＹ座標にする
+		col->m_nextPos.y = PolyMaxPosY;
+		//col->m_rigidbody.SetVelocity(col->m_nextPos);
+
+	}
+	
 }

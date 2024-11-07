@@ -63,6 +63,7 @@ namespace
 	const char* const kAnimAir = "Jumping";
 
 	const char* const kAnimHit = "Hit";
+
 	const char* const kAnimDead = "Down";
 	const char* const kAnimDeadPose = "DownPose";
 
@@ -242,8 +243,8 @@ void Player::OnCollide(const Collidable& colider)
 	auto tag = colider.GetTag();
 	switch (tag)
 	{
-	case Game::e_GameObjectTag::kPlayer:
-		message += "プレイヤー";
+	case Game::e_GameObjectTag::kItem:
+		message += "アイテム";
 		break;
 	case Game::e_GameObjectTag::kBoss:
 		message += "ボス";
@@ -300,6 +301,10 @@ void Player::IdleUpdate()
 		OnAttackY();
 		return;
 	}
+
+	VECTOR move;
+	move.y = m_rigidbody.GetVelocity().y;
+
 }
 
 void Player::WalkUpdate()
@@ -340,8 +345,9 @@ void Player::WalkUpdate()
 		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 		move = VTransform(move, mtx);
 
-		move.y = m_rigidbody.GetVelocity().y;
 		m_rigidbody.SetVelocity(move);
+		move.y = m_rigidbody.GetVelocity().y;
+
 		m_move = move;
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;

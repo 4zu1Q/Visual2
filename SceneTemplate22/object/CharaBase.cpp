@@ -1,33 +1,16 @@
 ﻿#include "CharaBase.h"
 
-CharaBase::CharaBase()
-{
+using namespace MyLib;
 
-}
-
-CharaBase::~CharaBase()
-{
-
-}
-
-void CharaBase::Initialize()
-{
-
-}
-
-void CharaBase::Finalize()
-{
-
-}
-
-void CharaBase::Update()
-{
-
-}
-
-void CharaBase::Draw()
-{
-
-}
+//CharaBase::CharaBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind colliderKind, bool isTrigger):
+//	Collidable(priority, tag, colliderKind, isTrigger),
+//{
+//
+//}
+//
+//CharaBase::~CharaBase()
+//{
+//
+//}
 
 

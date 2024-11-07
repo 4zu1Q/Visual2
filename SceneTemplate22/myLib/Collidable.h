@@ -25,6 +25,7 @@ namespace MyLib
 		enum class e_Priority : int
 		{
 			kLow,		// 低
+			kMidle,		// 中
 			kHigh,		// 高
 			kStatic,		// 動かない（最高）
 		};
@@ -48,12 +49,17 @@ namespace MyLib
 		// 当たり判定を無視（スルー）する対象かどうか
 		bool IsThroughTarget(const Collidable* target) const;
 
+	private:
+
+		ColliderData* CreateColliderData(ColliderData::e_Kind kind, bool isTrigger);
+
 	protected:
 		Rigidbody m_rigidbody;		// 物理データ
 		ColliderData* m_colliderData;	// 当たり判定データ
+		//std::list<std::shared_ptr<ColliderData>> m_colliders;
 
-	private:
-		ColliderData* CreateColliderData(ColliderData::e_Kind kind, bool isTrigger);
+		//std::list<Collidable*> m_collidables;	// 登録されたCollidableのリスト
+
 
 		Game::e_GameObjectTag m_tag;
 		e_Priority m_priority;
@@ -63,8 +69,6 @@ namespace MyLib
 
 		// PhysicsがCollidableを自由に管理するためにフレンド化
 		friend Physics;
-
-		// 以下、フレンドであるPhisicsのみが扱う型や変数
 
 	private:
 

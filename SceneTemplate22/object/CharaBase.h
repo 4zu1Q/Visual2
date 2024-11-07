@@ -1,8 +1,10 @@
 ﻿#pragma once
 #include "DxLib.h"
+#include "myLib/MyLib.h"
+#include "util/Game.h"
 #include "ObjectBase.h"
 
-class CharaBase 
+class CharaBase : public ObjectBase
 {
 public:
 
@@ -10,22 +12,18 @@ public:
 
 public:
 
-	CharaBase();
+	CharaBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind colliderKind, bool isTrigger);
 	virtual ~CharaBase();
 
-	void Initialize();
-	void Finalize();
+	// 衝突したとき
+	virtual void OnCollideEnter(const std::shared_ptr<Collidable>& colider) = 0;
 
-	virtual void Update();
-	virtual void Draw();
+protected:
 
+	VECTOR m_pos;
+	VECTOR m_move;
+	VECTOR m_collisionPos;
 
-
-
-
-private:
-
-
-
+	//ステータス関連をここに入れておきたい
 };
 

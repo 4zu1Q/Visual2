@@ -46,9 +46,10 @@ namespace Game
 	enum class e_GameObjectTag
 	{
 		kPlayer,			// プレイヤー
-		kBoss,			// ボス
-		kItem,			// アイテム
-		kShot,			// 弾		//できればやりたい…
+		kPlayerWeapon,		// プレイヤーの武器
+		kBoss,				// ボス
+		kItem,				// アイテム
+		kShot,				// 弾		//できればやりたい…
 		kSystemWall,		// システム壁
 		kStepGround,		// 足場の地面
 	};

@@ -1,12 +1,28 @@
 ﻿#pragma once
 
 #include "myLib/Collidable.h"
+#include "object/Field.h"
 
+#include <memory>
 #include <list>
 #include <vector>
 
+
+class Field;
+
+
 namespace MyLib
 {
+
+	namespace ColInfo
+	{
+		//最大当たり判定ポリゴン数
+		constexpr int kMaxColHitPolyNum = 2000;
+		//壁押し出し処理の最大試行回数
+		constexpr int kMaxColHitTryNum = 16;
+		//壁押し出し時にスライドさせる距離
+		constexpr float kColHitSlideLength = 1.0f;
+	}
 
 	class Collidable;
 
@@ -16,6 +32,8 @@ namespace MyLib
 	class Physics final
 	{
 	public:
+		Physics();
+
 		// 衝突物の登録・登録解除
 		void Entry(Collidable* collidable);
 		void Exit(Collidable* collidable);
@@ -26,13 +44,38 @@ namespace MyLib
 		// ぶつかっているオブジェクトを返す
 		std::list<Collidable*> IsCollideLine(const VECTOR& start, const VECTOR& end) const;
 
-		// 重力と最大重力加速度
-		static constexpr float m_kGravity = -0.1f;
-		static constexpr float m_kMaxGravityAccel = -0.65f;
 
 	private:
 
-		std::list<Collidable*> collidables;	// 登録されたCollidableのリスト
+		/// <summary>
+		/// 二つのオブジェクトが当たっているかどうかを判定する
+		/// </summary>
+		/// <param name="objA">当たっているオブジェクトの一つ</param>
+		/// <param name="objB">当たっているオブジェクトの一つ</param>
+		/// <returns></returns>
+		bool IsCollide(const Collidable* objA, const Collidable* objB) const;
+
+		/// <summary>
+		/// 位置補正
+		/// </summary>
+		/// <param name="primary">当たっているオブジェクトの一つ</param>
+		/// <param name="secondary">当たっているオブジェクトの一つ</param>
+		void FixNextPosition(Collidable* primary, Collidable* secondary) const;
+		
+		/// <summary>
+		/// 位置の最終補正を決定する関数
+		/// </summary>
+		void FixPosition();
+
+	private:
+
+		void CheckWallAndFloor(std::shared_ptr<Collidable>& col);
+
+		void FixPositionWithWall(std::shared_ptr<Collidable>& col);
+
+		void FixPositionWithWallInternal(std::shared_ptr<Collidable>& col);
+
+		void FixNowPositionWithFloor(std::shared_ptr<Collidable>& col);
 
 		// OnCollideの遅延通知のためのデータ
 		struct OnCollideInfo
@@ -42,13 +85,39 @@ namespace MyLib
 			void OnCollide() { owner_->OnCollide(*colider_); }
 		};
 
+	private:
+
+		std::shared_ptr<Field> m_pField;
+
 		// 当たり判定チェック
 		std::vector<OnCollideInfo> CheckColide() const;
-		bool IsCollide(const Collidable* objA, const Collidable* objB) const;
 
-		// 位置補正、決定
-		void FixNextPosition(Collidable* primary, Collidable* secondary) const;
-		void FixPosition();
+		// 重力と最大重力加速度
+		static constexpr float m_gravity = -0.1f;
+		static constexpr float m_maxGravityAccel = -0.65f;
+
+		//std::list<Collidable*> m_collidables;	// 登録されたCollidableのリスト
+		std::list<std::shared_ptr<Collidable*>> m_collidables;	// 登録されたCollidableのリスト
+
+
+
+		//壁と床のポリゴン数を入れるための変数
+		int m_wallNum;
+		int m_floorNum;
+
+		bool m_isHitFlag;
+
+		//当たり判定結果構造体
+		MV1_COLL_RESULT_POLY_DIM m_hitDim{};
+		// 壁ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
+		MV1_COLL_RESULT_POLY* m_pWallPoly[ColInfo::kMaxColHitPolyNum]{};
+		// 床ポリゴンと判断されたポリゴンの構造体のアドレスを保存しておくためのポインタ配列
+		MV1_COLL_RESULT_POLY* m_pFloorPoly[ColInfo::kMaxColHitPolyNum]{};
+		// ポリゴンの構造体にアクセスするために使用するポインタ
+		MV1_COLL_RESULT_POLY* m_pPoly = nullptr;
+		// 線分とポリゴンとの当たり判定の結果を代入する構造体
+		HITRESULT_LINE m_lineRes{};
+
 	};
 
 }

@@ -7,14 +7,16 @@
 #include "SceneGamePlay.h"
 
 #include "object/player/Player.h"
+#include "object/Camera.h"
 #include "object/item/ItemBase.h"	//後々消す
 
 #include "object/item/ItemHp.h"
 #include "object/item/ItemMp.h"
 
+#include "object/Field.h"
 #include "object/SkyDome.h"
-#include "object/Camera.h"
 #include "object/Tomb.h"
+
 
 #include "ui/HpBar.h"
 #include "ui/FaceUi.h"
@@ -43,30 +45,30 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 
 	m_pPlayer = std::make_shared<Player>();
 	m_pCamera = std::make_shared<Camera>();
-	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
-	m_pItem = std::make_shared<ItemBase>();
 
+	m_pField = std::make_shared<Field>();
+	m_pSkyDome = std::make_shared<SkyDome>();
+
+	m_pItem = std::make_shared<ItemBase>();
 	m_pItemHp = std::make_shared<ItemHp>();
 	m_pItemMp = std::make_shared<ItemMp>();
-
 	m_pTomb = std::make_shared<Tomb>();
 
-	//m_pPhysics = std::make_shared<Physics>();
 
 
 	m_playerPos = VGet(0, 0, -120);
 	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize(m_pPhysics);
-	m_pItemHp->Initialize();
+	m_pItemHp->Initialize(m_pPhysics);
 }
 
 SceneSelect::~SceneSelect()
 {
 	m_pPlayer->Finalize(m_pPhysics);
-	m_pItemHp->Finalize();
+	m_pItemHp->Finalize(m_pPhysics);
 }
 
 void SceneSelect::Update()
@@ -109,9 +111,10 @@ void SceneSelect::Update()
 	m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
+	m_pItemHp->Update(m_pPhysics);
 	m_pItem->Update();
 	m_pItemMp->Update();
-	m_pItemHp->Update();
+	m_pField->Update();
 
 	m_pPhysics->Update();
 
@@ -122,7 +125,7 @@ void SceneSelect::Update()
 
 	//プレイヤーとアイテムの当たり判定のフラグを代入
 	m_isMpHit = m_pItemMp->MpHit(m_pPlayer);
-	m_isHpHit = m_pItemHp->HpHit(m_pPlayer);
+	//m_isHpHit = m_pItemHp->HpHit(m_pPlayer);
 
 	m_isTombHitP = m_pTomb->TombPHit(m_pPlayer);
 	m_isTombHitS = m_pTomb->TombSHit(m_pPlayer);
@@ -133,29 +136,29 @@ void SceneSelect::Update()
 
 	//プレイヤーと墓が当たった場合
 
-	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitP)
-	{
-		printfDx("パワーボス");
-		StartFadeOut();
-		m_isToNextScene = true;
-		
-	}
+	//if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitP)
+	//{
+	//	printfDx("パワーボス");
+	//	StartFadeOut();
+	//	m_isToNextScene = true;
+	//	
+	//}
 
-	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitS)
-	{
-		printfDx("スピードボス");
-		StartFadeOut();
-		m_isToNextScene = true;
+	//if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitS)
+	//{
+	//	printfDx("スピードボス");
+	//	StartFadeOut();
+	//	m_isToNextScene = true;
 
-	}
+	//}
 
-	if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitR)
-	{
-		printfDx("ラスボス");
-		StartFadeOut();
-		m_isToNextScene = true;
+	//if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitR)
+	//{
+	//	printfDx("ラスボス");
+	//	StartFadeOut();
+	//	m_isToNextScene = true;
 
-	}
+	//}
 
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
@@ -175,11 +178,12 @@ void SceneSelect::Update()
 void SceneSelect::Draw()
 {
 	m_pCamera->Draw();
-	m_pSkyDome->Draw();
 	m_pPlayer->Draw();
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pHpBar->Draw();
 
+	m_pField->Draw();
+	m_pSkyDome->Draw();
 	m_pItem->Draw(m_pPlayer);
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
