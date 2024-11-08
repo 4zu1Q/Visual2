@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include <list> 
+#include <memory>
+#include <List>
 
 #include "myLib/ColliderData.h"
 
@@ -17,7 +18,7 @@ namespace MyLib
 	/// <summary>
 	/// 衝突できるもの。物理・衝突判定をする場合はこれを継承させる
 	/// </summary>
-	class Collidable abstract
+	class Collidable abstract : std::enable_shared_from_this<Collidable>
 	{
 	public:
 
@@ -33,8 +34,8 @@ namespace MyLib
 		Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderData::e_Kind colliderKind, bool isTrigger);	// コンストラクタ
 
 		virtual ~Collidable();													// デストラクタ
-		virtual void Initialize(MyLib::Physics* physics);
-		virtual void Finalize(MyLib::Physics* physics);
+		virtual void Initialize(std::shared_ptr<MyLib::Physics> physics/*MyLib::Physics* physics*/);
+		virtual void Finalize(std::shared_ptr<MyLib::Physics> physics/*MyLib::Physics* physics*/);
 
 		virtual void OnCollide(const Collidable& colider) abstract;				// 衝突したとき
 
@@ -51,11 +52,11 @@ namespace MyLib
 
 	private:
 
-		ColliderData* CreateColliderData(ColliderData::e_Kind kind, bool isTrigger);
+		std::shared_ptr<ColliderData> CreateColliderData(ColliderData::e_Kind kind, bool isTrigger);
 
 	protected:
 		Rigidbody m_rigidbody;		// 物理データ
-		ColliderData* m_colliderData;	// 当たり判定データ
+		std::shared_ptr<ColliderData> m_pColliderData;	// 当たり判定データ
 		//std::list<std::shared_ptr<ColliderData>> m_colliders;
 
 		//std::list<Collidable*> m_collidables;	// 登録されたCollidableのリスト

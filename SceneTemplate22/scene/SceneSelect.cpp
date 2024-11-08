@@ -56,6 +56,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pItemMp = std::make_shared<ItemMp>();
 	m_pTomb = std::make_shared<Tomb>();
 
+	m_pPhysics = std::make_shared<MyLib::Physics>();
 
 
 	m_playerPos = VGet(0, 0, -120);

@@ -16,7 +16,7 @@ class ItemMp;
 class ItemHp;
 class Tomb;
 class Field;
-class Physics;
+class MyLib::Physics;
 
 class SceneSelect :
 	public SceneBase
@@ -52,9 +52,9 @@ private:
 	std::shared_ptr<Field> m_pField;
 
 
-	//std::shared_ptr<Physics> m_pPhysics;
+	std::shared_ptr<MyLib::Physics> m_pPhysics;
 
-	MyLib::Physics* m_pPhysics = new MyLib::Physics;
+	//MyLib::Physics* m_pPhysics = new MyLib::Physics;
 
 
 	//遷移先

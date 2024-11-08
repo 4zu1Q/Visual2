@@ -114,29 +114,30 @@ Player::Player() :
 	m_isAnimDamage = false;
 	m_isAnimDown = false;
 
-
 	m_isJump = false;
 
 	//モデルのロード
 	m_modelH = MV1LoadModel(kModelFilename);
 	assert(m_modelH > -1);
 
-
 	m_playerKind = e_PlayerKind::kPowerPlayer;
 
 	m_pWeapon = std::make_shared<PlayerWeapon>();
 	m_pAnim = std::make_shared<AnimController>();
 
+	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>();
 
-	auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>(m_colliderData);
+	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
+	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 5.0f;
+
 }
 
 Player::~Player()
 {
 }
 
-void Player::Initialize(MyLib::Physics* physics)
+void Player::Initialize(std::shared_ptr<MyLib::Physics> physics)
 {
 	Collidable::Initialize(physics);
 
@@ -161,8 +162,9 @@ void Player::Initialize(MyLib::Physics* physics)
 
 }
 
-void Player::Finalize(MyLib::Physics* physics)
+void Player::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
+
 	//モデルをデリートする
 	MV1DeleteModel(m_modelH);
 	m_modelH = -1;
@@ -170,7 +172,7 @@ void Player::Finalize(MyLib::Physics* physics)
 	Collidable::Finalize(physics);
 }
 
-void Player::Update(MyLib::Physics* physics)
+void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 {
 
 	//アップデート

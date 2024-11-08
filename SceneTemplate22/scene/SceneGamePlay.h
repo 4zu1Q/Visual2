@@ -13,7 +13,7 @@ class HpBar;
 class FaceUi;
 class ItemBase;
 class BossPower;
-class Physics;
+class MyLib::Physics;
 
 class SceneGamePlay :
 	public SceneBase
@@ -47,8 +47,8 @@ private:
 	std::shared_ptr<ItemBase> m_pItem;
 	std::shared_ptr<BossPower> m_pBoss;
 
-	MyLib::Physics* m_pPhysics = new MyLib::Physics;
-	//std::shared_ptr<Physics*> m_pPhysics;
+	//MyLib::Physics* m_pPhysics = new MyLib::Physics;
+	std::shared_ptr<MyLib::Physics> m_pPhysics;
 
 
 	//

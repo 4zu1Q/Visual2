@@ -11,10 +11,10 @@ public:
 	ItemHp();
 	virtual ~ItemHp();
 
-	void Initialize(MyLib::Physics* physics) override;
-	void Finalize(MyLib::Physics* physics) override;
+	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
+	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
 
-	void Update(MyLib::Physics* physics);
+	void Update(std::shared_ptr<MyLib::Physics> physics);
 	void Draw();
 
 	// 衝突したとき

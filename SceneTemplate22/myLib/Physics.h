@@ -35,8 +35,8 @@ namespace MyLib
 		Physics();
 
 		// 衝突物の登録・登録解除
-		void Entry(Collidable* collidable);
-		void Exit(Collidable* collidable);
+		void Entry(std::shared_ptr<Collidable> collidable );
+		void Exit(std::shared_ptr<Collidable> collidable );
 
 		void Update();	// 更新（登録オブジェクトの物理移動、衝突通知）
 
@@ -69,6 +69,7 @@ namespace MyLib
 
 	private:
 
+
 		void CheckWallAndFloor(std::shared_ptr<Collidable>& col);
 
 		void FixPositionWithWall(std::shared_ptr<Collidable>& col);
@@ -76,6 +77,7 @@ namespace MyLib
 		void FixPositionWithWallInternal(std::shared_ptr<Collidable>& col);
 
 		void FixNowPositionWithFloor(std::shared_ptr<Collidable>& col);
+
 
 		// OnCollideの遅延通知のためのデータ
 		struct OnCollideInfo
@@ -87,6 +89,7 @@ namespace MyLib
 
 	private:
 
+		//フィールドのポインタ
 		std::shared_ptr<Field> m_pField;
 
 		// 当たり判定チェック
@@ -96,9 +99,8 @@ namespace MyLib
 		static constexpr float m_gravity = -0.1f;
 		static constexpr float m_maxGravityAccel = -0.65f;
 
-		//std::list<Collidable*> m_collidables;	// 登録されたCollidableのリスト
-		std::list<std::shared_ptr<Collidable*>> m_collidables;	// 登録されたCollidableのリスト
-
+		std::list<std::shared_ptr<Collidable>> m_collidables;	// 登録されたCollidableのリスト
+		//std::list<std::shared_ptr<Collidable*>> m_collidables;	// 登録されたCollidableのリスト
 
 
 		//壁と床のポリゴン数を入れるための変数

@@ -38,8 +38,12 @@ ItemHp::ItemHp():
 	m_modelH = MV1LoadModel(kItemHpModelFilename);
 	MV1SetScale(m_modelH, kModelScale);
 
-	auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>(m_colliderData);
-	circleColliderData->m_radius = 55.0f;
+	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>();
+
+	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>(m_colliderData);
+	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
+
+	circleColliderData->m_radius = 2.0f;
 }
 
 ItemHp::~ItemHp()
@@ -47,7 +51,7 @@ ItemHp::~ItemHp()
 
 }
 
-void ItemHp::Initialize(MyLib::Physics* physics)
+void ItemHp::Initialize(std::shared_ptr<MyLib::Physics> physics)
 {
 	Collidable::Initialize(physics);
 
@@ -56,7 +60,7 @@ void ItemHp::Initialize(MyLib::Physics* physics)
 	m_rigidbody.SetPos(kModelInitPos);
 }
 
-void ItemHp::Finalize(MyLib::Physics* physics)
+void ItemHp::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
 	//モデルをデリートする
 	MV1DeleteModel(m_modelH);
@@ -65,7 +69,7 @@ void ItemHp::Finalize(MyLib::Physics* physics)
 	Collidable::Finalize(physics);
 }
 
-void ItemHp::Update(MyLib::Physics* physics)
+void ItemHp::Update(std::shared_ptr<MyLib::Physics> physics)
 {
 	m_rot += kRotSpeed;
 

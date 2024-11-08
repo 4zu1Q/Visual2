@@ -40,7 +40,7 @@ MyLib::Physics::Physics()
 /// <summary>
 /// 衝突物の登録
 /// </summary>
-void Physics::Entry(Collidable* collidable)
+void Physics::Entry(std::shared_ptr<Collidable> collidable /*std::shared_ptr<Collidable*> collidable*/)
 {
 	// 登録
 	bool found = (std::find(m_collidables.begin(), m_collidables.end(), collidable) != m_collidables.end());
@@ -58,7 +58,7 @@ void Physics::Entry(Collidable* collidable)
 /// <summary>
 /// 衝突物の登録解除
 /// </summary>
-void Physics::Exit(Collidable* collidable)
+void Physics::Exit(std::shared_ptr<Collidable> collidable /*std::shared_ptr<Collidable*> collidable*/)
 {	
 	// 登録解除(remove)
 	bool found = (std::find(m_collidables.begin(), m_collidables.end(), collidable) != m_collidables.end());
@@ -104,12 +104,11 @@ void Physics::Update()
 		// もともとの情報、予定情報をデバッグ表示
 #if _DEBUG
 
-		auto kind = item->m_colliderData->GetKind();
+		auto kind = item->m_pColliderData->GetKind();
 
 		if (kind == ColliderData::e_Kind::kSphere)
 		{
-			ColliderDataSphere* sphereData;
-			sphereData = dynamic_cast<ColliderDataSphere*>(item->m_colliderData);
+			auto sphereData = std::dynamic_pointer_cast<ColliderDataSphere>(item->m_pColliderData);
 			float radius = sphereData->m_radius;
 			DebugDraw::DrawSphere(pos, radius, kBeforeFixInfoColor);
 			DebugDraw::DrawSphere(nextPos, radius, kAimInfoColor);
@@ -117,8 +116,7 @@ void Physics::Update()
 		}
 		else if (kind == ColliderData::e_Kind::kCapsule)
 		{
-			ColliderDataCapsule* capsuleData;
-			capsuleData = dynamic_cast<ColliderDataCapsule*>(item->m_colliderData);
+			auto capsuleData = std::dynamic_pointer_cast<ColliderDataCapsule>(item->m_pColliderData);
 			float radius = capsuleData->m_radius;
 			VECTOR upPos = capsuleData->m_posUp;
 			
@@ -129,7 +127,7 @@ void Physics::Update()
 		else if (kind == ColliderData::e_Kind::kLine)
 		{
 			// lineはstaticなので確定色で描く
-			auto lineData = dynamic_cast<ColliderDataLine*>(item->m_colliderData);
+			auto lineData = std::dynamic_pointer_cast<ColliderDataLine>(item->m_pColliderData);
 			DebugDraw::DrawLine(lineData->m_startPos, lineData->m_endPos, kAfterFixInfoColor);
 		}
 #endif
@@ -137,25 +135,27 @@ void Physics::Update()
 		// 予定ポジション設定
 		item->m_nextPos = nextPos;
 
-		auto sphere = dynamic_cast<ColliderDataSphere*>(item->m_colliderData);
+		auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(item->m_pColliderData);
 
 
 		// プレイヤーの周囲にあるステージポリゴンを取得する
 		// ( 検出する範囲は移動距離も考慮する )
 		m_hitDim = MV1CollCheck_Sphere(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos() , sphere->m_radius);
 
+
 		//壁と床の当たり判定を行う
 		CheckWallAndFloor(item);
+		
 		//壁との当たり判定処理
-		FixPositionWithWall();
+		FixPositionWithWall(item);
+
 		//床との当たり判定処理
-		FixNowPositionWithFloor();
+		FixNowPositionWithFloor(item);
+
 	}
 
 	// 当たり判定チェック（nextPos指定）
 	std::vector<OnCollideInfo> onCollideInfo = CheckColide();
-
-
 
 	// 位置確定
 	FixPosition();
@@ -176,6 +176,7 @@ std::vector<Physics::OnCollideInfo> Physics::CheckColide() const
 	// 衝突通知、ポジション補正
 	bool	doCheck		= true;
 	int		checkCount	= 0;	// チェック回数
+
 	while (doCheck)
 	{
 		doCheck = false;
@@ -190,23 +191,23 @@ std::vector<Physics::OnCollideInfo> Physics::CheckColide() const
 				if (objA != objB)
 				{
 					// ぶつかっていれば
-					if (IsCollide(objA, objB))
+					if (IsCollide(objA.get(), objB.get()))
 					{
 						auto priorityA = objA->GetPriority();
 						auto priorityB = objB->GetPriority();
 
-						Collidable* primary = objA;
-						Collidable* secondary = objB;
+						Collidable* primary = objA.get();
+						Collidable* secondary = objB.get();
 
 						// どちらもトリガーでなければ次目標位置修正
-						bool isTriggerAorB = objA->m_colliderData->IsTrigger() || objB->m_colliderData->IsTrigger();
+						bool isTriggerAorB = objA->m_pColliderData->IsTrigger() || objB->m_pColliderData->IsTrigger();
 						if (!isTriggerAorB)
 						{
 							// プライオリティの低いほうを移動
 							if (priorityA < priorityB)
 							{
-								primary = objB;
-								secondary = objA;
+								primary = objB.get();
+								secondary = objA.get();
 							}
 							FixNextPosition(primary, secondary);
 						}
@@ -275,26 +276,26 @@ std::list<Collidable*> Physics::IsCollideLine(const VECTOR& start, const VECTOR&
 	for (auto& obj : m_collidables)
 	{
 		// collidableの種類によって、当たり判定を分ける
-		auto kind = obj->m_colliderData->GetKind();
+		auto kind = obj->m_pColliderData->GetKind();
 		// ラインとライン
 		if (kind == ColliderData::e_Kind::kLine)
 		{
-			auto lineColliderData = dynamic_cast<ColliderDataLine*>(obj->m_colliderData);
+			auto lineColliderData = std::dynamic_pointer_cast<ColliderDataLine>(obj->m_pColliderData);
 			// 2つのライン同士の最短距離が0だと当たっている
 			float minLength = Segment_Segment_MinLength(start, end, lineColliderData->m_startPos, lineColliderData->m_endPos);
 			if (minLength < 0.001f)	// float誤差を許容
 			{
- 				ret.emplace_back(obj);
+ 				ret.emplace_back(obj.get());
 			}
 		}
 		// ラインと球体
 		else if (kind == ColliderData::e_Kind::kSphere)
 		{
-			auto sphereColliderData = dynamic_cast<ColliderDataSphere*>(obj->m_colliderData);
+			auto sphereColliderData = std::dynamic_pointer_cast<ColliderDataSphere>(obj->m_pColliderData);
 			bool isHit = (Segment_Point_MinLength(start, end, obj->m_rigidbody.GetPos()) < sphereColliderData->m_radius);
 			if (isHit)
 			{
-				ret.emplace_back(obj);
+				ret.emplace_back(obj.get());
 			}
 		}
 		//ラインとカプセル
@@ -321,8 +322,8 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 	}
 
 	// collidableの種類によって、当たり判定を分ける
-	auto aKind = objA->m_colliderData->GetKind();
-	auto bKind = objB->m_colliderData->GetKind();
+	auto aKind = objA->m_pColliderData->GetKind();
+	auto bKind = objB->m_pColliderData->GetKind();
 
 	// 当たり判定を分ける
 	// 円同士
@@ -332,8 +333,8 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 		auto atobLength = VSize(atob);
 
 		// お互いの距離が、それぞれの半径を足したものより小さければ当たる
-		auto objAColliderData = dynamic_cast<ColliderDataSphere*>(objA->m_colliderData);
-		auto objBColliderData = dynamic_cast<ColliderDataSphere*>(objB->m_colliderData);
+		auto objAColliderData = std::dynamic_pointer_cast<ColliderDataSphere>(objA->m_pColliderData);
+		auto objBColliderData = std::dynamic_pointer_cast<ColliderDataSphere>(objB->m_pColliderData);
 		isHit = (atobLength < objAColliderData->m_radius + objBColliderData->m_radius);
 	}
 	//カプセル同士
@@ -348,88 +349,8 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 	{
 
 	}
-	
-	
 
-	//// 円とライン
-	//else if (
-	//	(aKind == ColliderData::Kind::Line2D && bKind == ColliderData::Kind::Circle3D)
-	//	 ||
-	//	(aKind == ColliderData::Kind::Circle3D && bKind == ColliderData::Kind::Line2D)
-	//	)
-	//{
-	//	ColliderData* lineDataBase = objA->colliderData;
-	//	ColliderData* circleDataBase = objB->colliderData;
-	//	VECTOR circleCenter = objB->nextPos;
-	//	if (bKind == ColliderData::Kind::Line2D)
-	//	{
-	//		lineDataBase = objB->colliderData;
-	//		circleDataBase = objA->colliderData;
-	//		circleCenter = objA->nextPos;
-	//	}
-	//	auto lineColliderData = dynamic_cast<ColliderDataLine2D*>(lineDataBase);
-	//	auto circleColliderData = dynamic_cast<ColliderDataCircle3D*>(circleDataBase);
-	//	isHit = (Segment_Point_MinLength(lineColliderData->startPoint, lineColliderData->endPoint, circleCenter) < circleColliderData->radius);
-	//}
-	//// 円と一方通行ライン
-	//else if (
-	//	(aKind == ColliderData::Kind::OneWayLine2D && bKind == ColliderData::Kind::Circle3D)
-	//		||
-	//	(aKind == ColliderData::Kind::Circle3D && bKind == ColliderData::Kind::OneWayLine2D)
-	//	)
-	//{
-	//	ColliderData* lineDataBase = objA->colliderData;
-	//	ColliderData* circleDataBase = objB->colliderData;
-	//	VECTOR circleCenter = objB->nextPos;
-	//	VECTOR circlePrevCenter = objB->rigidbody.GetPos();
-	//	if (bKind == ColliderData::Kind::OneWayLine2D)
-	//	{
-	//		lineDataBase = objB->colliderData;
-	//		circleDataBase = objA->colliderData;
-	//		circleCenter = objA->nextPos;
-	//		circlePrevCenter = objA->rigidbody.GetPos();
-	//	}
-	//	auto lineColliderData = dynamic_cast<ColliderDataOneWayLine2D*>(lineDataBase);
-	//	auto circleColliderData = dynamic_cast<ColliderDataCircle3D*>(circleDataBase);
 
-	//	// 一方通行ラインの場合は、円の移動前のポジション→次のポジションのベクトルが
-	//	// 一方通行ラインの通行可能方向かどうかの判定が必要
-	//	// 通行不可能な方向なら通常のライン当たり判定を行う
-	//	VECTOR prevToNext = VSub(circleCenter, circlePrevCenter);
-	//	VECTOR startToEnd = VSub(lineColliderData->endPoint, lineColliderData->startPoint);
-
-	//	// 「円の移動前のポジション→次のポジション」ベクトルと、「通っていい方向」の内積をとることで、
-	//	// それぞれのベクトルの交差方向を見る
-	//	VECTOR throughWay;	// 通っていい方向
-	//	{
-	//		// 法線方向が始点→終点ラインの上方向なフラグが立っている
-	//		if (lineColliderData->isStartToEndUp)
-	//		{
-	//			// 通っていい方向は始点→終点ラインとZ=1.0fなライン始点との外積
-	//			throughWay = VCross(startToEnd, VGet(startToEnd.x, startToEnd.y, 1.0f));
-	//		}
-	//		// 法線方向が始点→終点ラインの下方向なフラグが立っている
-	//		else
-	//		{
-	//			// 通っていい方向は始点→終点ラインとZ=-1.0fなライン始点との外積
-	//			throughWay = VCross(startToEnd, VGet(startToEnd.x, startToEnd.y, -1.0f));
-	//		}
-	//	}
-	//	// 「円の移動前のポジション→次のポジション」ベクトルと、「通っていい方向」の内積がプラスなら当たる
-	//	if (VDot(prevToNext, throughWay) > 0)
-	//	{
-	//		auto minLength = Segment_Point_MinLength(lineColliderData->startPoint, lineColliderData->endPoint, circleCenter);
-	//		isHit = (minLength < circleColliderData->radius);
-
-	//		// 例外処理：移動前に既に当たっている場合
-	//		//（移動前のポジションと線分の距離が円の半径より小さい場合）は無視
-	//		auto prevMinLength = Segment_Point_MinLength(lineColliderData->startPoint, lineColliderData->endPoint, circlePrevCenter);
-	//		if (isHit && (prevMinLength < circleColliderData->radius))
-	//		{
-	//			isHit = false;
-	//		}
-	//	}
-	//}
 
 	return isHit;
 }
@@ -440,8 +361,8 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 void Physics::FixNextPosition(Collidable* primary, Collidable* secondary) const
 {
 	// 当たり判定の種別ごとに補正方法を変える
-	auto primaryKind = primary->m_colliderData->GetKind();
-	auto secondaryKind = secondary->m_colliderData->GetKind();
+	auto primaryKind = primary->m_pColliderData->GetKind();
+	auto secondaryKind = secondary->m_pColliderData->GetKind();
 
 	// 円同士の位置補正
 	if (primaryKind == ColliderData::e_Kind::kSphere && secondaryKind == ColliderData::e_Kind::kSphere)
@@ -449,8 +370,8 @@ void Physics::FixNextPosition(Collidable* primary, Collidable* secondary) const
 		VECTOR primaryToSecondary = VSub(secondary->m_nextPos, primary->m_nextPos);
 		VECTOR primaryToSecondaryN = VNorm(primaryToSecondary);
 
-		auto primaryColliderData = dynamic_cast<ColliderDataSphere*>(primary->m_colliderData);
-		auto secondaryColliderData = dynamic_cast<ColliderDataSphere*>(secondary->m_colliderData);
+		auto primaryColliderData = std::dynamic_pointer_cast<ColliderDataSphere>(primary->m_pColliderData);
+		auto secondaryColliderData = std::dynamic_pointer_cast<ColliderDataSphere>(secondary->m_pColliderData);
 		float  awayDist = primaryColliderData->m_radius + secondaryColliderData->m_radius + 0.0001f;	// そのままだとちょうど当たる位置になるので少し余分に離す
 
 		VECTOR primaryToNewSecondaryPos = VScale(primaryToSecondaryN, awayDist);
@@ -520,9 +441,9 @@ void Physics::FixPosition()
 		// 補正後の位置をデバッグ表示
 		//DebugDraw::DrawLine(item->rigidbody.GetPos(), item->nextPos, AfterFixInfoColor);
 
-		if (item->m_colliderData->GetKind() == ColliderData::e_Kind::kSphere)
+		if (item->m_pColliderData->GetKind() == ColliderData::e_Kind::kSphere)
 		{
-			auto itemCircleData = dynamic_cast<ColliderDataSphere*>(item->m_colliderData);
+			auto itemCircleData = std::dynamic_pointer_cast<ColliderDataSphere>(item->m_pColliderData);
 			DebugDraw::DrawSphere(item->m_nextPos, itemCircleData->m_radius, kAfterFixInfoColor);
 		}
 
@@ -583,7 +504,7 @@ void MyLib::Physics::CheckWallAndFloor(std::shared_ptr<Collidable>& col)
 void MyLib::Physics::FixPositionWithWall(std::shared_ptr<Collidable>& col)
 {	
 
-	auto sphere = dynamic_cast<ColliderDataSphere*>(col->m_colliderData);
+	auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(col->m_pColliderData);
 
 	// 壁ポリゴンがない場合は何もしない
 	if (m_wallNum == 0) return;
@@ -697,7 +618,7 @@ void MyLib::Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable>& co
 			m_pPoly = m_pWallPoly[j];
 
 			// プレイヤーと当たっているかを判定
-			auto sphere = dynamic_cast<ColliderDataSphere*>(col->m_colliderData);
+			auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(col->m_pColliderData);
 			
 			if (!HitCheck_Sphere_Triangle(
 				col->m_nextPos,			//球体の座標

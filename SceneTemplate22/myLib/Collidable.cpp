@@ -11,7 +11,7 @@ using namespace MyLib;
 Collidable::Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderData::e_Kind colliderKind, bool isTrigger):
 	m_priority(priority),
 	m_tag(tag),
-	m_colliderData(nullptr),
+	m_pColliderData(nullptr),
 	m_nextPos(VGet(0,0,0))
 {
 	CreateColliderData(colliderKind, isTrigger);
@@ -22,27 +22,40 @@ Collidable::Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderD
 /// </summary>
 Collidable::~Collidable()
 {
-	if (m_colliderData != nullptr)
-	{
-		delete m_colliderData;
-		m_colliderData = nullptr;
-	}
+	//if (m_colliderData != nullptr)
+	//{
+	//	delete m_colliderData;
+	//	m_colliderData = nullptr;
+	//}
 }
 
 /// <summary>
 /// 初期化
 /// </summary>
-void Collidable::Initialize(MyLib::Physics* physics)
+void Collidable::Initialize(std::shared_ptr<MyLib::Physics> physics)
 {
-	physics->Entry(this);	// 物理情報に自身を登録
+
+	physics->Entry(shared_from_this());	// 物理情報に自身を登録
+
+
+	////変更前
+
+	//physics->Entry(this);	// 物理情報に自身を登録
 }
 
 /// <summary>
 /// 終了
 /// </summary>
-void Collidable::Finalize(MyLib::Physics* physics)
+void Collidable::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
-	physics->Exit(this);	// 物理情報登録解除
+
+	physics->Exit(shared_from_this());	// 物理情報登録解除
+
+
+	////変更前
+
+	//physics->Exit(this);	// 物理情報登録解除
+
 }
 
 /// <summary>
@@ -97,27 +110,53 @@ bool Collidable::IsThroughTarget(const Collidable* target) const
 /// <summary>
 /// 当たり判定データの作成
 /// </summary>
-ColliderData* Collidable::CreateColliderData(ColliderData::e_Kind kind, bool isTrigger)
+std::shared_ptr<ColliderData> Collidable::CreateColliderData(ColliderData::e_Kind kind, bool isTrigger)
 {
-	if (m_colliderData != nullptr)
+
+	std::shared_ptr<ColliderData> create;
+
+	if (kind == ColliderData::e_Kind::kSphere)
 	{
-		assert(0 && "colliderDataは既に作られています。");
-		return m_colliderData;
+		create = std::make_shared<ColliderDataSphere>(isTrigger);
 	}
-	switch (kind)
+	else if (kind == ColliderData::e_Kind::kCapsule)
 	{
-	case ColliderData::e_Kind::kSphere:
-		m_colliderData = new ColliderDataSphere(isTrigger);
-		break;
-	case ColliderData::e_Kind::kCapsule:
-		m_colliderData = new ColliderDataCapsule(isTrigger);
-		break;
-	case ColliderData::e_Kind::kLine:
-		m_colliderData = new ColliderDataLine(isTrigger);
-		break;
-	default:
+		create = std::make_shared<ColliderDataCapsule>(isTrigger);
+	}
+	else if (kind == ColliderData::e_Kind::kLine)
+	{
+		create = std::make_shared<ColliderDataLine>(isTrigger);
+	}
+	else
+	{
 		assert(0 && "colliderData作成に失敗。");
-		break;
 	}
-	return m_colliderData;
+
+	return create;
+
+
+	////変更前
+
+	//if (m_colliderData != nullptr)
+	//{
+	//	assert(0 && "colliderDataは既に作られています。");
+	//	return m_colliderData;
+	//}
+
+	//switch (kind)
+	//{
+	//case ColliderData::e_Kind::kSphere:
+	//	m_colliderData = new ColliderDataSphere(isTrigger);
+	//	break;
+	//case ColliderData::e_Kind::kCapsule:
+	//	m_colliderData = new ColliderDataCapsule(isTrigger);
+	//	break;
+	//case ColliderData::e_Kind::kLine:
+	//	m_colliderData = new ColliderDataLine(isTrigger);
+	//	break;
+	//default:
+	//	assert(0 && "colliderData作成に失敗。");
+	//	break;
+	//}
+	//return m_colliderData;
 }

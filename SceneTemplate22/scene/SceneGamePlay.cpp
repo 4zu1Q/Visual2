@@ -43,6 +43,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pItem = std::make_shared<ItemBase>();
 	m_pBoss = std::make_shared<BossPower>();
 
+	m_pPhysics = std::make_shared<MyLib::Physics>();
+
 
 	m_playerPos = VGet(30, 0, 20);
 	m_cameraPos = VGet(0, 0, 0);

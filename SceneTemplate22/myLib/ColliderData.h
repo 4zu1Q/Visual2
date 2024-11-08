@@ -33,6 +33,7 @@ namespace MyLib
 		bool IsTrigger() const { return m_isTrigger; }
 
 	private:
+
 		e_Kind	m_kind;
 		bool	m_isTrigger;
 	};
