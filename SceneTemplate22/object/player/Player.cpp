@@ -125,7 +125,8 @@ Player::Player() :
 	m_pWeapon = std::make_shared<PlayerWeapon>();
 	m_pAnim = std::make_shared<AnimController>();
 
-	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>();
+
+	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
 	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
@@ -135,10 +136,12 @@ Player::Player() :
 
 Player::~Player()
 {
+
 }
 
 void Player::Initialize(std::shared_ptr<MyLib::Physics> physics)
 {
+	//
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
@@ -255,6 +258,7 @@ void Player::OnCollide(const Collidable& colider)
 		message += "システム壁";
 		break;
 	case Game::e_GameObjectTag::kStepGround:
+		m_isJump = false;
 		message += "足場";
 		break;
 	default:
@@ -499,6 +503,12 @@ void Player::JumpUpdate()
 		m_attackDir = VNorm(move);
 		m_avoid = VNorm(move);
 	}
+
+	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
+	{
+		OnJump();
+	}
+
 }
 
 void Player::AirUpdate()
@@ -547,13 +557,11 @@ void Player::AttackXUpdate()
 
 void Player::AttackYUpdate()
 {
-
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
 	}
-
 }
 
 void Player::HitUpdate()
@@ -563,7 +571,6 @@ void Player::HitUpdate()
 	{
 		OnIdle();
 	}
-
 }
 
 void Player::DeadUpdate()
@@ -578,10 +585,12 @@ void Player::DeadUpdate()
 void Player::DeadPoseUpadte()
 {
 	// 死んでいるので何も操作できない
+	// ここにゲームオーバーシーンに遷移するためのフラグをたてる
 }
 
 void Player::SpawnUpdate()
 {
+	//セレクトシーンの始めに
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -642,12 +651,14 @@ void Player::OnDash()
 
 void Player::OnAttackX()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimNormalAttackX,true,true,true);
 	m_updaFunc = &Player::AttackXUpdate;
 }
 
 void Player::OnAttackY()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimNormalAttackY,true, true, true);
 	m_updaFunc = &Player::AttackYUpdate;
 }
@@ -655,7 +666,7 @@ void Player::OnAttackY()
 void Player::OnJump()
 {
 	//地面と接触しているかどうか
-	//m_isJump = true;
+	m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
 	vel.y = kJumpPower;
 	m_rigidbody.SetVelocity(vel);

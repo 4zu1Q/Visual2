@@ -8,7 +8,6 @@
 
 #include "object/player/Player.h"
 #include "object/boss/BossPower.h"
-#include "object/item/ItemBase.h"
 #include "object/SkyDome.h"
 #include "object/Camera.h"
 
@@ -40,7 +39,6 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
-	m_pItem = std::make_shared<ItemBase>();
 	m_pBoss = std::make_shared<BossPower>();
 
 	m_pPhysics = std::make_shared<MyLib::Physics>();
@@ -100,7 +98,6 @@ void SceneGamePlay::Update()
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
 	m_pBoss->Update();
-	m_pItem->Update();
 
 	m_pPhysics->Update();
 
@@ -108,8 +105,6 @@ void SceneGamePlay::Update()
 	m_pHpBar->Update(*m_pPlayer);
 
 
-	//プレイヤーとアイテムの当たり判定のフラグを代入
-	m_isMpHit = m_pItem->ItemHit(m_pPlayer);
 
 	
 
@@ -127,7 +122,6 @@ void SceneGamePlay::Draw()
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pHpBar->Draw();
 
-	m_pItem->Draw(m_pPlayer);
 
 	DrawFade(0xffffff);
 	

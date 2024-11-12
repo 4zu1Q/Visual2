@@ -26,9 +26,6 @@ public:
 	Player();
 	virtual ~Player();
 
-	//void Initialize(MyLib::Physics* physics) override;
-	//void Finalize(MyLib::Physics* physics) override;
-
 	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
 	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
 
@@ -43,9 +40,7 @@ public:
 	void SetModelHandle(const int modelH) { m_modelH = modelH; }
 
 	//プレイヤー下の座標を取得
-//	const VECTOR& GetPosDown() const { return m_posDown; }
 	const VECTOR& GetPosDown() const;
-//	void SetPosDown(const VECTOR pos) { m_posDown = pos; }
 	void SetPosDown(const VECTOR pos);
 
 	//プレイヤー上の座標を取得
@@ -70,11 +65,6 @@ public:
 
 	//カメラの方向を取得
 	void SetCameraAngle(float angle) { m_cameraAngle = angle; }
-
-	//攻撃の半径を取得
-	const float& GetRadius() const { return m_radius; }
-
-	
 
 	/*プレイヤーがボスを倒したかどうかのフラグを取得する関数*/
 	//これ多分必要ない可能性

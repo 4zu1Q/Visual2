@@ -28,22 +28,22 @@ namespace
 }
 
 ItemHp::ItemHp():
-	Collidable(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kItem, MyLib::ColliderData::e_Kind::kSphere, false),
+	Collidable(Collidable::e_Priority::kLow, Game::e_GameObjectTag::kItem, MyLib::ColliderData::e_Kind::kSphere, false),
 	m_modelH(-1),
 	m_pos(kModelInitPos),
 	m_move(VGet(0, 0, 0)),
-	m_radius(3.0f),
 	m_rot(0.0f)
 {
 	m_modelH = MV1LoadModel(kItemHpModelFilename);
 	MV1SetScale(m_modelH, kModelScale);
 
-	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>();
+	
+	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
 	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>(m_colliderData);
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
+	circleColliderData->m_radius = 3.0f;
 
-	circleColliderData->m_radius = 2.0f;
 }
 
 ItemHp::~ItemHp()
@@ -53,10 +53,11 @@ ItemHp::~ItemHp()
 
 void ItemHp::Initialize(std::shared_ptr<MyLib::Physics> physics)
 {
+	//
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
-	m_rigidbody.Initialize(false);
+	m_rigidbody.Initialize(true);
 	m_rigidbody.SetPos(kModelInitPos);
 }
 
@@ -93,8 +94,6 @@ void ItemHp::Update(std::shared_ptr<MyLib::Physics> physics)
 void ItemHp::Draw()
 {
 	MV1DrawModel(m_modelH);
-	//DrawSphere3D(m_pos, m_radius, 32, 0xffffff, 0xff0000, false);
-
 }
 
 void ItemHp::OnCollide(const Collidable& colider)
@@ -122,49 +121,3 @@ void ItemHp::OnCollide(const Collidable& colider)
 	printfDx(message.c_str());
 }
 
-//bool ItemHp::HpHit(std::shared_ptr<Player> pPlayer)
-//{
-//	/*カプセルと円の当たり判定*/
-//
-//	//カプセルと球のベクトル
-//	VECTOR Cap1ToSph = VSub(m_pos, pPlayer->GetPosDown());
-//
-//	//カプセルの上の座標と下の座標のベクトル
-//	VECTOR Cap1ToCap2 = VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown());
-//
-//	//正規化
-//	VECTOR normal = VNorm(Cap1ToCap2);
-//
-//	//内積
-//	float dot = VDot(Cap1ToSph, normal);
-//
-//
-//	// 球からカプセルへの線上最近点
-//	VECTOR point = VGet(pPlayer->GetPosDown().x + (normal.x * dot), pPlayer->GetPosDown().y + (normal.y * dot), pPlayer->GetPosDown().z + (normal.z * dot));
-//
-//	float temp = VSize(VSub(point, pPlayer->GetPosDown())) / VSize(VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown()));
-//	float distance;
-//
-//
-//	if (temp < 0) // 球からカプセル線分に垂線をおろせず、GetPosDownに近い場所
-//	{
-//		distance = VSize(VSub(point, pPlayer->GetPosDown()));
-//	}
-//	else if (temp > 1) // 球からカプセル線分に垂線をおろせず、GetPosUpに近い場所
-//	{
-//		distance = VSize(VSub(point, pPlayer->GetPosUp()));
-//	}
-//	else // 球からカプセル線分に垂線をおろせる
-//	{
-//		distance = VSize(VSub(point, m_pos));
-//	}
-//
-//	// 当たっているとき
-//	if (distance < m_radius + pPlayer->GetRadius())
-//	{
-//
-//		return true;
-//	}
-//
-//	return false;
-//}

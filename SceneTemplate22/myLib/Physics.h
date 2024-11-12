@@ -80,7 +80,7 @@ namespace MyLib
 
 
 		// OnCollideの遅延通知のためのデータ
-		struct OnCollideInfo
+		struct OnCollideInfo_
 		{
 			Collidable* owner_;
 			Collidable* colider_;
@@ -93,7 +93,7 @@ namespace MyLib
 		std::shared_ptr<Field> m_pField;
 
 		// 当たり判定チェック
-		std::vector<OnCollideInfo> CheckColide() const;
+		std::vector<OnCollideInfo_> CheckColide() const;
 
 		// 重力と最大重力加速度
 		static constexpr float m_gravity = -0.1f;
@@ -101,7 +101,6 @@ namespace MyLib
 
 		std::list<std::shared_ptr<Collidable>> m_collidables;	// 登録されたCollidableのリスト
 		//std::list<std::shared_ptr<Collidable*>> m_collidables;	// 登録されたCollidableのリスト
-
 
 		//壁と床のポリゴン数を入れるための変数
 		int m_wallNum;

@@ -8,7 +8,6 @@
 
 #include "object/player/Player.h"
 #include "object/Camera.h"
-#include "object/item/ItemBase.h"	//後々消す
 
 #include "object/item/ItemHp.h"
 #include "object/item/ItemMp.h"
@@ -51,10 +50,8 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pField = std::make_shared<Field>();
 	m_pSkyDome = std::make_shared<SkyDome>();
 
-	m_pItem = std::make_shared<ItemBase>();
 	m_pItemHp = std::make_shared<ItemHp>();
 	m_pItemMp = std::make_shared<ItemMp>();
-	m_pTomb = std::make_shared<Tomb>();
 
 	m_pPhysics = std::make_shared<MyLib::Physics>();
 
@@ -113,7 +110,6 @@ void SceneSelect::Update()
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
 	m_pItemHp->Update(m_pPhysics);
-	m_pItem->Update();
 	m_pItemMp->Update();
 	m_pField->Update();
 
@@ -122,15 +118,15 @@ void SceneSelect::Update()
 	m_pFaceUi->Update();
 	m_pHpBar->Update(*m_pPlayer);
 
-	m_pTomb->Update();
+	//m_pTomb->Update();
 
 	//プレイヤーとアイテムの当たり判定のフラグを代入
-	m_isMpHit = m_pItemMp->MpHit(m_pPlayer);
+	//m_isMpHit = m_pItemMp->MpHit(m_pPlayer);
 	//m_isHpHit = m_pItemHp->HpHit(m_pPlayer);
 
-	m_isTombHitP = m_pTomb->TombPHit(m_pPlayer);
-	m_isTombHitS = m_pTomb->TombSHit(m_pPlayer);
-	m_isTombHitR = m_pTomb->TombRHit(m_pPlayer);
+	//m_isTombHitP = m_pTomb->TombPHit(m_pPlayer);
+	//m_isTombHitS = m_pTomb->TombSHit(m_pPlayer);
+	//m_isTombHitR = m_pTomb->TombRHit(m_pPlayer);
 
 
 
@@ -185,10 +181,9 @@ void SceneSelect::Draw()
 
 	m_pField->Draw();
 	m_pSkyDome->Draw();
-	m_pItem->Draw(m_pPlayer);
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
-	m_pTomb->Draw();
+	//m_pTomb->Draw();
 
 //#ifdef _DEBUG
 

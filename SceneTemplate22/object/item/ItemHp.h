@@ -28,8 +28,7 @@ private:
 	VECTOR m_pos;
 	//移動
 	VECTOR m_move;
-	//半径
-	float m_radius;
+
 	//回転
 	float m_rot;
 

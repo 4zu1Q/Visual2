@@ -20,6 +20,9 @@
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	//画面サイズの設定
+	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
+
 	// 一部の関数はDxLib_Init()の前に実行する必要がある
 	//ウィンドウモードの設定
 #ifdef _DEBUG
@@ -31,8 +34,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//ウィンドウ名の設定
 	SetMainWindowText(Game::kTitleText);
 
-	//画面サイズの設定
-	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight , Game::kColorDepth);
+
 	
 	// 画面のフルスクリーンアンチエイリアスモードの設定を行う( DxLib_Init の前でのみ使用可能 )
 	SetFullSceneAntiAliasingMode(4, 4);

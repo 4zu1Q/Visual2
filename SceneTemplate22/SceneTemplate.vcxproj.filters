@@ -147,9 +147,6 @@
     <ClCompile Include="util\ActionTime.cpp">
       <Filter>ソース ファイル\util</Filter>
     </ClCompile>
-    <ClCompile Include="object\item\ItemBase.cpp">
-      <Filter>ソース ファイル\object\item</Filter>
-    </ClCompile>
     <ClCompile Include="object\item\ItemMp.cpp">
       <Filter>ソース ファイル\object\item</Filter>
     </ClCompile>
@@ -202,7 +199,7 @@
       <Filter>ソース ファイル\object</Filter>
     </ClCompile>
     <ClCompile Include="object\Field.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -289,9 +286,6 @@
     </ClInclude>
     <ClInclude Include="util\ActionTime.h">
       <Filter>ヘッダー ファイル\util</Filter>
-    </ClInclude>
-    <ClInclude Include="object\item\ItemBase.h">
-      <Filter>ヘッダー ファイル\object\item</Filter>
     </ClInclude>
     <ClInclude Include="object\item\ItemMp.h">
       <Filter>ヘッダー ファイル\object\item</Filter>

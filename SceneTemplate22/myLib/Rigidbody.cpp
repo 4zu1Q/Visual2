@@ -7,7 +7,8 @@ using namespace MyLib;
 /// コンストラクタ
 /// </summary>
 Rigidbody::Rigidbody() :
-	m_pos (VGet(0, 0, 0)),
+	m_pos(VGet(0, 0, 0)),
+	m_nextPos(VGet(0, 0, 0)),
 	m_dir (VGet(0, 0, 0)),
 	m_velocity (VGet(0, 0, 0)),
 	m_isUseGravity (false)

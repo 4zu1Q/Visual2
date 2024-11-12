@@ -14,11 +14,8 @@ Field::Field():
 	m_modelH(-1),
 	m_pos(VGet(0,0,0))
 {
-
 	m_modelH = MV1LoadModel(kFieldModelFilename);
 	MV1SetScale(m_modelH, kModelScale);
-
-
 }
 
 Field::~Field()
@@ -29,14 +26,10 @@ Field::~Field()
 
 void Field::Initialize()
 {
-
-
 }
 
 void Field::Update()
 {
-
-
 	//モデルに座標をセットする
 	MV1SetPosition(m_modelH, m_pos);
 }

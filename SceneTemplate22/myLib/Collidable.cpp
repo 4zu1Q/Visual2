@@ -11,8 +11,7 @@ using namespace MyLib;
 Collidable::Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderData::e_Kind colliderKind, bool isTrigger):
 	m_priority(priority),
 	m_tag(tag),
-	m_pColliderData(nullptr),
-	m_nextPos(VGet(0,0,0))
+	m_pColliderData(nullptr)
 {
 	CreateColliderData(colliderKind, isTrigger);
 }
@@ -34,12 +33,10 @@ Collidable::~Collidable()
 /// </summary>
 void Collidable::Initialize(std::shared_ptr<MyLib::Physics> physics)
 {
-
-	physics->Entry(shared_from_this());	// 物理情報に自身を登録
-
+	auto temp = shared_from_this();
+	physics->Entry(temp);	// 物理情報に自身を登録
 
 	////変更前
-
 	//physics->Entry(this);	// 物理情報に自身を登録
 }
 
@@ -48,14 +45,10 @@ void Collidable::Initialize(std::shared_ptr<MyLib::Physics> physics)
 /// </summary>
 void Collidable::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
-
 	physics->Exit(shared_from_this());	// 物理情報登録解除
 
-
 	////変更前
-
 	//physics->Exit(this);	// 物理情報登録解除
-
 }
 
 /// <summary>

@@ -18,7 +18,7 @@ namespace MyLib
 	/// <summary>
 	/// 衝突できるもの。物理・衝突判定をする場合はこれを継承させる
 	/// </summary>
-	class Collidable abstract : std::enable_shared_from_this<Collidable>
+	class Collidable abstract : public std::enable_shared_from_this<Collidable>
 	{
 	public:
 
@@ -57,8 +57,8 @@ namespace MyLib
 	protected:
 		Rigidbody m_rigidbody;		// 物理データ
 		std::shared_ptr<ColliderData> m_pColliderData;	// 当たり判定データ
-		//std::list<std::shared_ptr<ColliderData>> m_colliders;
 
+		//std::list<std::shared_ptr<ColliderData>> m_colliders;
 		//std::list<Collidable*> m_collidables;	// 登録されたCollidableのリスト
 
 
@@ -71,9 +71,7 @@ namespace MyLib
 		// PhysicsがCollidableを自由に管理するためにフレンド化
 		friend Physics;
 
-	private:
 
-		VECTOR m_nextPos;
 	};
 
 }

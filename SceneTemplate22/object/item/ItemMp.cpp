@@ -24,7 +24,6 @@ ItemMp::ItemMp():
 	m_modelH(-1),
 	m_pos(kModelInitPos),
 	m_move(VGet(0, 0, 0)),
-	m_radius(3.0f),
 	m_rot(0.0f)
 {
 	m_modelH = MV1LoadModel(kItemHpModelFilename);
@@ -68,53 +67,52 @@ void ItemMp::Update()
 void ItemMp::Draw()
 {
 	MV1DrawModel(m_modelH);
-	DrawSphere3D(m_pos, m_radius, 32, 0xffffff, 0xff0000, false);
 
 }
 
-bool ItemMp::MpHit(std::shared_ptr<Player> pPlayer)
-{
-	/*カプセルと円の当たり判定*/
-
-	//カプセルと球のベクトル
-	VECTOR Cap1ToSph = VSub(m_pos, pPlayer->GetPosDown());
-
-	//カプセルの上の座標と下の座標のベクトル
-	VECTOR Cap1ToCap2 = VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown());
-
-	//正規化
-	VECTOR normal = VNorm(Cap1ToCap2);
-
-	//内積
-	float dot = VDot(Cap1ToSph, normal);
-
-
-	// 球からカプセルへの線上最近点
-	VECTOR point = VGet(pPlayer->GetPosDown().x + (normal.x * dot), pPlayer->GetPosDown().y + (normal.y * dot), pPlayer->GetPosDown().z + (normal.z * dot));
-
-	float temp = VSize(VSub(point, pPlayer->GetPosDown())) / VSize(VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown()));
-	float distance;
-
-
-	if (temp < 0) // 球からカプセル線分に垂線をおろせず、GetPosDownに近い場所
-	{
-		distance = VSize(VSub(point, pPlayer->GetPosDown()));
-	}
-	else if (temp > 1) // 球からカプセル線分に垂線をおろせず、GetPosUpに近い場所
-	{
-		distance = VSize(VSub(point, pPlayer->GetPosUp()));
-	}
-	else // 球からカプセル線分に垂線をおろせる
-	{
-		distance = VSize(VSub(point, m_pos));
-	}
-
-	// 当たっているとき
-	if (distance < m_radius + pPlayer->GetRadius())
-	{
-
-		return true;
-	}
-
-	return false;
-}
+//bool ItemMp::MpHit(std::shared_ptr<Player> pPlayer)
+//{
+//	/*カプセルと円の当たり判定*/
+//
+//	//カプセルと球のベクトル
+//	VECTOR Cap1ToSph = VSub(m_pos, pPlayer->GetPosDown());
+//
+//	//カプセルの上の座標と下の座標のベクトル
+//	VECTOR Cap1ToCap2 = VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown());
+//
+//	//正規化
+//	VECTOR normal = VNorm(Cap1ToCap2);
+//
+//	//内積
+//	float dot = VDot(Cap1ToSph, normal);
+//
+//
+//	// 球からカプセルへの線上最近点
+//	VECTOR point = VGet(pPlayer->GetPosDown().x + (normal.x * dot), pPlayer->GetPosDown().y + (normal.y * dot), pPlayer->GetPosDown().z + (normal.z * dot));
+//
+//	float temp = VSize(VSub(point, pPlayer->GetPosDown())) / VSize(VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown()));
+//	float distance;
+//
+//
+//	if (temp < 0) // 球からカプセル線分に垂線をおろせず、GetPosDownに近い場所
+//	{
+//		distance = VSize(VSub(point, pPlayer->GetPosDown()));
+//	}
+//	else if (temp > 1) // 球からカプセル線分に垂線をおろせず、GetPosUpに近い場所
+//	{
+//		distance = VSize(VSub(point, pPlayer->GetPosUp()));
+//	}
+//	else // 球からカプセル線分に垂線をおろせる
+//	{
+//		distance = VSize(VSub(point, m_pos));
+//	}
+//
+//	// 当たっているとき
+//	if (distance < m_radius + pPlayer->GetRadius())
+//	{
+//
+//		return true;
+//	}
+//
+//	return false;
+//}
