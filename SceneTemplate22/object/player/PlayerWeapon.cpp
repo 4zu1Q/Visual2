@@ -27,11 +27,12 @@ PlayerWeapon::PlayerWeapon():
 	m_modelLeftFrame(0),
 	m_attachFramePos(VGet(0, 0, 0))
 {
+
 }
 
 PlayerWeapon::~PlayerWeapon()
 {
-	Finalize();
+
 }
 
 void PlayerWeapon::Load()
@@ -48,6 +49,7 @@ void PlayerWeapon::Load()
 
 void PlayerWeapon::Initialize(int modelH, int modelRightFrame, int modelLeftFrame)
 {
+
 	//代入
 	m_modelH = modelH;
 	m_modelRightFrame = modelRightFrame;
@@ -57,6 +59,7 @@ void PlayerWeapon::Initialize(int modelH, int modelRightFrame, int modelLeftFram
 
 void PlayerWeapon::Finalize()
 {
+
 	//モデルのデリート
 	MV1DeleteModel(m_swordModelH);
 	MV1DeleteModel(m_axeModelH);

@@ -49,7 +49,6 @@ void Camera::Finalize()
 void Camera::Update(Player& player)
 {
 
-
 	//アナログスティックを使ってカメラ回転
 	int analogX = 0;
 	int analogZ = 0;
@@ -97,6 +96,7 @@ void Camera::Draw()
 
 void Camera::DebugUpdate()
 {
+
 	//アナログスティックを使ってカメラ回転
 	int analogX = 0;
 	int analogZ = 0;

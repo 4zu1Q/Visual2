@@ -3,9 +3,11 @@
 #include "myLib/MyLib.h"
 #include <memory>
 
+#include "ItemBase.h"
+
 class Colidable;
 
-class ItemHp : public MyLib::Collidable
+class ItemHp : public ItemBase
 {
 public:
 	ItemHp();
@@ -18,19 +20,19 @@ public:
 	void Draw();
 
 	// 衝突したとき
-	void OnCollide(const Collidable& colider) override;
+	//void OnCollide(const Collidable& colider) override;
 
 private:
 
 	//モデルハンドル
-	int m_modelH;
-	//座標
-	VECTOR m_pos;
-	//移動
-	VECTOR m_move;
+	//int m_modelH;
+	////座標
+	//VECTOR m_pos;
+	////移動
+	//VECTOR m_move;
 
-	//回転
-	float m_rot;
+	////回転
+	//float m_rot;
 
 };
 

@@ -12,9 +12,9 @@
 #include "object/item/ItemHp.h"
 #include "object/item/ItemMp.h"
 
-#include "object/Field.h"
-#include "object/SkyDome.h"
-#include "object/Tomb.h"
+#include "object/stage/Field.h"
+#include "object/stage/SkyDome.h"
+#include "object/stage/Tomb.h"
 
 
 #include "ui/HpBar.h"
@@ -33,12 +33,7 @@ namespace
 
 
 SceneSelect::SceneSelect(SceneManager& manager) :
-	SceneBase(manager),
-	m_isMpHit(false),
-	m_isHpHit(false),
-	m_isTombHitP(false),
-	m_isTombHitS(false),
-	m_isTombHitR(false)
+	SceneBase(manager)
 {
 	m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
 
@@ -61,6 +56,8 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 
 	m_pPlayer->Initialize(m_pPhysics);
 	m_pItemHp->Initialize(m_pPhysics);
+	m_pField->Initialize();
+
 }
 
 SceneSelect::~SceneSelect()
@@ -111,51 +108,11 @@ void SceneSelect::Update()
 	m_pPlayer->Update(m_pPhysics);
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update();
-	m_pField->Update();
 
 	m_pPhysics->Update();
 
 	m_pFaceUi->Update();
 	m_pHpBar->Update(*m_pPlayer);
-
-	//m_pTomb->Update();
-
-	//プレイヤーとアイテムの当たり判定のフラグを代入
-	//m_isMpHit = m_pItemMp->MpHit(m_pPlayer);
-	//m_isHpHit = m_pItemHp->HpHit(m_pPlayer);
-
-	//m_isTombHitP = m_pTomb->TombPHit(m_pPlayer);
-	//m_isTombHitS = m_pTomb->TombSHit(m_pPlayer);
-	//m_isTombHitR = m_pTomb->TombRHit(m_pPlayer);
-
-
-
-
-	//プレイヤーと墓が当たった場合
-
-	//if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitP)
-	//{
-	//	printfDx("パワーボス");
-	//	StartFadeOut();
-	//	m_isToNextScene = true;
-	//	
-	//}
-
-	//if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitS)
-	//{
-	//	printfDx("スピードボス");
-	//	StartFadeOut();
-	//	m_isToNextScene = true;
-
-	//}
-
-	//if (Pad::IsTrigger(PAD_INPUT_1) && m_isTombHitR)
-	//{
-	//	printfDx("ラスボス");
-	//	StartFadeOut();
-	//	m_isToNextScene = true;
-
-	//}
 
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
@@ -183,13 +140,15 @@ void SceneSelect::Draw()
 	m_pSkyDome->Draw();
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
-	//m_pTomb->Draw();
 
 //#ifdef _DEBUG
 
 	DrawString(0, 0, "Scene Select", 0xffffff, false);
 
 //#endif
+
+	DrawFormatString(900, 280, 0xffffff, " PlayerHp : %f ", m_pPlayer->GetHp());
+
 
 	if (!m_isFadeColor)
 	{

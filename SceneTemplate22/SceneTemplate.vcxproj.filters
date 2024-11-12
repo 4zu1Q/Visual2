@@ -61,6 +61,18 @@
     <Filter Include="ソース ファイル\myLib">
       <UniqueIdentifier>{f4bf15a2-b8e1-4f06-b113-494134f39c37}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\object\weapon">
+      <UniqueIdentifier>{be7be85c-40c5-4fe5-8a69-2b70400e813a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\weapon">
+      <UniqueIdentifier>{4a628768-4d92-47ba-9de2-3ddc749b701d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\stage">
+      <UniqueIdentifier>{774fc939-23d0-4125-ad5e-aff0564864a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\stage">
+      <UniqueIdentifier>{17b196ff-7941-457f-8c7f-af5325170c22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -114,9 +126,6 @@
     <ClCompile Include="object\player\Player.cpp">
       <Filter>ソース ファイル\object\player</Filter>
     </ClCompile>
-    <ClCompile Include="object\SkyDome.cpp">
-      <Filter>ソース ファイル\object</Filter>
-    </ClCompile>
     <ClCompile Include="ui\HpBar.cpp">
       <Filter>ソース ファイル\ui</Filter>
     </ClCompile>
@@ -155,9 +164,6 @@
     </ClCompile>
     <ClCompile Include="util\Collision.cpp">
       <Filter>ソース ファイル\util</Filter>
-    </ClCompile>
-    <ClCompile Include="object\Tomb.cpp">
-      <Filter>ソース ファイル\object</Filter>
     </ClCompile>
     <ClCompile Include="util\AnimController.cpp">
       <Filter>ソース ファイル\util</Filter>
@@ -198,8 +204,20 @@
     <ClCompile Include="object\ObjectBase.cpp">
       <Filter>ソース ファイル\object</Filter>
     </ClCompile>
-    <ClCompile Include="object\Field.cpp">
-      <Filter>ソース ファイル\object</Filter>
+    <ClCompile Include="object\stage\Field.cpp">
+      <Filter>ソース ファイル\object\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="object\stage\SkyDome.cpp">
+      <Filter>ソース ファイル\object\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="object\stage\Tomb.cpp">
+      <Filter>ソース ファイル\object\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="WeaponBase.cpp">
+      <Filter>ソース ファイル\object\weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="object\item\ItemBase.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -254,9 +272,6 @@
     <ClInclude Include="object\player\Player.h">
       <Filter>ヘッダー ファイル\object\player</Filter>
     </ClInclude>
-    <ClInclude Include="object\SkyDome.h">
-      <Filter>ヘッダー ファイル\object</Filter>
-    </ClInclude>
     <ClInclude Include="ui\HpBar.h">
       <Filter>ヘッダー ファイル\ui</Filter>
     </ClInclude>
@@ -295,9 +310,6 @@
     </ClInclude>
     <ClInclude Include="util\Collision.h">
       <Filter>ヘッダー ファイル\util</Filter>
-    </ClInclude>
-    <ClInclude Include="object\Tomb.h">
-      <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
     <ClInclude Include="util\AnimController.h">
       <Filter>ヘッダー ファイル\util</Filter>
@@ -347,8 +359,23 @@
     <ClInclude Include="object\ObjectBase.h">
       <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
-    <ClInclude Include="object\Field.h">
-      <Filter>ヘッダー ファイル\object</Filter>
+    <ClInclude Include="object\stage\Field.h">
+      <Filter>ヘッダー ファイル\object\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="object\stage\SkyDome.h">
+      <Filter>ヘッダー ファイル\object\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="object\stage\Tomb.h">
+      <Filter>ヘッダー ファイル\object\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponBase.h">
+      <Filter>ヘッダー ファイル\object\weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\GameObjectTag.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemBase.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

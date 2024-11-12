@@ -11,8 +11,8 @@ class Camera;
 class SkyDome;
 class HpBar;
 class FaceUi;
-class ItemBase;
 class BossPower;
+class Field;
 class MyLib::Physics;
 
 class SceneGamePlay :
@@ -44,10 +44,9 @@ private:
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	std::shared_ptr<HpBar> m_pHpBar;
 	std::shared_ptr<FaceUi> m_pFaceUi;
-	std::shared_ptr<ItemBase> m_pItem;
 	std::shared_ptr<BossPower> m_pBoss;
+	std::shared_ptr<Field> m_pField;
 
-	//MyLib::Physics* m_pPhysics = new MyLib::Physics;
 	std::shared_ptr<MyLib::Physics> m_pPhysics;
 
 

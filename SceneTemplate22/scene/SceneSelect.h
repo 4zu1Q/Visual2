@@ -11,7 +11,6 @@ class Camera;
 class SkyDome;
 class HpBar;
 class FaceUi;
-class ItemBase;
 class ItemMp;
 class ItemHp;
 class Tomb;
@@ -44,8 +43,6 @@ private:
 	std::shared_ptr<HpBar> m_pHpBar;
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	
-	std::shared_ptr<ItemBase> m_pItem;	//後々消す
-
 	std::shared_ptr<ItemMp> m_pItemMp;
 	std::shared_ptr<ItemHp> m_pItemHp;
 	std::shared_ptr<Tomb> m_pTomb;
@@ -53,9 +50,6 @@ private:
 
 
 	std::shared_ptr<MyLib::Physics> m_pPhysics;
-
-	//MyLib::Physics* m_pPhysics = new MyLib::Physics;
-
 
 	//遷移先
 	enum class e_SceneTrans : int
@@ -81,19 +75,6 @@ private:
 
 	bool m_isFadingOut;
 	float m_cameraAngle;
-
-
-	/* 当たり判定フラグ */
-
-	//アイテムの当たり判定フラグ
-	bool m_isHpHit;
-	bool m_isMpHit;
-
-	//墓の当たり判定フラグ
-	bool m_isTombHitP;
-	bool m_isTombHitS;
-	bool m_isTombHitR;
-
 
 };
 

@@ -2,21 +2,16 @@
 
 using namespace MyLib;
 
+ObjectBase::ObjectBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind kind, bool IsTrigger):
+		Collidable(priority, tag, kind, IsTrigger),
+		m_rot(VGet(0,0,0)),
+		m_modelH(-1)
+{
 
-//ObjectBase::ObjectBase(e_Priority priority, e_GameObjectTag tag):
-//		Collidable(priority , tag),
-//		m_rot(VGet(0,0,0)),
-//		m_modelH(-1)
-//{
-//
-//}
-//
-//ObjectBase::~ObjectBase()
-//{
-//	MV1DeleteModel(m_modelH);
-//}
-//
-//void ObjectBase::OnColliderEnter(const std::shared_ptr<Collidable>& collider)
-//{
-//
-//}
+}
+
+ObjectBase::~ObjectBase()
+{
+	MV1DeleteModel(m_modelH);
+}
+

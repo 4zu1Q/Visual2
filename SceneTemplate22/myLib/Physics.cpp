@@ -122,12 +122,7 @@ void Physics::Update()
 			DebugDraw::DrawCapsule(pos, upPos, radius, kBeforeFixInfoColor);
 			DebugDraw::DrawCapsule(nextPos, upPos, radius, kAimInfoColor);
 		}
-		else if (kind == ColliderData::e_Kind::kLine)
-		{
-			// lineはstaticなので確定色で描く
-			auto lineData = std::dynamic_pointer_cast<ColliderDataLine>(item->m_pColliderData);
-			DebugDraw::DrawLine(lineData->m_startPos, lineData->m_endPos, kAfterFixInfoColor);
-		}
+
 #endif
 
 		// 予定ポジション設定
@@ -164,7 +159,7 @@ void Physics::Update()
 	// 当たり通知
 	for (auto& item : onCollideInfo)
 	{
-		item.owner_->OnCollide(*item.colider_);
+		//item.owner_->OnCollide(*item.colider_);
 	}
 }
 
@@ -266,52 +261,6 @@ std::vector<Physics::OnCollideInfo_> Physics::CheckColide() const
 	return onCollideInfo;
 }
 
-
-/// <summary>
-/// 指定ラインがオブジェクトとぶつかっているかどうか判定し、ぶつかっているオブジェクトを返す
-/// </summary>
-std::list<Collidable*> Physics::IsCollideLine(const VECTOR& start, const VECTOR& end) const
-{
-	std::list<Collidable*> ret;
-
-	for (auto& obj : m_collidables)
-	{
-		// collidableの種類によって、当たり判定を分ける
-		auto kind = obj->m_pColliderData->GetKind();
-		// ラインとライン
-		if (kind == ColliderData::e_Kind::kLine)
-		{
-			auto lineColliderData = std::dynamic_pointer_cast<ColliderDataLine>(obj->m_pColliderData);
-			// 2つのライン同士の最短距離が0だと当たっている
-			float minLength = Segment_Segment_MinLength(start, end, lineColliderData->m_startPos, lineColliderData->m_endPos);
-			if (minLength < 0.001f)	// float誤差を許容
-			{
-				ret.emplace_back(obj.get());
-			}
-		}
-		// ラインと球体
-		else if (kind == ColliderData::e_Kind::kSphere)
-		{
-			auto sphereColliderData = std::dynamic_pointer_cast<ColliderDataSphere>(obj->m_pColliderData);
-			bool isHit = (Segment_Point_MinLength(start, end, obj->m_rigidbody.GetPos()) < sphereColliderData->m_radius);
-			if (isHit)
-			{
-				ret.emplace_back(obj.get());
-			}
-		}
-		//ラインとカプセル
-		else if (kind == ColliderData::e_Kind::kCapsule)
-		{
-
-		}
-
-	}
-	return ret;
-}
-
-/// <summary>
-/// 当たっているかどうかだけ判定
-/// </summary>
 bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 {
 	bool isHit = false;
@@ -341,6 +290,11 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 	//カプセル同士
 	else if (aKind == ColliderData::e_Kind::kCapsule && bKind == ColliderData::e_Kind::kCapsule)
 	{
+		auto atob = VSub(objB->m_rigidbody.GetNextPos(), objA->m_rigidbody.GetNextPos());
+		auto atobLength = VSize(atob);
+
+		//
+
 
 	}
 	//円とカプセル
@@ -348,6 +302,11 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 				||
 			 aKind == ColliderData::e_Kind::kSphere && bKind == ColliderData::e_Kind::kCapsule)
 	{
+		auto atob = VSub(objB->m_rigidbody.GetNextPos(), objA->m_rigidbody.GetNextPos());
+		auto atobLength = VSize(atob);
+
+		//
+
 
 	}
 
@@ -356,16 +315,13 @@ bool Physics::IsCollide(const Collidable* objA, const Collidable* objB) const
 	return isHit;
 }
 
-/// <summary>
-/// 次位置補正
-/// </summary>
 void Physics::FixNextPosition(Collidable* primary, Collidable* secondary) const
 {
 	// 当たり判定の種別ごとに補正方法を変える
 	auto primaryKind = primary->m_pColliderData->GetKind();
 	auto secondaryKind = secondary->m_pColliderData->GetKind();
 
-	// 円同士の位置補正
+	// 球体同士の位置補正
 	if (primaryKind == ColliderData::e_Kind::kSphere && secondaryKind == ColliderData::e_Kind::kSphere)
 	{
 		VECTOR primaryToSecondary = VSub(secondary->m_rigidbody.GetNextPos(), primary->m_rigidbody.GetNextPos());
@@ -379,61 +335,24 @@ void Physics::FixNextPosition(Collidable* primary, Collidable* secondary) const
 		VECTOR fixedPos = VAdd(primary->m_rigidbody.GetNextPos(), primaryToNewSecondaryPos);
 		secondary->m_rigidbody.SetNextPos(fixedPos);
 	}
-	// ラインと円の位置補正
-	// HACK:現状lineは必ずstaticなのでprimaryにline,secondaryにcircleがくる。そうでないときはエラーを吐く
-	//else if (
-	//	(primaryKind == ColliderData::e_Kind::Line2D || primaryKind == ColliderData::e_Kind::OneWayLine2D)
-	//	&& secondaryKind == ColliderData::e_Kind::Circle3D)
+	// カプセルとカプセルの位置補正
+	else if (primaryKind == ColliderData::e_Kind::kCapsule && secondaryKind == ColliderData::e_Kind::kCapsule)
 	{
-		//auto lineData = dynamic_cast<ColliderDataLine2D*>(primary->colliderData);
-		//auto circleData = dynamic_cast<ColliderDataCircle3D*>(secondary->colliderData);
-		//// secondaryが移動する円として処理
 
-		//// 1.過去の位置→未来の位置の線分と、壁線分が交わるかどうかを調べる
-		//float bothSegmentLength = (
-		//	Segment_Segment_MinLength(secondary->nextPos, secondary->rigidbody.GetPos(),
-		//		lineData->startPoint, lineData->endPoint)
-		//	);
-		//bool isCross = (bothSegmentLength == 0);	// ２つの線分の最近接点までの距離が0なら交差している
-
-		//// 後の計算で結局「壁線分上の、未来の位置（ベクトルの終端の点）との最近接点」が必要になるので
-		//// 先に出しておく
-		//VECTOR closestPtOnWallAndNextPos 
-		//	= GetClosestPtOnSegment(secondary->nextPos, lineData->startPoint, lineData->endPoint);
-
-		//// 2.交わる場合
-		//if (isCross)
-		//{
-		//	// 未来の位置の点から壁線分に対しておろした垂線との交点を調べる
-		//	// →垂線の交点＝「壁線分上の、未来の位置（ベクトルの終端の点）との最近接点」
-		//	// 最終的な位置は、垂線の交点から「未来の位置→垂線との交点 ベクトル方向」に円の半径分動かした位置
-		//	VECTOR nextToClosest = VSub(closestPtOnWallAndNextPos, secondary->nextPos);
-		//	VECTOR nextToClosestN = VNorm(nextToClosest);
-		//	VECTOR fixedPos = VAdd(closestPtOnWallAndNextPos, VScale(nextToClosestN, circleData->radius + 0.0001f));
-		//	secondary->nextPos = fixedPos;
-		//}
-		//// 3.交わらない場合
-		//else
-		//{
-		//	// 過去の位置→未来の位置の線分と、壁線分の最近接点を調べる
-		//	// その最近接点から壁線分に対しておろした垂線との交点を調べる
-		//	// →垂線の交点＝「壁線分上の、未来の位置（ベクトルの終端の点）との最近接点」
-		//	// 最終的な位置は、垂線の交点から「垂線の交点→未来の位置 ベクトル方向」に円の半径分動かした位置
-		//	VECTOR closestToNext = VSub(secondary->nextPos, closestPtOnWallAndNextPos);
-		//	VECTOR closestToNextN = VNorm(closestToNext);
-		//	VECTOR fixedPos = VAdd(closestPtOnWallAndNextPos, VScale(closestToNextN, circleData->radius + 0.0001f));
-		//	secondary->nextPos = fixedPos;
-		//}
 	}
-	//else
-	//{
-	//	assert(0 && "許可されていない当たり判定の位置補正です");
-	//}
+	//カプセルと球体の位置補正
+	else if (primaryKind == ColliderData::e_Kind::kSphere && secondaryKind == ColliderData::e_Kind::kCapsule
+			||
+			primaryKind == ColliderData::e_Kind::kCapsule && secondaryKind == ColliderData::e_Kind::kSphere)
+	{
+
+	}
+	else
+	{
+		assert(0 && "許可されていない当たり判定の位置補正です");
+	}
 }
 
-/// <summary>
-/// 位置確定
-/// </summary>
 void Physics::FixPosition()
 {
 	for (auto& item : m_collidables)
@@ -448,6 +367,13 @@ void Physics::FixPosition()
 			DebugDraw::DrawSphere(item->m_rigidbody.GetNextPos(), itemCircleData->m_radius, kAfterFixInfoColor);
 		}
 
+		if (item->m_pColliderData->GetKind() == ColliderData::e_Kind::kCapsule)
+		{
+			VECTOR upPos = VGet(item->m_rigidbody.GetNextPos().x, item->m_rigidbody.GetNextPos().y + 8.0f, item->m_rigidbody.GetNextPos().z);
+
+			auto itemCircleData = std::dynamic_pointer_cast<ColliderDataCapsule>(item->m_pColliderData);
+			DebugDraw::DrawCapsule(item->m_rigidbody.GetNextPos(), upPos,itemCircleData->m_radius, kAfterFixInfoColor);
+		}
 
 #endif
 		// Posを更新するので、velocityもそこに移動するvelocityに修正
@@ -701,8 +627,6 @@ void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
 	{
 		// 接触したポリゴンで一番高いＹ座標をプレイヤーのＹ座標にする
 		col->m_rigidbody.SetNextPos(VGet(col->m_rigidbody.GetNextPos().x, PolyMaxPosY, col->m_rigidbody.GetNextPos().z));
-		//col->m_rigidbody.SetVelocity(col->m_nextPos);
-
 	}
 
 }

@@ -157,14 +157,15 @@
     <ClCompile Include="object\boss\BossSpeed.cpp" />
     <ClCompile Include="object\Camera.cpp" />
     <ClCompile Include="object\CharaBase.cpp" />
-    <ClCompile Include="object\Field.cpp" />
+    <ClCompile Include="object\item\ItemBase.cpp" />
     <ClCompile Include="object\item\ItemHp.cpp" />
     <ClCompile Include="object\item\ItemMp.cpp" />
     <ClCompile Include="object\ObjectBase.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
     <ClCompile Include="object\player\PlayerWeapon.cpp" />
-    <ClCompile Include="object\SkyDome.cpp" />
-    <ClCompile Include="object\Tomb.cpp" />
+    <ClCompile Include="object\stage\Field.cpp" />
+    <ClCompile Include="object\stage\SkyDome.cpp" />
+    <ClCompile Include="object\stage\Tomb.cpp" />
     <ClCompile Include="scene\SceneBase.cpp" />
     <ClCompile Include="scene\SceneDebug.cpp" />
     <ClCompile Include="scene\SceneGameClear.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="util\Time.cpp" />
     <ClCompile Include="util\Vec2.cpp" />
     <ClCompile Include="util\Vec3.cpp" />
+    <ClCompile Include="WeaponBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib\Collidable.h" />
@@ -197,6 +199,7 @@
     <ClInclude Include="myLib\ColliderDataLine.h" />
     <ClInclude Include="myLib\ColliderDataSphere.h" />
     <ClInclude Include="myLib\DebugDraw.h" />
+    <ClInclude Include="myLib\GameObjectTag.h" />
     <ClInclude Include="myLib\MathHelper.h" />
     <ClInclude Include="myLib\MyLib.h" />
     <ClInclude Include="myLib\Physics.h" />
@@ -207,14 +210,15 @@
     <ClInclude Include="object\boss\BossSpeed.h" />
     <ClInclude Include="object\Camera.h" />
     <ClInclude Include="object\CharaBase.h" />
-    <ClInclude Include="object\Field.h" />
+    <ClInclude Include="object\item\ItemBase.h" />
     <ClInclude Include="object\item\ItemHp.h" />
     <ClInclude Include="object\item\ItemMp.h" />
     <ClInclude Include="object\ObjectBase.h" />
     <ClInclude Include="object\player\Player.h" />
     <ClInclude Include="object\player\PlayerWeapon.h" />
-    <ClInclude Include="object\SkyDome.h" />
-    <ClInclude Include="object\Tomb.h" />
+    <ClInclude Include="object\stage\Field.h" />
+    <ClInclude Include="object\stage\SkyDome.h" />
+    <ClInclude Include="object\stage\Tomb.h" />
     <ClInclude Include="scene\SceneBase.h" />
     <ClInclude Include="scene\SceneDebug.h" />
     <ClInclude Include="scene\SceneGameClear.h" />
@@ -240,6 +244,7 @@
     <ClInclude Include="util\Time.h" />
     <ClInclude Include="util\Vec2.h" />
     <ClInclude Include="util\Vec3.h" />
+    <ClInclude Include="WeaponBase.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "myLib/Collidable.h"
-#include "object/Field.h"
+#include "object/stage/Field.h"
 
 #include <memory>
 #include <list>
@@ -32,6 +32,7 @@ namespace MyLib
 	class Physics final
 	{
 	public:
+
 		Physics();
 
 		// 衝突物の登録・登録解除
@@ -39,11 +40,6 @@ namespace MyLib
 		void Exit(std::shared_ptr<Collidable> collidable );
 
 		void Update();	// 更新（登録オブジェクトの物理移動、衝突通知）
-
-		// 指定ラインがオブジェクトとぶつかっているかどうか判定し、
-		// ぶつかっているオブジェクトを返す
-		std::list<Collidable*> IsCollideLine(const VECTOR& start, const VECTOR& end) const;
-
 
 	private:
 
@@ -69,13 +65,28 @@ namespace MyLib
 
 	private:
 
-
+		/// <summary>
+		/// チェックしたポリゴンが壁ポリゴンか床ポリゴンかを判断し保存する
+		/// </summary>
+		/// <param name="col">登録したコライダー情報</param>
 		void CheckWallAndFloor(std::shared_ptr<Collidable>& col);
 
+		/// <summary>
+		/// 壁ポリゴンとの当たり判定をチェックし、移動させる
+		/// </summary>
+		/// <param name="col">登録したコライダー情報</param>
 		void FixPositionWithWall(std::shared_ptr<Collidable>& col);
 
+		/// <summary>
+		/// 壁の中から押し出す
+		/// </summary>
+		/// <param name="col">登録したコライダー情報</param>
 		void FixPositionWithWallInternal(std::shared_ptr<Collidable>& col);
 
+		/// <summary>
+		/// 床ポリゴンとの当たり判定をチェックし、移動させる
+		/// </summary>
+		/// <param name="col">登録したコライダー情報</param>
 		void FixNowPositionWithFloor(std::shared_ptr<Collidable>& col);
 
 
@@ -84,7 +95,7 @@ namespace MyLib
 		{
 			Collidable* owner_;
 			Collidable* colider_;
-			void OnCollide() { owner_->OnCollide(*colider_); }
+			//void OnCollide() { owner_->OnCollide(*colider_); }
 		};
 
 	private:
@@ -96,8 +107,8 @@ namespace MyLib
 		std::vector<OnCollideInfo_> CheckColide() const;
 
 		// 重力と最大重力加速度
-		static constexpr float m_gravity = -0.1f;
-		static constexpr float m_maxGravityAccel = -0.65f;
+		static constexpr float m_gravity = -0.3f;
+		static constexpr float m_maxGravityAccel = -0.95f;
 
 		std::list<std::shared_ptr<Collidable>> m_collidables;	// 登録されたCollidableのリスト
 		//std::list<std::shared_ptr<Collidable*>> m_collidables;	// 登録されたCollidableのリスト

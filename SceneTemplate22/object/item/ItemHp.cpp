@@ -28,11 +28,11 @@ namespace
 }
 
 ItemHp::ItemHp():
-	Collidable(Collidable::e_Priority::kLow, Game::e_GameObjectTag::kItem, MyLib::ColliderData::e_Kind::kSphere, false),
-	m_modelH(-1),
-	m_pos(kModelInitPos),
-	m_move(VGet(0, 0, 0)),
-	m_rot(0.0f)
+	ItemBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kItem, MyLib::ColliderData::e_Kind::kSphere, false)
+	//m_modelH(-1),
+	//m_pos(kModelInitPos),
+	//m_move(VGet(0, 0, 0)),
+	//m_rot(0.0f)
 {
 	m_modelH = MV1LoadModel(kItemHpModelFilename);
 	MV1SetScale(m_modelH, kModelScale);
@@ -42,7 +42,7 @@ ItemHp::ItemHp():
 
 	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>(m_colliderData);
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
-	circleColliderData->m_radius = 3.0f;
+	circleColliderData->m_radius = 70.0f;
 
 }
 
@@ -96,28 +96,28 @@ void ItemHp::Draw()
 	MV1DrawModel(m_modelH);
 }
 
-void ItemHp::OnCollide(const Collidable& colider)
-{
-	std::string message = "アイテムが";
-	auto tag = colider.GetTag();
-	switch (tag)
-	{
-	case Game::e_GameObjectTag::kPlayer:
-		message += "プレイヤー";
-		break;
-	case Game::e_GameObjectTag::kBoss:
-		message += "ボス";
-		break;
-	case Game::e_GameObjectTag::kSystemWall:
-		message += "システム壁";
-		break;
-	case Game::e_GameObjectTag::kStepGround:
-		message += "足場";
-		break;
-	default:
-		break;
-	}
-	message += "と当たった！\n";
-	printfDx(message.c_str());
-}
+//void ItemHp::OnCollide(const Collidable& colider)
+//{
+//	std::string message = "アイテムが";
+//	auto tag = colider.GetTag();
+//	switch (tag)
+//	{
+//	case Game::e_GameObjectTag::kPlayer:
+//		message += "プレイヤー";
+//		break;
+//	case Game::e_GameObjectTag::kBoss:
+//		message += "ボス";
+//		break;
+//	case Game::e_GameObjectTag::kSystemWall:
+//		message += "システム壁";
+//		break;
+//	case Game::e_GameObjectTag::kStepGround:
+//		message += "足場";
+//		break;
+//	default:
+//		break;
+//	}
+//	message += "と当たった！\n";
+//	printfDx(message.c_str());
+//}
 

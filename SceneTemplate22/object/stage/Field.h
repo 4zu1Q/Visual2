@@ -10,7 +10,7 @@ public:
 	virtual ~Field();
 
 	void Initialize();
-	void Update();
+	//void Update();	//いらない気がする
 	void Draw();
 
 	//モデルハンドル取得

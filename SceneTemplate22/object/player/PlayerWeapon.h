@@ -3,9 +3,9 @@
 #include <memory>
 
 
-class PlayerBase;
-class PlayerWeapon
+class PlayerWeapon 
 {
+
 public:
 	PlayerWeapon();
 	virtual ~PlayerWeapon();
@@ -17,6 +17,9 @@ public:
 
 	void Initialize(int modelHint, int modelRightFrame, int modelLeftFrame);
 	void Finalize();
+
+	//void InitializeCol(std::shared_ptr<MyLib::Physics> physics);
+	//void FinalizeCol(std::shared_ptr<MyLib::Physics> physics);
 
 	/// <summary>
 	/// 苦肉の策

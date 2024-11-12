@@ -34,7 +34,7 @@ namespace
 	constexpr float kDashSpeed = 1.0f;
 
 	//ジャンプ力
-	constexpr float kJumpPower = 3.0f;
+	constexpr float kJumpPower = 6.0f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
@@ -71,8 +71,8 @@ namespace
 }
 
 Player::Player() :
-	Collidable(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kSphere, false),
-	m_modelH(-1),
+	CharaBase(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kSphere, false),
+	//m_modelH(-1),
 	m_weaponH(-1),
 	m_radius(2),
 	m_posUp(kInitPos),
@@ -236,37 +236,36 @@ void Player::Draw()
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
 
 	DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
-	DrawFormatString(0, 280, 0x000fff, " PlayerHp : %d ", m_hp);
 
 #endif
 
 }
 
-void Player::OnCollide(const Collidable& colider)
-{
-	std::string message = "プレイヤーが";
-	auto tag = colider.GetTag();
-	switch (tag)
-	{
-	case Game::e_GameObjectTag::kItem:
-		message += "アイテム";
-		break;
-	case Game::e_GameObjectTag::kBoss:
-		message += "ボス";
-		break;
-	case Game::e_GameObjectTag::kSystemWall:
-		message += "システム壁";
-		break;
-	case Game::e_GameObjectTag::kStepGround:
-		m_isJump = false;
-		message += "足場";
-		break;
-	default:
-		break;
-	}
-	message += "と当たった！\n";
-	printfDx(message.c_str());
-}
+//void Player::OnCollide(const Collidable& colider)
+//{
+//	std::string message = "プレイヤーが";
+//	auto tag = colider.GetTag();
+//	switch (tag)
+//	{
+//	case Game::e_GameObjectTag::kItem:
+//		message += "アイテム";
+//		m_hp += 1;
+//		break;
+//	case Game::e_GameObjectTag::kBoss:
+//		message += "ボス";
+//		break;
+//	case Game::e_GameObjectTag::kSystemWall:
+//		message += "システム壁";
+//		break;
+//	case Game::e_GameObjectTag::kStepGround:
+//		message += "足場";
+//		break;
+//	default:
+//		break;
+//	}
+//	message += "と当たった！\n";
+//	printfDx(message.c_str());
+//}
 
 const VECTOR& Player::GetPosDown() const
 {
@@ -280,6 +279,7 @@ void Player::SetPosDown(const VECTOR pos)
 
 void Player::IdleUpdate()
 {
+
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR input = VGet(m_analogX, 0.0f, -m_analogZ);
 
@@ -310,6 +310,7 @@ void Player::IdleUpdate()
 
 	VECTOR move;
 	move.y = m_rigidbody.GetVelocity().y;
+	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
 
 }
 
@@ -351,8 +352,8 @@ void Player::WalkUpdate()
 		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 		move = VTransform(move, mtx);
 
-		m_rigidbody.SetVelocity(move);
 		move.y = m_rigidbody.GetVelocity().y;
+		m_rigidbody.SetVelocity(move);
 
 		m_move = move;
 
@@ -576,16 +577,10 @@ void Player::HitUpdate()
 void Player::DeadUpdate()
 {
 	//アニメーションが終わったら死んでいるポーズ画面に遷移
-	if (m_pAnim->IsLoop())
-	{
-		OnDeadPose();
-	}
-}
-
-void Player::DeadPoseUpadte()
-{
-	// 死んでいるので何も操作できない
-	// ここにゲームオーバーシーンに遷移するためのフラグをたてる
+	//if (m_pAnim->IsLoop())
+	//{
+	//	OnDeadPose();
+	//}
 }
 
 void Player::SpawnUpdate()
@@ -651,6 +646,7 @@ void Player::OnDash()
 
 void Player::OnAttackX()
 {
+	m_hp -= 1;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimNormalAttackX,true,true,true);
 	m_updaFunc = &Player::AttackXUpdate;
@@ -666,7 +662,7 @@ void Player::OnAttackY()
 void Player::OnJump()
 {
 	//地面と接触しているかどうか
-	m_isJump = true;
+	//m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
 	vel.y = kJumpPower;
 	m_rigidbody.SetVelocity(vel);
@@ -688,14 +684,8 @@ void Player::OnHit()
 
 void Player::OnDead()
 {
-	m_pAnim->ChangeAnim(kAnimDead);
+	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updaFunc = &Player::DeadUpdate;
-}
-
-void Player::OnDeadPose()
-{
-	m_pAnim->ChangeAnim(kAnimDeadPose);
-	m_updaFunc = &Player::DeadPoseUpadte;
 }
 
 void Player::OnSpawn()

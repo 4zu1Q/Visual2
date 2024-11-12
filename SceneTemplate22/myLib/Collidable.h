@@ -20,6 +20,10 @@ namespace MyLib
 	/// </summary>
 	class Collidable abstract : public std::enable_shared_from_this<Collidable>
 	{
+
+		// PhysicsがCollidableを自由に管理するためにフレンド化
+		friend Physics;
+
 	public:
 
 		// 位置補正の優先度の判別に使う
@@ -28,20 +32,28 @@ namespace MyLib
 			kLow,		// 低
 			kMidle,		// 中
 			kHigh,		// 高
-			kStatic,		// 動かない（最高）
+			kStatic,	// 動かない（最高）
 		};
 
-		Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderData::e_Kind colliderKind, bool isTrigger);	// コンストラクタ
+		// コンストラクタ
+		Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderData::e_Kind colliderKind, bool isTrigger);
+		//デストラクタ
+		virtual ~Collidable();	
 
-		virtual ~Collidable();													// デストラクタ
-		virtual void Initialize(std::shared_ptr<MyLib::Physics> physics/*MyLib::Physics* physics*/);
-		virtual void Finalize(std::shared_ptr<MyLib::Physics> physics/*MyLib::Physics* physics*/);
+		//初期化
+		virtual void Initialize(std::shared_ptr<MyLib::Physics> physics);
+		//終了化
+		virtual void Finalize(std::shared_ptr<MyLib::Physics> physics);
 
-		virtual void OnCollide(const Collidable& colider) abstract;				// 衝突したとき
+		//// 衝突したとき
+		//virtual void OnCollide(const Collidable& colider) abstract;
 
-		Game::e_GameObjectTag GetTag() const { return m_tag; }					// タグ情報
-		e_Priority GetPriority() const { return m_priority; }				// 優先度
-		Rigidbody GetRigidbody() const { return m_rigidbody; }				// 優先度
+		// タグ情報
+		Game::e_GameObjectTag GetTag() const { return m_tag; }
+		// 優先度
+		e_Priority GetPriority() const { return m_priority; }		
+		// 物理
+		Rigidbody GetRigidbody() const { return m_rigidbody; }				
 
 		// 当たり判定を無視（スルー）するタグの追加/削除
 		void AddThroughTag(Game::e_GameObjectTag tag);
@@ -52,25 +64,23 @@ namespace MyLib
 
 	private:
 
+		//当たり判定データの作成
 		std::shared_ptr<ColliderData> CreateColliderData(ColliderData::e_Kind kind, bool isTrigger);
 
 	protected:
-		Rigidbody m_rigidbody;		// 物理データ
-		std::shared_ptr<ColliderData> m_pColliderData;	// 当たり判定データ
 
-		//std::list<std::shared_ptr<ColliderData>> m_colliders;
-		//std::list<Collidable*> m_collidables;	// 登録されたCollidableのリスト
+		// 物理データ
+		Rigidbody m_rigidbody;		
+		// 当たり判定データ
+		std::shared_ptr<ColliderData> m_pColliderData;	
 
-
+		//タグ
 		Game::e_GameObjectTag m_tag;
+		//優先度
 		e_Priority m_priority;
 
 		// 当たり判定を無視（スルー）するタグのリスト
 		std::list<Game::e_GameObjectTag> m_throughTags;
-
-		// PhysicsがCollidableを自由に管理するためにフレンド化
-		friend Physics;
-
 
 	};
 

@@ -8,7 +8,7 @@
 
 #include "object/player/Player.h"
 #include "object/boss/BossPower.h"
-#include "object/SkyDome.h"
+#include "object/stage/SkyDome.h"
 #include "object/Camera.h"
 
 #include "ui/HpBar.h"
@@ -40,6 +40,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
 	m_pBoss = std::make_shared<BossPower>();
+	m_pField = std::make_shared<Field>();
 
 	m_pPhysics = std::make_shared<MyLib::Physics>();
 
@@ -51,6 +52,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pPlayer->Initialize(m_pPhysics);
 	m_pBoss->Initialize();
 
+	m_pField->Initialize();
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -104,24 +106,21 @@ void SceneGamePlay::Update()
 	m_pFaceUi->Update();
 	m_pHpBar->Update(*m_pPlayer);
 
-
-
-	
-
-
 }
 
 void SceneGamePlay::Draw()
 {
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 
-	m_pCamera->Draw();
-	m_pSkyDome->Draw();
 	m_pPlayer->Draw();
 	m_pBoss->Draw();
-	m_pFaceUi->Draw(*m_pPlayer);
-	m_pHpBar->Draw();
+	m_pCamera->Draw();
 
+	m_pField->Draw();
+	m_pSkyDome->Draw();
+
+	m_pHpBar->Draw();
+	m_pFaceUi->Draw(*m_pPlayer);
 
 	DrawFade(0xffffff);
 	

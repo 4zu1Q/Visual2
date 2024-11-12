@@ -3,11 +3,13 @@
 #include "myLib/Collidable.h"
 #include <memory>
 
+#include "object/CharaBase.h"
+
 class PlayerWeapon;
 class Collidable;
 class AnimController;
 
-class Player : public MyLib::Collidable
+class Player : public CharaBase
 {
 
 public:
@@ -33,7 +35,7 @@ public:
 	void Draw();
 
 	// 衝突したとき
-	void OnCollide(const Collidable& colider) override;
+	//void OnCollide(const Collidable& colider) override;
 
 	//プレイヤーのモデルハンドルを取得
 	const int& GetModelHandle() const { return m_modelH; }
@@ -66,6 +68,10 @@ public:
 	//カメラの方向を取得
 	void SetCameraAngle(float angle) { m_cameraAngle = angle; }
 
+	//ジャンプフラグを取得
+	const bool& GetIsJump() const { return m_isJump; }
+	void SetIsJump(const bool isJump) { m_isJump = isJump; }
+
 	/*プレイヤーがボスを倒したかどうかのフラグを取得する関数*/
 	//これ多分必要ない可能性
 
@@ -97,7 +103,6 @@ private:
 	void AttackYUpdate();
 	void HitUpdate();
 	void DeadUpdate();
-	void DeadPoseUpadte();
 	void SpawnUpdate();
 
 	/*アップデート処理に移動させるための関数*/
@@ -110,7 +115,6 @@ private:
 	void OnAttackY();
 	void OnHit();
 	void OnDead();
-	void OnDeadPose();
 	void OnSpawn();
 
 	//武器を描画するだけの関数
@@ -136,7 +140,6 @@ private:
 	//仮HP
 	float m_hp;
 	float m_mp;
-	int m_modelH;
 	int m_weaponH;
 
 	//プレイヤの座標
