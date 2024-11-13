@@ -1,5 +1,4 @@
-﻿// 2024 Takeru Yui All Rights Reserved.
-#pragma once
+﻿#pragma once
 
 namespace MyLib 
 {
@@ -14,20 +13,23 @@ namespace MyLib
 		//コンストラクタ
 		Rigidbody();
 
-		// 初期化
+		/// <summary>
+		/// 初期化
+		/// </summary>
+		/// <param name="useGravity">ture : 重力あり　false : 重力なし</param>
 		void Initialize(bool useGravity = false);
 
 		// velocityに力を加える
 		void AddForce(const VECTOR& force);
 
-		// Getter
+		/*Getter*/
 		const VECTOR& GetPos() const { return m_pos; }
 		const VECTOR& GetNextPos() const { return m_nextPos; }
 		const VECTOR& GetDir() const { return m_dir; }
 		const VECTOR& GetVelocity() const { return m_velocity; }
 		bool UseGravity() const { return m_isUseGravity; }
 
-		// Setter
+		/*Setter*/
 		void SetPos(const VECTOR& set) { m_pos = set; }
 		void SetNextPos(const VECTOR& set) { m_nextPos = set; }
 		void SetVelocity(const VECTOR& set);

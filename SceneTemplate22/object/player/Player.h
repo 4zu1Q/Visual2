@@ -28,14 +28,14 @@ public:
 	Player();
 	virtual ~Player();
 
-	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
-	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
+	void Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos);
+	void Finalize(std::shared_ptr<MyLib::Physics> physics);
 
 	void Update(std::shared_ptr<MyLib::Physics> physics);
 	void Draw();
 
 	// 衝突したとき
-	//void OnCollide(const Collidable& colider) override;
+	//virtual void OnCollide(const Collidable& colider);
 
 	//プレイヤーのモデルハンドルを取得
 	const int& GetModelHandle() const { return m_modelH; }

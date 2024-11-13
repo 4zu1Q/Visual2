@@ -62,6 +62,9 @@ namespace MyLib
 		// 当たり判定を無視（スルー）する対象かどうか
 		bool IsThroughTarget(const Collidable* target) const;
 
+
+		//virtual void OnCollide(const std::shared_ptr<Collidable>& colider);
+
 	private:
 
 		//当たり判定データの作成

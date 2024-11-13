@@ -29,6 +29,9 @@ namespace
 	constexpr int kTextX = 64;
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
+
+	//初期位置
+	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
 }
 
 
@@ -54,8 +57,9 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_playerPos = VGet(0, 0, -120);
 	m_cameraPos = VGet(0, 0, 0);
 
-	m_pPlayer->Initialize(m_pPhysics);
+	m_pPlayer->Initialize(m_pPhysics, kInitPos);
 	m_pItemHp->Initialize(m_pPhysics);
+	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
 }
@@ -64,6 +68,7 @@ SceneSelect::~SceneSelect()
 {
 	m_pPlayer->Finalize(m_pPhysics);
 	m_pItemHp->Finalize(m_pPhysics);
+	m_pItemMp->Finalize(m_pPhysics);
 }
 
 void SceneSelect::Update()
@@ -107,7 +112,7 @@ void SceneSelect::Update()
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
 	m_pItemHp->Update(m_pPhysics);
-	m_pItemMp->Update();
+	m_pItemMp->Update(m_pPhysics);
 
 	m_pPhysics->Update();
 
@@ -133,19 +138,20 @@ void SceneSelect::Draw()
 {
 	m_pCamera->Draw();
 	m_pPlayer->Draw();
-	m_pFaceUi->Draw(*m_pPlayer);
-	m_pHpBar->Draw();
-
-	m_pField->Draw();
 	m_pSkyDome->Draw();
+	m_pField->Draw();
+
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
 
-//#ifdef _DEBUG
+	m_pFaceUi->Draw(*m_pPlayer);
+	m_pHpBar->Draw();
+
+#ifdef _DEBUG
 
 	DrawString(0, 0, "Scene Select", 0xffffff, false);
 
-//#endif
+#endif
 
 	DrawFormatString(900, 280, 0xffffff, " PlayerHp : %f ", m_pPlayer->GetHp());
 

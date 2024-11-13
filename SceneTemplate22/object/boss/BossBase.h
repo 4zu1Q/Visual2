@@ -1,11 +1,13 @@
 ﻿#pragma once
 #include "DxLib.h"
+#include "object/CharaBase.h"
 
 class Player;
-class BossBase
+
+class BossBase : public CharaBase
 {
 public:
-	BossBase();
+	BossBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind kind, bool isTrigger);
 	virtual ~BossBase();
 
 	void Initialize();
@@ -31,7 +33,7 @@ protected:
 	int m_hp;
 
 	//モデルハンドル
-	int m_modelH;
+	//int m_modelH;
 
 	//座標
 	VECTOR m_pos;

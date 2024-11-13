@@ -13,11 +13,13 @@ namespace
 	//モデルのファイル名
 	const char* const kItemHpModelFilename = "Data/Model/Obj/Heart.mv1";
 
-	constexpr float kSinSpeed = 0.01f;
-	constexpr float kHeightSize = 0.01f;
+	//constexpr float kSinSpeed = 0.01f;
+	constexpr float kSinSpeed = 0.05f;
+	//constexpr float kHeightSize = 0.01f;
+	constexpr float kHeightSize = 1.0f;
 
 	//モデルのスケール値
-	constexpr VECTOR kModelScale = { 0.08f , 0.08f , 0.08f };
+	constexpr VECTOR kModelScale = { 0.06f , 0.06f , 0.06f };
 
 	//モデルの初期位置
 	constexpr VECTOR kModelInitPos = { -10.0f , 0.0f , 50.0f };
@@ -28,11 +30,8 @@ namespace
 }
 
 ItemHp::ItemHp():
-	ItemBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kItem, MyLib::ColliderData::e_Kind::kSphere, false)
-	//m_modelH(-1),
-	//m_pos(kModelInitPos),
-	//m_move(VGet(0, 0, 0)),
-	//m_rot(0.0f)
+	ItemBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kItemHp, MyLib::ColliderData::e_Kind::kSphere, false)
+
 {
 	m_modelH = MV1LoadModel(kItemHpModelFilename);
 	MV1SetScale(m_modelH, kModelScale);
@@ -40,9 +39,8 @@ ItemHp::ItemHp():
 	
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
-	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>(m_colliderData);
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
-	circleColliderData->m_radius = 70.0f;
+	circleColliderData->m_radius = 2.0f;
 
 }
 
@@ -57,7 +55,7 @@ void ItemHp::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
-	m_rigidbody.Initialize(true);
+	m_rigidbody.Initialize(false);
 	m_rigidbody.SetPos(kModelInitPos);
 }
 
@@ -107,9 +105,6 @@ void ItemHp::Draw()
 //		break;
 //	case Game::e_GameObjectTag::kBoss:
 //		message += "ボス";
-//		break;
-//	case Game::e_GameObjectTag::kSystemWall:
-//		message += "システム壁";
 //		break;
 //	case Game::e_GameObjectTag::kStepGround:
 //		message += "足場";

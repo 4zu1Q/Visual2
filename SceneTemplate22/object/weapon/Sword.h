@@ -1,9 +1,7 @@
 ﻿#pragma once
-
-
-
-class WeaponBase
+class Sword
 {
+
 
 };
 

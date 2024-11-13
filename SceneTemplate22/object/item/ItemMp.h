@@ -2,17 +2,19 @@
 #include "DxLib.h"
 #include <memory>
 
+#include "ItemBase.h"
+
 class Player;
-class ItemMp
+class ItemMp : public ItemBase
 {
 public:
 	ItemMp();
 	virtual ~ItemMp();
 
-	void Initialize();
-	void Finalize();
+	void Initialize(std::shared_ptr<MyLib::Physics> physics);
+	void Finalize(std::shared_ptr<MyLib::Physics> physics);
 
-	void Update();
+	void Update(std::shared_ptr<MyLib::Physics> physics);
 	void Draw();
 
 private:

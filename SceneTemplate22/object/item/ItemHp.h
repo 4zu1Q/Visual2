@@ -20,19 +20,10 @@ public:
 	void Draw();
 
 	// 衝突したとき
-	//void OnCollide(const Collidable& colider) override;
+	//virtual void OnCollide(const Collidable& colider);
 
 private:
 
-	//モデルハンドル
-	//int m_modelH;
-	////座標
-	//VECTOR m_pos;
-	////移動
-	//VECTOR m_move;
-
-	////回転
-	//float m_rot;
 
 };
 

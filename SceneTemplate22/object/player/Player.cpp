@@ -71,8 +71,7 @@ namespace
 }
 
 Player::Player() :
-	CharaBase(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kSphere, false),
-	//m_modelH(-1),
+	CharaBase(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kCapsule, false),
 	m_weaponH(-1),
 	m_radius(2),
 	m_posUp(kInitPos),
@@ -128,10 +127,16 @@ Player::Player() :
 
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
-	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 5.0f;
 
+
+	//m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
+
+	//auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataCapsule>(m_pColliderData);
+	//circleColliderData->m_radius = 2.0f;
+	//circleColliderData->m_posDown = VGet(0,0,0);
+	//circleColliderData->m_posUp = VGet(0,8,0);
 }
 
 Player::~Player()
@@ -139,14 +144,14 @@ Player::~Player()
 
 }
 
-void Player::Initialize(std::shared_ptr<MyLib::Physics> physics)
+void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos)
 {
 	//
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
 	m_rigidbody.Initialize(true);
-	m_rigidbody.SetPos(kInitPos);
+	m_rigidbody.SetPos(pos);
 	m_speed = 0.1f;
 
 	//モデルのスケールを決める
@@ -192,8 +197,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
-	//顔を選択する関数
-	FaceSelect();
+
 
 
 	//カプセル用のポジション
@@ -247,15 +251,12 @@ void Player::Draw()
 //	auto tag = colider.GetTag();
 //	switch (tag)
 //	{
-//	case Game::e_GameObjectTag::kItem:
-//		message += "アイテム";
+//	case Game::e_GameObjectTag::kItemHp:
+//		message += "アイテムHp";
 //		m_hp += 1;
 //		break;
 //	case Game::e_GameObjectTag::kBoss:
 //		message += "ボス";
-//		break;
-//	case Game::e_GameObjectTag::kSystemWall:
-//		message += "システム壁";
 //		break;
 //	case Game::e_GameObjectTag::kStepGround:
 //		message += "足場";
@@ -311,6 +312,9 @@ void Player::IdleUpdate()
 	VECTOR move;
 	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
+
+	//顔を選択する関数
+	FaceSelect();
 
 }
 
@@ -395,6 +399,9 @@ void Player::WalkUpdate()
 		OnJump();
 		return;
 	}
+
+	//顔を選択する関数
+	FaceSelect();
 }
 
 void Player::DashUpdate()
@@ -461,6 +468,8 @@ void Player::DashUpdate()
 		OnJump();
 	}
 
+	//顔を選択する関数
+	FaceSelect();
 }
 
 void Player::JumpUpdate()
@@ -646,7 +655,7 @@ void Player::OnDash()
 
 void Player::OnAttackX()
 {
-	m_hp -= 1;
+	//m_hp -= 1;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimNormalAttackX,true,true,true);
 	m_updaFunc = &Player::AttackXUpdate;

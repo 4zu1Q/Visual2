@@ -5,7 +5,7 @@
 #include <memory>
 
 class Player;
-class BossBase;
+//class BossBase;
 
 class HpBar
 {
@@ -31,7 +31,7 @@ public:
 private:
 
 	std::shared_ptr<Player> m_pPlayer;
-	std::shared_ptr<BossBase> m_pBoss;
+	//std::shared_ptr<BossBase> m_pBoss;
 
 	float m_playerHp;
 	int m_bossHp;

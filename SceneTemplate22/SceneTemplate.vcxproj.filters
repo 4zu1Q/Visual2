@@ -73,6 +73,12 @@
     <Filter Include="ヘッダー ファイル\object\stage">
       <UniqueIdentifier>{17b196ff-7941-457f-8c7f-af5325170c22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\object\face">
+      <UniqueIdentifier>{07fca25c-9af8-4004-9faf-479ca2130ffd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\face">
+      <UniqueIdentifier>{90156e82-432e-4f8b-8427-578805bf931b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -213,11 +219,20 @@
     <ClCompile Include="object\stage\Tomb.cpp">
       <Filter>ソース ファイル\object\stage</Filter>
     </ClCompile>
-    <ClCompile Include="WeaponBase.cpp">
-      <Filter>ソース ファイル\object\weapon</Filter>
-    </ClCompile>
     <ClCompile Include="object\item\ItemBase.cpp">
       <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
+    <ClCompile Include="object\weapon\WeaponBase.cpp">
+      <Filter>ソース ファイル\object\weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="object\weapon\Sword.cpp">
+      <Filter>ソース ファイル\object\weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="object\weapon\Axe.cpp">
+      <Filter>ソース ファイル\object\weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="object\weapon\Dagger.cpp">
+      <Filter>ソース ファイル\object\weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -368,14 +383,23 @@
     <ClInclude Include="object\stage\Tomb.h">
       <Filter>ヘッダー ファイル\object\stage</Filter>
     </ClInclude>
-    <ClInclude Include="WeaponBase.h">
-      <Filter>ヘッダー ファイル\object\weapon</Filter>
-    </ClInclude>
     <ClInclude Include="myLib\GameObjectTag.h">
       <Filter>ヘッダー ファイル\myLib</Filter>
     </ClInclude>
     <ClInclude Include="object\item\ItemBase.h">
       <Filter>ヘッダー ファイル\object\item</Filter>
+    </ClInclude>
+    <ClInclude Include="object\weapon\WeaponBase.h">
+      <Filter>ヘッダー ファイル\object\weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="object\weapon\Sword.h">
+      <Filter>ヘッダー ファイル\object\weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="object\weapon\Axe.h">
+      <Filter>ヘッダー ファイル\object\weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="object\weapon\Dagger.h">
+      <Filter>ヘッダー ファイル\object\weapon</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

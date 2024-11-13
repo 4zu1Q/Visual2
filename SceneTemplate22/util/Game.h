@@ -46,12 +46,16 @@ namespace Game
 	enum class e_GameObjectTag
 	{
 		kPlayer,			// プレイヤー
-		kPlayerWeapon,		// プレイヤーの武器
+		kSword,				// 剣(プレイヤー用)
+		kAxe,				// 斧(プレイヤー用)
+		kDagger,			// 双剣(プレイヤー用)
+		kItemHp,			// アイテム(体力回復用)
+		kItemMp,			// アイテム(魔力回復用)
+		kItemWarp,			// アイテム(ゲームセレクトへワープするアイテム)
 		kBoss,				// ボス
-		kItem,				// アイテム
 		kShot,				// 弾		//できればやりたい…
-		kSystemWall,		// システム壁
 		kStepGround,		// 足場の地面
+
 	};
 
 }

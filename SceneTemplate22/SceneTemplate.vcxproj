@@ -166,6 +166,10 @@
     <ClCompile Include="object\stage\Field.cpp" />
     <ClCompile Include="object\stage\SkyDome.cpp" />
     <ClCompile Include="object\stage\Tomb.cpp" />
+    <ClCompile Include="object\weapon\Axe.cpp" />
+    <ClCompile Include="object\weapon\Dagger.cpp" />
+    <ClCompile Include="object\weapon\Sword.cpp" />
+    <ClCompile Include="object\weapon\WeaponBase.cpp" />
     <ClCompile Include="scene\SceneBase.cpp" />
     <ClCompile Include="scene\SceneDebug.cpp" />
     <ClCompile Include="scene\SceneGameClear.cpp" />
@@ -190,7 +194,6 @@
     <ClCompile Include="util\Time.cpp" />
     <ClCompile Include="util\Vec2.cpp" />
     <ClCompile Include="util\Vec3.cpp" />
-    <ClCompile Include="WeaponBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib\Collidable.h" />
@@ -219,6 +222,10 @@
     <ClInclude Include="object\stage\Field.h" />
     <ClInclude Include="object\stage\SkyDome.h" />
     <ClInclude Include="object\stage\Tomb.h" />
+    <ClInclude Include="object\weapon\Axe.h" />
+    <ClInclude Include="object\weapon\Dagger.h" />
+    <ClInclude Include="object\weapon\Sword.h" />
+    <ClInclude Include="object\weapon\WeaponBase.h" />
     <ClInclude Include="scene\SceneBase.h" />
     <ClInclude Include="scene\SceneDebug.h" />
     <ClInclude Include="scene\SceneGameClear.h" />
@@ -244,7 +251,6 @@
     <ClInclude Include="util\Time.h" />
     <ClInclude Include="util\Vec2.h" />
     <ClInclude Include="util\Vec3.h" />
-    <ClInclude Include="WeaponBase.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

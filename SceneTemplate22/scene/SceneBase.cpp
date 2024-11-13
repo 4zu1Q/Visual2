@@ -55,13 +55,6 @@ void SceneBase::DrawFade(int fadeColor) const
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
-//void SceneBase::DrawWhiteFade() const
-//{
-//	SetDrawBlendMode(DX_BLENDMODE_ALPHA, m_fadeBright);
-//	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, kFadeColor, true);
-//	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-//}
-
 void SceneBase::StartFadeOut()
 {
 	m_fadeSpeed = kFadeSpeed;

@@ -10,8 +10,17 @@ namespace
 
 }
 
-BossBase::BossBase():
-	m_hp(100),
+//BossBase::BossBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind kind, bool isTrigger):
+//	CharaBase(priority, tag, kind, isTrigger),
+//	m_hp(100),
+//	m_pos(VGet(0,0,0))
+//{
+//
+//}
+
+BossBase::BossBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind kind, bool isTrigger):
+	CharaBase(priority, tag, kind, isTrigger),
+	m_hp(0),
 	m_pos(VGet(0,0,0))
 {
 

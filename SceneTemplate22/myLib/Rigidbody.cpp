@@ -16,9 +16,7 @@ Rigidbody::Rigidbody() :
 	// 処理なし
 }
 
-/// <summary>
-/// 初期化
-/// </summary>
+
 void Rigidbody::Initialize(bool useGravity)
 {
 	m_pos = VGet(0, 0, 0);

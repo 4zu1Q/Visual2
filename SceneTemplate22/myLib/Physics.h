@@ -39,7 +39,10 @@ namespace MyLib
 		void Entry(std::shared_ptr<Collidable> collidable );
 		void Exit(std::shared_ptr<Collidable> collidable );
 
-		void Update();	// 更新（登録オブジェクトの物理移動、衝突通知）
+		/// <summary>
+		/// 更新（登録オブジェクトの物理移動、衝突通知）
+		/// </summary>
+		void Update();
 
 	private:
 

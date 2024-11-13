@@ -33,8 +33,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//ウィンドウ名の設定
 	SetMainWindowText(Game::kTitleText);
-
-
 	
 	// 画面のフルスクリーンアンチエイリアスモードの設定を行う( DxLib_Init の前でのみ使用可能 )
 	SetFullSceneAntiAliasingMode(4, 4);

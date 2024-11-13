@@ -40,12 +40,12 @@ namespace
 }
 
 BossPower::BossPower():
+	BossBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kBoss, MyLib::ColliderData::e_Kind::kSphere, false),
 	m_posDown(kInitPos),
 	m_posUp(kInitPos),
 	m_direction(VGet(0,0,0)),
 	m_velocity(VGet(0,0,0)),
-	m_angle(0.0f),
-	m_radius(5)
+	m_angle(0.0f)
 {
 
 	m_modelH = MV1LoadModel(kModelFilename);
@@ -60,16 +60,29 @@ BossPower::BossPower():
 	m_pOnAttackTime = std::make_shared<ActionTime>(120);
 
 	m_pPlayer = std::make_shared<Player>();
+
+	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
+
+	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
+	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
+	circleColliderData->m_radius = 5.0f;
 }
 
 BossPower::~BossPower()
 {
-	MV1DeleteModel(m_modelH);
-	m_modelH = -1;
+
 }
 
-void BossPower::Initialize()
+void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
 {
+	//
+	Collidable::Initialize(physics);
+
+	// 物理挙動の初期化
+	m_rigidbody.Initialize(true);
+	m_rigidbody.SetPos(kInitPos);
+	//m_speed = 0.1f;
+
 	//初期位置を代入
 	m_pos = VGet(0, 0, 100);
 
@@ -84,25 +97,34 @@ void BossPower::Initialize()
 
 }
 
-void BossPower::Finalize()
+void BossPower::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
+	MV1DeleteModel(m_modelH);
+	m_modelH = -1;
 
+	Collidable::Finalize(physics);
 }
 
-void BossPower::Update()
+void BossPower::Update(std::shared_ptr<MyLib::Physics> physics)
 {
 	//アップデート
 	(this->*m_updaFunc)();
 
-	m_pos = m_pPlayer->GetPosDown();
+	//m_pos = m_pPlayer->GetPosDown();
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 	
-	m_posUp = VGet(m_posDown.x, m_posDown.y + kUpPos.y, m_posDown.z);
+	auto pos = m_rigidbody.GetPos();
+
+	//モデルのポジションを合わせるよう
+	VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
+
+	m_posUp = VGet(pos.x, pos.y + kUpPos.y, pos.z);
+
 
 	//モデルに座標をセットする
-	MV1SetPosition(m_modelH, m_posDown);
+	MV1SetPosition(m_modelH, modelPos);
 	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));
 
 }
@@ -111,8 +133,18 @@ void BossPower::Draw()
 {
 	MV1DrawModel(m_modelH);
 
-	DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
+	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 	DrawSphere3D(m_posDown, 32, 16, 0xffffff, 0xffffff, false);
+}
+
+const VECTOR& BossPower::GetPosDown() const
+{
+	return m_rigidbody.GetPos();
+}
+
+void BossPower::SetPosDown(const VECTOR pos)
+{
+	m_rigidbody.SetPos(pos);
 }
 
 void BossPower::IdleUpdate()
@@ -136,6 +168,9 @@ void BossPower::IdleUpdate()
 
 	m_angle = atan2f(m_direction.x, m_direction.z);
 
+	VECTOR move;
+	move.y = m_rigidbody.GetVelocity().y;
+	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
 }
 
 void BossPower::WalkUpdate()

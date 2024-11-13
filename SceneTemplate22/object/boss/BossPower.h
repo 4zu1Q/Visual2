@@ -8,18 +8,21 @@ class ActionTime;
 
 class Player;
 
-class BossPower :
-	public BossBase
+class BossPower : public BossBase
 {
 public:
+
 	BossPower();
 	virtual ~BossPower();
 
-	void Initialize();
-	void Finalize();
+	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
+	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
 
-	void Update();
+	void Update(std::shared_ptr<MyLib::Physics> physics);
 	void Draw();
+
+	const VECTOR& GetPosDown() const;
+	void SetPosDown(const VECTOR pos);
 
 private:
 
@@ -52,7 +55,7 @@ private:
 	UpdateFunc_t m_updaFunc;
 
 	//モデルハンドル
-	int m_modelH;
+	//int m_modelH;
 
 	//タイマー関連の変数
 	std::shared_ptr<ActionTime> m_pOnWlakTime;
@@ -61,8 +64,6 @@ private:
 	std::shared_ptr<ActionTime> m_pOnDownTime;
 	std::shared_ptr<ActionTime> m_pOnAttackTime;
 
-	//当たり判定の半径
-	float m_radius;
 	//攻撃判定の半径
 	float m_attackRadius;
 

@@ -18,7 +18,8 @@
 
 namespace
 {
-
+	//初期位置
+	constexpr VECTOR kInitPos = { 20.0f,5.0f,-100.0f };
 }
 
 SceneGamePlay::SceneGamePlay(SceneManager& manager) :
@@ -49,8 +50,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_cameraPos = VGet(0, 0, 0);
 
 	//初期位置をセット
-	m_pPlayer->Initialize(m_pPhysics);
-	m_pBoss->Initialize();
+	m_pPlayer->Initialize(m_pPhysics, kInitPos);
+	m_pBoss->Initialize(m_pPhysics);
 
 	m_pField->Initialize();
 }
@@ -58,6 +59,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 SceneGamePlay::~SceneGamePlay()
 {
 	m_pPlayer->Finalize(m_pPhysics);
+	m_pBoss->Finalize(m_pPhysics);
 }
 
 
@@ -99,7 +101,7 @@ void SceneGamePlay::Update()
 	m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
-	m_pBoss->Update();
+	m_pBoss->Update(m_pPhysics);
 
 	m_pPhysics->Update();
 

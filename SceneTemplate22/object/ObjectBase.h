@@ -19,7 +19,7 @@ public:
 	virtual void Draw() {};
 
 	//void OnColliderEnter(const std::shared_ptr<Collidable>& collider);
-	//void OnCollide(const std::shared_ptr<Collidable>& colider) = 0;
+	//virtual void OnCollide(const std::shared_ptr<Collidable>& colider) = 0;
 			
 
 protected:

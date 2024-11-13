@@ -11,7 +11,7 @@ namespace
 {
 	constexpr int kBeforeFixInfoColor = 0xff00ff;	// 補正前情報色
 	constexpr int kAimInfoColor = 0x00ffff;			// 補正前予定情報色
-	constexpr int kAfterFixInfoColor = 0xff00ff;	// 補正後情報色
+	constexpr int kAfterFixInfoColor = 0xffffff;	// 補正後情報色
 
 
 	//最大当たり判定ポリゴン数
@@ -99,10 +99,11 @@ void Physics::Update()
 
 		item->m_rigidbody.SetVelocity(velocity);
 
-		// もともとの情報、予定情報をデバッグ表示
+		/* もともとの情報、予定情報をデバッグ表示 */ 
+		auto kind = item->m_pColliderData->GetKind();
+
 #if _DEBUG
 
-		auto kind = item->m_pColliderData->GetKind();
 
 		if (kind == ColliderData::e_Kind::kSphere)
 		{
@@ -125,15 +126,49 @@ void Physics::Update()
 
 #endif
 
+		if (kind == ColliderData::e_Kind::kSphere)
+		{
+
+
+		}
+		else if (kind == ColliderData::e_Kind::kCapsule)
+		{
+			///*フィールドとの当たり判定の処理*/
+
+			//// 予定ポジション設定
+			//item->m_rigidbody.SetNextPos(nextPos);
+
+			//auto capsule = std::dynamic_pointer_cast<ColliderDataCapsule>(item->m_pColliderData);
+
+
+			//// プレイヤーの周囲にあるステージポリゴンを取得する
+			//// ( 検出する範囲は移動距離も考慮する )
+			//m_hitDim = MV1CollCheck_Sphere(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos(), sphere->m_radius);
+
+
+			////壁と床の当たり判定を行う
+			//CheckWallAndFloor(item);
+
+			////壁との当たり判定処理
+			//FixPositionWithWall(item);
+
+			////床との当たり判定処理
+			//FixNowPositionWithFloor(item);
+		}
+
+		/*フィールドとの当たり判定の処理*/
+
 		// 予定ポジション設定
 		item->m_rigidbody.SetNextPos(nextPos);
 
 		auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(item->m_pColliderData);
+		//auto sphere = std::dynamic_pointer_cast<ColliderDataCapsule>(item->m_pColliderData);
 
 
 		// プレイヤーの周囲にあるステージポリゴンを取得する
 		// ( 検出する範囲は移動距離も考慮する )
 		m_hitDim = MV1CollCheck_Sphere(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos(), sphere->m_radius);
+		//m_hitDim = MV1CollCheck_Capsule(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos(), VAdd(item->m_rigidbody.GetNextPos(), VGet(0.0f, sphere->m_radius, 0.0f)), sphere->m_radius);
 
 
 		//壁と床の当たり判定を行う
@@ -156,10 +191,11 @@ void Physics::Update()
 	// 位置確定
 	FixPosition();
 
+
 	// 当たり通知
 	for (auto& item : onCollideInfo)
 	{
-		//item.owner_->OnCollide(*item.colider_);
+		//item.owner_->OnCollide(item.colider_);
 	}
 }
 
@@ -252,9 +288,11 @@ std::vector<Physics::OnCollideInfo_> Physics::CheckColide() const
 		// FIXME: 定数化
 		if (checkCount > 1000 && doCheck)
 		{
+
 #if _DEBUG
 			printfDx("当たり判定の繰り返しチェックが規定数を超えた\n");
 #endif
+
 			break;
 		}
 	}
@@ -357,9 +395,8 @@ void Physics::FixPosition()
 {
 	for (auto& item : m_collidables)
 	{
+		/* 補正後の位置をデバッグ表示 */
 #if _DEBUG
-		// 補正後の位置をデバッグ表示
-		//DebugDraw::DrawLine(item->rigidbody.GetPos(), item->nextPos, AfterFixInfoColor);
 
 		if (item->m_pColliderData->GetKind() == ColliderData::e_Kind::kSphere)
 		{
@@ -431,6 +468,7 @@ void MyLib::Physics::CheckWallAndFloor(std::shared_ptr<Collidable>& col)
 void MyLib::Physics::FixPositionWithWall(std::shared_ptr<Collidable>& col)
 {
 
+	//auto sphere = std::dynamic_pointer_cast<ColliderDataCapsule>(col->m_pColliderData);
 	auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(col->m_pColliderData);
 
 	// 壁ポリゴンがない場合は何もしない
@@ -450,10 +488,21 @@ void MyLib::Physics::FixPositionWithWall(std::shared_ptr<Collidable>& col)
 			m_pPoly = m_pWallPoly[i];
 
 			// ポリゴンとプレイヤーが当たっていなかったら次のカウントへ
-			if (!HitCheck_Capsule_Triangle(col->m_rigidbody.GetNextPos(), VAdd(col->m_rigidbody.GetNextPos(),
-				VGet(0.0f, sphere->m_radius, 0.0f)),
-				sphere->m_radius,
-				m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2])) continue;
+			// 球体のチェックにすると壁がすり抜けるようになってしまう
+			if (!HitCheck_Capsule_Triangle(col->m_rigidbody.GetNextPos(),				//カプセルの下座標
+				VAdd(col->m_rigidbody.GetNextPos(),VGet(0.0f, sphere->m_radius, 0.0f)),	//カプセルの上座標
+				sphere->m_radius,		//半径
+				m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
+				m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
+				m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
+				continue;
+
+			//if (!HitCheck_Sphere_Triangle(col->m_rigidbody.GetNextPos(),
+			//	sphere->m_radius,
+			//	m_pPoly->Position[0],
+			//	m_pPoly->Position[1], 
+			//	m_pPoly->Position[2])) 
+			//	continue;
 
 			// ここにきたらポリゴンとプレイヤーが当たっているということなので、ポリゴンに当たったフラグを立てる
 			m_isHitFlag = true;
@@ -480,10 +529,19 @@ void MyLib::Physics::FixPositionWithWall(std::shared_ptr<Collidable>& col)
 				m_pPoly = m_pWallPoly[j];
 
 				// 当たっていたらループから抜ける
-				if (HitCheck_Capsule_Triangle(col->m_rigidbody.GetNextPos(), VAdd(col->m_rigidbody.GetNextPos(),
-					VGet(0.0f, sphere->m_radius, 0.0f)),
-					sphere->m_radius,
-					m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]))
+				// 球体のチェックにすると壁がすり抜けるようになってしまう
+				if (HitCheck_Capsule_Triangle(col->m_rigidbody.GetNextPos(),				//カプセルの下座標
+					VAdd(col->m_rigidbody.GetNextPos(),VGet(0.0f, sphere->m_radius, 0.0f)),	//カプセルの上座標
+					sphere->m_radius,		//半径
+					m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
+					m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
+					m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
+
+				//if (HitCheck_Sphere_Triangle(col->m_rigidbody.GetNextPos(),
+				//	sphere->m_radius,
+				//	m_pPoly->Position[0], 
+				//	m_pPoly->Position[1],
+				//	m_pPoly->Position[2]))
 				{
 					//trueにする
 					isHitWallPolygon = true;
@@ -511,9 +569,15 @@ void MyLib::Physics::FixPositionWithWall(std::shared_ptr<Collidable>& col)
 			m_pPoly = m_pWallPoly[i];
 
 			// ポリゴンに当たっていたら当たったフラグを立てた上でループから抜ける
-			if (HitCheck_Sphere_Triangle(
-				col->m_rigidbody.GetNextPos(),		//球体の座標 
-				sphere->m_radius,	//球体の半径
+			//if (HitCheck_Sphere_Triangle(
+			//	col->m_rigidbody.GetNextPos(),		//球体の座標 
+			//	sphere->m_radius,	//球体の半径
+			//	m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
+			//	m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
+			//	m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
+			if (HitCheck_Capsule_Triangle(col->m_rigidbody.GetNextPos(),				//カプセルの下座標
+				VAdd(col->m_rigidbody.GetNextPos(), VGet(0.0f, sphere->m_radius, 0.0f)),	//カプセルの上座標
+				sphere->m_radius,		//半径
 				m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
 				m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
 				m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
@@ -544,12 +608,24 @@ void MyLib::Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable>& co
 			// i番目の壁ポリゴンのアドレスを壁ポリゴンポインタ配列から取得
 			m_pPoly = m_pWallPoly[j];
 
+
+			//if (!HitCheck_Sphere_Triangle(
+			//	col->m_rigidbody.GetNextPos(),			//球体の座標
+			//	sphere->m_radius,		//球体の半径
+			//	m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
+			//	m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
+			//	m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
+			//	continue;
+			
+
+
 			// プレイヤーと当たっているかを判定
 			auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(col->m_pColliderData);
+			//auto sphere = std::dynamic_pointer_cast<ColliderDataCapsule>(col->m_pColliderData);
 
-			if (!HitCheck_Sphere_Triangle(
-				col->m_rigidbody.GetNextPos(),			//球体の座標
-				sphere->m_radius,		//球体の半径
+			if (!HitCheck_Capsule_Triangle(col->m_rigidbody.GetNextPos(),				//カプセルの下座標
+				VAdd(col->m_rigidbody.GetNextPos(), VGet(0.0f, sphere->m_radius, 0.0f)),	//カプセルの上座標
+				sphere->m_radius,		//半径
 				m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
 				m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
 				m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
@@ -563,9 +639,18 @@ void MyLib::Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable>& co
 			{
 				// 当たっていたらループを抜ける
 				m_pPoly = m_pWallPoly[k];
-				if (HitCheck_Sphere_Triangle(col->m_rigidbody.GetNextPos(),
-					sphere->m_radius,
-					m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]))
+				//if (HitCheck_Sphere_Triangle(col->m_rigidbody.GetNextPos(),
+				//	sphere->m_radius,
+				//	m_pPoly->Position[0],
+				//	m_pPoly->Position[1],
+				//	m_pPoly->Position[2]))
+
+				if (HitCheck_Capsule_Triangle(col->m_rigidbody.GetNextPos(),				//カプセルの下座標
+					VAdd(col->m_rigidbody.GetNextPos(), VGet(0.0f, sphere->m_radius, 0.0f)),	//カプセルの上座標
+					sphere->m_radius,		//半径
+					m_pPoly->Position[0],	//ポリゴンの三頂点の一つ
+					m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
+					m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
 				{
 					isHitWall = true;
 					break;
@@ -606,8 +691,12 @@ void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
 		m_pPoly = m_pFloorPoly[i];
 
 		//頭から足元まででポリゴンと当たっているかを判定
-		m_lineRes = HitCheck_Line_Triangle(VAdd(col->m_rigidbody.GetNextPos(), VGet(0.0f, kHeadHeight, 0.0f)),
-			col->m_rigidbody.GetNextPos(), m_pPoly->Position[0], m_pPoly->Position[1], m_pPoly->Position[2]);
+		m_lineRes = HitCheck_Line_Triangle(VAdd(col->m_rigidbody.GetNextPos(), 
+			VGet(0.0f, kHeadHeight, 0.0f)),
+			col->m_rigidbody.GetNextPos(),
+			m_pPoly->Position[0],
+			m_pPoly->Position[1], 
+			m_pPoly->Position[2]);
 
 		//当たっていなかったら何もしない
 		if (!m_lineRes.HitFlag) continue;

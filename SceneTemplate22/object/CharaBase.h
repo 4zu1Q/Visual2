@@ -9,17 +9,18 @@ class CharaBase : public ObjectBase
 {
 public:
 
+	//ステータス構造体
 	struct Status
 	{
-		
-
-
+		int hp_;	//体力
+		int atk_;	//攻撃力
+		int def_;	//防御力
 	};
 
 
 public:
 
-	CharaBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind colliderKind, bool isTrigger);
+	CharaBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind kind, bool isTrigger);
 	virtual ~CharaBase();
 
 	//// 衝突したとき
