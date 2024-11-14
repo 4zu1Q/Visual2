@@ -160,6 +160,7 @@
     <ClCompile Include="object\item\ItemBase.cpp" />
     <ClCompile Include="object\item\ItemHp.cpp" />
     <ClCompile Include="object\item\ItemMp.cpp" />
+    <ClCompile Include="object\item\ItemWarp.cpp" />
     <ClCompile Include="object\ObjectBase.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
     <ClCompile Include="object\player\PlayerWeapon.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="object\item\ItemBase.h" />
     <ClInclude Include="object\item\ItemHp.h" />
     <ClInclude Include="object\item\ItemMp.h" />
+    <ClInclude Include="object\item\ItemWarp.h" />
     <ClInclude Include="object\ObjectBase.h" />
     <ClInclude Include="object\player\Player.h" />
     <ClInclude Include="object\player\PlayerWeapon.h" />

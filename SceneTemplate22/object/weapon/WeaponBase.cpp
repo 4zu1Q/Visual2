@@ -10,3 +10,16 @@ WeaponBase::~WeaponBase()
 {
 
 }
+
+void WeaponBase::Initialize(int modelH, int modelRightFrame, int modelLeftFrame)
+{
+	//代入
+	m_modelH = modelH;
+	m_modelRightFrame = modelRightFrame;
+	m_modelLeftFrame = modelLeftFrame;
+}
+
+void WeaponBase::Finalize()
+{
+
+}

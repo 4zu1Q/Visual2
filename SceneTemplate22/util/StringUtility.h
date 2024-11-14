@@ -1,4 +1,4 @@
-#pragma once
+ο»Ώ#pragma once
 #include <string>
 #include <vector>
 
@@ -6,25 +6,26 @@ class StringUtility
 {
 public:
 	/// <summary>
-	/// ƒ}ƒ‹ƒ`ƒoƒCƒg•¶—ρ‚©‚ηƒƒCƒh•¶—ρ‚Φ‚Μ•Ο·
+	/// γƒγƒ«γƒγƒγ‚¤γƒζ–‡ε­—ε—γ‹γ‚‰γƒ―γ‚¤γƒ‰ζ–‡ε­—ε—γΈγ®ε¤‰ζ›
 	/// </summary>
-	/// <param name="str">•Ο·³‚Μƒ}ƒ‹ƒ`ƒoƒCƒg•¶—ρ</param>
-	/// <returns>•Ο·γ‚ΜƒƒCƒh•¶—ρ</returns>
+	/// <param name="str">ε¤‰ζ›ε…ƒγ®γƒγƒ«γƒγƒγ‚¤γƒζ–‡ε­—ε—</param>
+	/// <returns>ε¤‰ζ›εΎγ®γƒ―γ‚¤γƒ‰ζ–‡ε­—ε—</returns>
 	static std::wstring  StringToWString(const std::string& str);
 
 	/// <summary>
-	/// •ª„Φ”
+	/// ε†ε‰²ι–Άζ•°
 	/// </summary>
-	/// <param name="str">³‚Μ•¶—ρ</param>
-	/// <param name="del">•ª„‚·‚ι•¶</param>
-	/// <returns>•ª„‚µ‚½•¶Q</returns>
+	/// <param name="str">ε…ƒγ®ζ–‡ε­—ε—</param>
+	/// <param name="del">ε†ε‰²γ™γ‚‹ζ–‡ε­—</param>
+	/// <returns>ε†ε‰²γ—γζ–‡ε­—ηΎ¤</returns>
 	static std::vector<std::string> Split(std::string& str, char del);
+
 	/// <summary>
-	/// •ª„Φ”
+	/// ε†ε‰²ι–Άζ•°
 	/// </summary>
-	/// <param name="str">³‚Μ•¶—ρ</param>
-	/// <param name="del">•ª„‚·‚ι•¶</param>
-	/// <returns>•ª„‚µ‚½•¶Q</returns>
+	/// <param name="str">ε…ƒγ®ζ–‡ε­—ε—</param>
+	/// <param name="del">ε†ε‰²γ™γ‚‹ζ–‡ε­—</param>
+	/// <returns>ε†ε‰²γ—γζ–‡ε­—ηΎ¤</returns>
 	static std::vector<std::wstring> Split(std::wstring& str, char del);
 };
 

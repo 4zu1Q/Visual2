@@ -3,7 +3,7 @@
 
 namespace 
 {
-	const char* const kFieldModelFilename = "Data/Model/Stage/Field.mv1";
+	const char* const kFieldModelFilename = "Data/Model/Stage/Field01.mv1";
 	const char* const kTestModelFilename = "Data/Model/Weapon/Boss_Shield.mv1";
 
 	constexpr VECTOR kModelScale = { 0.45f , 0.45f , 0.45f };

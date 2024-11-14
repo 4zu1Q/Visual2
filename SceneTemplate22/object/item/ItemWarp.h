@@ -1,15 +1,11 @@
 ﻿#pragma once
-#include "DxLib.h"
-#include <memory>
-
 #include "ItemBase.h"
 
-class Player;
-class ItemMp : public ItemBase
+class ItemWarp : public ItemBase
 {
 public:
-	ItemMp();
-	virtual ~ItemMp();
+	ItemWarp();
+	virtual ~ItemWarp();
 
 	void Initialize(std::shared_ptr<MyLib::Physics> physics);
 	void Finalize(std::shared_ptr<MyLib::Physics> physics);
@@ -18,6 +14,5 @@ public:
 	void Draw();
 
 private:
-
 };
 

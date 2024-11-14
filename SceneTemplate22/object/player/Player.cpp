@@ -585,11 +585,8 @@ void Player::HitUpdate()
 
 void Player::DeadUpdate()
 {
-	//アニメーションが終わったら死んでいるポーズ画面に遷移
-	//if (m_pAnim->IsLoop())
-	//{
-	//	OnDeadPose();
-	//}
+	//ゲームオーバーシーンに遷移するフラグをたてる
+
 }
 
 void Player::SpawnUpdate()

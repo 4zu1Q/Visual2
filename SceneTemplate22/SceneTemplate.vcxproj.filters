@@ -234,6 +234,9 @@
     <ClCompile Include="object\weapon\Dagger.cpp">
       <Filter>ソース ファイル\object\weapon</Filter>
     </ClCompile>
+    <ClCompile Include="object\item\ItemWarp.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -400,6 +403,9 @@
     </ClInclude>
     <ClInclude Include="object\weapon\Dagger.h">
       <Filter>ヘッダー ファイル\object\weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemWarp.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
