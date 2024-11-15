@@ -5,6 +5,7 @@
 #include "ScenePause.h"
 #include "SceneOption.h"
 #include "SceneGamePlay.h"
+#include "SceneDebug.h"
 
 #include "object/player/Player.h"
 #include "object/Camera.h"
@@ -30,6 +31,9 @@ namespace
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
 
+	constexpr float kCameraNear = 5.0f;
+	constexpr float kCameraFar = 5000.0f;
+
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
 }
@@ -41,7 +45,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
 
 	m_pPlayer = std::make_shared<Player>();
-	m_pCamera = std::make_shared<Camera>();
+	//m_pCamera = std::make_shared<Camera>();
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
 
@@ -61,6 +65,8 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
+
+	SetCameraNearFar(kCameraNear, kCameraFar);
 
 }
 
@@ -85,9 +91,16 @@ void SceneSelect::Update()
 	Pad::Update();
 	UpdateFade();
 
+#ifdef _DEBUG
+	if (Pad::IsTrigger PAD_INPUT_7)
+	{
+		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
+		return;
+	}
+#endif
 
 	//カメラのアングルをセットする
-	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
+	//m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
 
 	if (m_isFadingOut)
 	{
@@ -108,7 +121,7 @@ void SceneSelect::Update()
 		}
 	}
 
-	m_pCamera->Update(*m_pPlayer);
+	//m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
 	m_pItemHp->Update(m_pPhysics);
@@ -136,7 +149,7 @@ void SceneSelect::Update()
 
 void SceneSelect::Draw()
 {
-	m_pCamera->Draw();
+	//m_pCamera->Draw();
 	m_pPlayer->Draw();
 	m_pSkyDome->Draw();
 	m_pField->Draw();
@@ -146,6 +159,8 @@ void SceneSelect::Draw()
 
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pHpBar->Draw();
+
+	//m_pCamera->Draw();
 
 #ifdef _DEBUG
 

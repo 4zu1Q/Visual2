@@ -4,7 +4,7 @@
 
 namespace
 {
-	const char* const kItemHpModelFilename = "Data/Model/Obj/Potion.mv1";
+	const char* const kItemHpModelFilename = "Data/Model/Obj/ItemPotion.mv1";
 
 	//constexpr float kSinSpeed = 0.01f;
 	constexpr float kSinSpeed = 0.05f;
@@ -25,6 +25,7 @@ namespace
 ItemMp::ItemMp():
 	ItemBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kItemMp, MyLib::ColliderData::e_Kind::kSphere, false)
 {
+
 	m_modelH = MV1LoadModel(kItemHpModelFilename);
 	MV1SetScale(m_modelH, kModelScale);
 
@@ -32,6 +33,7 @@ ItemMp::ItemMp():
 
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 2.0f;
+
 }
 
 ItemMp::~ItemMp()

@@ -5,6 +5,7 @@
 #include "SceneManager.h"
 #include "SceneGamePlay.h"
 #include "ScenePause.h"
+#include "SceneDebug.h"
 
 #include "object/player/Player.h"
 #include "object/boss/BossPower.h"
@@ -36,7 +37,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_cameraAngle(0.0f)
 {
 	m_pPlayer = std::make_shared<Player>();
-	m_pCamera = std::make_shared<Camera>();
+	//m_pCamera = std::make_shared<Camera>();
 	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
@@ -76,9 +77,17 @@ void SceneGamePlay::Update()
 	Pad::Update();
 	UpdateFade();
 
+#ifdef _DEBUG
+	//デバッグに遷移する
+	if (Pad::IsTrigger PAD_INPUT_7)
+	{
+		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
+		return;
+	}
+#endif
 
 	//カメラのアングルをセットする
-	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
+	//m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
 
 	if (m_isFadingOut)
 	{
@@ -98,7 +107,7 @@ void SceneGamePlay::Update()
 		}
 	}
 
-	m_pCamera->Update(*m_pPlayer);
+	//m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
 	m_pBoss->Update(m_pPhysics);

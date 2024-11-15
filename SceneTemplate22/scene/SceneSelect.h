@@ -38,7 +38,7 @@ private:
 
 	//スマートポインタ
 	std::shared_ptr<Player> m_pPlayer;
-	std::shared_ptr<Camera> m_pCamera;
+	//std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	std::shared_ptr<HpBar> m_pHpBar;
 	std::shared_ptr<FaceUi> m_pFaceUi;

@@ -46,6 +46,7 @@ namespace Game
 	enum class e_GameObjectTag
 	{
 		kPlayer,			// プレイヤー
+		kCamera,			// カメラ
 		kSword,				// 剣(プレイヤー用)
 		kAxe,				// 斧(プレイヤー用)
 		kDagger,			// 双剣(プレイヤー用)

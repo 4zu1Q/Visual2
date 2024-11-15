@@ -4,6 +4,7 @@
 #include "SceneGameClear.h"
 #include "SceneSelect.h"
 #include "SceneTitle.h"
+#include "SceneDebug.h"
 
 #include "util/Pad.h"
 #include "util/Game.h"
@@ -30,6 +31,15 @@ void SceneGameClear::Update()
 {
 	Pad::Update();
 	UpdateFade();
+
+#ifdef _DEBUG
+	//デバッグに遷移する
+	if (Pad::IsTrigger PAD_INPUT_7)
+	{
+		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
+		return;
+	}
+#endif
 
 	if (!m_isToNextScene)
 	{

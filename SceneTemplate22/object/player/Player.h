@@ -8,6 +8,7 @@
 class PlayerWeapon;
 class Collidable;
 class AnimController;
+class Camera;
 
 class Player : public CharaBase
 {
@@ -125,10 +126,14 @@ private:
 	/// </summary>
 	void FaceSelect();
 
+	void CameraUpdate();
+
 private:
 
+	//スマートポインタ
 	std::shared_ptr<PlayerWeapon> m_pWeapon;
 	std::shared_ptr<AnimController> m_pAnim;
+	std::shared_ptr<Camera> m_pCamera;
 
 	//プレイヤーの顔の種類
 	e_PlayerKind m_playerKind;
@@ -148,6 +153,8 @@ private:
 
 	VECTOR m_attackPos;
 	VECTOR m_attackDir;
+
+	VECTOR m_cameraToPlayerVec;
 
 	VECTOR m_avoid;
 	VECTOR m_move;

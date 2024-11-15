@@ -1,5 +1,6 @@
 ﻿#include "Player.h"
 #include "PlayerWeapon.h"
+#include "object/Camera.h"
 
 #include "util/Pad.h"
 #include "util/AnimController.h"
@@ -78,6 +79,7 @@ Player::Player() :
 	m_move(VGet(0, 0, 0)),
 	m_attackPos(VGet(0, 0, 0)),
 	m_attackDir(VGet(0, 0, 0)),
+	m_cameraToPlayerVec(VGet(0,0,0)),
 	m_avoid(VGet(0, 0, 0)),
 	m_analogX(0),
 	m_analogZ(0),
@@ -124,6 +126,8 @@ Player::Player() :
 	m_pWeapon = std::make_shared<PlayerWeapon>();
 	m_pAnim = std::make_shared<AnimController>();
 
+
+	m_pCamera = std::make_shared<Camera>();
 
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
@@ -197,12 +201,12 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
-
-
-
 	//カプセル用のポジション
 	auto pos = m_rigidbody.GetPos();
 
+	//カメラの更新
+	m_pCamera->Update(pos);
+	m_cameraToPlayerVec = VSub(pos, m_pCamera->GetPos());
 
 	m_posUp = VGet(pos.x, pos.y + kUpPos.y, pos.z);
 
@@ -216,7 +220,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
 
 	//HPがゼロより下にいった場合
-	if (m_hp < 0)
+	if (m_hp <= 0)
 	{
 		m_hp = 0;
 
@@ -233,14 +237,16 @@ void Player::Draw()
 	MV1DrawModel(m_modelH);
 	MV1DrawModel(m_weaponH);
 
+
 #ifdef _DEBUG
 
 	auto pos = m_rigidbody.GetPos();
 	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", pos.x, pos.y, pos.z);
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
 
-	DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
+	//DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
 
+	m_pCamera->Draw();
 #endif
 
 }
@@ -299,7 +305,6 @@ void Player::IdleUpdate()
 	if (Pad::IsTrigger(PAD_INPUT_3))
 	{
 		OnAttackX();
-		m_hp = m_hp - 1;
 		return;
 	}
 
@@ -320,6 +325,9 @@ void Player::IdleUpdate()
 
 void Player::WalkUpdate()
 {
+	// カメラの角度によって進む方向を変える
+	MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+
 	/*プレイヤーの移動*/
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
@@ -400,12 +408,17 @@ void Player::WalkUpdate()
 		return;
 	}
 
+
+
 	//顔を選択する関数
 	FaceSelect();
 }
 
 void Player::DashUpdate()
 {
+	// カメラの角度によって進む方向を変える
+	MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
@@ -474,6 +487,8 @@ void Player::DashUpdate()
 
 void Player::JumpUpdate()
 {
+	// カメラの角度によって進む方向を変える
+	MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
 	if (m_pAnim->IsLoop())
 	{
@@ -523,6 +538,8 @@ void Player::JumpUpdate()
 
 void Player::AirUpdate()
 {
+	// カメラの角度によって進む方向を変える
+	MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
 	if (!m_isJump)
 	{
@@ -652,7 +669,7 @@ void Player::OnDash()
 
 void Player::OnAttackX()
 {
-	//m_hp -= 1;
+	m_hp -= 1;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimNormalAttackX,true,true,true);
 	m_updaFunc = &Player::AttackXUpdate;
@@ -724,5 +741,9 @@ void Player::FaceSelect()
 		m_isFaceUse = !m_isFaceUse;
 	}
 
+}
+
+void Player::CameraUpdate()
+{
 }
 

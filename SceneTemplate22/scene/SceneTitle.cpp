@@ -8,6 +8,7 @@
 #include "SceneTitle.h"
 #include "SceneSelect.h"
 #include "SceneOption.h"
+#include "SceneDebug.h"
 
 #include "util/SoundManager.h"
 
@@ -47,6 +48,14 @@ void SceneTitle::Update()
 	Pad::Update();
 	UpdateFade();
 
+#ifdef _DEBUG
+	//デバッグに遷移する
+	if (Pad::IsTrigger PAD_INPUT_7)
+	{
+		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
+		return;
+	}
+#endif
 	
 	if (!m_isToNextScene)
 	{

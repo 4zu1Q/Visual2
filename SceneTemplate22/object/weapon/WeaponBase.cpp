@@ -23,3 +23,23 @@ void WeaponBase::Finalize()
 {
 
 }
+
+void WeaponBase::OneHandUpdate(int weaponModelH)
+{
+
+}
+
+void WeaponBase::BothHandsUpdate(int rightWeaponModelH, int leftWeaponModelH)
+{
+
+}
+
+void WeaponBase::OneHandDraw(int weaponModelH)
+{
+
+}
+
+void WeaponBase::BothHandsDraw(int rightWeaponModelH, int leftWeaponModelH)
+{
+
+}
