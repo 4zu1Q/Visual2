@@ -5,6 +5,8 @@
 #include "util/Pad.h"
 #include "util/AnimController.h"
 
+#include "ui/ButtonUi.h"
+
 #include "myLib/MyLib.h"
 
 #include <cmath>
@@ -126,6 +128,7 @@ Player::Player() :
 	m_pWeapon = std::make_shared<PlayerWeapon>();
 	m_pAnim = std::make_shared<AnimController>();
 
+	//m_pButtonUi = std::make_shared<ButtonUi>();
 
 	m_pCamera = std::make_shared<Camera>();
 
@@ -196,7 +199,8 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	m_pWeapon->DaggerUpdate();
 	m_pWeapon->MagicWandUpdate();
 	m_pWeapon->LongSwordUpdate();
-
+	
+	
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
@@ -587,6 +591,9 @@ void Player::AttackYUpdate()
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
+		
+		m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kNone);
+		m_pButtonUi->SetIsButtonPush(false);
 		OnIdle();
 	}
 }
@@ -662,7 +669,9 @@ void Player::OnWalk()
 
 void Player::OnDash()
 {
-	m_pAnim->ChangeAnim(kAnimDash);
+	m_pAnim->ChangeAnim(kAnimDash);			//アニメーションの変更
+//	m_pButtonUi->SetIsButtonPush(true);		//ボタンが押された
+//	m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kAbutton);	//どのボタンが押されたか
 	m_updaFunc = &Player::DashUpdate;
 }
 
@@ -672,6 +681,8 @@ void Player::OnAttackX()
 	m_hp -= 1;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimNormalAttackX,true,true,true);
+//	m_pButtonUi->SetIsButtonPush(true);		//ボタンが押された
+//	m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kXbutton);	//どのボタンが押されたか
 	m_updaFunc = &Player::AttackXUpdate;
 }
 
@@ -679,6 +690,8 @@ void Player::OnAttackY()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimNormalAttackY,true, true, true);
+//	m_pButtonUi->SetIsButtonPush(true);		//ボタンが押された
+//	m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kYbutton);	//どのボタンが押されたか
 	m_updaFunc = &Player::AttackYUpdate;
 }
 
@@ -690,7 +703,11 @@ void Player::OnJump()
 	vel.y = kJumpPower;
 	m_rigidbody.SetVelocity(vel);
 	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
+//	m_pButtonUi->SetIsButtonPush(true);								//ボタンが押された
+//	m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kBbutton);	//どのボタンが押されたか
+
 	m_updaFunc = &Player::JumpUpdate;
+
 }
 
 void Player::OnAir()

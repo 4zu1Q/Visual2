@@ -9,6 +9,7 @@ class PlayerWeapon;
 class Collidable;
 class AnimController;
 class Camera;
+//class ButtonUi;
 
 class Player : public CharaBase
 {
@@ -134,6 +135,8 @@ private:
 	std::shared_ptr<PlayerWeapon> m_pWeapon;
 	std::shared_ptr<AnimController> m_pAnim;
 	std::shared_ptr<Camera> m_pCamera;
+
+	//std::shared_ptr<ButtonUi> m_pButtonUi;
 
 	//プレイヤーの顔の種類
 	e_PlayerKind m_playerKind;

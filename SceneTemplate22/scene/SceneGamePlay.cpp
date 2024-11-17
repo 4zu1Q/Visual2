@@ -14,6 +14,7 @@
 
 #include "ui/HpBar.h"
 #include "ui/FaceUi.h"
+#include "ui/ButtonUi.h"
 
 #include "util/Pad.h"
 
@@ -38,10 +39,14 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 {
 	m_pPlayer = std::make_shared<Player>();
 	//m_pCamera = std::make_shared<Camera>();
-	m_pSkyDome = std::make_shared<SkyDome>();
+
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
+	m_pButton = std::make_shared<ButtonUi>();
+
 	m_pBoss = std::make_shared<BossPower>();
+
+	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pField = std::make_shared<Field>();
 
 	m_pPhysics = std::make_shared<MyLib::Physics>();
@@ -123,7 +128,6 @@ void SceneGamePlay::Draw()
 {
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 
-	m_pPlayer->Draw();
 	m_pBoss->Draw();
 	m_pCamera->Draw();
 
@@ -132,6 +136,8 @@ void SceneGamePlay::Draw()
 
 	m_pHpBar->Draw();
 	m_pFaceUi->Draw(*m_pPlayer);
+	//m_pButton->Draw();
+	m_pPlayer->Draw();
 
 	DrawFade(0xffffff);
 	
