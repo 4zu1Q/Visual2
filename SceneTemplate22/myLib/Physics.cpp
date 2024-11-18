@@ -161,13 +161,22 @@ void Physics::Update()
 		// 予定ポジション設定
 		item->m_rigidbody.SetNextPos(nextPos);
 
-		auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(item->m_pColliderData);
+		if (item->m_pColliderData->GetKind() == ColliderData::e_Kind::kSphere)
+		{
+			auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(item->m_pColliderData);
+			m_hitDim = MV1CollCheck_Sphere(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos(), sphere->m_radius);
+		}
+		else if (item->m_pColliderData->GetKind() == ColliderData::e_Kind::kCapsule)
+		{
+			auto capsule = std::dynamic_pointer_cast<ColliderDataCapsule>(item->m_pColliderData);
+			m_hitDim = MV1CollCheck_Capsule(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos(), capsule->m_posUp, capsule->m_radius);
+		}
+
 		//auto sphere = std::dynamic_pointer_cast<ColliderDataCapsule>(item->m_pColliderData);
 
 
 		// プレイヤーの周囲にあるステージポリゴンを取得する
 		// ( 検出する範囲は移動距離も考慮する )
-		m_hitDim = MV1CollCheck_Sphere(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos(), sphere->m_radius);
 		//m_hitDim = MV1CollCheck_Capsule(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos(), VAdd(item->m_rigidbody.GetNextPos(), VGet(0.0f, sphere->m_radius, 0.0f)), sphere->m_radius);
 
 
@@ -708,7 +717,7 @@ void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
 		m_isHitFlag = true;
 
 		//接触したＹ座標を保存する
-		PolyMaxPosY = m_lineRes.Position.y;
+		PolyMaxPosY = m_lineRes.Position.y /*+ std::dynamic_pointer_cast<ColliderDataSphere>(col->m_pColliderData)->m_radius*/;
 	}
 
 	//床ポリゴンの当たり判定かつ、ジャンプ力が0よりも小さい(下降中の場合)どうかで処理を分岐

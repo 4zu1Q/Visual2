@@ -45,6 +45,10 @@ namespace
 	// カメラの注視点(プレイヤー座標からの高さ)
 	constexpr float kCameraPlayerTargetHeight = 65.0f;		
 
+	// カメラからプレイヤーまでの最大距離と最小距離
+	constexpr float kCameraToPlayerLenghtMax = 175.0f;		
+	constexpr float kCameraToPlayerLenghtMin = 0.0f;		
+
 
 	///*アナログスティックによる移動関連*/
 	//constexpr float kAnalogRangeMin = 0.1;	//アナログスティックの入力判定範囲
@@ -54,11 +58,12 @@ namespace
 }
 
 Camera::Camera() :
-	m_pos(VGet(0,0,0)),
-	m_prevPos(VGet(0, 0, 0)),
 	m_nextPos(VGet(0, 0, 0)),
+	m_pos(VGet(0, 0, 0)),
+	m_prevPos(VGet(0, 0, 0)),
 	m_targetPos(VGet(0, 0, 0)),
 	m_cameraangle(VGet(0, 0, 0)),
+	m_cameraToTargetLength(kCameraToPlayerLenghtMax),
 	m_angleV(0.0f),
 	m_angleH(0.0f),
 	m_rotX(MGetRotX(m_angleV)),
@@ -166,9 +171,8 @@ void Camera::ResetCamera()
 	SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
 }
 
-void Camera::DebugUpdate()
+void Camera::DebugUpdate(VECTOR playerPos)
 {
-
 	//アナログスティックを使ってカメラ回転
 	int analogX = 0;
 	int analogZ = 0;
@@ -176,13 +180,19 @@ void Camera::DebugUpdate()
 	//アナログスティックを取得
 	GetJoypadAnalogInputRight(&analogX, &analogZ, DX_INPUT_PAD1);
 
+	// カメラに位置を反映
+	//注視点の座標
+	VECTOR playerAimPos = VGet(playerPos.x, playerPos.y, playerPos.z);
+	//ベクトルの方向(注視点-カメラのポジション)
+	VECTOR posToAim = VSub(playerAimPos, m_prevPos);
+
 	//右スティックを右に押した場合
 	if (analogX >= 10)
 	{
 		m_angle -= 0.05f;
 	}
 	else if (analogX <= -10)
-	{	
+	{
 		m_angle += 0.05f;
 	}
 
@@ -190,6 +200,34 @@ void Camera::DebugUpdate()
 	m_prevPos.x += cosf(m_angle) * kCameraDist;
 	m_prevPos.y += kCameraHeight;
 	m_prevPos.z += sinf(m_angle) * kCameraDist;
+
+	//現在位置に設定したポジションを足す
+	m_prevPos = VAdd(m_prevPos, posToAim);
+
+
+	SetCameraPositionAndTarget_UpVecY(m_prevPos, playerPos);
+
+	////アナログスティックを使ってカメラ回転
+	//int analogX = 0;
+	//int analogZ = 0;
+
+	////アナログスティックを取得
+	//GetJoypadAnalogInputRight(&analogX, &analogZ, DX_INPUT_PAD1);
+
+	////右スティックを右に押した場合
+	//if (analogX >= 10)
+	//{
+	//	m_angle -= 0.05f;
+	//}
+	//else if (analogX <= -10)
+	//{	
+	//	m_angle += 0.05f;
+	//}
+
+	////カメラの回転
+	//m_prevPos.x += cosf(m_angle) * kCameraDist;
+	//m_prevPos.y += kCameraHeight;
+	//m_prevPos.z += sinf(m_angle) * kCameraDist;
 }
 
 void Camera::CameraPosUpdate()
@@ -197,6 +235,7 @@ void Camera::CameraPosUpdate()
 
 	//垂直方向の回転はX軸回転
 	MATRIX RotX = MGetRotY(m_angleV);
+
 	//水平方向の回転はY軸回転
 	MATRIX RotY = MGetRotY(m_angleH);
 
@@ -243,6 +282,7 @@ void Camera::AngleUpdate(/*bool isLookOn*/)
 	rotY *= kCameraAngleSpeedY;
 
 	m_angleH += rotX;
+
 	if (input.Rx < 0.0f)
 	{
 		// -180°以下になったら角度地が大きくなりすぎないように360°を足す
@@ -261,6 +301,7 @@ void Camera::AngleUpdate(/*bool isLookOn*/)
 	}
 
 	m_angleV -= rotY;
+
 	// 一定角度以下ににはならないようにする
 	if (m_angleV < kCameraAngleVMin)
 	{

@@ -61,11 +61,20 @@ BossPower::BossPower():
 
 	m_pPlayer = std::make_shared<Player>();
 
-	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
+	//m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
-	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
-	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
+	////auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
+	//auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
+	//circleColliderData->m_radius = 5.0f;
+
+	m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
+
+	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataCapsule>(m_pColliderData);
 	circleColliderData->m_radius = 5.0f;
+	circleColliderData->m_posDown = VGet(0.0f, 0.0f, 0.0f);
+	circleColliderData->m_posUp = VGet(0.0f, 0.0f, 0.0f);
+	
+
 }
 
 BossPower::~BossPower()
@@ -122,6 +131,7 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics)
 
 	m_posUp = VGet(pos.x, pos.y + kUpPos.y, pos.z);
 
+	DrawSphere3D(pos, 32, 16, 0xffffff, 0xffffff, false);
 
 	//モデルに座標をセットする
 	MV1SetPosition(m_modelH, modelPos);
@@ -134,7 +144,6 @@ void BossPower::Draw()
 	MV1DrawModel(m_modelH);
 
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
-	DrawSphere3D(m_posDown, 32, 16, 0xffffff, 0xffffff, false);
 }
 
 const VECTOR& BossPower::GetPosDown() const
@@ -163,14 +172,14 @@ void BossPower::IdleUpdate()
 
 	
 	//プレイヤーへの向きを取得
-	m_direction = VSub(m_pos, m_posDown);
-	m_direction = VNorm(m_direction);
+	//m_direction = VSub(m_pos, m_posDown);
+	//m_direction = VNorm(m_direction);
 
-	m_angle = atan2f(m_direction.x, m_direction.z);
+	//m_angle = atan2f(m_direction.x, m_direction.z);
 
-	VECTOR move;
-	move.y = m_rigidbody.GetVelocity().y;
-	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
+	//VECTOR move;
+	//move.y = m_rigidbody.GetVelocity().y;
+	//m_rigidbody.SetVelocity(VGet(0, move.y, 0));
 }
 
 void BossPower::WalkUpdate()
@@ -195,8 +204,10 @@ void BossPower::WalkUpdate()
 	//ベクトルを、正規化し、向きだけを保存させる
 	m_velocity = VScale(m_direction, kSpeed);
 
+	auto pos = m_rigidbody.GetPos();
+
 	//敵の移動
-	m_posDown = VAdd(m_posDown, m_velocity);
+	pos = VAdd(pos, m_velocity);
 }
 
 void BossPower::Attack1Update()
@@ -240,6 +251,7 @@ void BossPower::DownUpdate()
 
 void BossPower::DeadUpdate()
 {
+	//ワープアイテムが出現するフラグをおいておく
 
 }
 

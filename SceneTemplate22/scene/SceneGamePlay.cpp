@@ -38,7 +38,6 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_cameraAngle(0.0f)
 {
 	m_pPlayer = std::make_shared<Player>();
-	//m_pCamera = std::make_shared<Camera>();
 
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
@@ -91,8 +90,6 @@ void SceneGamePlay::Update()
 	}
 #endif
 
-	//カメラのアングルをセットする
-	//m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
 
 	if (m_isFadingOut)
 	{
@@ -112,7 +109,6 @@ void SceneGamePlay::Update()
 		}
 	}
 
-	//m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
 	m_pBoss->Update(m_pPhysics);
@@ -135,8 +131,8 @@ void SceneGamePlay::Draw()
 	m_pSkyDome->Draw();
 
 	m_pHpBar->Draw();
+	m_pButton->Draw();
 	m_pFaceUi->Draw(*m_pPlayer);
-	//m_pButton->Draw();
 	m_pPlayer->Draw();
 
 	DrawFade(0xffffff);

@@ -14,7 +14,6 @@ public:
 	void Initialize();
 	void Finalize();
 
-	//void Update(Player& player);
 	void Draw();
 
 	void Update(VECTOR playerPos/*, bool isLockOn*/);
@@ -22,10 +21,10 @@ public:
 	void ResetCamera();
 
 	//デバッグ用のアップデート
-	void DebugUpdate();
+	void DebugUpdate(VECTOR playerPos);
 
 
-	const VECTOR& GetPos() const { return m_nextPos; }
+	const VECTOR& GetNextPos() const { return m_nextPos; }
 
 
 	//カメラのアングルを取得
@@ -69,9 +68,6 @@ private:
 	//スマートポインタ
 	//std::shared_ptr<Player> m_pPlayer;
 
-
-
-	
 	// MyLibのやつ継承すると思われ
 	VECTOR m_pos;				//座標
 	VECTOR m_prevPos;			//前フレーム座標

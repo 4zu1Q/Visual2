@@ -99,9 +99,6 @@ void SceneSelect::Update()
 	}
 #endif
 
-	//カメラのアングルをセットする
-	//m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
-
 	if (m_isFadingOut)
 	{
 		if (IsFadingOut())
@@ -121,7 +118,6 @@ void SceneSelect::Update()
 		}
 	}
 
-	//m_pCamera->Update(*m_pPlayer);
 	m_pSkyDome->Update();
 	m_pPlayer->Update(m_pPhysics);
 	m_pItemHp->Update(m_pPhysics);
@@ -149,7 +145,6 @@ void SceneSelect::Update()
 
 void SceneSelect::Draw()
 {
-	//m_pCamera->Draw();
 	m_pPlayer->Draw();
 	m_pSkyDome->Draw();
 	m_pField->Draw();
@@ -160,7 +155,6 @@ void SceneSelect::Draw()
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pHpBar->Draw();
 
-	//m_pCamera->Draw();
 
 #ifdef _DEBUG
 

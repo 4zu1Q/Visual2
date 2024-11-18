@@ -151,7 +151,7 @@ private:
 	int m_weaponH;
 
 	//プレイヤの座標
-//	VECTOR m_posDown;
+	//	VECTOR m_posDown;
 	VECTOR m_posUp;
 
 	VECTOR m_attackPos;

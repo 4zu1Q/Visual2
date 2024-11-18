@@ -9,7 +9,7 @@ namespace
 	//constexpr float kSinSpeed = 0.01f;
 	constexpr float kSinSpeed = 0.05f;
 	//constexpr float kHeightSize = 0.01f;
-	constexpr float kHeightSize = 1.0f;
+	constexpr float kHeightSize = 0.50f;
 
 	//モデルのスケール値
 	constexpr VECTOR kModelScale = { 0.1f , 0.1f , 0.1f };
@@ -18,8 +18,6 @@ namespace
 
 	//回転速度
 	constexpr float kRotSpeed = 0.009f;
-
-
 }
 
 ItemMp::ItemMp():
@@ -45,7 +43,7 @@ void ItemMp::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
-	m_rigidbody.Initialize(false);
+	m_rigidbody.Initialize(true);
 	m_rigidbody.SetPos(kModelInitPos);
 }
 

@@ -153,7 +153,7 @@ Player::~Player()
 
 void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos)
 {
-	//
+
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
@@ -200,7 +200,8 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	m_pWeapon->MagicWandUpdate();
 	m_pWeapon->LongSwordUpdate();
 	
-	
+	SetCameraAngle(m_pCamera->GetAngle());
+
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
@@ -208,17 +209,20 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	//カプセル用のポジション
 	auto pos = m_rigidbody.GetPos();
 
+	m_pCamera->DebugUpdate(pos);
+
 	//カメラの更新
-	m_pCamera->Update(pos);
-	m_cameraToPlayerVec = VSub(pos, m_pCamera->GetPos());
+	//m_pCamera->Update(pos);
+	//m_cameraToPlayerVec = VSub(pos, m_pCamera->GetNextPos());
 
 	m_posUp = VGet(pos.x, pos.y + kUpPos.y, pos.z);
 
 	//モデルのポジションを合わせるよう
 	VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
 
+
 	//モデルに座標をセットする
-	MV1SetPosition(m_modelH, pos);
+	MV1SetPosition(m_modelH, modelPos);
 
 	//モデルに回転をセットする
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
@@ -249,9 +253,9 @@ void Player::Draw()
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
 
 	//DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
+#endif
 
 	m_pCamera->Draw();
-#endif
 
 }
 
@@ -368,6 +372,13 @@ void Player::WalkUpdate()
 		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 		move = VTransform(move, mtx);
 
+		////カメラの角度によって進む方向を変える
+		//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+		////移動ベクトルとカメラ角度行列を乗算
+		//move = VTransform(move, playerRotMtx);
+
+
+
 		move.y = m_rigidbody.GetVelocity().y;
 		m_rigidbody.SetVelocity(move);
 
@@ -451,6 +462,11 @@ void Player::DashUpdate()
 		//コントローラーによる移動方向を決定する
 		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 		move = VTransform(move, mtx);
+
+		////カメラの角度によって進む方向を変える
+		//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+		////移動ベクトルとカメラ角度行列を乗算
+		//move = VTransform(move, playerRotMtx);
 
 		move.y = m_rigidbody.GetVelocity().y;
 		m_rigidbody.SetVelocity(move);
@@ -592,8 +608,8 @@ void Player::AttackYUpdate()
 	if (m_pAnim->IsLoop())
 	{
 		
-		m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kNone);
-		m_pButtonUi->SetIsButtonPush(false);
+		//m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kNone);
+		//m_pButtonUi->SetIsButtonPush(false);
 		OnIdle();
 	}
 }
@@ -762,5 +778,6 @@ void Player::FaceSelect()
 
 void Player::CameraUpdate()
 {
+	//カメラ更新
 }
 
