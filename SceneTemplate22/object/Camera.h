@@ -14,9 +14,9 @@ public:
 	void Initialize();
 	void Finalize();
 
+	void Update(int stageHandle);
 	void Draw();
 
-	void Update(VECTOR playerPos/*, bool isLockOn*/);
 
 	void ResetCamera();
 
@@ -28,13 +28,18 @@ public:
 
 
 	//カメラのアングルを取得
-	const float GetAngle() const { return m_angle; }
+	const float GetAngle() const { return m_cameraAngleX; }
 	
 	/// <summary>
 	/// カメラのX角度の取得
 	/// </summary>
 	/// <returns></returns>
 	float GetCameraAngleX() { return m_angleH; }
+
+
+	void SetPlayerPos(VECTOR playerPos) { m_playerPos = playerPos; }
+
+	const VECTOR GetDirection();
 
 
 private:
@@ -67,6 +72,26 @@ private:
 
 	//スマートポインタ
 	//std::shared_ptr<Player> m_pPlayer;
+
+	//カメラの角度
+	float m_cameraAngleX;
+	float m_cameraAngleY;
+
+	VECTOR m_cameraPos;		//カメラ座標
+	VECTOR m_aimPos;		//カメラが向いているベクトル
+	VECTOR m_playerPos;		//プレイヤーの座標
+
+	VECTOR m_testPositon;
+
+	int m_lightHandle;		//ライトハンドル
+	float m_angleMoveScale;	//移動の大きさ
+
+	MV1_COLL_RESULT_POLY_DIM m_hitDim{};	//当たり判定結果構造体
+
+
+
+
+	/////////別のカメラのやり方↓
 
 	// MyLibのやつ継承すると思われ
 	VECTOR m_pos;				//座標

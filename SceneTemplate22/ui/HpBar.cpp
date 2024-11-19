@@ -51,13 +51,13 @@ void HpBar::Draw()
 	//スタミナの仮位置
 	//魔力の仮位置
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
-	DrawBox(32, 10, 374, 50, 0x000000, true);
+	//DrawBox(32, 10, 374, 50, 0x000000, true);
 	DrawBox(34, 55, 334, 70, 0x00ff00, true);
 	DrawBox(34, 75, 334, 90, 0xff0000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	
 	//枠
-	DrawBox(32, 10, 374, 50, 0xffffff, false);
+	//DrawBox(32, 10, 374, 50, 0xffffff, false);
 	DrawBox(34, 55, 334, 70, 0xffffff, false);
 	DrawBox(34, 75, 334, 90, 0xffffff, false);
 

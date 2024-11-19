@@ -43,7 +43,7 @@ namespace
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
 
 	//カプセルの上の座標
-	constexpr VECTOR kUpPos = { 0.0f,8.0f,0.0f };
+	constexpr VECTOR kUpPos = { 0.0f,15.0f,0.0f };
 
 	/*プレイヤーのアニメーションの種類*/
 	const char* const kAnimInfoFilename = "Data/Master/AnimPlayerMaster.csv";
@@ -82,6 +82,7 @@ Player::Player() :
 	m_attackPos(VGet(0, 0, 0)),
 	m_attackDir(VGet(0, 0, 0)),
 	m_cameraToPlayerVec(VGet(0,0,0)),
+	m_cameraDirection(VGet(0,0,0)),
 	m_avoid(VGet(0, 0, 0)),
 	m_analogX(0),
 	m_analogZ(0),
@@ -89,6 +90,7 @@ Player::Player() :
 	m_cameraAngle(0.0f),
 	m_rate(0.0f),
 	m_isDead(false),
+	m_frame(0),
 	m_isMove(false)
 {
 
@@ -130,7 +132,7 @@ Player::Player() :
 
 	//m_pButtonUi = std::make_shared<ButtonUi>();
 
-	m_pCamera = std::make_shared<Camera>();
+	//m_pCamera = std::make_shared<Camera>();
 
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
@@ -200,7 +202,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	m_pWeapon->MagicWandUpdate();
 	m_pWeapon->LongSwordUpdate();
 	
-	SetCameraAngle(m_pCamera->GetAngle());
+	//SetCameraAngle(m_pCamera->GetAngle());
 
 
 	//アニメーションの更新処理
@@ -209,7 +211,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	//カプセル用のポジション
 	auto pos = m_rigidbody.GetPos();
 
-	m_pCamera->DebugUpdate(pos);
+	//m_pCamera->DebugUpdate(pos);
 
 	//カメラの更新
 	//m_pCamera->Update(pos);
@@ -255,7 +257,7 @@ void Player::Draw()
 	//DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
 #endif
 
-	m_pCamera->Draw();
+	//m_pCamera->Draw();
 
 }
 
@@ -334,7 +336,7 @@ void Player::IdleUpdate()
 void Player::WalkUpdate()
 {
 	// カメラの角度によって進む方向を変える
-	MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
 	/*プレイヤーの移動*/
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
@@ -432,7 +434,7 @@ void Player::WalkUpdate()
 void Player::DashUpdate()
 {
 	// カメラの角度によって進む方向を変える
-	MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
@@ -508,7 +510,7 @@ void Player::DashUpdate()
 void Player::JumpUpdate()
 {
 	// カメラの角度によって進む方向を変える
-	MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
 	if (m_pAnim->IsLoop())
 	{
@@ -559,14 +561,23 @@ void Player::JumpUpdate()
 void Player::AirUpdate()
 {
 	// カメラの角度によって進む方向を変える
-	MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
-	if (!m_isJump)
+	m_frame++;
+
+
+
+	if (m_frame > 30)
 	{
+		m_frame = 0;
+		m_isJump = false;
 		OnIdle();
 	}
 
+	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
+
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
+
 	float len = VSize(move);
 	float rate = len / kAnalogInputMax;
 
@@ -586,6 +597,14 @@ void Player::AirUpdate()
 	//コントローラーによる移動方向を決定する
 	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 	move = VTransform(move, mtx);
+
+	//動いている間
+	if (VSquareSize(move) > 0.0f)
+	{
+		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+		m_attackDir = VNorm(move);
+		m_avoid = VNorm(move);
+	}
 
 	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(move);
@@ -714,7 +733,7 @@ void Player::OnAttackY()
 void Player::OnJump()
 {
 	//地面と接触しているかどうか
-	//m_isJump = true;
+	m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
 	vel.y = kJumpPower;
 	m_rigidbody.SetVelocity(vel);

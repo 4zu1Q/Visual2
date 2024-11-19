@@ -111,7 +111,7 @@ namespace MyLib
 
 		// 重力と最大重力加速度
 		static constexpr float m_gravity = -0.3f;
-		static constexpr float m_maxGravityAccel = -0.95f;
+		static constexpr float m_maxGravityAccel = -1.5f;
 
 		std::list<std::shared_ptr<Collidable>> m_collidables;	// 登録されたCollidableのリスト
 		//std::list<std::shared_ptr<Collidable*>> m_collidables;	// 登録されたCollidableのリスト

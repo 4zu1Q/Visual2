@@ -8,6 +8,7 @@ namespace MyLib
 	/// </summary>
 	class ColliderData abstract
 	{
+
 	public:
 		// 当たり判定種別
 		enum class e_Kind

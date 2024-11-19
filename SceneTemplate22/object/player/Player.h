@@ -70,6 +70,8 @@ public:
 	//カメラの方向を取得
 	void SetCameraAngle(float angle) { m_cameraAngle = angle; }
 
+	void SetCameraDirection(VECTOR dir) { m_cameraDirection = dir; }
+
 	//ジャンプフラグを取得
 	const bool& GetIsJump() const { return m_isJump; }
 	void SetIsJump(const bool isJump) { m_isJump = isJump; }
@@ -134,7 +136,7 @@ private:
 	//スマートポインタ
 	std::shared_ptr<PlayerWeapon> m_pWeapon;
 	std::shared_ptr<AnimController> m_pAnim;
-	std::shared_ptr<Camera> m_pCamera;
+	//std::shared_ptr<Camera> m_pCamera;
 
 	//std::shared_ptr<ButtonUi> m_pButtonUi;
 
@@ -159,6 +161,8 @@ private:
 
 	VECTOR m_cameraToPlayerVec;
 
+	VECTOR m_cameraDirection;
+
 	VECTOR m_avoid;
 	VECTOR m_move;
 	float m_rate;
@@ -179,6 +183,9 @@ private:
 	//アナログスティック用の変数
 	int m_analogX;
 	int m_analogZ;
+
+	
+	int m_frame;
 
 	float m_speed;
 

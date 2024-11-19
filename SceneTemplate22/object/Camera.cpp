@@ -1,63 +1,99 @@
 ﻿#include "Camera.h"
 #include "object/player/Player.h"
 
+#include <cmath>
 #include "util/Pad.h"
 
 namespace
 {
 
-	//カメラの距離
-	constexpr float kCameraDist = 30;
-	//カメラの高さ
-	constexpr float kCameraHeight = 10;
+	////カメラの距離
+	//constexpr float kCameraDist = 30;
+	////カメラの高さ
+	//constexpr float kCameraHeight = 10;
 
-	//constexpr float kAngleSpeed = 0.05f;	//旋回速度
-	//constexpr float kCameraPlayerTargetHeight = 400.0f;	//プレイヤー座標からどれだけ高い位置を注視点とするか
-	//constexpr float kToPlayerLength = 1600.0f;	//プレイヤーとの距離
-	//constexpr float kCollisionSize = 50.0f;		//カメラの当たり判定サイズ
+	////constexpr float kAngleSpeed = 0.05f;	//旋回速度
+	////constexpr float kCameraPlayerTargetHeight = 400.0f;	//プレイヤー座標からどれだけ高い位置を注視点とするか
+	////constexpr float kToPlayerLength = 1600.0f;	//プレイヤーとの距離
+	////constexpr float kCollisionSize = 50.0f;		//カメラの当たり判定サイズ
 
-	//カメラのnearとfarの設定
-	constexpr float kNear = 10.0f;
+	////カメラのnearとfarの設定
+	constexpr float kNear = 0.0f;
 	constexpr float kFar = 6000.0f;
 
-	//カメラの角度制限
-	constexpr float kCameraAngleVLimitMin = -DX_PI_F / 2.0f + 0.6f;
-	constexpr float kCameraAngleVLimitMax = DX_PI_F / 2.0f - 0.6f;
+	////カメラの角度制限
+	//constexpr float kCameraAngleVLimitMin = -DX_PI_F / 2.0f + 0.6f;
+	//constexpr float kCameraAngleVLimitMax = DX_PI_F / 2.0f - 0.6f;
 
-	//カメラのついてくる速度
-	constexpr float kCameraFollowSpeed = 0.2f;
-	constexpr float kPrevCameraFollowSpeed = 1.0f - kCameraFollowSpeed;
-	constexpr float kCameraLockOnFollowSpeed = 0.5f;
-	constexpr float kPrevCameraLockOnFollowSpeed = 1.0f - kCameraLockOnFollowSpeed;
+	////カメラのついてくる速度
+	//constexpr float kCameraFollowSpeed = 0.2f;
+	//constexpr float kPrevCameraFollowSpeed = 1.0f - kCameraFollowSpeed;
+	//constexpr float kCameraLockOnFollowSpeed = 0.5f;
+	//constexpr float kPrevCameraLockOnFollowSpeed = 1.0f - kCameraLockOnFollowSpeed;
 
-	//カメラの注視点を追いかける速度
-	constexpr float kCameraTargetFollowSpeed = 0.2f;
-	constexpr float kPrevCameraTargetFollowSpeed = 1.0f - kCameraTargetFollowSpeed;
+	////カメラの注視点を追いかける速度
+	//constexpr float kCameraTargetFollowSpeed = 0.2f;
+	//constexpr float kPrevCameraTargetFollowSpeed = 1.0f - kCameraTargetFollowSpeed;
+
+	//// カメラの旋回スピード
+	//constexpr float kCameraAngleSpeedX = 0.1f;
+	//constexpr float kCameraAngleSpeedY = 0.05f;
+
+	//// カメラの最小角度と最大角度を求める
+	//constexpr float kCameraAngleVMax = DX_PI_F / 2.0f - 0.8f;
+	//constexpr float kCameraAngleVMin = -DX_PI_F / 2.0f + 0.6f;	
+
+	//// カメラの注視点(プレイヤー座標からの高さ)
+	//constexpr float kCameraPlayerTargetHeight = 65.0f;		
+
+	//// カメラからプレイヤーまでの最大距離と最小距離
+	//constexpr float kCameraToPlayerLenghtMax = 175.0f;		
+	//constexpr float kCameraToPlayerLenghtMin = 0.0f;		
+
+	//////////////////////////////////////////////////////////////
+
+	constexpr float kCameraDist = 24.0f;
+	constexpr float kCameraHeight = 38.0f;
+
+	constexpr float kCameraNear = 3.0f;
+	constexpr float kCameraFar = 6000.0f;
+
+	constexpr float kCameraRadius = kCameraNear + 0.2f;
+
+	constexpr float kAngleMoveScaleMax = 0.01f;
+
+	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
 	// カメラの旋回スピード
 	constexpr float kCameraAngleSpeedX = 0.1f;
 	constexpr float kCameraAngleSpeedY = 0.05f;
 
-	// カメラの最小角度と最大角度を求める
-	constexpr float kCameraAngleVMax = DX_PI_F / 2.0f - 0.8f;
-	constexpr float kCameraAngleVMin = -DX_PI_F / 2.0f + 0.6f;	
+	//カメラの角度制限
+	constexpr float kCameraAngleVLimitMin = -DX_PI_F / 2.0f + 0.6f;
+	constexpr float kCameraAngleVLimitMax = DX_PI_F / 2.0f - 0.6f;
 
-	// カメラの注視点(プレイヤー座標からの高さ)
-	constexpr float kCameraPlayerTargetHeight = 65.0f;		
+	// カメラからプレイヤーまでの最大距離
+	constexpr float kCameraToPlayerLenghtMax = 175.0f;
 
-	// カメラからプレイヤーまでの最大距離と最小距離
-	constexpr float kCameraToPlayerLenghtMax = 175.0f;		
-	constexpr float kCameraToPlayerLenghtMin = 0.0f;		
 
 
 	///*アナログスティックによる移動関連*/
-	//constexpr float kAnalogRangeMin = 0.1;	//アナログスティックの入力判定範囲
-	//constexpr float kAnalogRangeMax = 0.8;
+	constexpr float kAnalogRangeMin = 0.1;	//アナログスティックの入力判定範囲
+	constexpr float kAnalogRangeMax = 0.8;
 	//constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大値
 
 }
 
 Camera::Camera() :
+	m_cameraAngleX(0.0f),
+	m_cameraAngleY(0.0f),
+	m_cameraPos{ 0.0f,0.0f,0.0f },
+	m_aimPos{ 0.0f,0.0f,0.0f },
+	m_playerPos{ 0.0f,0.0f,0.0f },
+	m_testPositon{ 0.0f,0.0f,0.0f },
+	m_lightHandle(-1),
+	m_angleMoveScale(0.0f),
+	//////////////////////////////////////
 	m_nextPos(VGet(0, 0, 0)),
 	m_pos(VGet(0, 0, 0)),
 	m_prevPos(VGet(0, 0, 0)),
@@ -70,16 +106,21 @@ Camera::Camera() :
 	m_rotY(MGetRotX(m_angleH)),
 	m_angle(-DX_PI_F / 2)
 {
-	SetCameraNearFar(kNear, kFar);
+	//SetCameraNearFar(kNear, kFar);
+	m_lightHandle = CreateDirLightHandle(VSub(m_aimPos, m_cameraPos));
 }
 
 Camera::~Camera()
 {
+	DeleteLightHandle(m_lightHandle);
 
 }
 
 void Camera::Initialize()
 {
+	m_cameraAngleX = 0.0f;
+	m_cameraAngleY = 12.0f;
+	SetCameraNearFar(kCameraNear, kCameraFar);
 
 }
 
@@ -126,43 +167,177 @@ void Camera::Finalize()
 	//SetCameraPositionAndTarget_UpVecY(m_prevPos, player.GetPosDown());
 //}
 
+void Camera::Update(int stageHandle)
+{
+	m_angleMoveScale = kAngleMoveScaleMax * 1.0f;
+
+	//アナログスティックを使ってカメラ回転
+	int analogX = 0;
+	int analogY = 0;
+
+	//アナログスティックを取得
+	GetJoypadAnalogInputRight(&analogX, &analogY, DX_INPUT_PAD1);
+
+	//VECTOR move = VGet(analogX, -analogY, 0.0f);
+	//float len = VSize(move);
+
+	//float rate = len / kAnalogInputMax;
+
+	////アナログスティック無効な範囲を除外する
+	//rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	//rate = min(rate, 1.0f);
+	//rate = max(rate, 0.0f);
+
+	
+	//ベクトルの方向(注視点-カメラのポジション)
+	VECTOR posToAim = VSub(m_playerPos, m_prevPos);
+	
+	//入力から角度を計算する
+	if (analogX > 50.0f)
+	{
+		m_cameraAngleX -= m_angleMoveScale * std::abs(analogX);
+	}
+	else if (analogX < -50.0f)
+	{
+		m_cameraAngleX += m_angleMoveScale * std::abs(analogX);
+	}
+
+	if (analogY > 50.0f)
+	{
+		m_cameraAngleY += m_angleMoveScale * std::abs(analogY);
+		//角度が90度超えてしまった場合
+		if (m_cameraAngleY > 90)
+		{
+			m_cameraAngleY = 88;
+		}
+	}
+	else if (analogY < -50.0f)
+	{
+		m_cameraAngleY -= m_angleMoveScale * std::abs(analogY);
+		//角度が-90度超えてしまった場合
+		if (m_cameraAngleY < -90)
+		{
+			m_cameraAngleY = -88;
+		}
+	}
+	
+	// カメラの位置はカメラの水平角度と垂直角度から算出
+	// 最初に垂直角度を反映した位置を算出
+	VECTOR tempPos1;
+	float sinParam = sinf(m_cameraAngleY / 180.0f * DX_PI_F);
+	float cosParam = cosf(m_cameraAngleY / 180.0f * DX_PI_F);
+	tempPos1.x = 0.0f;
+	tempPos1.y = sinParam * kCameraDist;
+	tempPos1.z = -cosParam * kCameraDist;
+
+	// 次に水平角度を反映した位置を算出
+	VECTOR tempPos2;
+	sinParam = sinf(m_cameraAngleX / 180.0f * DX_PI_F);
+	cosParam = cosf(m_cameraAngleX / 180.0f * DX_PI_F);
+	tempPos2.x = cosParam * tempPos1.x - sinParam * tempPos1.z;
+	tempPos2.y = tempPos1.y;
+	tempPos2.z = sinParam * tempPos1.x + cosParam * tempPos1.z;
+
+	//
+	m_aimPos = VGet(m_playerPos.x, m_playerPos.y + 4.0f , m_playerPos.z - 10.0f);
+
+	// 算出した座標に注視点の位置を加算したものがカメラの位置になる
+	m_cameraPos = VAdd(tempPos2, m_aimPos);
+	
+	auto nextPos = m_cameraPos;
+
+	// 最初はステージ自体と判定
+	//m_hitDim = MV1CollCheck_Capsule(stageHandle, -1, m_aimPos, m_cameraPos, kCameraRadius);
+
+	//// 検出した周囲のポリゴン情報を開放する
+	//MV1CollResultPolyDimTerminate(m_hitDim);
+
+	//// ステージのポリゴンは周囲に無かったら今度はコリジョンオブジェクトのポリゴンが周囲にあるか調べる
+	//if (m_hitDim.HitNum == 0)
+	//{
+	//	// 検出した周囲のポリゴン情報を開放する
+	//	MV1CollResultPolyDimTerminate(m_hitDim);
+	//}
+	//else if (m_hitDim.HitNum != 0)
+	//{
+	//	bool doCheck = true;
+
+	//	while (doCheck)
+	//	{
+
+	//		doCheck = false;
+
+	//		//プレイヤーの座標からカメラの移動予定後座標の方向ベクトルを計算する
+	//		auto playerToCamera = VSub(m_cameraPos , m_aimPos);
+
+	//		//向きと大きさに分ける
+	//		auto vec = VNorm(playerToCamera);
+	//		auto length = VSize(playerToCamera);
+
+	//		//距離を縮める
+	//		length *= 0.998f;
+
+	//		auto checkPos = VScale(VAdd(m_aimPos, vec), length);
+
+	//		// 最初はステージ自体と判定
+	//		m_hitDim = MV1CollCheck_Capsule(stageHandle, -1, m_aimPos, checkPos, kCameraRadius);
+	//		MV1CollResultPolyDimTerminate(m_hitDim);
+
+	//		if (m_hitDim.HitNum != 0)
+	//		{
+	//			m_cameraPos = checkPos;
+	//			doCheck = true;
+	//		}
+	//		else
+	//		{
+	//			doCheck = false;
+	//		}
+
+	//		// HitLength と NoHitLength が十分に近づいていなかったらループ
+	//	}
+
+	//	nextPos = VGet(m_testPositon.x, m_testPositon.y, m_testPositon.z);
+	//}
+
+	SetLightDirectionHandle(m_lightHandle, VSub(m_aimPos, m_cameraPos));
+
+	SetCameraPositionAndTarget_UpVecY(m_cameraPos, m_aimPos);
+
+
+	//// 更新前の座標の設定
+	//m_prevPos = m_nextPos;
+
+	//// ターゲットの座標の設定
+	//VECTOR targetPos;
+	//targetPos = playerPos;
+	//targetPos.y += kCameraPlayerTargetHeight;
+
+	//// 角度更新
+	//AngleUpdate();
+
+	//// 座標更新
+	//NormalUpdate(targetPos);
+
+	//// 座標の確定
+	//CameraPosUpdate();
+
+	////m_pos = VAdd(VScale(m_prevPos, kPrevCameraFollowSpeed), VScale(m_nextPos, kCameraFollowSpeed));
+	//SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
+}
+
 void Camera::Draw()
 {
 
 #ifdef _DEBUG
 
 
-//	DrawFormatString(0, 80, 0x000000, "カメラ座標：%f,%f,%f", m_prevPos.x, m_prevPos.y, m_prevPos.z);
-//	DrawFormatString(0, 100, 0x000000, "ターゲット座標：%f,%f,%f", m_targetPos.x, m_targetPos.y, m_targetPos.z);
-//	DrawFormatString(0, 120, 0x000000, "GetTargetPos:%f,%f,%f", GetCameraTarget().x, GetCameraTarget().y, GetCameraTarget().z);
+	//DrawFormatString(0, 80, 0x000000, "カメラ座標：%f,%f,%f", m_prevPos.x, m_prevPos.y, m_prevPos.z);
+	//DrawFormatString(0, 100, 0x000000, "ターゲット座標：%f,%f,%f", m_targetPos.x, m_targetPos.y, m_targetPos.z);
+	//DrawFormatString(0, 120, 0x000000, "GetTargetPos:%f,%f,%f", GetCameraTarget().x, GetCameraTarget().y, GetCameraTarget().z);
 
 	//DrawGrid();
 
 #endif
-}
-
-void Camera::Update(VECTOR playerPos/*, bool isLockOn*/)
-{
-	// 更新前の座標の設定
-	m_prevPos = m_nextPos;
-
-	// ターゲットの座標の設定
-	VECTOR targetPos;
-	targetPos = playerPos;
-	targetPos.y += kCameraPlayerTargetHeight;
-
-	// 角度更新
-	AngleUpdate();
-
-	// 座標更新
-	NormalUpdate(targetPos);
-
-	// 座標の確定
-	CameraPosUpdate();
-
-
-	//m_pos = VAdd(VScale(m_prevPos, kPrevCameraFollowSpeed), VScale(m_nextPos, kCameraFollowSpeed));
-	SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
 }
 
 void Camera::ResetCamera()
@@ -230,6 +405,11 @@ void Camera::DebugUpdate(VECTOR playerPos)
 	//m_prevPos.z += sinf(m_angle) * kCameraDist;
 }
 
+const VECTOR Camera::GetDirection()
+{
+	return VNorm(VSub(m_aimPos,m_cameraPos));
+}
+
 void Camera::CameraPosUpdate()
 {
 
@@ -250,9 +430,9 @@ void Camera::CameraPosUpdate()
 
 void Camera::NormalUpdate(VECTOR targetPos)
 {
-	m_targetPos.x = (m_targetPos.x * kPrevCameraTargetFollowSpeed) + (targetPos.x * kCameraTargetFollowSpeed);
-	m_targetPos.y = (m_targetPos.y * kPrevCameraTargetFollowSpeed) + (targetPos.y * kCameraTargetFollowSpeed);
-	m_targetPos.z = (m_targetPos.z * kPrevCameraTargetFollowSpeed) + (targetPos.z * kCameraTargetFollowSpeed);
+	//m_targetPos.x = (m_targetPos.x * kPrevCameraTargetFollowSpeed) + (targetPos.x * kCameraTargetFollowSpeed);
+	//m_targetPos.y = (m_targetPos.y * kPrevCameraTargetFollowSpeed) + (targetPos.y * kCameraTargetFollowSpeed);
+	//m_targetPos.z = (m_targetPos.z * kPrevCameraTargetFollowSpeed) + (targetPos.z * kCameraTargetFollowSpeed);
 }
 
 void Camera::AngleUpdate(/*bool isLookOn*/)
@@ -303,15 +483,15 @@ void Camera::AngleUpdate(/*bool isLookOn*/)
 	m_angleV -= rotY;
 
 	// 一定角度以下ににはならないようにする
-	if (m_angleV < kCameraAngleVMin)
-	{
-		m_angleV = kCameraAngleVMin;
-	}
-	// 一定角度以上にはならないようにする
-	if (m_angleV > kCameraAngleVMax)
-	{
-		m_angleV = kCameraAngleVMax;
-	}
+	//if (m_angleV < kCameraAngleVMin)
+	//{
+	//	m_angleV = kCameraAngleVMin;
+	//}
+	//// 一定角度以上にはならないようにする
+	//if (m_angleV > kCameraAngleVMax)
+	//{
+	//	m_angleV = kCameraAngleVMax;
+	//}
 
 
 }

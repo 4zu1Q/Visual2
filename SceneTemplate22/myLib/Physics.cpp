@@ -174,7 +174,6 @@ void Physics::Update()
 
 		//auto sphere = std::dynamic_pointer_cast<ColliderDataCapsule>(item->m_pColliderData);
 
-
 		// プレイヤーの周囲にあるステージポリゴンを取得する
 		// ( 検出する範囲は移動距離も考慮する )
 		//m_hitDim = MV1CollCheck_Capsule(m_pField->GetModelHandle(), -1, item->m_rigidbody.GetPos(), VAdd(item->m_rigidbody.GetNextPos(), VGet(0.0f, sphere->m_radius, 0.0f)), sphere->m_radius);
@@ -625,7 +624,6 @@ void MyLib::Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable>& co
 			//	m_pPoly->Position[1],	//ポリゴンの三頂点の一つ
 			//	m_pPoly->Position[2]))	//ポリゴンの三頂点の一つ
 			//	continue;
-			
 
 
 			// プレイヤーと当たっているかを判定
@@ -648,6 +646,7 @@ void MyLib::Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable>& co
 			{
 				// 当たっていたらループを抜ける
 				m_pPoly = m_pWallPoly[k];
+
 				//if (HitCheck_Sphere_Triangle(col->m_rigidbody.GetNextPos(),
 				//	sphere->m_radius,
 				//	m_pPoly->Position[0],
@@ -681,10 +680,14 @@ void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
 	if (m_floorNum == 0) return;
 
 	// 床ポリゴンとの当たり判定処理
-	//あたったかどうかのフラグ初期化
+	// あたったかどうかのフラグ初期化
 	bool IsHitFlag = false;
 
+
+	//auto sphere = std::dynamic_pointer_cast<ColliderDataSphere>(col->m_pColliderData);
+
 	//床ポリゴンとの当たり判定
+
 
    //一番高い床ポリゴンにぶつける為の判定用変数を初期化
 	float PolyMaxPosY = 0.0f;
@@ -700,31 +703,53 @@ void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
 		m_pPoly = m_pFloorPoly[i];
 
 		//頭から足元まででポリゴンと当たっているかを判定
-		m_lineRes = HitCheck_Line_Triangle(VAdd(col->m_rigidbody.GetNextPos(), 
+		m_lineRes = HitCheck_Line_Triangle(VAdd(col->m_rigidbody.GetNextPos(),
 			VGet(0.0f, kHeadHeight, 0.0f)),
 			col->m_rigidbody.GetNextPos(),
 			m_pPoly->Position[0],
 			m_pPoly->Position[1], 
 			m_pPoly->Position[2]);
 
+		//if(!HitCheck_Sphere_Triangle(VAdd(col->m_rigidbody.GetNextPos(),
+		//	VGet(0.0f, kHeadHeight, 0.0f)), 
+		//	sphere->m_radius,
+		//	m_pPoly->Position[0],
+		//	m_pPoly->Position[1],
+		//	m_pPoly->Position[2])) continue;
+
+		//float mostHeightY = m_pPoly->Position[0].y;
+
+		//if (mostHeightY < m_pPoly->Position[1].y)
+		//{
+		//	mostHeightY = m_pPoly->Position[1].y;
+		//}
+
+		//if (mostHeightY < m_pPoly->Position[2].y)
+		//{
+		//	mostHeightY = m_pPoly->Position[2].y;
+		//}
+
 		//当たっていなかったら何もしない
 		if (!m_lineRes.HitFlag) continue;
 
+
 		//既に当たったポリゴンがあり、且つ今まで検出した床ポリゴンより低い場合は何もしない
 		if (m_isHitFlag && PolyMaxPosY > m_lineRes.Position.y) continue;
+		//if (m_isHitFlag && PolyMaxPosY > mostHeightY) continue;
 
 		//ポリゴンに当たったフラグを立てる
 		m_isHitFlag = true;
 
 		//接触したＹ座標を保存する
 		PolyMaxPosY = m_lineRes.Position.y /*+ std::dynamic_pointer_cast<ColliderDataSphere>(col->m_pColliderData)->m_radius*/;
+		//PolyMaxPosY = mostHeightY; /*+ std::dynamic_pointer_cast<ColliderDataSphere>(col->m_pColliderData)->m_radius*/;
 	}
 
 	//床ポリゴンの当たり判定かつ、ジャンプ力が0よりも小さい(下降中の場合)どうかで処理を分岐
 	if (m_isHitFlag)
 	{
 		// 接触したポリゴンで一番高いＹ座標をプレイヤーのＹ座標にする
-		col->m_rigidbody.SetNextPos(VGet(col->m_rigidbody.GetNextPos().x, PolyMaxPosY, col->m_rigidbody.GetNextPos().z));
+		col->m_rigidbody.SetNextPos(VGet(col->m_rigidbody.GetNextPos().x, PolyMaxPosY/* + sphere->m_radius*/, col->m_rigidbody.GetNextPos().z));
 	}
 
 }

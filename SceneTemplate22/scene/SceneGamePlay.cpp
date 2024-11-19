@@ -50,6 +50,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 
 	m_pPhysics = std::make_shared<MyLib::Physics>();
 
+	m_pCamera = std::make_shared<Camera>();
 
 	m_playerPos = VGet(30, 0, 20);
 	m_cameraPos = VGet(0, 0, 0);
@@ -57,6 +58,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	//初期位置をセット
 	m_pPlayer->Initialize(m_pPhysics, kInitPos);
 	m_pBoss->Initialize(m_pPhysics);
+	m_pCamera->Initialize();
 
 	m_pField->Initialize();
 }
@@ -91,6 +93,7 @@ void SceneGamePlay::Update()
 #endif
 
 
+
 	if (m_isFadingOut)
 	{
 		if (IsFadingOut())
@@ -110,8 +113,13 @@ void SceneGamePlay::Update()
 	}
 
 	m_pSkyDome->Update();
-	m_pPlayer->Update(m_pPhysics);
 	m_pBoss->Update(m_pPhysics);
+
+	m_pCamera->Update(m_pField->GetModelHandle());
+	m_pCamera->SetPlayerPos(m_pPlayer->GetPosUp());
+
+	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
+	m_pPlayer->Update(m_pPhysics);
 
 	m_pPhysics->Update();
 
