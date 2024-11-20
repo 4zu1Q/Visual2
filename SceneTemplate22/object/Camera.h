@@ -28,7 +28,7 @@ public:
 
 
 	//カメラのアングルを取得
-	const float GetAngle() const { return m_cameraAngleX; }
+	const float GetAngle() const { return m_angle; }
 	
 	/// <summary>
 	/// カメラのX角度の取得
