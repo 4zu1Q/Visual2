@@ -240,6 +240,9 @@
     <ClCompile Include="ui\ButtonUi.cpp">
       <Filter>ソース ファイル\ui</Filter>
     </ClCompile>
+    <ClCompile Include="ui\FaceFrameUi.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -411,6 +414,9 @@
       <Filter>ヘッダー ファイル\object\item</Filter>
     </ClInclude>
     <ClInclude Include="ui\ButtonUi.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\FaceFrameUi.h">
       <Filter>ヘッダー ファイル\ui</Filter>
     </ClInclude>
   </ItemGroup>

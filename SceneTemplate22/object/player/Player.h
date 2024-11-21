@@ -25,6 +25,27 @@ public:
 		kStrongestPlayer	//ラスボス型
 	};
 
+	//ボタンの種類
+	enum class e_ButtonKind : int
+	{
+		kNone,		//何もなし
+		kAbutton,	//Aボタン
+		kBbutton,	//Bボタン
+		kXbutton,	//Xボタン
+		kYbutton,	//Yボタン
+
+	};
+
+	//後ろのボタンの種類
+	enum class e_BackButtonKind : int
+	{
+		kRBbutton,	//RBボタン
+		kLBbutton,	//LBボタン
+		kRTbutton,	//RTボタン
+		kLTbutton,	//LTボタン
+	};
+
+
 public:
 
 	Player();
@@ -76,6 +97,13 @@ public:
 	const bool& GetIsJump() const { return m_isJump; }
 	void SetIsJump(const bool isJump) { m_isJump = isJump; }
 
+	//ボタンを押しているかどうかのフラグを取得
+	const bool& GetIsButtonPush() const { return m_isButtonPush; }
+	//押しているボタンの種類
+	const e_ButtonKind& GetButtonKind() const { return m_buttonKind; }
+
+	const bool& GetIsFrame() const { return m_isFaceUse; }
+
 	/*プレイヤーがボスを倒したかどうかのフラグを取得する関数*/
 	//これ多分必要ない可能性
 
@@ -103,11 +131,14 @@ private:
 	void DashUpdate();
 	void JumpUpdate();
 	void AirUpdate();
+	void AttackCharge();
 	void AttackXUpdate();
 	void AttackYUpdate();
 	void HitUpdate();
 	void DeadUpdate();
 	void SpawnUpdate();
+
+	void FaceUseUpdate();
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
@@ -115,11 +146,14 @@ private:
 	void OnDash();
 	void OnJump();
 	void OnAir();
+	void OnAttackCharge();
 	void OnAttackX();
 	void OnAttackY();
 	void OnHit();
 	void OnDead();
 	void OnSpawn();
+
+	void OnFaceUse();
 
 	//武器を描画するだけの関数
 	void WeaponDraw();
@@ -138,19 +172,22 @@ private:
 	std::shared_ptr<AnimController> m_pAnim;
 	//std::shared_ptr<Camera> m_pCamera;
 
-	//std::shared_ptr<ButtonUi> m_pButtonUi;
 
 	//プレイヤーの顔の種類
 	e_PlayerKind m_playerKind;
+	e_ButtonKind m_buttonKind;
 
 	//メンバ関数ポインタ
 	using UpdateFunc_t = void(Player::*)(/*引数書く*/);
-	UpdateFunc_t m_updaFunc;
+	UpdateFunc_t m_updateFunc;
 
 	//仮HP
 	float m_hp;
 	float m_mp;
 	int m_weaponH;
+
+	int m_frame;
+	int m_chargeFrame = 0;
 
 	//プレイヤの座標
 	//	VECTOR m_posDown;
@@ -185,23 +222,15 @@ private:
 	int m_analogZ;
 
 	
-	int m_frame;
 
 	float m_speed;
 
 	//顔を装着しているかしていないかの変数
+	//ボタンを押しているかどうか
 	bool m_isFaceUse;
+	bool m_isButtonPush;
 
-	/*アニメーションフラグ*/
-	bool m_isAnimIdle;
-	bool m_isAnimWalk;
-	bool m_isAnimDash;
 	bool m_isJump;
-	bool m_isAnimAvoid;
-	bool m_isAnimAttackX;
-	bool m_isAnimAttackY;
-	bool m_isAnimDamage;
-	bool m_isAnimDown;
 
 	//顔の保持しているかどうかのフラグ
 	bool m_isPowerFace;

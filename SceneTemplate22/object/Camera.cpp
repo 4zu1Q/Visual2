@@ -52,8 +52,8 @@ namespace
 
 	//////////////////////////////////////////////////////////////
 
-	constexpr float kCameraDist = 24.0f;
-	constexpr float kCameraHeight = 38.0f;
+	constexpr float kCameraDist = 44.0f;
+	constexpr float kCameraHeight = 2.0f;
 
 	constexpr float kCameraNear = 3.0f;
 	constexpr float kCameraFar = 6000.0f;
@@ -177,17 +177,6 @@ void Camera::Update(int stageHandle)
 
 	//アナログスティックを取得
 	GetJoypadAnalogInputRight(&analogX, &analogY, DX_INPUT_PAD1);
-
-	//VECTOR move = VGet(analogX, -analogY, 0.0f);
-	//float len = VSize(move);
-
-	//float rate = len / kAnalogInputMax;
-
-	////アナログスティック無効な範囲を除外する
-	//rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	//rate = min(rate, 1.0f);
-	//rate = max(rate, 0.0f);
-
 	
 	//ベクトルの方向(注視点-カメラのポジション)
 	VECTOR posToAim = VSub(m_playerPos, m_prevPos);

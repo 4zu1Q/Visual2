@@ -11,6 +11,7 @@ class Camera;
 class SkyDome;
 class HpBar;
 class FaceUi;
+class FaceFrameUi;
 class ButtonUi;
 class BossPower;
 class Field;
@@ -45,14 +46,20 @@ private:
 	
 	std::shared_ptr<BossPower> m_pBoss;
 	
+	//std::shared_ptr<GamePlayUi> m_pGamePlayUi;
+
+
 	std::shared_ptr<HpBar> m_pHpBar;
+	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<ButtonUi> m_pButton;
+
 
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	std::shared_ptr<Field> m_pField;
 
 	std::shared_ptr<MyLib::Physics> m_pPhysics;
+
 
 
 	//

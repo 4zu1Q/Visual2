@@ -1,4 +1,5 @@
 ﻿#include "ButtonUi.h"
+#include "object/player/Player.h"
 
 namespace
 {
@@ -11,7 +12,6 @@ namespace
 	const char* const kButtonPauseFileName = "Data/Image/ButtonPause.png";
 	const char* const kRBFileName = "Data/Image/RB.png";
 	const char* const kLBFileName = "Data/Image/LB.png";
-	const char* const kFaceFrameFileName = "Data/Image/FaceFrame.png";
 
 	//押されているときの画像ファイル名
 	const char* const kPushButtonAFileName = "Data/Image/ButtonA_Push.png";
@@ -31,13 +31,12 @@ namespace
 	const Vec2 kRBPos = { 1220.0f , 36.0f };
 	const Vec2 kLBPos = { 1040.0f , 36.0f };
 
-	//顔選択の枠の座標
-	const Vec2 kFaceFramePos = { 1100.0f , 6.0f };
+
 
 }
 
 ButtonUi::ButtonUi():
-	m_kind(e_ButtonKind::kNone),
+	//m_kind(e_ButtonKind::kNone),
 	m_isPush(false),
 	m_buttonAHandle(LoadGraph(kButtonAFileName)),
 	m_buttonBHandle(LoadGraph(kButtonBFileName)),
@@ -51,8 +50,7 @@ ButtonUi::ButtonUi():
 	m_pushButtonYHandle(LoadGraph(kPushButtonYFileName)),
 	m_pushButtonRBHandle(LoadGraph(kPushRBFileName)),
 	m_pushButtonLBHandle(LoadGraph(kPushLBFileName)),
-	m_buttonPauseHandle(LoadGraph(kButtonPauseFileName)),
-	m_faceFrameHandle(LoadGraph(kFaceFrameFileName))
+	m_buttonPauseHandle(LoadGraph(kButtonPauseFileName))
 {
 
 }
@@ -74,7 +72,6 @@ ButtonUi::~ButtonUi()
 	DeleteGraph(m_pushButtonLBHandle);
 
 	DeleteGraph(m_buttonPauseHandle);
-	DeleteGraph(m_faceFrameHandle);
 }
 
 void ButtonUi::Initialize()
@@ -87,7 +84,7 @@ void ButtonUi::Update()
 
 }
 
-void ButtonUi::Draw()
+void ButtonUi::Draw(Player& player)
 {
 	DrawGraph(kButtonAPos.x, kButtonAPos.y, m_buttonAHandle, true);
 	DrawGraph(kButtonBPos.x, kButtonBPos.y, m_buttonBHandle, true);
@@ -96,38 +93,28 @@ void ButtonUi::Draw()
 	DrawGraph(kRBPos.x, kRBPos.y, m_buttonRBHandle, true);
 	DrawGraph(kLBPos.x, kLBPos.y, m_buttonLBHandle, true);
 
-	if (m_isPush && m_kind == e_ButtonKind::kAbutton)
+	if (player.GetIsButtonPush() && player.GetButtonKind() == Player::e_ButtonKind::kAbutton)
 	{
-		DrawGraph(kButtonAPos.x, kButtonAPos.y, m_buttonAHandle, true);
+		DrawGraph(kButtonAPos.x, kButtonAPos.y, m_pushButtonAHandle, true);
 
 	}
-	else if (m_isPush && m_kind == e_ButtonKind::kBbutton)
+	else if (player.GetIsButtonPush() && player.GetButtonKind() == Player::e_ButtonKind::kBbutton)
 	{
-		DrawGraph(kButtonBPos.x, kButtonBPos.y, m_buttonBHandle, true);
+		DrawGraph(kButtonBPos.x, kButtonBPos.y, m_pushButtonBHandle, true);
 
 	}
-	else if (m_isPush && m_kind == e_ButtonKind::kXbutton)
+	else if (player.GetIsButtonPush() && player.GetButtonKind() == Player::e_ButtonKind::kXbutton)
 	{
-		DrawGraph(kButtonXPos.x, kButtonXPos.y, m_buttonXHandle, true);
+		DrawGraph(kButtonXPos.x, kButtonXPos.y, m_pushButtonXHandle, true);
 
 	}
-	else if (m_isPush && m_kind == e_ButtonKind::kYbutton)
+	else if (player.GetIsButtonPush() && player.GetButtonKind() == Player::e_ButtonKind::kYbutton)
 	{
-		DrawGraph(kButtonYPos.x, kButtonYPos.y, m_buttonYHandle, true);
+		DrawGraph(kButtonYPos.x, kButtonYPos.y, m_pushButtonYHandle, true);
 
 	}
-	else if (m_isPush && m_kind == e_ButtonKind::kRBbutton)
-	{
-		DrawGraph(kRBPos.x, kRBPos.y, m_buttonRBHandle, true);
 
-	}
-	else if (m_isPush && m_kind == e_ButtonKind::kLBbutton)
-	{
-		DrawGraph(kLBPos.x, kLBPos.y, m_buttonLBHandle, true);
-
-	}
 
 
 	DrawGraph(kButtonPausePos.x, kButtonPausePos.y, m_buttonPauseHandle, true);
-	DrawGraph(kFaceFramePos.x, kFaceFramePos.y, m_faceFrameHandle, true);
 }

@@ -10,6 +10,7 @@ class Player;
 class Camera;
 class SkyDome;
 class HpBar;
+class ButtonUi;
 class FaceUi;
 class ItemMp;
 class ItemHp;
@@ -38,10 +39,11 @@ private:
 
 	//スマートポインタ
 	std::shared_ptr<Player> m_pPlayer;
-	//std::shared_ptr<Camera> m_pCamera;
+	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	std::shared_ptr<HpBar> m_pHpBar;
 	std::shared_ptr<FaceUi> m_pFaceUi;
+	std::shared_ptr<ButtonUi> m_pButtonUi;
 	
 	std::shared_ptr<ItemMp> m_pItemMp;
 	std::shared_ptr<ItemHp> m_pItemHp;

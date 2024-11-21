@@ -4,15 +4,22 @@
 
 namespace
 {
-	//顔のUIの位置
-	constexpr int kFacePosX = 32;
-	constexpr int kFacePosY = 150;
+	//顔の画像ファイル名
+	const char* const kPowerFaceFileName = "Data/Image/Face01.png";
+	const char* const kSpeedFaceFileName = "Data/Image/Face02.png";
+	const char* const kShotFaceFileName = "Data/Image/Face03.png";
+	const char* const kRastFaceFileName = "Data/Image/Face04.png";
 
-	//デバッグ用の円の半径
-	constexpr int kRadius = 32;
+	//顔の座標
+	const Vec2 kFacePos = { 1130.0f , 40.0f };
+
 }
 
-FaceUi::FaceUi()
+FaceUi::FaceUi():
+	m_PowerFaceHandle(LoadGraph(kPowerFaceFileName)),
+	m_SpeedFaceHandle(LoadGraph(kSpeedFaceFileName)),
+	m_ShotFaceHandle(LoadGraph(kShotFaceFileName)),
+	m_RastFaceHandle(LoadGraph(kRastFaceFileName))
 {
 
 }
@@ -24,58 +31,29 @@ FaceUi::~FaceUi()
 
 void FaceUi::Update()
 {
-
-
-
 }
 
 void FaceUi::Draw(Player& player)
 {
-
-
-	//顔のUIのフレーム
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
-	//DrawBox(1160, 20, 1260, 120, 0x000000, true);
-	//DrawCircle(1110, 35, 32, 0xff0000, true, true);
-	//DrawCircle(1210, 70, kRadius, 0x000000, true, true);
-	//DrawCircle(1210, 70, kRadius, 0x000000, true, true);
-	//DrawCircle(1210, 70, kRadius, 0x000000, true, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-	//DrawBox(1160, 20, 1260, 120, 0xffffff, false);
-
-	//A
-	//DrawCircle(1110, 35, 32, 0xffffff,false);
-	////B
-	//DrawCircle(1210, 70, kRadius, 0xffff0f, false);
-	////X
-	//DrawCircle(1210, 70, kRadius, 0xffff0f, false);
-	////Y
-	//DrawCircle(1210, 70, kRadius, 0xffff0f, false);
-
 	//プレイヤーの仮面UI
 	if (player.GetFaceKind() == Player::e_PlayerKind::kPowerPlayer)
 	{
-		DrawCircle(1160, 70, kRadius, 0xffff0f, true, true);
-		//DrawCircle(kFacePosX, kFacePosY, kRadius, 0xffff0f, true, true);
+		DrawGraph(kFacePos.x, kFacePos.y, m_PowerFaceHandle, true);
 
 	}
 	else if (player.GetFaceKind() == Player::e_PlayerKind::kSpeedPlayer)
 	{
-		DrawCircle(1160, 70, kRadius, 0xfff0ff, true, true);
-		//DrawCircle(kFacePosX, kFacePosY, kRadius, 0xfff0ff, true, true);
+		DrawGraph(kFacePos.x, kFacePos.y, m_SpeedFaceHandle, true);
 
 	}
 	else if (player.GetFaceKind() == Player::e_PlayerKind::kShotPlayer)
 	{
-		DrawCircle(1160, 70, kRadius, 0xff0fff, true, true);
-		//DrawCircle(kFacePosX, kFacePosY, kRadius, 0xff0fff, true, true);
+		DrawGraph(kFacePos.x, kFacePos.y, m_ShotFaceHandle, true);
 
 	}
 	else if (player.GetFaceKind() == Player::e_PlayerKind::kStrongestPlayer)
 	{
-		DrawCircle(1160, 70, kRadius, 0x0fffff, true, true);
-		//DrawCircle(kFacePosX, kFacePosY, kRadius, 0x0fffff, true, true);
+		DrawGraph(kFacePos.x, kFacePos.y, m_RastFaceHandle, true);
 
 	}
 

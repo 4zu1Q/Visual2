@@ -45,7 +45,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
 
 	m_pPlayer = std::make_shared<Player>();
-	//m_pCamera = std::make_shared<Camera>();
+	m_pCamera = std::make_shared<Camera>();
 	m_pHpBar = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
 
@@ -62,12 +62,12 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize(m_pPhysics, kInitPos);
+	m_pCamera->Initialize();
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
 	SetCameraNearFar(kCameraNear, kCameraFar);
-
 }
 
 SceneSelect::~SceneSelect()
@@ -119,9 +119,15 @@ void SceneSelect::Update()
 	}
 
 	m_pSkyDome->Update();
-	m_pPlayer->Update(m_pPhysics);
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update(m_pPhysics);
+
+	//m_pCamera->Update(m_pField->GetModelHandle());
+	//m_pCamera->SetPlayerPos(m_pPlayer->GetPosUp());
+	m_pCamera->DebugUpdate(m_pPlayer->GetPosUp());
+
+	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
+	m_pPlayer->Update(m_pPhysics);
 
 	m_pPhysics->Update();
 

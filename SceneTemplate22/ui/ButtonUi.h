@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include "DxLib.h"
 #include "util/Vec2.h"
+#include <memory>
 
+class Player;
 class ButtonUi
 {
 public:
@@ -11,26 +13,13 @@ public:
 
 	void Initialize();
 	void Update();
-	void Draw();
+	void Draw(Player& player);
 
-	//ボタンの種類
-	enum class e_ButtonKind : int
-	{
-		kNone,		//何もなし
-		kAbutton,	//Aボタン
-		kBbutton,	//Bボタン
-		kXbutton,	//Xボタン
-		kYbutton,	//Yボタン
-		kRBbutton,	//RBボタン
-		kRTbutton,	//RTボタン
-		kLBbutton,	//LBボタン
-		kLTbutton,	//LTボタン
-	};
+
 
 	//Setter
 	void SetIsButtonPush(bool isPush) { m_isPush = isPush; }
 
-	void SetButtonKind(e_ButtonKind kind) { m_kind = kind; }
 
 private:
 
@@ -43,7 +32,6 @@ private:
 	int m_buttonRBHandle;
 	int m_buttonLBHandle;
 
-	int m_faceFrameHandle;
 
 	int m_buttonPauseHandle;
 
@@ -60,7 +48,7 @@ private:
 	bool m_isPush;
 
 	//ボタンの種類
-	e_ButtonKind m_kind;
+	//e_ButtonKind m_kind;
 
 	//bool m_isButtonAPush;
 	//bool m_isButtonBPush;

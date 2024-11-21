@@ -5,7 +5,6 @@
 #include "util/Pad.h"
 #include "util/AnimController.h"
 
-#include "ui/ButtonUi.h"
 
 #include "myLib/MyLib.h"
 
@@ -34,24 +33,42 @@ namespace
 	constexpr float kMinSpeedN = 0.5f;
 
 	//ダッシュスピード
-	constexpr float kDashSpeed = 1.0f;
+	constexpr float kNormalDashSpeed = 1.0f;
+	constexpr float kPowerDashSpeed = 0.4f;
+	constexpr float kSpeedDashSpeed = 1.5f;
+	constexpr float kShotDashSpeed = 1.1f;
+	constexpr float kStrongestDashSpeed = 1.2f;
 
 	//ジャンプ力
-	constexpr float kJumpPower = 6.0f;
+	constexpr float kNormalJumpPower = 6.0f;
+	constexpr float kPowerJumpPower = 3.0f;
+	constexpr float kSpeedJumpPower = 9.0f;
+	constexpr float kShotJumpPower = 5.0f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
 
 	//カプセルの上の座標
-	constexpr VECTOR kUpPos = { 0.0f,15.0f,0.0f };
+	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
 	/*プレイヤーのアニメーションの種類*/
 	const char* const kAnimInfoFilename = "Data/Master/AnimPlayerMaster.csv";
 
 	const char* const kAnimSpawn = "Spawn";
-	const char* const kAnimIdle = "Idle";
-	const char* const kAnimWalk = "Walk";
-	const char* const kAnimDash = "Dash";
+
+	const char* const kNormalAnimIdle = "Idle";
+	const char* const kPowerAnimIdle = "PowerIdle";
+	const char* const kSpeedAnimIdle = "SpeedIdle";
+
+	const char* const kNormalAnimWalk = "Walk";
+	const char* const kPowerAnimWalk = "PowerWalk";
+	const char* const kSpeedAnimWalk = "SpeedWalk";
+
+	const char* const kAnimNormalDash = "NormalDash";
+	const char* const kAnimPowerDash = "PowerDash";
+	const char* const kAnimSpeedDash = "SpeedDash";
+
+	const char* const kAnimAttackCharge = "AttackCharge";
 
 	const char* const kAnimNormalAttackX = "NormalAttackX";
 	const char* const kAnimNormalAttackY = "NormalAttackY";
@@ -61,14 +78,18 @@ namespace
 
 	const char* const kAnimSpeedAttackX = "SpeedAttackX";
 	const char* const kAnimSpeedAttackY = "SpeedAttackY";
-	
+
+	const char* const kAnimShotAttackX = "ShotAttackX";
+	const char* const kAnimShotAttackY = "ShotAttackY";
+
 	const char* const kAnimJump = "Jump";
 	const char* const kAnimAir = "Jumping";
 
 	const char* const kAnimHit = "Hit";
 
 	const char* const kAnimDead = "Down";
-	const char* const kAnimDeadPose = "DownPose";
+
+	const char* const kAnimUseFace = "UseFace";
 
 
 }
@@ -94,8 +115,7 @@ Player::Player() :
 	m_isMove(false)
 {
 
-	/*マスク関連の初期化*/
-	m_isFaceUse = false;
+
 
 #ifdef _DEBUG
 	m_isPowerFace = true;
@@ -111,26 +131,24 @@ Player::Player() :
 
 #endif
 
-	m_isAnimIdle = false;
-	m_isAnimWalk = false;
-	m_isAnimDash = false;
-	m_isAnimAttackX = false;
-	m_isAnimAttackY = false;
-	m_isAnimDamage = false;
-	m_isAnimDown = false;
-
 	m_isJump = false;
 
 	//モデルのロード
 	m_modelH = MV1LoadModel(kModelFilename);
 	assert(m_modelH > -1);
 
+	//マスク関連の初期化
+	m_isFaceUse = false;
 	m_playerKind = e_PlayerKind::kPowerPlayer;
+	
+	//ボタンUI関連
+	m_isButtonPush = false;
+	m_buttonKind = e_ButtonKind::kNone;
 
+	//
 	m_pWeapon = std::make_shared<PlayerWeapon>();
 	m_pAnim = std::make_shared<AnimController>();
 
-	//m_pButtonUi = std::make_shared<ButtonUi>();
 
 	//m_pCamera = std::make_shared<Camera>();
 
@@ -171,11 +189,11 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos)
 	m_pWeapon->Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
 
 	//アニメーションの初期化
-	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimIdle);
+	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kNormalAnimIdle);
 
 
 	// メンバ関数ポインタの初期化
-	m_updaFunc = &Player::IdleUpdate;
+	m_updateFunc = &Player::IdleUpdate;
 
 }
 
@@ -193,7 +211,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 {
 
 	//アップデート
-	(this->*m_updaFunc)();
+	(this->*m_updateFunc)();
 
 	/*フレームにアタッチするための更新処理*/
 	m_pWeapon->SwordUpdate();
@@ -318,9 +336,41 @@ void Player::IdleUpdate()
 		return;
 	}
 
-	if (Pad::IsTrigger(PAD_INPUT_4))
+	if (Pad::IsPress(PAD_INPUT_4))
 	{
-		OnAttackY();
+		//OnAttackY();
+		OnAttackCharge();
+		return;
+	}
+
+	//攻撃Y
+	//if (Pad::IsPress(PAD_INPUT_4) && !m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	//OnAttackY();
+	//	OnAttackCharge();
+	//}
+	////攻撃Y(スピードタイプのみショートカット)
+	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnAttackCharge();
+	//}
+	////攻撃Y(スピードタイプのみショートカット)
+	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnAttackY();
+	//}
+
+
+	//顔を決定する	ここはZRで決定にする
+	if (Pad::IsTrigger(PAD_INPUT_9))
+	{
+		OnFaceUse();
 		return;
 	}
 
@@ -405,11 +455,34 @@ void Player::WalkUpdate()
 	}
 
 	//攻撃Y
-	if (Pad::IsTrigger(PAD_INPUT_4))
+	if (Pad::IsPress(PAD_INPUT_4))
 	{
-		OnAttackY();
+		//OnAttackY();
+		OnAttackCharge();
 		return;
 	}
+
+	//if (Pad::IsPress(PAD_INPUT_4) && !m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	//OnAttackY();
+	//	OnAttackCharge();
+	//}
+	////攻撃Y(スピードタイプのみショートカット)
+	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnAttackY();
+	//}
+	////攻撃Y(スピードタイプのみショートカット)
+	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnAttackY();
+	//}
 
 	//ダッシュ
 	if (Pad::IsPress(PAD_INPUT_1))
@@ -425,7 +498,12 @@ void Player::WalkUpdate()
 		return;
 	}
 
-
+	//顔を決定する	ここはZRで決定にする
+	if (Pad::IsTrigger(PAD_INPUT_9))
+	{
+		OnFaceUse();
+		return;
+	}
 
 	//顔を選択する関数
 	FaceSelect();
@@ -449,6 +527,9 @@ void Player::DashUpdate()
 	rate = min(rate, 1.0f);
 	rate = max(rate, 0.0f);
 
+	float speed = 0;
+
+
 	//動いている間
 	if (VSquareSize(move) > 0.0f)
 	{
@@ -456,8 +537,34 @@ void Player::DashUpdate()
 		//速度が決定できるので移動ベクトルに反映する
 		move = VNorm(move);
 
-		//ダッシュ
-		float speed = kDashSpeed * rate;
+		//プレイヤーのタイプで攻撃アニメーションを変える
+		if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+		{
+			//ダッシュ
+			speed = kPowerDashSpeed * rate;
+		}
+		else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+		{
+			//ダッシュ
+			speed = kSpeedDashSpeed * rate;
+		}
+		else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+		{
+			//ダッシュ
+			speed = kShotDashSpeed * rate;
+		}
+		else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+		{
+			//ダッシュ
+			speed = kStrongestDashSpeed * rate;
+		}
+
+		if (!m_isFaceUse)
+		{
+			//ダッシュ
+			speed = kNormalDashSpeed * rate;
+		}
+
 		move = VScale(move, speed);
 
 		//カメラのいる場所(角度)から
@@ -482,25 +589,63 @@ void Player::DashUpdate()
 	//歩き
 	if (Pad::IsRelase(PAD_INPUT_1) || VSquareSize(move) == 0.0f)
 	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		OnWalk();
 	}
 
 	//攻撃X
 	if (Pad::IsTrigger(PAD_INPUT_3))
 	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackX();
 	}
 
 	//攻撃Y
-	if (Pad::IsTrigger(PAD_INPUT_4))
+	if (Pad::IsPress(PAD_INPUT_4))
 	{
-		OnAttackY();
+		//OnAttackY();
+		OnAttackCharge();
+		return;
 	}
+
+	//攻撃Y
+	//if (Pad::IsPress(PAD_INPUT_4) && !m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	//OnAttackY();
+	//	OnAttackCharge();
+	//}
+	////攻撃Y(スピードタイプのみショートカット)
+	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnAttackY();
+	//}
+	////攻撃Y(スピードタイプのみショートカット)
+	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnAttackY();
+	//}
 
 	//ジャンプ
 	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
 	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		OnJump();
+	}
+
+	//顔を決定する	ここはZRで決定にする
+	if (Pad::IsTrigger(PAD_INPUT_9))
+	{
+		OnFaceUse();
+		return;
 	}
 
 	//顔を選択する関数
@@ -516,6 +661,7 @@ void Player::JumpUpdate()
 	{
 		OnAir();
 	}
+
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
@@ -532,7 +678,7 @@ void Player::JumpUpdate()
 	rate = max(rate, 0.0f);
 
 	//ダッシュ
-	float speed = kDashSpeed * rate;
+	float speed = kNormalDashSpeed * rate;
 	move = VScale(move, speed);
 
 	//カメラのいる場所(角度)から
@@ -571,6 +717,9 @@ void Player::AirUpdate()
 	{
 		m_frame = 0;
 		m_isJump = false;
+
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
 	}
 
@@ -590,7 +739,7 @@ void Player::AirUpdate()
 	rate = max(rate, 0.0f);
 
 	//ダッシュ
-	float speed = kDashSpeed * rate;
+	float speed = kNormalDashSpeed * rate;
 	move = VScale(move, speed);
 
 	//カメラのいる場所(角度)から
@@ -610,12 +759,31 @@ void Player::AirUpdate()
 	m_rigidbody.SetVelocity(move);
 }
 
+void Player::AttackCharge()
+{
+	m_chargeFrame++;
+
+	//Yボタンを離した場合
+	if (Pad::IsRelase(PAD_INPUT_4) && m_chargeFrame > 60)
+	{
+		m_chargeFrame = 0;
+		OnAttackY();
+	}
+	else if(Pad::IsRelase(PAD_INPUT_4) && m_chargeFrame < 60)
+	{
+		m_chargeFrame = 0;
+		OnIdle();
+	}
+}
+
 void Player::AttackXUpdate()
 {
 
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
 	}
 
@@ -626,9 +794,8 @@ void Player::AttackYUpdate()
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
-		
-		//m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kNone);
-		//m_pButtonUi->SetIsButtonPush(false);
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
 	}
 }
@@ -645,6 +812,8 @@ void Player::HitUpdate()
 void Player::DeadUpdate()
 {
 	//ゲームオーバーシーンに遷移するフラグをたてる
+	m_isButtonPush = false;
+	m_buttonKind = e_ButtonKind::kNone;
 
 }
 
@@ -653,6 +822,17 @@ void Player::SpawnUpdate()
 	//セレクトシーンの始めに
 	if (m_pAnim->IsLoop())
 	{
+		OnIdle();
+	}
+}
+
+void Player::FaceUseUpdate()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	if (m_pAnim->IsLoop())
+	{
+		m_isFaceUse = !m_isFaceUse;
 		OnIdle();
 	}
 }
@@ -692,22 +872,89 @@ void Player::WeaponDraw()
 void Player::OnIdle()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_pAnim->ChangeAnim(kAnimIdle);
-	m_updaFunc = &Player::IdleUpdate;
+
+	//プレイヤーのタイプでダッシュアニメーションを変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kPowerAnimIdle);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kSpeedAnimIdle);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kNormalAnimIdle);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kNormalAnimIdle);
+	}
+
+	if (!m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kNormalAnimIdle);
+	}
+
+	m_updateFunc = &Player::IdleUpdate;
 }
 
 void Player::OnWalk()
 {
-	m_pAnim->ChangeAnim(kAnimWalk);
-	m_updaFunc = &Player::WalkUpdate;
+	//プレイヤーのタイプでダッシュアニメーションを変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kPowerAnimWalk);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kSpeedAnimWalk);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kNormalAnimWalk);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kNormalAnimWalk);
+	}
+
+	if (!m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kNormalAnimWalk);
+	}
+
+	m_updateFunc = &Player::WalkUpdate;
 }
 
 void Player::OnDash()
 {
-	m_pAnim->ChangeAnim(kAnimDash);			//アニメーションの変更
-//	m_pButtonUi->SetIsButtonPush(true);		//ボタンが押された
-//	m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kAbutton);	//どのボタンが押されたか
-	m_updaFunc = &Player::DashUpdate;
+	//プレイヤーのタイプでダッシュアニメーションを変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimPowerDash);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimSpeedDash);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimNormalDash);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimNormalDash);
+	}
+
+	if (!m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimNormalDash);
+	}
+
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kAbutton;
+	m_updateFunc = &Player::DashUpdate;
 }
 
 
@@ -715,19 +962,67 @@ void Player::OnAttackX()
 {
 	m_hp -= 1;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_pAnim->ChangeAnim(kAnimNormalAttackX,true,true,true);
-//	m_pButtonUi->SetIsButtonPush(true);		//ボタンが押された
-//	m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kXbutton);	//どのボタンが押されたか
-	m_updaFunc = &Player::AttackXUpdate;
+
+	//プレイヤーのタイプで攻撃Xアニメーションを変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimPowerAttackX, true, true, true);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimSpeedAttackX, true, true, true);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimShotAttackX, true, true, true);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimNormalAttackX, true, true, true);
+	}
+	
+	if (!m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimNormalAttackX, true, true, true);
+	}
+
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kXbutton;
+
+	m_updateFunc = &Player::AttackXUpdate;
 }
 
 void Player::OnAttackY()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_pAnim->ChangeAnim(kAnimNormalAttackY,true, true, true);
-//	m_pButtonUi->SetIsButtonPush(true);		//ボタンが押された
-//	m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kYbutton);	//どのボタンが押されたか
-	m_updaFunc = &Player::AttackYUpdate;
+
+	//プレイヤーのタイプで攻撃Yアニメーションを変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimPowerAttackY, true, true, true);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimSpeedAttackY, true, true, true);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimShotAttackY, true, true, true);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimNormalAttackY, true, true, true);
+	}
+
+	if (!m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(kAnimNormalAttackY, true, true, true);
+	}
+
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kYbutton;
+
+	m_updateFunc = &Player::AttackYUpdate;
 }
 
 void Player::OnJump()
@@ -735,38 +1030,80 @@ void Player::OnJump()
 	//地面と接触しているかどうか
 	m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
-	vel.y = kJumpPower;
-	m_rigidbody.SetVelocity(vel);
-	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
-//	m_pButtonUi->SetIsButtonPush(true);								//ボタンが押された
-//	m_pButtonUi->SetButtonKind(ButtonUi::e_ButtonKind::kBbutton);	//どのボタンが押されたか
 
-	m_updaFunc = &Player::JumpUpdate;
+	//プレイヤーのタイプでジャンプ力を変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		vel.y = kPowerJumpPower;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		vel.y = kSpeedJumpPower;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		vel.y = kShotJumpPower;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		vel.y = kNormalJumpPower;
+	}
+
+	if (!m_isFaceUse)
+	{
+		vel.y = kNormalJumpPower;
+	}
+
+	m_rigidbody.SetVelocity(vel);
+
+	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kBbutton;
+
+	m_updateFunc = &Player::JumpUpdate;
 
 }
 
 void Player::OnAir()
 {
 	m_pAnim->ChangeAnim(kAnimAir);
-	m_updaFunc = &Player::AirUpdate;
+	m_updateFunc = &Player::AirUpdate;
+}
+
+void Player::OnAttackCharge()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_pAnim->ChangeAnim(kAnimAttackCharge);
+
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kYbutton;
+
+	m_updateFunc = &Player::AttackCharge;
+
 }
 
 void Player::OnHit()
 {
 	m_pAnim->ChangeAnim(kAnimJump);
-	m_updaFunc = &Player::HitUpdate;
+	m_updateFunc = &Player::HitUpdate;
 }
 
 void Player::OnDead()
 {
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
-	m_updaFunc = &Player::DeadUpdate;
+	m_updateFunc = &Player::DeadUpdate;
 }
 
 void Player::OnSpawn()
 {
 	m_pAnim->ChangeAnim(kAnimSpawn);
-	m_updaFunc = &Player::SpawnUpdate;
+	m_updateFunc = &Player::SpawnUpdate;
+}
+
+void Player::OnFaceUse()
+{
+	m_pAnim->ChangeAnim(kAnimUseFace);
+	m_updateFunc = &Player::FaceUseUpdate;
 }
 
 void Player::FaceSelect()
@@ -786,13 +1123,6 @@ void Player::FaceSelect()
 			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) - 1);
 		}
 	}
-
-	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(PAD_INPUT_9))
-	{
-		m_isFaceUse = !m_isFaceUse;
-	}
-
 }
 
 void Player::CameraUpdate()

@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "DxLib.h"
 #include "util/Vec2.h"
-#include <memory>
 
 class Player;
 
@@ -16,10 +15,12 @@ public:
 	void Draw(Player& player);
 
 private:
-
-	int m_hpHandle;
-	int m_hpLostHandle;
 	
+	//顔のハンドル
+	int m_PowerFaceHandle;
+	int m_SpeedFaceHandle;
+	int m_ShotFaceHandle;
+	int m_RastFaceHandle;
 
 };
 
