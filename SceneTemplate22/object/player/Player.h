@@ -132,13 +132,17 @@ private:
 	void JumpUpdate();
 	void AirUpdate();
 	void AttackCharge();
-	void AttackXUpdate();
+	void AttackXUpdate_First();
+	void AttackXUpdate_Second();
+	void AttackXUpdate_Third();
+	void AttackXUpdate_Fourth();
 	void AttackYUpdate();
 	void HitUpdate();
 	void DeadUpdate();
 	void SpawnUpdate();
 
 	void FaceUseUpdate();
+	void TalkUpdate();
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
@@ -147,13 +151,17 @@ private:
 	void OnJump();
 	void OnAir();
 	void OnAttackCharge();
-	void OnAttackX();
+	void OnAttackX_First();
+	void OnAttackX_Second();
+	void OnAttackX_Third();
+	void OnAttackX_Fourth();
 	void OnAttackY();
 	void OnHit();
 	void OnDead();
 	void OnSpawn();
 
 	void OnFaceUse();
+	void OnTalk();
 
 	//武器を描画するだけの関数
 	void WeaponDraw();
@@ -164,6 +172,9 @@ private:
 	void FaceSelect();
 
 	void CameraUpdate();
+
+	//タイプによってアニメーションを分ける関数
+	void AnimChange(const char* normal, const char* power, const char* speed, const char* shot);
 
 private:
 
@@ -187,7 +198,7 @@ private:
 	int m_weaponH;
 
 	int m_frame;
-	int m_chargeFrame = 0;
+	int m_chargeTime;
 
 	//プレイヤの座標
 	//	VECTOR m_posDown;
@@ -221,7 +232,14 @@ private:
 	int m_analogX;
 	int m_analogZ;
 
-	
+	//続けて攻撃するかどうか
+	bool m_isAttackFirst;
+	bool m_isAttackSecond;
+	bool m_isAttackThird;
+	bool m_isAttackFourth;
+	//次攻撃するまでの時間
+	int m_actionTime;
+
 
 	float m_speed;
 

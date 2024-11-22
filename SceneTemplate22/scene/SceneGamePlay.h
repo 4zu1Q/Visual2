@@ -49,10 +49,10 @@ private:
 	//std::shared_ptr<GamePlayUi> m_pGamePlayUi;
 
 
-	std::shared_ptr<HpBar> m_pHpBar;
+	std::shared_ptr<HpBar> m_pHpBarUi;
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
 	std::shared_ptr<FaceUi> m_pFaceUi;
-	std::shared_ptr<ButtonUi> m_pButton;
+	std::shared_ptr<ButtonUi> m_pButtonUi;
 
 
 	std::shared_ptr<SkyDome> m_pSkyDome;

@@ -42,10 +42,10 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 {
 	m_pPlayer = std::make_shared<Player>();
 
-	m_pHpBar = std::make_shared<HpBar>();
+	m_pHpBarUi = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
-	m_pButton = std::make_shared<ButtonUi>();
+	m_pButtonUi = std::make_shared<ButtonUi>();
 
 
 	m_pBoss = std::make_shared<BossPower>();
@@ -132,7 +132,7 @@ void SceneGamePlay::Update()
 
 	m_pFaceUi->Update();
 
-	m_pHpBar->Update(*m_pPlayer);
+	m_pHpBarUi->Update(*m_pPlayer);
 
 }
 
@@ -146,8 +146,8 @@ void SceneGamePlay::Draw()
 	m_pField->Draw();
 	m_pSkyDome->Draw();
 
-	m_pHpBar->Draw();
-	m_pButton->Draw(*m_pPlayer);
+	m_pHpBarUi->Draw();
+	m_pButtonUi->Draw(*m_pPlayer);
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pPlayer->Draw();

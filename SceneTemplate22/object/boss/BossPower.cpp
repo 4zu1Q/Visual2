@@ -26,8 +26,8 @@ namespace
 	/*プレイヤーのアニメーションの種類*/
 	const char* const kAnimInfoFilename = "Data/Master/AnimBossPowerMaster.csv";
 
-	const char* const kNormalAnimIdle = "Idle";
-	const char* const kNormalAnimWalk = "Walk";
+	const char* const kAnimNormalIdle = "Idle";
+	const char* const kAnimNormalWalk = "Walk";
 	const char* const kAnimNormalDash = "Dash";
 
 	const char* const kAnimAttack1 = "Attack1";
@@ -99,7 +99,7 @@ void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
 	//アニメーションの初期化
-	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kNormalAnimIdle);
+	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimNormalIdle);
 
 	// メンバ関数ポインタの初期化
 	m_updaFunc = &BossPower::IdleUpdate;
@@ -258,13 +258,13 @@ void BossPower::DeadUpdate()
 
 void BossPower::OnIdle()
 {
-	m_pAnim->ChangeAnim(kNormalAnimIdle);
+	m_pAnim->ChangeAnim(kAnimNormalIdle);
 	m_updaFunc = &BossPower::IdleUpdate;
 }
 
 void BossPower::OnWalk()
 {
-	m_pAnim->ChangeAnim(kNormalAnimWalk);
+	m_pAnim->ChangeAnim(kAnimNormalWalk);
 	m_updaFunc = &BossPower::WalkUpdate;
 }
 

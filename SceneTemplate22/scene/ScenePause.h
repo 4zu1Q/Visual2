@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 
+#include "util/Vec2.h"
+
 class ScenePause :
 	public SceneBase
 {
@@ -28,6 +30,9 @@ private:
 		kOption,	//オプション
 		kSelect,	//セレクト
 	};
+
+	//画像ハンドル
+	int m_pauseHandle;
 
 	e_SceneTrans m_sceneTrans;
 };

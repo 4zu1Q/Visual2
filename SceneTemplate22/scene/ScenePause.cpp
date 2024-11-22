@@ -14,12 +14,18 @@ namespace
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
 
+	const char* const kPauseFilename = "Data/Image/Pause.png";
+	const Vec2 kPausePos = { 0.0f , 0.0f };
+
+
+
 	//ポーズの背景アルファ値
 	constexpr int kAlpha = 200;
 }
 
 ScenePause::ScenePause(SceneManager& manager) :
-	SceneBase(manager)
+	SceneBase(manager),
+	m_pauseHandle(LoadGraph(kPauseFilename))
 {
 	m_sceneTrans = e_SceneTrans::kRestart;
 	FadeInSkip();
@@ -104,13 +110,14 @@ void ScenePause::Draw()
 {
 	//DrawBlackFade();
 
-#ifdef _DEBUG
-
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-	DrawBox(0, 0, Game::kScreenWidthHalf, Game::kScreenHeightHalf, 0xffffff, false);
+#ifdef _DEBUG
+
+
+
 
 
 	DrawString(0, 0, "Scene Pause", 0xffffff, false);
@@ -122,6 +129,8 @@ void ScenePause::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 
 #endif
+
+	DrawGraph(kPausePos.x, kPausePos.y, m_pauseHandle, true);
 
 	DrawFade(0x000000);
 

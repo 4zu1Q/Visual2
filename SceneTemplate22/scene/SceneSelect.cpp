@@ -20,6 +20,8 @@
 
 #include "ui/HpBar.h"
 #include "ui/FaceUi.h"
+#include "ui/FaceFrameUi.h"
+#include "ui/ButtonUi.h"
 
 #include "util/Pad.h"
 
@@ -46,8 +48,11 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 
 	m_pPlayer = std::make_shared<Player>();
 	m_pCamera = std::make_shared<Camera>();
-	m_pHpBar = std::make_shared<HpBar>();
+
+	m_pHpBarUi = std::make_shared<HpBar>();
 	m_pFaceUi = std::make_shared<FaceUi>();
+	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
+	m_pButtonUi = std::make_shared<ButtonUi>();
 
 	m_pField = std::make_shared<Field>();
 	m_pSkyDome = std::make_shared<SkyDome>();
@@ -132,7 +137,7 @@ void SceneSelect::Update()
 	m_pPhysics->Update();
 
 	m_pFaceUi->Update();
-	m_pHpBar->Update(*m_pPlayer);
+	m_pHpBarUi->Update(*m_pPlayer);
 
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
@@ -158,8 +163,10 @@ void SceneSelect::Draw()
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
 
+	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);
-	m_pHpBar->Draw();
+	m_pButtonUi->Draw(*m_pPlayer);
+	m_pHpBarUi->Draw();
 
 
 #ifdef _DEBUG

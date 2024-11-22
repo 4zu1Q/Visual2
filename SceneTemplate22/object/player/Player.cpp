@@ -54,43 +54,82 @@ namespace
 	/*プレイヤーのアニメーションの種類*/
 	const char* const kAnimInfoFilename = "Data/Master/AnimPlayerMaster.csv";
 
+	//スポーン
 	const char* const kAnimSpawn = "Spawn";
 
-	const char* const kNormalAnimIdle = "Idle";
-	const char* const kPowerAnimIdle = "PowerIdle";
-	const char* const kSpeedAnimIdle = "SpeedIdle";
+	//アイドル状態
+	const char* const kAnimNormalIdle = "Idle";
+	const char* const kAnimPowerIdle = "PowerIdle";
+	const char* const kAnimSpeedIdle = "SpeedIdle";
 
-	const char* const kNormalAnimWalk = "Walk";
-	const char* const kPowerAnimWalk = "PowerWalk";
-	const char* const kSpeedAnimWalk = "SpeedWalk";
+	//歩き状態
+	const char* const kAnimNormalWalk = "Walk";
+	const char* const kAnimPowerWalk = "PowerWalk";
+	const char* const kAnimSpeedWalk = "SpeedWalk";
 
+	//ダッシュ状態
 	const char* const kAnimNormalDash = "NormalDash";
 	const char* const kAnimPowerDash = "PowerDash";
 	const char* const kAnimSpeedDash = "SpeedDash";
 
+	//Y攻撃をするためのチャージアニメーション
 	const char* const kAnimAttackCharge = "AttackCharge";
+	const char* const kAnimShotAttackCharge = "ShotAttackCharge";
 
-	const char* const kAnimNormalAttackX = "NormalAttackX";
+	//通常時の攻撃アニメーション
+	const char* const kAnimNormalAttackX_First = "NormalAttackX_First";
+	const char* const kAnimNormalAttackX_Second = "NormalAttackX_Second";
+	const char* const kAnimNormalAttackX_Third = "NormalAttackX_Third";
+	const char* const kAnimNormalAttackX_Fourth = "NormalAttackX_Fourth";
+
 	const char* const kAnimNormalAttackY = "NormalAttackY";
 
-	const char* const kAnimPowerAttackX = "PowerAttackX";
+	//パワー型の攻撃アニメーション
+	const char* const kAnimPowerAttackX_First = "PowerAttackX_First";
+	const char* const kAnimPowerAttackX_Second = "PowerAttackX_Second";
+	const char* const kAnimPowerAttackX_Third = "PowerAttackX_Third";
+	const char* const kAnimPowerAttackX_Fourth = "PowerAttackX_Fourth";
+
 	const char* const kAnimPowerAttackY = "PowerAttackY";
 
-	const char* const kAnimSpeedAttackX = "SpeedAttackX";
+	//スピード型の攻撃アニメーション
+	const char* const kAnimSpeedAttackX_First = "SpeedAttackX_First";
+	const char* const kAnimSpeedAttackX_Second = "SpeedAttackX_Second";
+	const char* const kAnimSpeedAttackX_Third = "SpeedAttackX_Third";
+	const char* const kAnimSpeedAttackX_Fourth = "SpeedAttackX_Fourth";
+
 	const char* const kAnimSpeedAttackY = "SpeedAttackY";
 
-	const char* const kAnimShotAttackX = "ShotAttackX";
+	//ショット型の攻撃アニメーション
+	const char* const kAnimShotAttackX_First = "ShotAttackX_First";
+	const char* const kAnimShotAttackX_Second = "ShotAttackX_Second";
+	const char* const kAnimShotAttackX_Third = "ShotAttackX_Third";
+	const char* const kAnimShotAttackX_Fourth = "ShotAttackX_Fourth";
+
 	const char* const kAnimShotAttackY = "ShotAttackY";
 
+	//ジャンプアニメーション
 	const char* const kAnimJump = "Jump";
 	const char* const kAnimAir = "Jumping";
 
+	//ダメージとダウンアニメーション
 	const char* const kAnimHit = "Hit";
-
 	const char* const kAnimDead = "Down";
 
+	//顔の使用アニメーション
 	const char* const kAnimUseFace = "UseFace";
 
+
+	//パッドのボタン情報
+	constexpr int kPadButtonA = 0x00000010;
+	constexpr int kPadButtonB = 0x00000020;
+	constexpr int kPadButtonX = 0x00000040;
+	constexpr int kPadButtonY = 0x00000080;
+
+	constexpr int kPadButtonRB = 0x00000200;
+	constexpr int kPadButtonLB = 0x00000100;
+
+	constexpr int kPadButtonLStick = 0x00001000;
 
 }
 
@@ -112,10 +151,14 @@ Player::Player() :
 	m_rate(0.0f),
 	m_isDead(false),
 	m_frame(0),
-	m_isMove(false)
+	m_isMove(false),
+	m_isAttackFirst(false),
+	m_isAttackSecond(false),
+	m_isAttackThird(false),
+	m_isAttackFourth(false),
+	m_actionTime(0),
+	m_chargeTime(0)
 {
-
-
 
 #ifdef _DEBUG
 	m_isPowerFace = true;
@@ -189,7 +232,7 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos)
 	m_pWeapon->Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
 
 	//アニメーションの初期化
-	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kNormalAnimIdle);
+	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimNormalIdle);
 
 
 	// メンバ関数ポインタの初期化
@@ -221,6 +264,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	m_pWeapon->LongSwordUpdate();
 	
 	//SetCameraAngle(m_pCamera->GetAngle());
+
 
 
 	//アニメーションの更新処理
@@ -315,6 +359,9 @@ void Player::SetPosDown(const VECTOR pos)
 void Player::IdleUpdate()
 {
 
+	
+	m_actionTime = 0;
+
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR input = VGet(m_analogX, 0.0f, -m_analogZ);
 
@@ -324,24 +371,25 @@ void Player::IdleUpdate()
 		return;
 	}
 
-	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
+	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
 	{
 		OnJump();
 		return;
 	}
 
-	if (Pad::IsTrigger(PAD_INPUT_3))
+	if (Pad::IsTrigger(kPadButtonX))
 	{
-		OnAttackX();
+		OnAttackX_First();
 		return;
 	}
 
-	if (Pad::IsPress(PAD_INPUT_4))
+	if (Pad::IsPress(kPadButtonY))
 	{
 		//OnAttackY();
 		OnAttackCharge();
 		return;
 	}
+
 
 	//攻撃Y
 	//if (Pad::IsPress(PAD_INPUT_4) && !m_isFaceUse)
@@ -368,7 +416,7 @@ void Player::IdleUpdate()
 
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(PAD_INPUT_9))
+	if (Pad::IsTrigger(kPadButtonLStick))
 	{
 		OnFaceUse();
 		return;
@@ -448,14 +496,14 @@ void Player::WalkUpdate()
 	}
 
 	//攻撃X
-	if (Pad::IsTrigger(PAD_INPUT_3))
+	if (Pad::IsTrigger(kPadButtonX))
 	{
-		OnAttackX();
+		OnAttackX_First();
 		return;
 	}
 
 	//攻撃Y
-	if (Pad::IsPress(PAD_INPUT_4))
+	if (Pad::IsPress(kPadButtonY))
 	{
 		//OnAttackY();
 		OnAttackCharge();
@@ -485,21 +533,21 @@ void Player::WalkUpdate()
 	//}
 
 	//ダッシュ
-	if (Pad::IsPress(PAD_INPUT_1))
+	if (Pad::IsPress(kPadButtonA))
 	{
 		OnDash();
 		return;
 	}
 
 	//ジャンプ
-	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
+	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
 	{
 		OnJump();
 		return;
 	}
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(PAD_INPUT_9))
+	if (Pad::IsTrigger(kPadButtonLStick))
 	{
 		OnFaceUse();
 		return;
@@ -587,7 +635,7 @@ void Player::DashUpdate()
 	}
 
 	//歩き
-	if (Pad::IsRelase(PAD_INPUT_1) || VSquareSize(move) == 0.0f)
+	if (Pad::IsRelase(kPadButtonA) || VSquareSize(move) == 0.0f)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
@@ -595,15 +643,15 @@ void Player::DashUpdate()
 	}
 
 	//攻撃X
-	if (Pad::IsTrigger(PAD_INPUT_3))
+	if (Pad::IsTrigger(kPadButtonX))
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
-		OnAttackX();
+		OnAttackX_First();
 	}
 
 	//攻撃Y
-	if (Pad::IsPress(PAD_INPUT_4))
+	if (Pad::IsPress(kPadButtonY))
 	{
 		//OnAttackY();
 		OnAttackCharge();
@@ -634,7 +682,7 @@ void Player::DashUpdate()
 	//}
 
 	//ジャンプ
-	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
+	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
@@ -642,7 +690,7 @@ void Player::DashUpdate()
 	}
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(PAD_INPUT_9))
+	if (Pad::IsTrigger(kPadButtonLStick))
 	{
 		OnFaceUse();
 		return;
@@ -697,7 +745,7 @@ void Player::JumpUpdate()
 		m_avoid = VNorm(move);
 	}
 
-	if (Pad::IsTrigger(PAD_INPUT_2) && !m_isJump)
+	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
 	{
 		OnJump();
 	}
@@ -713,7 +761,7 @@ void Player::AirUpdate()
 
 
 
-	if (m_frame > 30)
+	if (m_frame > 6)
 	{
 		m_frame = 0;
 		m_isJump = false;
@@ -761,23 +809,146 @@ void Player::AirUpdate()
 
 void Player::AttackCharge()
 {
-	m_chargeFrame++;
+	m_chargeTime++;
+
+	if (m_chargeTime > 60)
+	{
+		//エフェクトを入れてチャージされたかを確認できるようにする
+		//後音も入れる
+	}
 
 	//Yボタンを離した場合
-	if (Pad::IsRelase(PAD_INPUT_4) && m_chargeFrame > 60)
+	if (Pad::IsRelase(kPadButtonY) && m_chargeTime > 60)
 	{
-		m_chargeFrame = 0;
+		m_chargeTime = 0;
 		OnAttackY();
 	}
-	else if(Pad::IsRelase(PAD_INPUT_4) && m_chargeFrame < 60)
+	else if(Pad::IsRelase(kPadButtonY) && m_chargeTime < 60)
 	{
-		m_chargeFrame = 0;
+		m_chargeTime = 0;
 		OnIdle();
 	}
 }
 
-void Player::AttackXUpdate()
+void Player::AttackXUpdate_First()
 {
+	//m_actionTime++;
+
+	//アニメーションが終わったら待機状態に遷移
+	if (m_pAnim->IsLoop())
+	{
+		//ループの間にボタンを押した場合
+		if (Pad::IsTrigger(kPadButtonX))
+		{
+			m_isAttackFirst = true;
+
+		}
+
+		//OnIdle();
+	}
+
+	if (m_pAnim->IsLoop() && m_isAttackFirst)
+	{
+		OnAttackX_Second();
+	}
+	else
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnIdle();
+	}
+
+	//if (m_actionTime < 10 && m_isAttackAction == true)
+	//{
+	//	m_actionTime = 0;
+	//	m_isAttackAction = false;
+	//	OnAttackX_Second();
+	//}
+	//else if (m_actionTime > 10 || m_isAttackAction == false)
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	m_actionTime = 0;
+	//	OnIdle();
+	//}
+
+}
+
+void Player::AttackXUpdate_Second()
+{
+	m_isAttackFirst = false;
+
+	//アニメーションが終わったら待機状態に遷移
+	if (m_pAnim->IsLoop())
+	{
+
+		//ループの間にボタンを押した場合
+		if (Pad::IsTrigger(kPadButtonX))
+		{
+			m_isAttackSecond = true;
+		}
+
+		//m_isButtonPush = false;
+		//m_buttonKind = e_ButtonKind::kNone;
+		//OnIdle();
+
+		//m_isButtonPush = false;
+		//m_buttonKind = e_ButtonKind::kNone;
+		//OnAttackX_Third();
+	}
+
+
+	if (m_pAnim->IsLoop() && m_isAttackSecond)
+	{
+		OnAttackX_Third();
+	}
+	else
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnIdle();
+	}
+
+}
+
+void Player::AttackXUpdate_Third()
+{
+	m_isAttackSecond = false;
+
+	//アニメーションが終わったら待機状態に遷移
+	if (m_pAnim->IsLoop())
+	{
+		//ループの間にボタンを押した場合
+		if (Pad::IsTrigger(kPadButtonX))
+		{
+			m_isAttackThird = true;
+
+		}
+
+		//m_isButtonPush = false;
+		//m_buttonKind = e_ButtonKind::kNone;
+		//OnIdle();
+
+		//m_isButtonPush = false;
+		//m_buttonKind = e_ButtonKind::kNone;
+		//OnAttackX_Fourth();
+	}
+
+	if (m_pAnim->IsLoop() && m_isAttackThird)
+	{
+		OnAttackX_Fourth();
+	}
+	else
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnIdle();
+	}
+}
+
+void Player::AttackXUpdate_Fourth()
+{
+	m_isAttackThird = false;
 
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
@@ -786,7 +957,6 @@ void Player::AttackXUpdate()
 		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
 	}
-
 }
 
 void Player::AttackYUpdate()
@@ -837,6 +1007,12 @@ void Player::FaceUseUpdate()
 	}
 }
 
+void Player::TalkUpdate()
+{
+	//会話するときの処理を入れる
+
+}
+
 void Player::WeaponDraw()
 {
 	//顔を付けている場合
@@ -873,84 +1049,25 @@ void Player::OnIdle()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	//プレイヤーのタイプでダッシュアニメーションを変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kPowerAnimIdle);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kSpeedAnimIdle);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kNormalAnimIdle);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kNormalAnimIdle);
-	}
-
-	if (!m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kNormalAnimIdle);
-	}
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimNormalIdle, kAnimPowerIdle, kAnimSpeedIdle, kAnimNormalIdle);
 
 	m_updateFunc = &Player::IdleUpdate;
 }
 
 void Player::OnWalk()
 {
-	//プレイヤーのタイプでダッシュアニメーションを変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kPowerAnimWalk);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kSpeedAnimWalk);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kNormalAnimWalk);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kNormalAnimWalk);
-	}
-
-	if (!m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kNormalAnimWalk);
-	}
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimNormalWalk, kAnimPowerWalk, kAnimSpeedWalk, kAnimNormalWalk);
 
 	m_updateFunc = &Player::WalkUpdate;
 }
 
 void Player::OnDash()
 {
-	//プレイヤーのタイプでダッシュアニメーションを変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimPowerDash);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimSpeedDash);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimNormalDash);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimNormalDash);
-	}
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimNormalDash, kAnimPowerDash, kAnimSpeedDash, kAnimNormalDash);
 
-	if (!m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimNormalDash);
-	}
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kAbutton;
@@ -958,66 +1075,62 @@ void Player::OnDash()
 }
 
 
-void Player::OnAttackX()
+void Player::OnAttackX_First()
 {
-	m_hp -= 1;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	//プレイヤーのタイプで攻撃Xアニメーションを変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimPowerAttackX, true, true, true);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimSpeedAttackX, true, true, true);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimShotAttackX, true, true, true);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimNormalAttackX, true, true, true);
-	}
-	
-	if (!m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimNormalAttackX, true, true, true);
-	}
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimNormalAttackX_First, kAnimPowerAttackX_First, kAnimSpeedAttackX_First, kAnimShotAttackX_First);
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kXbutton;
 
-	m_updateFunc = &Player::AttackXUpdate;
+	m_updateFunc = &Player::AttackXUpdate_First;
+}
+
+void Player::OnAttackX_Second()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimNormalAttackX_Second, kAnimPowerAttackX_Second, kAnimSpeedAttackX_Second, kAnimShotAttackX_Second);
+
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kXbutton;
+	m_updateFunc = &Player::AttackXUpdate_Second;
+}
+
+void Player::OnAttackX_Third()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimNormalAttackX_Third, kAnimPowerAttackX_Third, kAnimSpeedAttackX_Third, kAnimShotAttackX_Third);
+
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kXbutton;
+	m_updateFunc = &Player::AttackXUpdate_Third;
+}
+
+void Player::OnAttackX_Fourth()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimNormalAttackX_Fourth, kAnimPowerAttackX_Fourth, kAnimSpeedAttackX_Fourth, kAnimShotAttackX_Fourth);
+
+
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kXbutton;
+	m_updateFunc = &Player::AttackXUpdate_Fourth;
 }
 
 void Player::OnAttackY()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	//プレイヤーのタイプで攻撃Yアニメーションを変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimPowerAttackY, true, true, true);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimSpeedAttackY, true, true, true);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimShotAttackY, true, true, true);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimNormalAttackY, true, true, true);
-	}
-
-	if (!m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(kAnimNormalAttackY, true, true, true);
-	}
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimNormalAttackY, kAnimPowerAttackY, kAnimSpeedAttackY, kAnimShotAttackY);
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
@@ -1073,7 +1186,9 @@ void Player::OnAir()
 void Player::OnAttackCharge()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_pAnim->ChangeAnim(kAnimAttackCharge);
+
+	//タイプによってアニメーションを変える
+	AnimChange(kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge, kAnimShotAttackCharge);
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
@@ -1106,17 +1221,24 @@ void Player::OnFaceUse()
 	m_updateFunc = &Player::FaceUseUpdate;
 }
 
+void Player::OnTalk()
+{
+	m_pAnim->ChangeAnim(kAnimNormalIdle);
+	m_updateFunc = &Player::TalkUpdate;
+}
+
 void Player::FaceSelect()
 {
 	//顔を選択
-	if (Pad::IsTrigger(PAD_INPUT_6) && !m_isFaceUse)
+	if (Pad::IsTrigger(kPadButtonRB) && !m_isFaceUse)
 	{
 		if (m_playerKind != e_PlayerKind::kStrongestPlayer)
 		{
 			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) + 1);
 		}
 	}
-	if (Pad::IsTrigger(PAD_INPUT_5) && !m_isFaceUse)
+	//顔を選択
+	if (Pad::IsTrigger(kPadButtonLB) && !m_isFaceUse)
 	{
 		if (m_playerKind != e_PlayerKind::kPowerPlayer)
 		{
@@ -1128,5 +1250,31 @@ void Player::FaceSelect()
 void Player::CameraUpdate()
 {
 	//カメラ更新
+}
+
+void Player::AnimChange(const char* normal, const char* power, const char* speed, const char* shot)
+{
+	//プレイヤーのタイプでアニメーションを変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(power);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(speed);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(shot);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(normal);
+	}
+
+	if (!m_isFaceUse)
+	{
+		m_pAnim->ChangeAnim(normal);
+	}
 }
 

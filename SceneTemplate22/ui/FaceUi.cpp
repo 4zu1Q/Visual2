@@ -11,7 +11,7 @@ namespace
 	const char* const kRastFaceFileName = "Data/Image/Face04.png";
 
 	//顔の座標
-	const Vec2 kFacePos = { 1130.0f , 40.0f };
+	const Vec2 kFacePos = { 1128.0f , 40.0f };
 
 }
 
