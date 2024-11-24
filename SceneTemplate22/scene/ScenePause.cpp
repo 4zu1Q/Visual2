@@ -111,7 +111,7 @@ void ScenePause::Draw()
 	//DrawBlackFade();
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00bfff, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 #ifdef _DEBUG
