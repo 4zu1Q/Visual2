@@ -234,7 +234,6 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos)
 	//アニメーションの初期化
 	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimNormalIdle);
 
-
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &Player::IdleUpdate;
 
@@ -264,8 +263,6 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	m_pWeapon->LongSwordUpdate();
 	
 	//SetCameraAngle(m_pCamera->GetAngle());
-
-
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
@@ -477,8 +474,6 @@ void Player::WalkUpdate()
 		////移動ベクトルとカメラ角度行列を乗算
 		//move = VTransform(move, playerRotMtx);
 
-
-
 		move.y = m_rigidbody.GetVelocity().y;
 		m_rigidbody.SetVelocity(move);
 
@@ -487,6 +482,7 @@ void Player::WalkUpdate()
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
 		m_attackDir = VNorm(move);
 		m_avoid = VNorm(move);
+
 	}
 	//動かなかったらアイドル状態へ
 	else
@@ -759,8 +755,6 @@ void Player::AirUpdate()
 
 	m_frame++;
 
-
-
 	if (m_frame > 6)
 	{
 		m_frame = 0;
@@ -832,31 +826,31 @@ void Player::AttackCharge()
 
 void Player::AttackXUpdate_First()
 {
-	//m_actionTime++;
 
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
 		//ループの間にボタンを押した場合
-		if (Pad::IsTrigger(kPadButtonX))
-		{
-			m_isAttackFirst = true;
+		//if (Pad::IsTrigger(kPadButtonX))
+		//{
+		//	m_isAttackFirst = true;
 
-		}
+		//}
 
-		//OnIdle();
-	}
-
-	if (m_pAnim->IsLoop() && m_isAttackFirst)
-	{
-		OnAttackX_Second();
-	}
-	else
-	{
-		m_isButtonPush = false;
-		m_buttonKind = e_ButtonKind::kNone;
+		//OnAttackX_Second();
 		OnIdle();
 	}
+
+	//if (m_pAnim->IsLoop() && m_isAttackFirst)
+	//{
+	//	OnAttackX_Second();
+	//}
+	//else
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnIdle();
+	//}
 
 	//if (m_actionTime < 10 && m_isAttackAction == true)
 	//{
@@ -882,32 +876,33 @@ void Player::AttackXUpdate_Second()
 	if (m_pAnim->IsLoop())
 	{
 
-		//ループの間にボタンを押した場合
-		if (Pad::IsTrigger(kPadButtonX))
-		{
-			m_isAttackSecond = true;
-		}
+		////ループの間にボタンを押した場合
+		//if (Pad::IsTrigger(kPadButtonX))
+		//{
+		//	m_isAttackSecond = true;
+		//}
 
 		//m_isButtonPush = false;
 		//m_buttonKind = e_ButtonKind::kNone;
 		//OnIdle();
 
-		//m_isButtonPush = false;
-		//m_buttonKind = e_ButtonKind::kNone;
-		//OnAttackX_Third();
-	}
-
-
-	if (m_pAnim->IsLoop() && m_isAttackSecond)
-	{
-		OnAttackX_Third();
-	}
-	else
-	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
-		OnIdle();
+
+		OnAttackX_Third();
 	}
+
+
+	//if (m_pAnim->IsLoop() && m_isAttackSecond)
+	//{
+	//	OnAttackX_Third();
+	//}
+	//else
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnIdle();
+	//}
 
 }
 
@@ -919,31 +914,31 @@ void Player::AttackXUpdate_Third()
 	if (m_pAnim->IsLoop())
 	{
 		//ループの間にボタンを押した場合
-		if (Pad::IsTrigger(kPadButtonX))
-		{
-			m_isAttackThird = true;
+		//if (Pad::IsTrigger(kPadButtonX))
+		//{
+		//	m_isAttackThird = true;
 
-		}
+		//}
 
 		//m_isButtonPush = false;
 		//m_buttonKind = e_ButtonKind::kNone;
 		//OnIdle();
 
-		//m_isButtonPush = false;
-		//m_buttonKind = e_ButtonKind::kNone;
-		//OnAttackX_Fourth();
-	}
-
-	if (m_pAnim->IsLoop() && m_isAttackThird)
-	{
-		OnAttackX_Fourth();
-	}
-	else
-	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
-		OnIdle();
+		OnAttackX_Fourth();
 	}
+
+	//if (m_pAnim->IsLoop() && m_isAttackThird)
+	//{
+	//	OnAttackX_Fourth();
+	//}
+	//else
+	//{
+	//	m_isButtonPush = false;
+	//	m_buttonKind = e_ButtonKind::kNone;
+	//	OnIdle();
+	//}
 }
 
 void Player::AttackXUpdate_Fourth()
@@ -961,13 +956,16 @@ void Player::AttackXUpdate_Fourth()
 
 void Player::AttackYUpdate()
 {
+
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
+
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
 	}
+
 }
 
 void Player::HitUpdate()

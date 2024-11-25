@@ -61,18 +61,18 @@ BossPower::BossPower():
 
 	m_pPlayer = std::make_shared<Player>();
 
-	//m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
+	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
-	////auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
-	//auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
-	//circleColliderData->m_radius = 5.0f;
-
-	m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
-
-	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataCapsule>(m_pColliderData);
+	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
+	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 5.0f;
-	circleColliderData->m_posDown = VGet(0.0f, 0.0f, 0.0f);
-	circleColliderData->m_posUp = VGet(0.0f, 0.0f, 0.0f);
+
+	//m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
+
+	//auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataCapsule>(m_pColliderData);
+	//circleColliderData->m_radius = 5.0f;
+	//circleColliderData->m_posDown = VGet(0.0f, 0.0f, 0.0f);
+	//circleColliderData->m_posUp = VGet(0.0f, 0.0f, 0.0f);
 	
 
 }

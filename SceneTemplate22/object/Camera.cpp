@@ -121,7 +121,6 @@ void Camera::Initialize()
 	m_cameraAngleX = 0.0f;
 	m_cameraAngleY = 12.0f;
 	SetCameraNearFar(kCameraNear, kCameraFar);
-
 }
 
 void Camera::Finalize()
