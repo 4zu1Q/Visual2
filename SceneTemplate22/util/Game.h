@@ -39,6 +39,7 @@ namespace Game
 	{
 		kPowerStage,		//パワーステージ
 		kSpeedStage,		//スピードステージ
+		kShotStage,			//ショットステージ
 		kRastStage,			//ラスボスステージ
 	};
 

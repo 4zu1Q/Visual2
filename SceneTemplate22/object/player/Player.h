@@ -9,7 +9,8 @@ class PlayerWeapon;
 class Collidable;
 class AnimController;
 class Camera;
-//class ButtonUi;
+
+class WeaponBase;
 
 class Player : public CharaBase
 {
@@ -132,10 +133,7 @@ private:
 	void JumpUpdate();
 	void AirUpdate();
 	void AttackCharge();
-	void AttackXUpdate_First();
-	void AttackXUpdate_Second();
-	void AttackXUpdate_Third();
-	void AttackXUpdate_Fourth();
+	void AttackXUpdate();
 	void AttackYUpdate();
 	void HitUpdate();
 	void DeadUpdate();
@@ -151,10 +149,7 @@ private:
 	void OnJump();
 	void OnAir();
 	void OnAttackCharge();
-	void OnAttackX_First();
-	void OnAttackX_Second();
-	void OnAttackX_Third();
-	void OnAttackX_Fourth();
+	void OnAttackX();
 	void OnAttackY();
 	void OnHit();
 	void OnDead();
@@ -180,6 +175,7 @@ private:
 
 	//スマートポインタ
 	std::shared_ptr<PlayerWeapon> m_pWeapon;
+	std::shared_ptr<WeaponBase> m_pWeaponBase;
 	std::shared_ptr<AnimController> m_pAnim;
 	//std::shared_ptr<Camera> m_pCamera;
 
@@ -233,13 +229,13 @@ private:
 	int m_analogZ;
 
 	//続けて攻撃するかどうか
-	bool m_isAttackFirst;
-	bool m_isAttackSecond;
-	bool m_isAttackThird;
-	bool m_isAttackFourth;
+	int m_multiAttack;
+	bool m_isNextAttackFlag;
+
 	//次攻撃するまでの時間
 	int m_actionTime;
 
+	float m_jumpPower;
 
 	float m_speed;
 

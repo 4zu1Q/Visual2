@@ -42,7 +42,7 @@ public:
 	/// <summary>
 	/// 現在流れているアニメーションが一度でもループしているか
 	/// </summary>
-	/// <returns>true:ループしている / false:している</returns>
+	/// <returns>true:ループしている / false:ループしていない</returns>
 	bool IsLoop() const { return m_isLoop; }
 
 private:

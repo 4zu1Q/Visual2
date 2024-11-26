@@ -1,5 +1,7 @@
 ﻿#include "Player.h"
 #include "PlayerWeapon.h"
+#include "object/weapon/WeaponBase.h"
+
 #include "object/Camera.h"
 
 #include "util/Pad.h"
@@ -16,8 +18,12 @@ namespace
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Player/Player.mv1";
 
+	const char* const kSwordModelFileName = "Data/Model/Weapon/Player_Sword.mv1";
+
+
 	//モデルのスケール値
 	constexpr float kModelScale = 5.0f;
+	constexpr float kWeaponScale = 1.0f;
 
 	//プレイヤーの手のフレーム番号
 	constexpr int kRightModelFrameNo = 14;
@@ -29,12 +35,20 @@ namespace
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
 	//移動速度
-	constexpr float kMaxSpeedN = 0.7f;
-	constexpr float kMinSpeedN = 0.5f;
+	constexpr float kNormalMinSpeed = 0.5f;
+	constexpr float kPowerMinSpeed = 0.3f;
+	constexpr float kSpeedMinSpeed = 0.7f;
+	constexpr float kShotMinSpeed = 0.4f;
+
+	constexpr float kNormalMaxSpeed = 0.7f;
+	constexpr float kPowerMaxSpeed = 0.5f;
+	constexpr float kSpeedMaxSpeed = 0.9f;
+	constexpr float kShotMaxSpeed = 0.6f;
+
 
 	//ダッシュスピード
 	constexpr float kNormalDashSpeed = 1.0f;
-	constexpr float kPowerDashSpeed = 0.4f;
+	constexpr float kPowerDashSpeed = 0.7f;
 	constexpr float kSpeedDashSpeed = 1.5f;
 	constexpr float kShotDashSpeed = 1.1f;
 	constexpr float kStrongestDashSpeed = 1.2f;
@@ -47,11 +61,10 @@ namespace
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
-
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
-	/*プレイヤーのアニメーションの種類*/
+	/*　プレイヤーのアニメーションの種類　*/
 	const char* const kAnimInfoFilename = "Data/Master/AnimPlayerMaster.csv";
 
 	//スポーン
@@ -134,7 +147,7 @@ namespace
 }
 
 Player::Player() :
-	CharaBase(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kCapsule, false),
+	CharaBase(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kSphere, false),
 	m_weaponH(-1),
 	m_radius(2),
 	m_posUp(kInitPos),
@@ -152,10 +165,8 @@ Player::Player() :
 	m_isDead(false),
 	m_frame(0),
 	m_isMove(false),
-	m_isAttackFirst(false),
-	m_isAttackSecond(false),
-	m_isAttackThird(false),
-	m_isAttackFourth(false),
+	m_multiAttack(0),
+	m_isNextAttackFlag(false),
 	m_actionTime(0),
 	m_chargeTime(0)
 {
@@ -180,6 +191,8 @@ Player::Player() :
 	m_modelH = MV1LoadModel(kModelFilename);
 	assert(m_modelH > -1);
 
+	m_weaponH = MV1LoadModel(kSwordModelFileName);
+
 	//マスク関連の初期化
 	m_isFaceUse = false;
 	m_playerKind = e_PlayerKind::kPowerPlayer;
@@ -192,6 +205,8 @@ Player::Player() :
 	m_pWeapon = std::make_shared<PlayerWeapon>();
 	m_pAnim = std::make_shared<AnimController>();
 
+	m_pWeaponBase = std::make_shared<WeaponBase>();
+	m_pWeaponBase->Initialize(m_weaponH, m_modelH, "handslot.r", "handslot.l", kWeaponScale);
 
 	//m_pCamera = std::make_shared<Camera>();
 
@@ -261,6 +276,8 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	m_pWeapon->DaggerUpdate();
 	m_pWeapon->MagicWandUpdate();
 	m_pWeapon->LongSwordUpdate();
+
+
 	
 	//SetCameraAngle(m_pCamera->GetAngle());
 
@@ -269,6 +286,8 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 
 	//カプセル用のポジション
 	auto pos = m_rigidbody.GetPos();
+
+
 
 	//m_pCamera->DebugUpdate(pos);
 
@@ -304,8 +323,9 @@ void Player::Draw()
 
 	//モデルの描画
 	MV1DrawModel(m_modelH);
-	MV1DrawModel(m_weaponH);
+	//MV1DrawModel(m_weaponH);
 
+	//m_pWeaponBase->Draw();
 
 #ifdef _DEBUG
 
@@ -354,9 +374,7 @@ void Player::SetPosDown(const VECTOR pos)
 }
 
 void Player::IdleUpdate()
-{
-
-	
+{	
 	m_actionTime = 0;
 
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
@@ -376,41 +394,40 @@ void Player::IdleUpdate()
 
 	if (Pad::IsTrigger(kPadButtonX))
 	{
-		OnAttackX_First();
+		OnAttackX();
 		return;
 	}
 
-	if (Pad::IsPress(kPadButtonY))
-	{
-		//OnAttackY();
-		OnAttackCharge();
-		return;
-	}
+	//if (Pad::IsPress(kPadButtonY))
+	//{
+	//	//OnAttackY();
+	//	OnAttackCharge();
+	//	return;
+	//}
 
 
 	//攻撃Y
-	//if (Pad::IsPress(PAD_INPUT_4) && !m_isFaceUse)
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	//OnAttackY();
-	//	OnAttackCharge();
-	//}
-	////攻撃Y(スピードタイプのみショートカット)
-	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnAttackCharge();
-	//}
-	////攻撃Y(スピードタイプのみショートカット)
-	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnAttackY();
-	//}
-
+	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		//OnAttackY();
+		OnAttackCharge();
+	}
+	//攻撃Y(スピードタイプ以外はチャージあり)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnAttackCharge();
+	}
+	//攻撃Y(スピードタイプのみショートカット)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnAttackY();
+	}
 
 	//顔を決定する	ここはZRで決定にする
 	if (Pad::IsTrigger(kPadButtonLStick))
@@ -452,16 +469,76 @@ void Player::WalkUpdate()
 		//速度が決定できるので移動ベクトルに反映する
 		move = VNorm(move);
 
-		//スティックの押し加減でプレイヤーのスピードを変える
-		if (rate <= 0.6f && rate > 0.0f);
+		if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 		{
-			float speed = kMinSpeedN * rate;
-			move = VScale(move, speed);
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				float speed = kPowerMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				float speed = kPowerMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
 		}
-		if (rate >= 0.6f)
+		if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 		{
-			float speed = kMaxSpeedN * rate;
-			move = VScale(move, speed);
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				float speed = kSpeedMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				float speed = kSpeedMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
+		}
+		if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+		{
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				float speed = kShotMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				float speed = kShotMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
+		}
+		if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+		{
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				float speed = kNormalMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				float speed = kNormalMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
+		}
+
+		if (!m_isFaceUse)
+		{
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				float speed = kNormalMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				float speed = kNormalMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
 		}
 
 		//カメラのいる場所(角度)から
@@ -494,39 +571,40 @@ void Player::WalkUpdate()
 	//攻撃X
 	if (Pad::IsTrigger(kPadButtonX))
 	{
-		OnAttackX_First();
+		OnAttackX();
 		return;
 	}
 
 	//攻撃Y
-	if (Pad::IsPress(kPadButtonY))
-	{
-		//OnAttackY();
-		OnAttackCharge();
-		return;
-	}
-
-	//if (Pad::IsPress(PAD_INPUT_4) && !m_isFaceUse)
+	//if (Pad::IsPress(kPadButtonY))
 	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
 	//	//OnAttackY();
 	//	OnAttackCharge();
+	//	return;
 	//}
-	////攻撃Y(スピードタイプのみショートカット)
-	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnAttackY();
-	//}
-	////攻撃Y(スピードタイプのみショートカット)
-	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnAttackY();
-	//}
+
+	//攻撃Y
+	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		//OnAttackY();
+		OnAttackCharge();
+	}
+	//攻撃Y(スピードタイプ以外はチャージあり)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnAttackCharge();
+	}
+	//攻撃Y(スピードタイプのみショートカット)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnAttackY();
+	}
 
 	//ダッシュ
 	if (Pad::IsPress(kPadButtonA))
@@ -643,39 +721,39 @@ void Player::DashUpdate()
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
-		OnAttackX_First();
+		OnAttackX();
 	}
 
-	//攻撃Y
-	if (Pad::IsPress(kPadButtonY))
-	{
-		//OnAttackY();
-		OnAttackCharge();
-		return;
-	}
-
-	//攻撃Y
-	//if (Pad::IsPress(PAD_INPUT_4) && !m_isFaceUse)
+	////攻撃Y
+	//if (Pad::IsPress(kPadButtonY))
 	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
 	//	//OnAttackY();
 	//	OnAttackCharge();
+	//	return;
 	//}
-	////攻撃Y(スピードタイプのみショートカット)
-	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnAttackY();
-	//}
-	////攻撃Y(スピードタイプのみショートカット)
-	//else if (Pad::IsPress(PAD_INPUT_4) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnAttackY();
-	//}
+
+	//攻撃Y
+	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		//OnAttackY();
+		OnAttackCharge();
+	}
+	//攻撃Y(スピードタイプ以外はチャージあり)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnAttackCharge();
+	}
+	//攻撃Y(スピードタイプのみショートカット)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnAttackY();
+	}
 
 	//ジャンプ
 	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
@@ -759,7 +837,6 @@ void Player::AirUpdate()
 	{
 		m_frame = 0;
 		m_isJump = false;
-
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
@@ -824,11 +901,18 @@ void Player::AttackCharge()
 	}
 }
 
-void Player::AttackXUpdate_First()
+void Player::AttackXUpdate()
 {
 
+	//攻撃ボタンが押されたとき
+	if (Pad::IsTrigger(PAD_INPUT_3) && !m_isNextAttackFlag)
+	{
+		m_isNextAttackFlag = true;
+	}
+
 	//アニメーションが終わったら待機状態に遷移
-	if (m_pAnim->IsLoop())
+	//アニメーションが終わった段階で次の攻撃フラグがたっていなかったら
+	if (m_pAnim->IsLoop() && !m_isNextAttackFlag)
 	{
 		//ループの間にボタンを押した場合
 		//if (Pad::IsTrigger(kPadButtonX))
@@ -838,8 +922,22 @@ void Player::AttackXUpdate_First()
 		//}
 
 		//OnAttackX_Second();
+
+		m_multiAttack = 0;
+		//アイドル状態に戻る
 		OnIdle();
 	}
+
+	//アニメーションが終わった段階で次の攻撃フラグがたっていたら
+	if (m_pAnim->IsLoop() && m_isNextAttackFlag)
+	{
+
+		m_isNextAttackFlag = false;
+		m_multiAttack++;
+		//もう一回攻撃状態に戻る
+		OnAttackX();
+	}
+
 
 	//if (m_pAnim->IsLoop() && m_isAttackFirst)
 	//{
@@ -866,92 +964,6 @@ void Player::AttackXUpdate_First()
 	//	OnIdle();
 	//}
 
-}
-
-void Player::AttackXUpdate_Second()
-{
-	m_isAttackFirst = false;
-
-	//アニメーションが終わったら待機状態に遷移
-	if (m_pAnim->IsLoop())
-	{
-
-		////ループの間にボタンを押した場合
-		//if (Pad::IsTrigger(kPadButtonX))
-		//{
-		//	m_isAttackSecond = true;
-		//}
-
-		//m_isButtonPush = false;
-		//m_buttonKind = e_ButtonKind::kNone;
-		//OnIdle();
-
-		m_isButtonPush = false;
-		m_buttonKind = e_ButtonKind::kNone;
-
-		OnAttackX_Third();
-	}
-
-
-	//if (m_pAnim->IsLoop() && m_isAttackSecond)
-	//{
-	//	OnAttackX_Third();
-	//}
-	//else
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnIdle();
-	//}
-
-}
-
-void Player::AttackXUpdate_Third()
-{
-	m_isAttackSecond = false;
-
-	//アニメーションが終わったら待機状態に遷移
-	if (m_pAnim->IsLoop())
-	{
-		//ループの間にボタンを押した場合
-		//if (Pad::IsTrigger(kPadButtonX))
-		//{
-		//	m_isAttackThird = true;
-
-		//}
-
-		//m_isButtonPush = false;
-		//m_buttonKind = e_ButtonKind::kNone;
-		//OnIdle();
-
-		m_isButtonPush = false;
-		m_buttonKind = e_ButtonKind::kNone;
-		OnAttackX_Fourth();
-	}
-
-	//if (m_pAnim->IsLoop() && m_isAttackThird)
-	//{
-	//	OnAttackX_Fourth();
-	//}
-	//else
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnIdle();
-	//}
-}
-
-void Player::AttackXUpdate_Fourth()
-{
-	m_isAttackThird = false;
-
-	//アニメーションが終わったら待機状態に遷移
-	if (m_pAnim->IsLoop())
-	{
-		m_isButtonPush = false;
-		m_buttonKind = e_ButtonKind::kNone;
-		OnIdle();
-	}
 }
 
 void Player::AttackYUpdate()
@@ -1066,61 +1078,43 @@ void Player::OnDash()
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalDash, kAnimPowerDash, kAnimSpeedDash, kAnimNormalDash);
 
-
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kAbutton;
 	m_updateFunc = &Player::DashUpdate;
 }
 
 
-void Player::OnAttackX_First()
+void Player::OnAttackX()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimNormalAttackX_First, kAnimPowerAttackX_First, kAnimSpeedAttackX_First, kAnimShotAttackX_First);
+	//タイプによって攻撃アニメーションを変える
+	switch (m_multiAttack)
+	{
+	case 0:
+		//一番目の攻撃アニメーション
+		AnimChange(kAnimNormalAttackX_First, kAnimPowerAttackX_First, kAnimSpeedAttackX_First, kAnimShotAttackX_First);
+		break;
+	case 1:
+		//二番目の攻撃アニメーション
+		AnimChange(kAnimNormalAttackX_Second, kAnimPowerAttackX_Second, kAnimSpeedAttackX_Second, kAnimShotAttackX_Second);
+		break;
+	case 2:
+		//三番目の攻撃アニメーション
+		AnimChange(kAnimNormalAttackX_Third, kAnimPowerAttackX_Third, kAnimSpeedAttackX_Third, kAnimShotAttackX_Third);
+		break;
+	case 3:
+		//四番目の攻撃アニメーション
+		AnimChange(kAnimNormalAttackX_Fourth, kAnimPowerAttackX_Fourth, kAnimSpeedAttackX_Fourth, kAnimShotAttackX_Fourth);
+		break;
+	default:
+		break;
+	}
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kXbutton;
 
-	m_updateFunc = &Player::AttackXUpdate_First;
-}
-
-void Player::OnAttackX_Second()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimNormalAttackX_Second, kAnimPowerAttackX_Second, kAnimSpeedAttackX_Second, kAnimShotAttackX_Second);
-
-	m_isButtonPush = true;
-	m_buttonKind = e_ButtonKind::kXbutton;
-	m_updateFunc = &Player::AttackXUpdate_Second;
-}
-
-void Player::OnAttackX_Third()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimNormalAttackX_Third, kAnimPowerAttackX_Third, kAnimSpeedAttackX_Third, kAnimShotAttackX_Third);
-
-	m_isButtonPush = true;
-	m_buttonKind = e_ButtonKind::kXbutton;
-	m_updateFunc = &Player::AttackXUpdate_Third;
-}
-
-void Player::OnAttackX_Fourth()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimNormalAttackX_Fourth, kAnimPowerAttackX_Fourth, kAnimSpeedAttackX_Fourth, kAnimShotAttackX_Fourth);
-
-
-	m_isButtonPush = true;
-	m_buttonKind = e_ButtonKind::kXbutton;
-	m_updateFunc = &Player::AttackXUpdate_Fourth;
+	m_updateFunc = &Player::AttackXUpdate;
 }
 
 void Player::OnAttackY()
@@ -1146,6 +1140,7 @@ void Player::OnJump()
 	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
 	{
 		vel.y = kPowerJumpPower;
+
 	}
 	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
