@@ -18,29 +18,35 @@ public:
 	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
 	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
 
-	void Update(std::shared_ptr<MyLib::Physics> physics);
+	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player);
 	void Draw();
 
 	const VECTOR& GetPosDown() const;
 	void SetPosDown(const VECTOR pos);
+
+	const float& GetHp() const { return m_hp; }
 
 private:
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
 	void WalkUpdate();
+	void DashUpdate();
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
+	void AttackCoolTimeUpdate();
 	void DownUpdate();
 	void DeadUpdate();
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
 	void OnWalk();
+	void OnDash();
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
+	void OnAttackCoolTime();
 	void OnDown();
 	void OnDead();
 
@@ -51,8 +57,8 @@ private:
 	std::shared_ptr<Player> m_pPlayer;
 
 	//メンバ関数ポインタ
-	using UpdateFunc_t = void(BossPower::*)(/*引数書く*/);
-	UpdateFunc_t m_updaFunc;
+	using UpdateFunc_t = void(BossPower::*)();
+	UpdateFunc_t m_updateFunc;
 
 	//モデルハンドル
 	//int m_modelH;
@@ -69,9 +75,12 @@ private:
 
 	float m_angle;
 
+	float m_hp;
+
+	VECTOR m_playerPos;
 
 	//座標
-	VECTOR m_posDown;
+	VECTOR m_pos;
 	VECTOR m_posUp;
 
 	VECTOR m_direction;

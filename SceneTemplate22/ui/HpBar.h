@@ -22,21 +22,27 @@ public:
 	HpBar();
 	virtual ~HpBar();
 
-	void Initialize();
-	void Finalize();
-
 	void Update(Player& player);
 	void Draw();
 
 private:
 
-	std::shared_ptr<Player> m_pPlayer;
+	//std::shared_ptr<Player> m_pPlayer;
 	//std::shared_ptr<BossBase> m_pBoss;
 
 	float m_playerHp;
-	int m_bossHp;
+	float m_playerMp;
+	float m_playerStamina;
+
+	float m_playerPrevMp;
+	float m_playerPrevStamina;
+
+	bool m_isPlayerStamina;
 
 	int m_playerHpH;
+	int m_playerHpLostH;
+
+	int m_bossHp;
 	int m_bossHpH;
 };
 

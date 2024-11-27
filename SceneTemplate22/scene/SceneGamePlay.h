@@ -10,6 +10,7 @@ class Player;
 class Camera;
 class SkyDome;
 class HpBar;
+class PlayerBarUi;
 class FaceUi;
 class FaceFrameUi;
 class ButtonUi;
@@ -50,6 +51,7 @@ private:
 
 
 	std::shared_ptr<HpBar> m_pHpBarUi;
+	std::shared_ptr<PlayerBarUi> m_pPlayerBarUi;
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<ButtonUi> m_pButtonUi;
@@ -68,6 +70,8 @@ private:
 
 	int m_analogX;
 	int m_analogZ;
+
+	int m_gameOverTime;
 
 	int m_radius;
 	float m_angle;

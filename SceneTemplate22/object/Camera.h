@@ -68,6 +68,9 @@ private:
 	void LockOnUpdate(VECTOR targetPos);
 
 
+	
+
+
 private:
 
 	//スマートポインタ

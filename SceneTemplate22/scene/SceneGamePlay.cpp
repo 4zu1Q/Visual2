@@ -4,6 +4,7 @@
 
 #include "SceneManager.h"
 #include "SceneGamePlay.h"
+#include "SceneGameOver.h"
 #include "ScenePause.h"
 #include "SceneDebug.h"
 
@@ -13,6 +14,7 @@
 #include "object/Camera.h"
 
 #include "ui/HpBar.h"
+#include "ui/PlayerBarUi.h"
 #include "ui/FaceUi.h"
 #include "ui/FaceFrameUi.h"
 #include "ui/ButtonUi.h"
@@ -37,12 +39,13 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_radius(5),
 	m_angle(0.0f),
 #endif 
-	m_isFadingOut(false),
+	m_gameOverTime(0),
 	m_cameraAngle(0.0f)
 {
 	m_pPlayer = std::make_shared<Player>();
 
 	m_pHpBarUi = std::make_shared<HpBar>();
+	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
 	m_pFaceUi = std::make_shared<FaceUi>();
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
 	m_pButtonUi = std::make_shared<ButtonUi>();
@@ -77,6 +80,9 @@ SceneGamePlay::~SceneGamePlay()
 
 void SceneGamePlay::Update()
 {
+	Pad::Update();
+	UpdateFade();
+
 #ifdef _DEBUG
 	MyLib::DebugDraw::Draw();
 #endif
@@ -84,9 +90,6 @@ void SceneGamePlay::Update()
 #ifdef _DEBUG
 	MyLib::DebugDraw::Clear();
 #endif
-
-	Pad::Update();
-	UpdateFade();
 
 #ifdef _DEBUG
 	//デバッグに遷移する
@@ -97,28 +100,28 @@ void SceneGamePlay::Update()
 	}
 #endif
 
-
-
-	if (m_isFadingOut)
+	if (m_pPlayer->GetIsGameOver())
 	{
-		if (IsFadingOut())
-		{
-			SceneBase::StartFadeIn();
-			m_isFadingOut = false;
-		}
+		m_gameOverTime++;
 	}
+
+	if (m_gameOverTime > 240)
+	{
+		m_isToNextScene = true;
+		StartFadeOut();
+	}
+
 
 	if (!IsFading())
 	{
 		if (Pad::IsTrigger(PAD_INPUT_8))
 		{
 			m_pManager.PushScene(std::make_shared<ScenePause>(m_pManager));
-
 		}
 	}
 
 	m_pSkyDome->Update();
-	m_pBoss->Update(m_pPhysics);
+	m_pBoss->Update(m_pPhysics, *m_pPlayer);
 
 	m_pCamera->Update(m_pField->GetModelHandle());
 	m_pCamera->SetPlayerPos(m_pPlayer->GetPosUp());
@@ -131,30 +134,49 @@ void SceneGamePlay::Update()
 	//m_pGamePlayUi->Update(*m_pPlayer);
 
 	m_pFaceUi->Update();
-
 	m_pHpBarUi->Update(*m_pPlayer);
+	m_pPlayerBarUi->Update(*m_pPlayer);
+
+
+	//シーンフラグがたった場合
+	if (m_isToNextScene)
+	{
+		//なんか入らん後でやる
+		if (!IsFadingOut())
+		{
+			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager));
+			return;
+		}
+	}
 
 }
 
 void SceneGamePlay::Draw()
 {
-	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 
-	m_pBoss->Draw();
 	m_pCamera->Draw();
 
 	m_pField->Draw();
 	m_pSkyDome->Draw();
 
 	m_pHpBarUi->Draw();
+	m_pPlayerBarUi->Draw();
 	m_pButtonUi->Draw(*m_pPlayer);
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);
+
+	m_pBoss->Draw();
 	m_pPlayer->Draw();
 	//m_pGamePlayUi->Draw(*m_pPlayer);
 
-	DrawFade(0xffffff);
-	
+	DrawFade(0x000000);
+
+#ifdef _DEBUG
+	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
+
+#endif // DEBUG
+
+
 }
 
 //void SceneGamePlay::StartFadeOut()

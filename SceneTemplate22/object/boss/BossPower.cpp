@@ -12,9 +12,9 @@ namespace
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Boss/BossPower.mv1";
 	//モデルのスケール値
-	constexpr float kModelScale = 8.0f;
+	constexpr float kModelScale = 12.0f;
 
-	constexpr float kSpeed = 1.0f;
+	constexpr float kSpeed = 0.4f;
 
 
 	//初期位置
@@ -26,9 +26,9 @@ namespace
 	/*プレイヤーのアニメーションの種類*/
 	const char* const kAnimInfoFilename = "Data/Master/AnimBossPowerMaster.csv";
 
-	const char* const kAnimNormalIdle = "Idle";
-	const char* const kAnimNormalWalk = "Walk";
-	const char* const kAnimNormalDash = "Dash";
+	const char* const kAnimIdle = "Idle";
+	const char* const kAnimWalk = "Walk";
+	const char* const kAnimDash = "Dash";
 
 	const char* const kAnimAttack1 = "Attack1";
 	const char* const kAnimAttack2 = "Attack2";
@@ -41,10 +41,11 @@ namespace
 
 BossPower::BossPower():
 	BossBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kBoss, MyLib::ColliderData::e_Kind::kSphere, false),
-	m_posDown(kInitPos),
+	m_pos(kInitPos),
 	m_posUp(kInitPos),
 	m_direction(VGet(0,0,0)),
 	m_velocity(VGet(0,0,0)),
+	m_playerPos(VGet(0, 0, 0)),
 	m_angle(0.0f)
 {
 
@@ -65,7 +66,7 @@ BossPower::BossPower():
 
 	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
-	circleColliderData->m_radius = 5.0f;
+	circleColliderData->m_radius = 6.5f;
 
 	//m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
 
@@ -99,10 +100,10 @@ void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
 	//アニメーションの初期化
-	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimNormalIdle);
+	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimIdle);
 
 	// メンバ関数ポインタの初期化
-	m_updaFunc = &BossPower::IdleUpdate;
+	m_updateFunc = &BossPower::IdleUpdate;
 
 }
 
@@ -114,27 +115,30 @@ void BossPower::Finalize(std::shared_ptr<MyLib::Physics> physics)
 	Collidable::Finalize(physics);
 }
 
-void BossPower::Update(std::shared_ptr<MyLib::Physics> physics)
+void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 {
 	//アップデート
-	(this->*m_updaFunc)();
+	(this->*m_updateFunc)();
 
 	//m_pos = m_pPlayer->GetPosDown();
+
+	m_playerPos = player.GetPos();
+	m_pos = m_rigidbody.GetPos();
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 	
-	auto pos = m_rigidbody.GetPos();
+	//auto pos = m_rigidbody.GetPos();
 
 	//モデルのポジションを合わせるよう
-	VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
+	//VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
 
-	m_posUp = VGet(pos.x, pos.y + kUpPos.y, pos.z);
+	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
-	DrawSphere3D(pos, 32, 16, 0xffffff, 0xffffff, false);
+	//DrawSphere3D(m_pos, 32, 16, 0xffffff, 0xffffff, false);
 
 	//モデルに座標をセットする
-	MV1SetPosition(m_modelH, modelPos);
+	MV1SetPosition(m_modelH, m_pos);
 	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));
 
 }
@@ -142,6 +146,8 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics)
 void BossPower::Draw()
 {
 	MV1DrawModel(m_modelH);
+
+	DrawFormatString(0, 248, 0xff0fff, "BossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 }
@@ -158,45 +164,62 @@ void BossPower::SetPosDown(const VECTOR pos)
 
 void BossPower::IdleUpdate()
 {
+	//auto pos = m_rigidbody.GetPos();
 
-	//プレイヤーと離れていた場合歩き状態に移動
+	//プレイヤーへの向きを取得
+	m_direction = VSub(m_playerPos, m_pos);
+	m_direction = VNorm(m_direction);
 
+	m_angle = atan2f(m_direction.x, m_direction.z);
+
+	//プレイヤーと離れ過ぎていた場合走り状態に移動 && タイマー
+	{
+		//OnDash();
+	}
+
+	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
 	if (m_pOnWlakTime->IsUpdate())
 	{
 		m_pOnWlakTime->Reset();
 		OnWalk();
 	}
 
-	//プレイヤーと距離が離れていない場合攻撃状態に移動
-	//ランダム関数などを使用して三つの攻撃を使う
+	//プレイヤーと十分な距離の場合 && タイマー
+	{
+		//ランダム関数かなんか使ってやる
 
-	
-	//プレイヤーへの向きを取得
-	//m_direction = VSub(m_pos, m_posDown);
-	//m_direction = VNorm(m_direction);
+		
+		//ランダムで攻撃を行う
+		{
+			//OnAttack1();
+		}
+		{
+			//OnAttack2();
+		}
+		{
+			//OnAttack3();
+		}
 
-	//m_angle = atan2f(m_direction.x, m_direction.z);
+	}
 
-	//VECTOR move;
-	//move.y = m_rigidbody.GetVelocity().y;
-	//m_rigidbody.SetVelocity(VGet(0, move.y, 0));
+	//
+
+	VECTOR move;
+	move.y = m_rigidbody.GetVelocity().y;
+	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
+
 }
 
 void BossPower::WalkUpdate()
 {
-
-
-	//プレイヤーと距離が離れていない場合攻撃状態に移動
-	//ランダム関数などを使用して三つの攻撃を使う
-
-	if (m_pOnAttackTime->IsUpdate())
-	{
-		m_pOnWlakTime->Reset();
-		OnAttack3();
-	}
+	//VECTOR pos = m_rigidbody.GetPos();
 
 	//プレイヤーへの向きを取得
-	m_direction = VSub(m_pos, m_posDown);
+	m_direction = VSub(m_playerPos, m_pos);
+
+	VECTOR length = VSub(m_pos, m_playerPos);
+	float size = VSize(length);
+
 	m_direction = VNorm(m_direction);
 
 	m_angle = atan2f(m_direction.x, m_direction.z);
@@ -204,14 +227,25 @@ void BossPower::WalkUpdate()
 	//ベクトルを、正規化し、向きだけを保存させる
 	m_velocity = VScale(m_direction, kSpeed);
 
-	auto pos = m_rigidbody.GetPos();
-
 	//敵の移動
-	pos = VAdd(pos, m_velocity);
+	m_rigidbody.SetVelocity(m_velocity);
+
+	//プレイヤーとの距離がほぼゼロに近い状態なら攻撃状態に遷移する
+	if (size < 5.0f)
+	{
+		OnIdle();
+	}
+
+
+}
+
+void BossPower::DashUpdate()
+{
 }
 
 void BossPower::Attack1Update()
 {
+
 
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
@@ -240,6 +274,14 @@ void BossPower::Attack3Update()
 	}
 }
 
+void BossPower::AttackCoolTimeUpdate()
+{
+	if (m_pAnim->IsLoop())
+	{
+		OnIdle();
+	}
+}
+
 void BossPower::DownUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
@@ -258,42 +300,54 @@ void BossPower::DeadUpdate()
 
 void BossPower::OnIdle()
 {
-	m_pAnim->ChangeAnim(kAnimNormalIdle);
-	m_updaFunc = &BossPower::IdleUpdate;
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossPower::IdleUpdate;
 }
 
 void BossPower::OnWalk()
 {
-	m_pAnim->ChangeAnim(kAnimNormalWalk);
-	m_updaFunc = &BossPower::WalkUpdate;
+	m_pAnim->ChangeAnim(kAnimWalk);
+	m_updateFunc = &BossPower::WalkUpdate;
+}
+
+void BossPower::OnDash()
+{
+	m_pAnim->ChangeAnim(kAnimWalk);
+	m_updateFunc = &BossPower::DashUpdate;
 }
 
 void BossPower::OnAttack1()
 {
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
-	m_updaFunc = &BossPower::Attack1Update;
+	m_updateFunc = &BossPower::Attack1Update;
 }
 
 void BossPower::OnAttack2()
 {
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
-	m_updaFunc = &BossPower::Attack2Update;
+	m_updateFunc = &BossPower::Attack2Update;
 }
 
 void BossPower::OnAttack3()
 {
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
-	m_updaFunc = &BossPower::Attack3Update;
+	m_updateFunc = &BossPower::Attack3Update;
+}
+
+void BossPower::OnAttackCoolTime()
+{
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossPower::AttackCoolTimeUpdate;
 }
 
 void BossPower::OnDown()
 {
 	m_pAnim->ChangeAnim(kAnimDown);
-	m_updaFunc = &BossPower::DownUpdate;
+	m_updateFunc = &BossPower::DownUpdate;
 }
 
 void BossPower::OnDead()
 {
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
-	m_updaFunc = &BossPower::DeadUpdate;
+	m_updateFunc = &BossPower::DeadUpdate;
 }

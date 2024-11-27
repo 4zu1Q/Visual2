@@ -26,9 +26,9 @@ private:
 	//遷移先
 	enum class e_SceneTrans : int
 	{
-		kRestart,	//リスタート
-		kOption,	//オプション
-		kSelect,	//セレクト
+		kRestart,				//リスタート
+		kOption,				//オプション
+		kSelect,				//セレクト
 	};
 
 	//画像ハンドル

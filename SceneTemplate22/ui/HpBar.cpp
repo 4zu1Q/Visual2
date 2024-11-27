@@ -6,16 +6,33 @@
 
 namespace
 {
-	const char* const kHpFileName = "Data/Image/Hp02.png";
+	const char* const kHpFileName = "Data/Image/Hp.png";
+	const char* const kHpLostFileName = "Data/Image/HpLost.png";
 
+	//最大値
+	constexpr float kMaxHp = 10.0f;
+	constexpr float kMaxMp = 300.0f;
+	constexpr float kMaxStamina = 300.0f;
+
+	//スタミナの減るスピード
+	constexpr float kStaminaDiminishSpeed = 0.5f;
+	constexpr float kStaminaIncreaseSpeed = 0.4f;
+
+	//MPの減る値
+	constexpr float kMpDiminishNum = 30.0f;
+	constexpr float kMpIncreaseNum = 40.0f;
 }
 
-HpBar::HpBar():
-	m_playerHp(0),
+HpBar::HpBar() :
+	m_playerHp(0.0f),
+	m_playerMp(0.0f),
+	m_playerStamina(0.0f),
+	m_isPlayerStamina(false),
 	m_playerHpH(LoadGraph(kHpFileName)),
+	m_playerHpLostH(LoadGraph(kHpLostFileName)),
 	m_bossHp(0)
 {
-	m_pPlayer = std::make_shared<Player>();
+	//m_pPlayer = std::make_shared<Player>();
 	//m_pBoss = std::make_shared<BossBase>();
 
 }
@@ -26,49 +43,13 @@ HpBar::~HpBar()
 
 }
 
-void HpBar::Initialize()
-{
-
-}
-
-void HpBar::Finalize()
-{
-
-}
-
 void HpBar::Update(Player& player)
 {
-
-	m_playerHp = player.GetHp();
-
 
 }
 
 void HpBar::Draw()
 {
-
-	//HPの仮位置
-	//スタミナの仮位置
-	//魔力の仮位置
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
-	//DrawBox(32, 10, 374, 50, 0x000000, true);
-	DrawBox(34, 55, 334, 70, 0x00ff00, true);
-	DrawBox(34, 75, 334, 90, 0xff0000, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	
-	//枠
-	//DrawBox(32, 10, 374, 50, 0xffffff, false);
-	DrawBox(34, 55, 334, 70, 0xffffff, false);
-	DrawBox(34, 75, 334, 90, 0xffffff, false);
-
-
-	for (int i = 1; i <= static_cast<int>(m_playerHp); i++)
-	{
-		//DrawCircle(40 * i, 50, 17, 0xffffff, true);
-		//DrawCircle(40 * i, 50, 16, 0xff00ff, true);
-
-		DrawGraph(34 * i, 15, m_playerHpH, true);
-	}
 
 
 }

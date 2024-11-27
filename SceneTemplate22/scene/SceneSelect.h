@@ -13,6 +13,7 @@ class HpBar;
 class FaceUi;
 class FaceFrameUi;
 class ButtonUi;
+class PlayerBarUi;
 class ItemMp;
 class ItemHp;
 class Tomb;
@@ -42,8 +43,9 @@ private:
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<SkyDome> m_pSkyDome;
-
+	
 	std::shared_ptr<HpBar> m_pHpBarUi;
+	std::shared_ptr<PlayerBarUi> m_pPlayerBarUi;
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
 	std::shared_ptr<ButtonUi> m_pButtonUi;

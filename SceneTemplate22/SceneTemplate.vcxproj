@@ -184,8 +184,8 @@
     <ClCompile Include="ui\ButtonUi.cpp" />
     <ClCompile Include="ui\FaceFrameUi.cpp" />
     <ClCompile Include="ui\FaceUi.cpp" />
-    <ClCompile Include="ui\HeartHp.cpp" />
     <ClCompile Include="ui\HpBar.cpp" />
+    <ClCompile Include="ui\PlayerBarUi.cpp" />
     <ClCompile Include="util\ActionTime.cpp" />
     <ClCompile Include="util\AnimController.cpp" />
     <ClCompile Include="util\Collision.cpp" />
@@ -243,8 +243,8 @@
     <ClInclude Include="ui\ButtonUi.h" />
     <ClInclude Include="ui\FaceFrameUi.h" />
     <ClInclude Include="ui\FaceUi.h" />
-    <ClInclude Include="ui\HeartHp.h" />
     <ClInclude Include="ui\HpBar.h" />
+    <ClInclude Include="ui\PlayerBarUi.h" />
     <ClInclude Include="util\ActionTime.h" />
     <ClInclude Include="util\AnimController.h" />
     <ClInclude Include="util\Collision.h" />

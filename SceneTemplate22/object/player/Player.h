@@ -66,7 +66,7 @@ public:
 	void SetModelHandle(const int modelH) { m_modelH = modelH; }
 
 	//プレイヤー下の座標を取得
-	const VECTOR& GetPosDown() const;
+	const VECTOR& GetPos() const;
 	void SetPosDown(const VECTOR pos);
 
 	//プレイヤー上の座標を取得
@@ -77,15 +77,18 @@ public:
 	const VECTOR& GetAttackPos() const { return m_attackPos; }
 	void SetAttackPos(const VECTOR attackPos) { m_attackPos = attackPos; }
 
+	/* ステータスの取得 */
 	//プレイヤーのHPを取得
 	const float& GetHp() const { return m_hp; }
-	void SetHp(const float hp) { m_hp = hp; }
 
-	//プレイヤーのHPを取得
+	//プレイヤーのMPを取得
 	const float& GetMp() const { return m_mp; }
-	void SetMp(const float mp) { m_mp = mp; }
 
-	//プレイヤーの顔の種類
+	//プレイヤーのスタミナを取得
+	const float& GetStamina() const { return m_stamina; }
+	const bool& GetIsStamina() const { return m_isStamina; }
+
+	//プレイヤーの顔の種類を取得
 	const e_PlayerKind& GetFaceKind() const { return m_playerKind; }
 	void SetFaceKind(const e_PlayerKind playerKind) { m_playerKind = playerKind; }
 
@@ -102,8 +105,12 @@ public:
 	const bool& GetIsButtonPush() const { return m_isButtonPush; }
 	//押しているボタンの種類
 	const e_ButtonKind& GetButtonKind() const { return m_buttonKind; }
-
+	//顔を使用しているかどうかを取得
 	const bool& GetIsFrame() const { return m_isFaceUse; }
+
+	//ゲームオーバーのフラグを取得
+	const bool& GetIsGameOver() const { return m_isGameOver; }
+
 
 	/*プレイヤーがボスを倒したかどうかのフラグを取得する関数*/
 	//これ多分必要ない可能性
@@ -188,17 +195,23 @@ private:
 	using UpdateFunc_t = void(Player::*)(/*引数書く*/);
 	UpdateFunc_t m_updateFunc;
 
-	//仮HP
+	//仮
 	float m_hp;
 	float m_mp;
+	float m_stamina;
+
+	bool m_isUseMp;
+	bool m_isMp;
+	bool m_isStamina;
+
 	int m_weaponH;
 
 	int m_frame;
-	int m_chargeTime;
 
 	//プレイヤの座標
 	//	VECTOR m_posDown;
 	VECTOR m_posUp;
+	VECTOR m_pos;
 
 	VECTOR m_attackPos;
 	VECTOR m_attackDir;
@@ -232,9 +245,10 @@ private:
 	int m_multiAttack;
 	bool m_isNextAttackFlag;
 
-	//次攻撃するまでの時間
-	int m_actionTime;
+	//強攻撃のチャージ時間
+	int m_chargeTime;
 
+	//ジャンプ力
 	float m_jumpPower;
 
 	float m_speed;
@@ -244,6 +258,10 @@ private:
 	bool m_isFaceUse;
 	bool m_isButtonPush;
 
+	//ゲームオーバー画面に遷移するためのフラグ
+	bool m_isGameOver;
+
+	//ジャンプしているかどうか
 	bool m_isJump;
 
 	//顔の保持しているかどうかのフラグ

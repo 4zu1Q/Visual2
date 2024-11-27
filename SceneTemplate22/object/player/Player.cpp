@@ -34,17 +34,17 @@ namespace
 	constexpr float kAnalogRangeMax = 0.8f;
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
-	//移動速度
+	//最小移動速度
 	constexpr float kNormalMinSpeed = 0.5f;
 	constexpr float kPowerMinSpeed = 0.3f;
 	constexpr float kSpeedMinSpeed = 0.7f;
 	constexpr float kShotMinSpeed = 0.4f;
 
+	//最大移動速度
 	constexpr float kNormalMaxSpeed = 0.7f;
 	constexpr float kPowerMaxSpeed = 0.5f;
 	constexpr float kSpeedMaxSpeed = 0.9f;
 	constexpr float kShotMaxSpeed = 0.6f;
-
 
 	//ダッシュスピード
 	constexpr float kNormalDashSpeed = 1.0f;
@@ -144,30 +144,51 @@ namespace
 
 	constexpr int kPadButtonLStick = 0x00001000;
 
+	//最大値
+	constexpr float kMaxHp = 10.0f;
+	constexpr float kMaxMp = 300.0f;
+	constexpr float kMaxStamina = 300.0f;
+
+	//スタミナの減るスピード
+	constexpr float kStaminaDiminishSpeed = 0.5f;
+	constexpr float kStaminaIncreaseSpeed = 0.4f;
+	constexpr float kStaminaActionIncreaseSpeed = 0.2f;
+
+	//MPの減る値
+	constexpr float kMpDiminishNum = 30.0f;
+	constexpr float kMpIncreaseNum = 40.0f;
+
+
 }
 
 Player::Player() :
 	CharaBase(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kSphere, false),
+	m_isGameOver(false),
+	m_pos(VGet(0,0,0)),
 	m_weaponH(-1),
 	m_radius(2),
 	m_posUp(kInitPos),
 	m_move(VGet(0, 0, 0)),
 	m_attackPos(VGet(0, 0, 0)),
 	m_attackDir(VGet(0, 0, 0)),
-	m_cameraToPlayerVec(VGet(0,0,0)),
-	m_cameraDirection(VGet(0,0,0)),
+	m_cameraToPlayerVec(VGet(0, 0, 0)),
+	m_cameraDirection(VGet(0, 0, 0)),
 	m_avoid(VGet(0, 0, 0)),
 	m_analogX(0),
 	m_analogZ(0),
-	m_hp(10),
+	m_hp(kMaxHp),
+	m_mp(kMaxMp),
+	m_stamina(kMaxStamina),
 	m_cameraAngle(0.0f),
 	m_rate(0.0f),
 	m_isDead(false),
+	m_isStamina(false),
+	m_isMp(false),
+	m_isUseMp(false),
 	m_frame(0),
 	m_isMove(false),
 	m_multiAttack(0),
 	m_isNextAttackFlag(false),
-	m_actionTime(0),
 	m_chargeTime(0)
 {
 
@@ -276,18 +297,13 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	m_pWeapon->DaggerUpdate();
 	m_pWeapon->MagicWandUpdate();
 	m_pWeapon->LongSwordUpdate();
-
-
-	
+		
 	//SetCameraAngle(m_pCamera->GetAngle());
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
-	//カプセル用のポジション
-	auto pos = m_rigidbody.GetPos();
-
-
+	m_pos = m_rigidbody.GetPos();
 
 	//m_pCamera->DebugUpdate(pos);
 
@@ -295,24 +311,55 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	//m_pCamera->Update(pos);
 	//m_cameraToPlayerVec = VSub(pos, m_pCamera->GetNextPos());
 
-	m_posUp = VGet(pos.x, pos.y + kUpPos.y, pos.z);
+	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
 	//モデルのポジションを合わせるよう
-	VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
+	//VECTOR modelPos = VGet(m_pos.x, m_pos.y, m_pos.z);
 
 
 	//モデルに座標をセットする
-	MV1SetPosition(m_modelH, modelPos);
+	MV1SetPosition(m_modelH, m_pos);
 
 	//モデルに回転をセットする
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
+
 
 	//HPがゼロより下にいった場合
 	if (m_hp <= 0)
 	{
 		m_hp = 0;
-
+		//死亡状態へ遷移
 		OnDead();
+	}
+
+	//MPが0以下になったら
+	if (m_mp <= 0)
+	{
+		m_isMp = true;
+		m_mp = 0;
+	}
+	//MPが最大値を超えたら
+	if (m_mp > kMaxMp)
+	{
+		m_mp = kMaxMp;
+	}
+	
+
+	//スタミナ関連
+	if (m_stamina <= 0)
+	{
+		m_stamina = 0;
+		m_isStamina = true;
+	}
+	//スタミナがスタミナの最大値を超えた場合
+	if (m_stamina > kMaxStamina)
+	{
+		m_stamina = kMaxStamina;
+	}
+	//スタミナがスタミナの最大値に達した場合
+	if (m_stamina == kMaxStamina)
+	{
+		m_isStamina = false;
 	}
 }
 
@@ -329,9 +376,12 @@ void Player::Draw()
 
 #ifdef _DEBUG
 
-	auto pos = m_rigidbody.GetPos();
-	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", pos.x, pos.y, pos.z);
+	//auto pos = m_rigidbody.GetPos();
+	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
+
+	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
+
 
 	//DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
 #endif
@@ -363,7 +413,7 @@ void Player::Draw()
 //	printfDx(message.c_str());
 //}
 
-const VECTOR& Player::GetPosDown() const
+const VECTOR& Player::GetPos() const
 {
 	return m_rigidbody.GetPos();
 }
@@ -375,7 +425,8 @@ void Player::SetPosDown(const VECTOR pos)
 
 void Player::IdleUpdate()
 {	
-	m_actionTime = 0;
+
+	m_stamina += kStaminaIncreaseSpeed;
 
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR input = VGet(m_analogX, 0.0f, -m_analogZ);
@@ -386,44 +437,36 @@ void Player::IdleUpdate()
 		return;
 	}
 
-	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
+	if (Pad::IsTrigger(kPadButtonB) && !m_isJump && !m_isStamina)
 	{
 		OnJump();
 		return;
 	}
 
-	if (Pad::IsTrigger(kPadButtonX))
+	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
 		OnAttackX();
 		return;
 	}
 
-	//if (Pad::IsPress(kPadButtonY))
-	//{
-	//	//OnAttackY();
-	//	OnAttackCharge();
-	//	return;
-	//}
-
-
 	//攻撃Y
-	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse)
+	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse && !m_isStamina && !m_isMp)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
-		//OnAttackY();
 		OnAttackCharge();
 	}
 	//攻撃Y(スピードタイプ以外はチャージあり)
-	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse && !m_isStamina && !m_isMp)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackCharge();
 	}
 	//攻撃Y(スピードタイプのみショートカット)
-	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse && !m_isStamina && !m_isMp)
 	{
+		m_isUseMp = true;
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackY();
@@ -450,6 +493,8 @@ void Player::WalkUpdate()
 	// カメラの角度によって進む方向を変える
 	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
+	m_stamina += kStaminaIncreaseSpeed;
+
 	/*プレイヤーの移動*/
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
@@ -461,6 +506,8 @@ void Player::WalkUpdate()
 	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
 	rate = min(rate, 1.0f);
 	rate = max(rate, 0.0f);
+
+	float speed = 0;
 
 	//動いている間
 	if (len != 0.0f)
@@ -474,12 +521,12 @@ void Player::WalkUpdate()
 			//スティックの押し加減でプレイヤーのスピードを変える
 			if (rate <= 0.6f && rate > 0.0f);
 			{
-				float speed = kPowerMinSpeed * rate;
+				speed = kPowerMinSpeed * rate;
 				move = VScale(move, speed);
 			}
 			if (rate >= 0.6f)
 			{
-				float speed = kPowerMaxSpeed * rate;
+				speed = kPowerMaxSpeed * rate;
 				move = VScale(move, speed);
 			}
 		}
@@ -488,12 +535,12 @@ void Player::WalkUpdate()
 			//スティックの押し加減でプレイヤーのスピードを変える
 			if (rate <= 0.6f && rate > 0.0f);
 			{
-				float speed = kSpeedMinSpeed * rate;
+				speed = kSpeedMinSpeed * rate;
 				move = VScale(move, speed);
 			}
 			if (rate >= 0.6f)
 			{
-				float speed = kSpeedMaxSpeed * rate;
+				speed = kSpeedMaxSpeed * rate;
 				move = VScale(move, speed);
 			}
 		}
@@ -502,12 +549,12 @@ void Player::WalkUpdate()
 			//スティックの押し加減でプレイヤーのスピードを変える
 			if (rate <= 0.6f && rate > 0.0f);
 			{
-				float speed = kShotMinSpeed * rate;
+				speed = kShotMinSpeed * rate;
 				move = VScale(move, speed);
 			}
 			if (rate >= 0.6f)
 			{
-				float speed = kShotMaxSpeed * rate;
+				speed = kShotMaxSpeed * rate;
 				move = VScale(move, speed);
 			}
 		}
@@ -516,12 +563,12 @@ void Player::WalkUpdate()
 			//スティックの押し加減でプレイヤーのスピードを変える
 			if (rate <= 0.6f && rate > 0.0f);
 			{
-				float speed = kNormalMinSpeed * rate;
+				speed = kNormalMinSpeed * rate;
 				move = VScale(move, speed);
 			}
 			if (rate >= 0.6f)
 			{
-				float speed = kNormalMaxSpeed * rate;
+				speed = kNormalMaxSpeed * rate;
 				move = VScale(move, speed);
 			}
 		}
@@ -531,12 +578,12 @@ void Player::WalkUpdate()
 			//スティックの押し加減でプレイヤーのスピードを変える
 			if (rate <= 0.6f && rate > 0.0f);
 			{
-				float speed = kNormalMinSpeed * rate;
+				speed = kNormalMinSpeed * rate;
 				move = VScale(move, speed);
 			}
 			if (rate >= 0.6f)
 			{
-				float speed = kNormalMaxSpeed * rate;
+				speed = kNormalMaxSpeed * rate;
 				move = VScale(move, speed);
 			}
 		}
@@ -557,8 +604,8 @@ void Player::WalkUpdate()
 		m_move = move;
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		m_attackDir = VNorm(move);
-		m_avoid = VNorm(move);
+		//m_attackDir = VNorm(move);
+		//m_avoid = VNorm(move);
 
 	}
 	//動かなかったらアイドル状態へ
@@ -569,22 +616,14 @@ void Player::WalkUpdate()
 	}
 
 	//攻撃X
-	if (Pad::IsTrigger(kPadButtonX))
+	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
 		OnAttackX();
 		return;
 	}
 
 	//攻撃Y
-	//if (Pad::IsPress(kPadButtonY))
-	//{
-	//	//OnAttackY();
-	//	OnAttackCharge();
-	//	return;
-	//}
-
-	//攻撃Y
-	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse)
+	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse && !m_isStamina && !m_isMp)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
@@ -592,29 +631,30 @@ void Player::WalkUpdate()
 		OnAttackCharge();
 	}
 	//攻撃Y(スピードタイプ以外はチャージあり)
-	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse && !m_isStamina && !m_isMp)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackCharge();
 	}
 	//攻撃Y(スピードタイプのみショートカット)
-	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse && !m_isStamina && !m_isMp)
 	{
+		m_isUseMp = true;
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackY();
 	}
 
 	//ダッシュ
-	if (Pad::IsPress(kPadButtonA))
+	if (Pad::IsPress(kPadButtonA) && !m_isStamina)
 	{
 		OnDash();
 		return;
 	}
 
 	//ジャンプ
-	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
+	if (Pad::IsTrigger(kPadButtonB) && !m_isJump && !m_isStamina)
 	{
 		OnJump();
 		return;
@@ -655,6 +695,8 @@ void Player::DashUpdate()
 	//動いている間
 	if (VSquareSize(move) > 0.0f)
 	{
+		m_stamina -= 0.5f;
+
 
 		//速度が決定できるので移動ベクトルに反映する
 		move = VNorm(move);
@@ -703,13 +745,13 @@ void Player::DashUpdate()
 		m_rigidbody.SetVelocity(move);
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		m_attackDir = VNorm(move);
-		m_avoid = VNorm(move);
+		//m_attackDir = VNorm(move);
+		//m_avoid = VNorm(move);
 
 	}
 
 	//歩き
-	if (Pad::IsRelase(kPadButtonA) || VSquareSize(move) == 0.0f)
+	if (Pad::IsRelase(kPadButtonA) || VSquareSize(move) == 0.0f || m_isStamina)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
@@ -717,23 +759,15 @@ void Player::DashUpdate()
 	}
 
 	//攻撃X
-	if (Pad::IsTrigger(kPadButtonX))
+	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackX();
 	}
 
-	////攻撃Y
-	//if (Pad::IsPress(kPadButtonY))
-	//{
-	//	//OnAttackY();
-	//	OnAttackCharge();
-	//	return;
-	//}
-
 	//攻撃Y
-	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse)
+	if (Pad::IsPress(kPadButtonY) && !m_isFaceUse && !m_isStamina && !m_isMp)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
@@ -741,22 +775,23 @@ void Player::DashUpdate()
 		OnAttackCharge();
 	}
 	//攻撃Y(スピードタイプ以外はチャージあり)
-	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse && !m_isStamina && !m_isMp)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackCharge();
 	}
 	//攻撃Y(スピードタイプのみショートカット)
-	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse && !m_isStamina && !m_isMp)
 	{
+		m_isUseMp = true;
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackY();
 	}
 
 	//ジャンプ
-	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
+	if (Pad::IsTrigger(kPadButtonB) && !m_isJump && !m_isStamina)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
@@ -776,6 +811,8 @@ void Player::DashUpdate()
 
 void Player::JumpUpdate()
 {
+	m_stamina += kStaminaIncreaseSpeed;
+
 	// カメラの角度によって進む方向を変える
 	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
@@ -808,26 +845,30 @@ void Player::JumpUpdate()
 	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 	move = VTransform(move, mtx);
 
-	move.y = m_rigidbody.GetVelocity().y;
-	m_rigidbody.SetVelocity(move);
+
 
 	//動いている間
 	if (VSquareSize(move) > 0.0f)
 	{
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		m_attackDir = VNorm(move);
-		m_avoid = VNorm(move);
+		//m_attackDir = VNorm(move);
+		//m_avoid = VNorm(move);
 	}
 
-	if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
-	{
-		OnJump();
-	}
+	move.y = m_rigidbody.GetVelocity().y;
+	m_rigidbody.SetVelocity(move);
+
+	//if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
+	//{
+	//	OnJump();
+	//}
 
 }
 
 void Player::AirUpdate()
 {
+	m_stamina += kStaminaIncreaseSpeed;
+
 	// カメラの角度によって進む方向を変える
 	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
@@ -880,6 +921,8 @@ void Player::AirUpdate()
 
 void Player::AttackCharge()
 {
+	m_stamina += kStaminaIncreaseSpeed;
+
 	m_chargeTime++;
 
 	if (m_chargeTime > 60)
@@ -891,6 +934,7 @@ void Player::AttackCharge()
 	//Yボタンを離した場合
 	if (Pad::IsRelase(kPadButtonY) && m_chargeTime > 60)
 	{
+		m_isUseMp = true;
 		m_chargeTime = 0;
 		OnAttackY();
 	}
@@ -903,6 +947,7 @@ void Player::AttackCharge()
 
 void Player::AttackXUpdate()
 {
+	m_stamina += kStaminaIncreaseSpeed;
 
 	//攻撃ボタンが押されたとき
 	if (Pad::IsTrigger(PAD_INPUT_3) && !m_isNextAttackFlag)
@@ -910,19 +955,9 @@ void Player::AttackXUpdate()
 		m_isNextAttackFlag = true;
 	}
 
-	//アニメーションが終わったら待機状態に遷移
 	//アニメーションが終わった段階で次の攻撃フラグがたっていなかったら
 	if (m_pAnim->IsLoop() && !m_isNextAttackFlag)
 	{
-		//ループの間にボタンを押した場合
-		//if (Pad::IsTrigger(kPadButtonX))
-		//{
-		//	m_isAttackFirst = true;
-
-		//}
-
-		//OnAttackX_Second();
-
 		m_multiAttack = 0;
 		//アイドル状態に戻る
 		OnIdle();
@@ -931,43 +966,22 @@ void Player::AttackXUpdate()
 	//アニメーションが終わった段階で次の攻撃フラグがたっていたら
 	if (m_pAnim->IsLoop() && m_isNextAttackFlag)
 	{
-
 		m_isNextAttackFlag = false;
 		m_multiAttack++;
 		//もう一回攻撃状態に戻る
 		OnAttackX();
 	}
-
-
-	//if (m_pAnim->IsLoop() && m_isAttackFirst)
-	//{
-	//	OnAttackX_Second();
-	//}
-	//else
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	OnIdle();
-	//}
-
-	//if (m_actionTime < 10 && m_isAttackAction == true)
-	//{
-	//	m_actionTime = 0;
-	//	m_isAttackAction = false;
-	//	OnAttackX_Second();
-	//}
-	//else if (m_actionTime > 10 || m_isAttackAction == false)
-	//{
-	//	m_isButtonPush = false;
-	//	m_buttonKind = e_ButtonKind::kNone;
-	//	m_actionTime = 0;
-	//	OnIdle();
-	//}
-
 }
 
 void Player::AttackYUpdate()
 {
+	m_stamina += kStaminaIncreaseSpeed;
+
+	if (m_isUseMp)
+	{
+		m_mp -= kMpDiminishNum;
+		m_isUseMp = false;
+	}
 
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
@@ -982,6 +996,8 @@ void Player::AttackYUpdate()
 
 void Player::HitUpdate()
 {
+	m_stamina += kStaminaIncreaseSpeed;
+
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
@@ -991,7 +1007,11 @@ void Player::HitUpdate()
 
 void Player::DeadUpdate()
 {
-	//ゲームオーバーシーンに遷移するフラグをたてる
+	m_stamina += kStaminaIncreaseSpeed;
+
+	//ゲームオーバーシーンに遷移するためにフラグを立てる
+	m_isGameOver = true;
+
 	m_isButtonPush = false;
 	m_buttonKind = e_ButtonKind::kNone;
 
@@ -1008,6 +1028,8 @@ void Player::SpawnUpdate()
 
 void Player::FaceUseUpdate()
 {
+	m_stamina += kStaminaIncreaseSpeed;
+
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	if (m_pAnim->IsLoop())
@@ -1019,6 +1041,8 @@ void Player::FaceUseUpdate()
 
 void Player::TalkUpdate()
 {
+	m_stamina += kStaminaIncreaseSpeed;
+
 	//会話するときの処理を入れる
 
 }
@@ -1086,6 +1110,7 @@ void Player::OnDash()
 
 void Player::OnAttackX()
 {
+
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	//タイプによって攻撃アニメーションを変える
