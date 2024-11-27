@@ -62,7 +62,7 @@ namespace
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
 	//カプセルの上の座標
-	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
+	constexpr VECTOR kUpPos = { 0.0f,12.0f,0.0f };
 
 	/*　プレイヤーのアニメーションの種類　*/
 	const char* const kAnimInfoFilename = "Data/Master/AnimPlayerMaster.csv";
