@@ -243,6 +243,9 @@
     <ClCompile Include="ui\PlayerBarUi.cpp">
       <Filter>ソース ファイル\ui</Filter>
     </ClCompile>
+    <ClCompile Include="object\boss\BossRast.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -418,6 +421,9 @@
     </ClInclude>
     <ClInclude Include="ui\PlayerBarUi.h">
       <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossRast.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -9,7 +9,6 @@
 class Player;
 class Camera;
 class SkyDome;
-class HpBar;
 class FaceUi;
 class FaceFrameUi;
 class ButtonUi;
@@ -44,7 +43,6 @@ private:
 	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	
-	std::shared_ptr<HpBar> m_pHpBarUi;
 	std::shared_ptr<PlayerBarUi> m_pPlayerBarUi;
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
@@ -79,6 +77,7 @@ private:
 
 	int m_radius;
 	float m_angle;
+
 
 	bool m_isFadingOut;
 	float m_cameraAngle;

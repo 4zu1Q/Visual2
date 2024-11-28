@@ -50,7 +50,6 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pPlayer = std::make_shared<Player>();
 	m_pCamera = std::make_shared<Camera>();
 
-	m_pHpBarUi = std::make_shared<HpBar>();
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
 	m_pFaceUi = std::make_shared<FaceUi>();
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
@@ -144,7 +143,6 @@ void SceneSelect::Update()
 	m_pPhysics->Update();
 
 	m_pFaceUi->Update();
-	m_pHpBarUi->Update(*m_pPlayer);
 	m_pPlayerBarUi->Update(*m_pPlayer);
 
 	//シーンフラグがたった場合
@@ -172,7 +170,6 @@ void SceneSelect::Draw()
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
 
-	m_pHpBarUi->Draw();
 	m_pPlayerBarUi->Draw();
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);

@@ -911,8 +911,8 @@ void Player::AirUpdate()
 	if (VSquareSize(move) > 0.0f)
 	{
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		m_attackDir = VNorm(move);
-		m_avoid = VNorm(move);
+		//m_attackDir = VNorm(move);
+		//m_avoid = VNorm(move);
 	}
 
 	move.y = m_rigidbody.GetVelocity().y;
@@ -941,6 +941,8 @@ void Player::AttackCharge()
 	else if(Pad::IsRelase(kPadButtonY) && m_chargeTime < 60)
 	{
 		m_chargeTime = 0;
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
 	}
 }
@@ -959,6 +961,8 @@ void Player::AttackXUpdate()
 	if (m_pAnim->IsLoop() && !m_isNextAttackFlag)
 	{
 		m_multiAttack = 0;
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		//アイドル状態に戻る
 		OnIdle();
 	}
@@ -968,6 +972,8 @@ void Player::AttackXUpdate()
 	{
 		m_isNextAttackFlag = false;
 		m_multiAttack++;
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
 		//もう一回攻撃状態に戻る
 		OnAttackX();
 	}

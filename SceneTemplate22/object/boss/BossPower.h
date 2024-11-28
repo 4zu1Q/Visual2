@@ -35,6 +35,7 @@ private:
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
+	void AvoidUpdate();
 	void AttackCoolTimeUpdate();
 	void DownUpdate();
 	void DeadUpdate();
@@ -46,6 +47,7 @@ private:
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
+	void OnAvoid();
 	void OnAttackCoolTime();
 	void OnDown();
 	void OnDead();
@@ -64,20 +66,30 @@ private:
 	//int m_modelH;
 
 	//タイマー関連の変数
-	std::shared_ptr<ActionTime> m_pOnWlakTime;
-	std::shared_ptr<ActionTime> m_pOnDashTime;
-	std::shared_ptr<ActionTime> m_pOnIdleTime;
-	std::shared_ptr<ActionTime> m_pOnDownTime;
-	std::shared_ptr<ActionTime> m_pOnAttackTime;
+	//std::shared_ptr<ActionTime> m_pOnWlakTime;
+	//std::shared_ptr<ActionTime> m_pOnDashTime;
+	//std::shared_ptr<ActionTime> m_pOnIdleTime;
+	//std::shared_ptr<ActionTime> m_pOnDownTime;
+	//std::shared_ptr<ActionTime> m_pOnAttackTime;
+
+	int m_attackCoolTime;
+	int m_actionTime;
+	bool m_isAttack;
+
+	int m_attackKind;
+
 
 	//攻撃判定の半径
 	float m_attackRadius;
 
 	float m_angle;
+	float m_nextAngle;
 
 	float m_hp;
 
 	VECTOR m_playerPos;
+
+	float m_length;
 
 	//座標
 	VECTOR m_pos;

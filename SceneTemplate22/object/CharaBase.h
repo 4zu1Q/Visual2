@@ -28,6 +28,11 @@ public:
 
 protected:
 
+	//角度を滑らかに変化させる関数
+	void SmoothAngle(float& nowAngle, float nextAngle);
+
+protected:
+
 	Status m_status;
 
 	VECTOR m_pos;

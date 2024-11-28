@@ -153,6 +153,7 @@
     <ClCompile Include="myLib\Rigidbody.cpp" />
     <ClCompile Include="object\boss\BossBase.cpp" />
     <ClCompile Include="object\boss\BossPower.cpp" />
+    <ClCompile Include="object\boss\BossRast.cpp" />
     <ClCompile Include="object\boss\BossShot.cpp" />
     <ClCompile Include="object\boss\BossSpeed.cpp" />
     <ClCompile Include="object\Camera.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="myLib\Rigidbody.h" />
     <ClInclude Include="object\boss\BossBase.h" />
     <ClInclude Include="object\boss\BossPower.h" />
+    <ClInclude Include="object\boss\BossRast.h" />
     <ClInclude Include="object\boss\BossShot.h" />
     <ClInclude Include="object\boss\BossSpeed.h" />
     <ClInclude Include="object\Camera.h" />
