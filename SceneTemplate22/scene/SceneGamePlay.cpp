@@ -51,7 +51,6 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
 	m_pButtonUi = std::make_shared<ButtonUi>();
 
-
 	m_pBossPower = std::make_shared<BossPower>();
 	m_pBossSpeed = std::make_shared<BossSpeed>();
 
@@ -136,10 +135,8 @@ void SceneGamePlay::Update()
 
 	m_pPhysics->Update();
 
-	//m_pGamePlayUi->Update(*m_pPlayer);
-
 	m_pFaceUi->Update();
-	m_pHpBarUi->Update(*m_pBossPower);
+	////m_pHpBarUi->Update(*m_pBossPower);
 	m_pPlayerBarUi->Update(*m_pPlayer);
 
 

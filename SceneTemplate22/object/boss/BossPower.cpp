@@ -18,6 +18,9 @@ namespace
 	constexpr float kDashSpeed = 0.7f;
 
 
+	constexpr float kAvoidSpeed = 2.0f;
+
+
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,200.0f };
 
@@ -25,7 +28,7 @@ namespace
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
 	/*ボスのアニメーションの種類*/
-	const char* const kAnimInfoFilename = "Data/Master/AnimBossPowerMaster.csv";
+	const char* const kAnimBossInfoFilename = "Data/Master/AnimBossMaster.csv";
 
 	const char* const kAnimIdle = "Idle";
 	const char* const kAnimWalk = "Walk";
@@ -34,6 +37,8 @@ namespace
 	const char* const kAnimAttack1 = "Attack1";
 	const char* const kAnimAttack2 = "Attack2";
 	const char* const kAnimAttack3 = "Attack3";
+
+	const char* const kAnimAvoid = "Avoid";
 
 	const char* const kAnimCoolTime = "CoolTime";
 
@@ -49,6 +54,7 @@ namespace
 	constexpr float kIdleToWalkTime = 40.0f;
 	constexpr float kIdleToAttackTime = 90.0f;
 	constexpr float kCoolTimeToIdleTime = 120.0f;
+	constexpr float kAvoidToIdleTime = 29.0f;
 
 	//次の状態に遷移するまでのプレイヤーとの長さ
 	constexpr float kIdleToWalkLength = 20.0f;
@@ -59,7 +65,7 @@ namespace
 	constexpr float kDashToWalkLength = 80.0f;
 
 	//攻撃の種類
-	constexpr int kAttackKind = 2;
+	constexpr int kAttackKind = 3;
 
 }
 
@@ -131,7 +137,7 @@ void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
 	//アニメーションの初期化
-	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimIdle);
+	m_pAnim->Initialize(kAnimBossInfoFilename, m_modelH, kAnimIdle);
 
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &BossPower::IdleUpdate;
@@ -294,8 +300,10 @@ void BossPower::DashUpdate()
 	VECTOR length = VSub(m_pos, m_playerPos);
 	float size = VSize(length);
 
+	//正規化
 	m_direction = VNorm(m_direction);
 
+	//モデルの角度
 	m_angle = atan2f(m_direction.x, m_direction.z);
 
 	//ベクトルを、正規化し、向きだけを保存させる
@@ -340,8 +348,23 @@ void BossPower::Attack3Update()
 
 void BossPower::AvoidUpdate()
 {
-	//アニメーションが終わったらクールタイム状態に入る
-	if (m_pAnim->IsLoop())
+	m_attackCoolTime++;
+
+	//プレイヤーへの向きを取得
+	m_direction = VSub(m_playerPos, m_pos);
+	//正規化
+	m_direction = VNorm(m_direction);
+	//モデルの角度
+	m_angle = atan2f(m_direction.x, m_direction.z);
+
+	//ベクトルを、正規化し、向きだけを保存させる
+	m_velocity = VScale(m_direction, -kAvoidSpeed);
+
+	//敵の移動
+	m_rigidbody.SetVelocity(m_velocity);
+
+	//アニメーションが終わったらアイドル状態に戻る
+	if (m_attackCoolTime > kAvoidToIdleTime)
 	{
 		OnIdle();
 	}
@@ -422,7 +445,7 @@ void BossPower::OnAvoid()
 {
 	m_attackKind = 0;
 	m_actionTime = 0;
-	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
+	m_pAnim->ChangeAnim(kAnimAvoid, true, true, false);
 	m_updateFunc = &BossPower::AvoidUpdate;
 }
 

@@ -13,7 +13,7 @@ Jump,Jump_Start,0.8
 Jumping,Jump_Idle,0.5
 AttackCharge,Blocking,1
 ShotAttackCharge,Spellcasting,0.7
-NormalAttackX_First,1H_Melee_Attack_Slice_Diagonal,0.8
+NormalAttackX_First,1H_Melee_Attack_Slice_Diagonal,0.6
 NormalAttackX_Second,1H_Melee_Attack_Chop,0.7
 NormalAttackX_Third,1H_Melee_Attack_Stab,1
 NormalAttackX_Fourth,Dualwield_Melee_Attack_Slice,0.6

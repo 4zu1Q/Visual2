@@ -51,7 +51,6 @@ private:
 	
 	//std::shared_ptr<GamePlayUi> m_pGamePlayUi;
 
-
 	std::shared_ptr<HpBar> m_pHpBarUi;
 	std::shared_ptr<PlayerBarUi> m_pPlayerBarUi;
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;

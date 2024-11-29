@@ -10,13 +10,14 @@
 namespace
 {
 	//プレイヤーのモデルファイル名
-	const char* const kModelFilename = "Data/Model/Boss/BossPower.mv1";
+	const char* const kModelFilename = "Data/Model/Boss/BossSpeed.mv1";
 	//モデルのスケール値
 	constexpr float kModelScale = 10.0f;
 
 	constexpr float kWalkSpeed = 0.4f;
 	constexpr float kDashSpeed = 0.7f;
 
+	constexpr float kAvoidSpeed = 2.0f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 100.0f,0.0f,200.0f };
@@ -25,7 +26,7 @@ namespace
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
 	/*ボスのアニメーションの種類*/
-	const char* const kAnimInfoFilename = "Data/Master/AnimBossPowerMaster.csv";
+	const char* const kAnimSpeedInfoFilename = "Data/Master/AnimBossMaster.csv";
 
 	const char* const kAnimIdle = "Idle";
 	const char* const kAnimWalk = "Walk";
@@ -34,6 +35,8 @@ namespace
 	const char* const kAnimAttack1 = "Attack1";
 	const char* const kAnimAttack2 = "Attack2";
 	const char* const kAnimAttack3 = "Attack3";
+
+	const char* const kAnimAvoid = "Avoid";
 
 	const char* const kAnimCoolTime = "CoolTime";
 
@@ -49,6 +52,7 @@ namespace
 	constexpr float kIdleToWalkTime = 40.0f;
 	constexpr float kIdleToAttackTime = 90.0f;
 	constexpr float kCoolTimeToIdleTime = 120.0f;
+	constexpr float kAvoidToIdleTime = 29.0f;
 
 	//次の状態に遷移するまでのプレイヤーとの長さ
 	constexpr float kIdleToWalkLength = 20.0f;
@@ -59,7 +63,7 @@ namespace
 	constexpr float kDashToWalkLength = 80.0f;
 
 	//攻撃の種類
-	constexpr int kAttackKind = 2;
+	constexpr int kAttackKind = 3;
 
 }
 
@@ -93,9 +97,9 @@ BossSpeed::BossSpeed() :
 
 	m_pPlayer = std::make_shared<Player>();
 
+	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
-	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 6.5f;
 
@@ -131,7 +135,7 @@ void BossSpeed::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
 	//アニメーションの初期化
-	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimIdle);
+	m_pAnim->Initialize(kAnimSpeedInfoFilename, m_modelH, kAnimIdle);
 
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &BossSpeed::IdleUpdate;
@@ -334,17 +338,33 @@ void BossSpeed::Attack3Update()
 	//アニメーションが終わったらクールタイム状態に入る
 	if (m_pAnim->IsLoop())
 	{
-		OnAttackCoolTime();
+		OnIdle();
 	}
 }
 
 void BossSpeed::AvoidUpdate()
 {
-	//アニメーションが終わったらクールタイム状態に入る
-	if (m_pAnim->IsLoop())
+	m_attackCoolTime++;
+
+	//プレイヤーへの向きを取得
+	m_direction = VSub(m_playerPos, m_pos);
+	//正規化
+	m_direction = VNorm(m_direction);
+	//モデルの角度
+	m_angle = atan2f(m_direction.x, m_direction.z);
+
+	//ベクトルを、正規化し、向きだけを保存させる
+	m_velocity = VScale(m_direction, -kAvoidSpeed);
+
+	//敵の移動
+	m_rigidbody.SetVelocity(m_velocity);
+
+	//アニメーションが終わったらアイドル状態に戻る
+	if (m_attackCoolTime > kAvoidToIdleTime)
 	{
 		OnIdle();
 	}
+
 }
 
 void BossSpeed::AttackCoolTimeUpdate()
@@ -422,7 +442,7 @@ void BossSpeed::OnAvoid()
 {
 	m_attackKind = 0;
 	m_actionTime = 0;
-	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
+	m_pAnim->ChangeAnim(kAnimAvoid, true, true, false);
 	m_updateFunc = &BossSpeed::AvoidUpdate;
 }
 
