@@ -28,7 +28,7 @@ namespace
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
 	/*ボスのアニメーションの種類*/
-	const char* const kAnimBossInfoFilename = "Data/Master/AnimBossMaster.csv";
+	const char* const kAnimBossInfoFilename = "Data/Master/AnimBossPowerMaster.csv";
 
 	const char* const kAnimIdle = "Idle";
 	const char* const kAnimWalk = "Walk";
@@ -326,6 +326,7 @@ void BossPower::Attack1Update()
 	{
 		OnIdle();
 	}
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 }
 
 void BossPower::Attack2Update()
@@ -335,6 +336,7 @@ void BossPower::Attack2Update()
 	{
 		OnIdle();
 	}
+	m_rigidbody.SetVelocity(VGet(0.0f,0.0f,0.0f));
 }
 
 void BossPower::Attack3Update()
@@ -344,6 +346,7 @@ void BossPower::Attack3Update()
 	{
 		OnAttackCoolTime();
 	}
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 }
 
 void BossPower::AvoidUpdate()
@@ -451,18 +454,24 @@ void BossPower::OnAvoid()
 
 void BossPower::OnAttackCoolTime()
 {
+	m_attackKind = 0;
+	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossPower::AttackCoolTimeUpdate;
 }
 
 void BossPower::OnDown()
 {
+	m_attackKind = 0;
+	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDown);
 	m_updateFunc = &BossPower::DownUpdate;
 }
 
 void BossPower::OnDead()
 {
+	m_attackKind = 0;
+	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updateFunc = &BossPower::DeadUpdate;
 }

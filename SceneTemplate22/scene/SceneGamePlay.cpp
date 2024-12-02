@@ -127,7 +127,7 @@ void SceneGamePlay::Update()
 	m_pBossPower->Update(m_pPhysics, *m_pPlayer);
 	m_pBossSpeed->Update(m_pPhysics, *m_pPlayer);
 
-	m_pCamera->Update(m_pField->GetModelHandle());
+	m_pCamera->Update(m_pField->GetModelHandle(), m_pPlayer->GetPos());
 	m_pCamera->SetPlayerPos(m_pPlayer->GetPosUp());
 
 	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());

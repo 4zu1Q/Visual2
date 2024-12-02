@@ -30,8 +30,8 @@ private:
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
-	void WalkUpdate();
 	void DashUpdate();
+	void PlayerToDashUpdate();
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
@@ -42,8 +42,8 @@ private:
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
-	void OnWalk();
 	void OnDash();
+	void OnPlayerToDash();
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
@@ -72,12 +72,15 @@ private:
 	//std::shared_ptr<ActionTime> m_pOnDownTime;
 	//std::shared_ptr<ActionTime> m_pOnAttackTime;
 
+	VECTOR m_anglePos;
+
 	int m_attackCoolTime;
 	int m_actionTime;
 	bool m_isAttack;
 
 	int m_attackKind;
 
+	float m_moveAngle;
 
 	//攻撃判定の半径
 	float m_attackRadius;
@@ -90,6 +93,8 @@ private:
 	VECTOR m_playerPos;
 
 	float m_length;
+
+
 
 	//座標
 	VECTOR m_pos;

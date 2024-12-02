@@ -55,6 +55,9 @@ namespace
 	constexpr float kCameraDist = 24.0f;
 	constexpr float kCameraHeight = 2.0f;
 
+	constexpr float kDashCameraDist = 90.0f;
+
+
 	constexpr float kCameraNear = 3.0f;
 	constexpr float kCameraFar = 6000.0f;
 
@@ -106,6 +109,13 @@ Camera::Camera() :
 	m_rotY(MGetRotX(m_angleH)),
 	m_angle(-DX_PI_F / 2)
 {
+	m_cameraDist = kCameraDist;
+
+	m_isDash = false;
+	m_isTarget = false;
+	m_isMovie = false;
+	m_isClear = false;
+
 	//SetCameraNearFar(kNear, kFar);
 	m_lightHandle = CreateDirLightHandle(VSub(m_aimPos, m_cameraPos));
 }
@@ -121,6 +131,8 @@ void Camera::Initialize()
 	m_cameraAngleX = 0.0f;
 	m_cameraAngleY = 12.0f;
 	SetCameraNearFar(kCameraNear, kCameraFar);
+
+	m_updateFunc = &Camera::NormalUpdate;
 }
 
 void Camera::Finalize()
@@ -166,73 +178,15 @@ void Camera::Finalize()
 	//SetCameraPositionAndTarget_UpVecY(m_prevPos, player.GetPosDown());
 //}
 
-void Camera::Update(int stageHandle)
+void Camera::Update(int stageHandle ,VECTOR targetPos)
 {
-	m_angleMoveScale = kAngleMoveScaleMax * 1.0f;
+	//アップデート
+	m_targetPos = targetPos;
 
-	//アナログスティックを使ってカメラ回転
-	int analogX = 0;
-	int analogY = 0;
+	(this->*m_updateFunc)(m_targetPos);
 
-	//アナログスティックを取得
-	GetJoypadAnalogInputRight(&analogX, &analogY, DX_INPUT_PAD1);
-	
-	//ベクトルの方向(注視点-カメラのポジション)
-	VECTOR posToAim = VSub(m_playerPos, m_prevPos);
-	
-	//入力から角度を計算する
-	if (analogX > 50.0f)
-	{
-		m_cameraAngleX -= m_angleMoveScale * std::abs(analogX);
-	}
-	else if (analogX < -50.0f)
-	{
-		m_cameraAngleX += m_angleMoveScale * std::abs(analogX);
-	}
 
-	if (analogY > 50.0f)
-	{
-		m_cameraAngleY += m_angleMoveScale * std::abs(analogY);
-		//角度が90度超えてしまった場合
-		if (m_cameraAngleY > 90)
-		{
-			m_cameraAngleY = 88;
-		}
-	}
-	else if (analogY < -50.0f)
-	{
-		m_cameraAngleY -= m_angleMoveScale * std::abs(analogY);
-		//角度が-90度超えてしまった場合
-		if (m_cameraAngleY < -90)
-		{
-			m_cameraAngleY = -88;
-		}
-	}
-	
-	// カメラの位置はカメラの水平角度と垂直角度から算出
-	// 最初に垂直角度を反映した位置を算出
-	VECTOR tempPos1;
-	float sinParam = sinf(m_cameraAngleY / 180.0f * DX_PI_F);
-	float cosParam = cosf(m_cameraAngleY / 180.0f * DX_PI_F);
-	tempPos1.x = 0.0f;
-	tempPos1.y = sinParam * kCameraDist;
-	tempPos1.z = -cosParam * kCameraDist;
 
-	// 次に水平角度を反映した位置を算出
-	VECTOR tempPos2;
-	sinParam = sinf(m_cameraAngleX / 180.0f * DX_PI_F);
-	cosParam = cosf(m_cameraAngleX / 180.0f * DX_PI_F);
-	tempPos2.x = cosParam * tempPos1.x - sinParam * tempPos1.z;
-	tempPos2.y = tempPos1.y;
-	tempPos2.z = sinParam * tempPos1.x + cosParam * tempPos1.z;
-
-	//
-	m_aimPos = VGet(m_playerPos.x, m_playerPos.y + 4.0f , m_playerPos.z - 10.0f);
-
-	// 算出した座標に注視点の位置を加算したものがカメラの位置になる
-	m_cameraPos = VAdd(tempPos2, m_aimPos);
-	
-	auto nextPos = m_cameraPos;
 
 	// 最初はステージ自体と判定
 	//m_hitDim = MV1CollCheck_Capsule(stageHandle, -1, m_aimPos, m_cameraPos, kCameraRadius);
@@ -360,9 +314,9 @@ void Camera::DebugUpdate(VECTOR playerPos)
 	}
 
 	//カメラの回転
-	m_prevPos.x += cosf(m_angle) * kCameraDist;
+	m_prevPos.x += cosf(m_angle) * m_cameraDist;
 	m_prevPos.y += kCameraHeight;
-	m_prevPos.z += sinf(m_angle) * kCameraDist;
+	m_prevPos.z += sinf(m_angle) * m_cameraDist;
 
 	//現在位置に設定したポジションを足す
 	m_prevPos = VAdd(m_prevPos, posToAim);
@@ -418,9 +372,210 @@ void Camera::CameraPosUpdate()
 
 void Camera::NormalUpdate(VECTOR targetPos)
 {
+	if (m_isDash)
+	{
+		OnDash();
+	}
+	else if (m_isTarget)
+	{
+		OnTarget();
+	}
+	else if (m_isMovie)
+	{
+		OnMovie();
+	}
+	else if (m_isClear)
+	{
+		OnClear();
+	}
+
+
+	m_angleMoveScale = kAngleMoveScaleMax * 1.0f;
+
+	//アナログスティックを使ってカメラ回転
+	int analogX = 0;
+	int analogY = 0;
+
+	//アナログスティックを取得
+	GetJoypadAnalogInputRight(&analogX, &analogY, DX_INPUT_PAD1);
+
+	//ベクトルの方向(注視点-カメラのポジション)
+	VECTOR posToAim = VSub(m_playerPos, m_prevPos);
+
+	//入力から角度を計算する
+	if (analogX > 50.0f)
+	{
+		m_cameraAngleX -= m_angleMoveScale * std::abs(analogX);
+	}
+	else if (analogX < -50.0f)
+	{
+		m_cameraAngleX += m_angleMoveScale * std::abs(analogX);
+	}
+
+	if (analogY > 50.0f)
+	{
+		m_cameraAngleY += m_angleMoveScale * std::abs(analogY);
+		//角度が90度超えてしまった場合
+		if (m_cameraAngleY > 90)
+		{
+			m_cameraAngleY = 88;
+		}
+	}
+	else if (analogY < -50.0f)
+	{
+		m_cameraAngleY -= m_angleMoveScale * std::abs(analogY);
+		//角度が-90度超えてしまった場合
+		if (m_cameraAngleY < -90)
+		{
+			m_cameraAngleY = -88;
+		}
+	}
+
+	// カメラの位置はカメラの水平角度と垂直角度から算出
+	// 最初に垂直角度を反映した位置を算出
+	VECTOR tempPos1;
+	float sinParam = sinf(m_cameraAngleY / 180.0f * DX_PI_F);
+	float cosParam = cosf(m_cameraAngleY / 180.0f * DX_PI_F);
+	tempPos1.x = 0.0f;
+	tempPos1.y = sinParam * m_cameraDist;
+	tempPos1.z = -cosParam * m_cameraDist;
+
+	// 次に水平角度を反映した位置を算出
+	VECTOR tempPos2;
+	sinParam = sinf(m_cameraAngleX / 180.0f * DX_PI_F);
+	cosParam = cosf(m_cameraAngleX / 180.0f * DX_PI_F);
+	tempPos2.x = cosParam * tempPos1.x - sinParam * tempPos1.z;
+	tempPos2.y = tempPos1.y;
+	tempPos2.z = sinParam * tempPos1.x + cosParam * tempPos1.z;
+
+	//
+	m_aimPos = VGet(m_playerPos.x, m_playerPos.y + 4.0f, m_playerPos.z - 10.0f);
+
+	// 算出した座標に注視点の位置を加算したものがカメラの位置になる
+	m_cameraPos = VAdd(tempPos2, m_aimPos);
+
+	auto nextPos = m_cameraPos;
+
 	//m_targetPos.x = (m_targetPos.x * kPrevCameraTargetFollowSpeed) + (targetPos.x * kCameraTargetFollowSpeed);
 	//m_targetPos.y = (m_targetPos.y * kPrevCameraTargetFollowSpeed) + (targetPos.y * kCameraTargetFollowSpeed);
 	//m_targetPos.z = (m_targetPos.z * kPrevCameraTargetFollowSpeed) + (targetPos.z * kCameraTargetFollowSpeed);
+}
+
+void Camera::DashUpdate(VECTOR targetPos)
+{
+	if (!m_isDash)
+	{
+		OnNormal();
+	}
+	else if (!m_isTarget)
+	{
+		OnTarget();
+	}
+
+	m_angleMoveScale = kAngleMoveScaleMax * 1.0f;
+
+	//アナログスティックを使ってカメラ回転
+	int analogX = 0;
+	int analogY = 0;
+
+	//アナログスティックを取得
+	GetJoypadAnalogInputRight(&analogX, &analogY, DX_INPUT_PAD1);
+
+	//ベクトルの方向(注視点-カメラのポジション)
+	VECTOR posToAim = VSub(m_playerPos, m_prevPos);
+
+	//入力から角度を計算する
+	if (analogX > 50.0f)
+	{
+		m_cameraAngleX -= m_angleMoveScale * std::abs(analogX);
+	}
+	else if (analogX < -50.0f)
+	{
+		m_cameraAngleX += m_angleMoveScale * std::abs(analogX);
+	}
+
+	if (analogY > 50.0f)
+	{
+		m_cameraAngleY += m_angleMoveScale * std::abs(analogY);
+		//角度が90度超えてしまった場合
+		if (m_cameraAngleY > 90)
+		{
+			m_cameraAngleY = 88;
+		}
+	}
+	else if (analogY < -50.0f)
+	{
+		m_cameraAngleY -= m_angleMoveScale * std::abs(analogY);
+		//角度が-90度超えてしまった場合
+		if (m_cameraAngleY < -90)
+		{
+			m_cameraAngleY = -88;
+		}
+	}
+
+	// カメラの位置はカメラの水平角度と垂直角度から算出
+	// 最初に垂直角度を反映した位置を算出
+	VECTOR tempPos1;
+	float sinParam = sinf(m_cameraAngleY / 180.0f * DX_PI_F);
+	float cosParam = cosf(m_cameraAngleY / 180.0f * DX_PI_F);
+	tempPos1.x = 0.0f;
+	tempPos1.y = sinParam * kDashCameraDist;
+	tempPos1.z = -cosParam * kDashCameraDist;
+
+	// 次に水平角度を反映した位置を算出
+	VECTOR tempPos2;
+	sinParam = sinf(m_cameraAngleX / 180.0f * DX_PI_F);
+	cosParam = cosf(m_cameraAngleX / 180.0f * DX_PI_F);
+	tempPos2.x = cosParam * tempPos1.x - sinParam * tempPos1.z;
+	tempPos2.y = tempPos1.y;
+	tempPos2.z = sinParam * tempPos1.x + cosParam * tempPos1.z;
+
+	//
+	m_aimPos = VGet(m_playerPos.x, m_playerPos.y + 4.0f, m_playerPos.z - 10.0f);
+
+	// 算出した座標に注視点の位置を加算したものがカメラの位置になる
+	m_cameraPos = VAdd(tempPos2, m_aimPos);
+
+	auto nextPos = m_cameraPos;
+}
+
+void Camera::TargetUpdate(VECTOR targetPos)
+{
+}
+
+void Camera::MovieUpdate(VECTOR targetPos)
+{
+}
+
+void Camera::ClearUpdate(VECTOR targetPos)
+{
+}
+
+void Camera::OnNormal()
+{
+	m_cameraDist = kCameraDist;
+	m_updateFunc = &Camera::NormalUpdate;
+}
+
+void Camera::OnDash()
+{
+	m_cameraDist = kDashCameraDist;
+	m_updateFunc = &Camera::DashUpdate;
+}
+
+void Camera::OnTarget()
+{
+	m_updateFunc = &Camera::TargetUpdate;
+}
+
+void Camera::OnMovie()
+{
+	m_updateFunc = &Camera::MovieUpdate;
+}
+
+void Camera::OnClear()
+{
+	m_updateFunc = &Camera::ClearUpdate;
 }
 
 void Camera::AngleUpdate(/*bool isLookOn*/)

@@ -229,7 +229,7 @@ Player::Player() :
 	m_pWeaponBase = std::make_shared<WeaponBase>();
 	m_pWeaponBase->Initialize(m_weaponH, m_modelH, "handslot.r", "handslot.l", kWeaponScale);
 
-	//m_pCamera = std::make_shared<Camera>();
+	m_pCamera = std::make_shared<Camera>();
 
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
@@ -382,6 +382,7 @@ void Player::Draw()
 
 	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
 
+	DrawFormatString(0, 200, 0xffffff, "DashFlag:%d", m_pCamera->GetIsDash());
 
 	//DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
 #endif
@@ -675,6 +676,7 @@ void Player::DashUpdate()
 {
 	// カメラの角度によって進む方向を変える
 	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
+
 
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
@@ -1089,6 +1091,7 @@ void Player::OnIdle()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	m_pCamera->SetIsDash(false);
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalIdle, kAnimPowerIdle, kAnimSpeedIdle, kAnimNormalIdle);
 
@@ -1097,6 +1100,7 @@ void Player::OnIdle()
 
 void Player::OnWalk()
 {
+	m_pCamera->SetIsDash(false);
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalWalk, kAnimPowerWalk, kAnimSpeedWalk, kAnimNormalWalk);
 
@@ -1105,6 +1109,8 @@ void Player::OnWalk()
 
 void Player::OnDash()
 {
+	m_pCamera->SetIsDash(true);
+
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalDash, kAnimPowerDash, kAnimSpeedDash, kAnimNormalDash);
 
@@ -1150,6 +1156,7 @@ void Player::OnAttackX()
 
 void Player::OnAttackY()
 {
+	m_pCamera->SetIsDash(false);
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	//タイプによってアニメーションを変える
@@ -1209,6 +1216,7 @@ void Player::OnAir()
 
 void Player::OnAttackCharge()
 {
+	m_pCamera->SetIsDash(false);
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	//タイプによってアニメーションを変える
@@ -1223,12 +1231,14 @@ void Player::OnAttackCharge()
 
 void Player::OnHit()
 {
+	m_pCamera->SetIsDash(false);
 	m_pAnim->ChangeAnim(kAnimJump);
 	m_updateFunc = &Player::HitUpdate;
 }
 
 void Player::OnDead()
 {
+	m_pCamera->SetIsDash(false);
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updateFunc = &Player::DeadUpdate;
 }
