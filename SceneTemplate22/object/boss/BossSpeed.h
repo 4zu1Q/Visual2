@@ -32,6 +32,7 @@ private:
 	void IdleUpdate();
 	void DashUpdate();
 	void PlayerToDashUpdate();
+	void HomePosDashUpdate();
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
@@ -44,6 +45,7 @@ private:
 	void OnIdle();
 	void OnDash();
 	void OnPlayerToDash();
+	void OnHomePosDash();
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
@@ -74,11 +76,12 @@ private:
 
 	VECTOR m_anglePos;
 
-	int m_attackCoolTime;
 	int m_actionTime;
 	bool m_isAttack;
+	bool m_isAvoid;
 
 	int m_attackKind;
+	int m_attackNum;
 
 	float m_moveAngle;
 
@@ -92,9 +95,10 @@ private:
 
 	VECTOR m_playerPos;
 
-	float m_length;
+	float m_bossToPlayerLength;
+	float m_bossToHomePosLength;
 
-
+	VECTOR m_homePos;
 
 	//座標
 	VECTOR m_pos;

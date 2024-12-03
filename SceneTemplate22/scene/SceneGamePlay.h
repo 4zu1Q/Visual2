@@ -16,6 +16,7 @@ class FaceFrameUi;
 class ButtonUi;
 class BossPower;
 class BossSpeed;
+class BossShot;
 class Field;
 class MyLib::Physics;
 
@@ -48,6 +49,7 @@ private:
 	
 	std::shared_ptr<BossPower> m_pBossPower;
 	std::shared_ptr<BossSpeed> m_pBossSpeed;
+	std::shared_ptr<BossShot> m_pBossShot;
 	
 	//std::shared_ptr<GamePlayUi> m_pGamePlayUi;
 

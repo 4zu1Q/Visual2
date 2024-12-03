@@ -51,14 +51,14 @@ namespace
 	constexpr float kMaxHp = 400.0f;
 
 	//次の状態に遷移するまでの時間
-	constexpr float kIdleToWalkTime = 40.0f;
-	constexpr float kIdleToAttackTime = 90.0f;
-	constexpr float kCoolTimeToIdleTime = 120.0f;
+	constexpr float kIdleToAttackTime = 40.0f;
+	constexpr float kIdleToAvoidTime = 90.0f;
+	constexpr float kCoolTimeToAvoidTime = 120.0f;
 	constexpr float kAvoidToIdleTime = 29.0f;
 
 	//次の状態に遷移するまでのプレイヤーとの長さ
-	constexpr float kIdleToWalkLength = 20.0f;
 	constexpr float kIdleToAttackLength = 20.0f;
+	//constexpr float kIdleToAttackLength = 20.0f;
 	constexpr float kWalkToIdleLength = 20.0f;
 
 	constexpr float kWalkToDashLength = 100.0f;
@@ -217,12 +217,12 @@ void BossPower::IdleUpdate()
 	//m_angle = atan2f(m_direction.x, m_direction.z);
 
 	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
-	if (m_actionTime > kIdleToWalkTime && m_length > kIdleToWalkLength)
+	if (m_actionTime > kIdleToAttackTime && m_length > kIdleToAttackLength)
 	{
 		OnWalk();
 	}
 	//プレイヤーと十分な距離の場合 && タイマー
-	else if (m_actionTime > kIdleToAttackTime && m_length < kIdleToAttackLength)
+	else if (m_actionTime > kIdleToAvoidTime && m_length < kIdleToAttackLength)
 	{
 		//ランダム関数かなんか使ってやる
 
@@ -241,7 +241,7 @@ void BossPower::IdleUpdate()
 			OnAttack3();
 			break;
 		case 3:
-			OnAvoid();
+			OnAttack1();
 			break;
 		default:
 			break;
@@ -377,7 +377,7 @@ void BossPower::AttackCoolTimeUpdate()
 {
 	m_attackCoolTime++;
 
-	if (m_attackCoolTime > kCoolTimeToIdleTime)
+	if (m_attackCoolTime > kCoolTimeToAvoidTime)
 	{
 		OnIdle();
 	}

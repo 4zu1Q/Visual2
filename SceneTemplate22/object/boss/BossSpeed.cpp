@@ -12,12 +12,12 @@ namespace
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Boss/BossSpeed.mv1";
 	//モデルのスケール値
-	constexpr float kModelScale = 10.0f;
+	constexpr float kModelScale = 8.0f;
 
 	constexpr float kWalkSpeed = 0.4f;
 	constexpr float kDashSpeed = 0.7f;
 
-	constexpr float kAvoidSpeed = 4.0f;
+	constexpr float kAvoidSpeed = 2.0f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
@@ -51,14 +51,14 @@ namespace
 
 
 	//次の状態に遷移するまでの時間
-	constexpr float kIdleToWalkTime = 40.0f;
-	constexpr float kIdleToAttackTime = 20.0f;
-	constexpr float kCoolTimeToIdleTime = 120.0f;
+	constexpr float kIdleToAttackTime = 40.0f;
+	constexpr float kIdleToAvoidTime = 40.0f;
+	constexpr float kCoolTimeToAvoidTime = 80.0f;
 	constexpr float kAvoidToIdleTime = 29.0f;
 
 	//次の状態に遷移するまでのプレイヤーとの長さ
-	constexpr float kIdleToWalkLength = 20.0f;
 	constexpr float kIdleToAttackLength = 20.0f;
+	constexpr float kIdleToDashLength = 20.0f;
 	constexpr float kWalkToIdleLength = 20.0f;
 
 	constexpr float kWalkToDashLength = 100.0f;
@@ -66,6 +66,8 @@ namespace
 
 	//攻撃の種類
 	constexpr int kAttackKind = 3;
+
+	constexpr int kAttackNum = 2;
 
 }
 
@@ -76,12 +78,15 @@ BossSpeed::BossSpeed() :
 	m_direction(VGet(0, 0, 0)),
 	m_velocity(VGet(0, 0, 0)),
 	m_playerPos(VGet(0, 0, 0)),
+	m_homePos(VGet(0,0,0)),
 	m_angle(0.0f),
 	m_nextAngle(0.0f),
-	m_length(0.0f),
-	m_attackCoolTime(0),
+	m_bossToPlayerLength(0.0f),
+	m_bossToHomePosLength(0.0f),
 	m_actionTime(0),
+	m_attackNum(0),
 	m_isAttack(false),
+	m_isAvoid(false),
 	m_attackKind(0),
 	m_moveAngle(0.0f),
 	m_hp(350.0f)
@@ -160,7 +165,10 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 
 	//プレイヤーとボスの距離を距離を求める
 	VECTOR toPlayer = VSub(m_playerPos, m_pos);
-	m_length = VSize(toPlayer);
+	m_bossToPlayerLength = VSize(toPlayer);
+
+	VECTOR toHomePos = VSub(m_homePos, m_pos);
+	m_bossToHomePosLength = VSize(toHomePos);
 
 	//m_pos = m_pPlayer->GetPosDown();
 
@@ -169,6 +177,15 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
+
+	if (m_attackNum > 2)
+	{
+		m_isAvoid = true;
+	}
+	else
+	{
+		m_isAvoid = false;
+	}
 
 	//auto pos = m_rigidbody.GetPos();
 
@@ -190,7 +207,8 @@ void BossSpeed::Draw()
 	MV1DrawModel(m_modelH);
 
 	DrawFormatString(0, 262, 0xff0fff, "BossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
-	DrawFormatString(0, 368, 0xff0fff, "BossToPlayer:%f", m_length);
+	DrawFormatString(0, 368, 0xff0fff, "BossToPlayer:%f", m_bossToPlayerLength);
+	DrawFormatString(0, 388, 0xff0fff, "BossToHomePos:%f", m_bossToHomePosLength);
 
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 }
@@ -218,11 +236,37 @@ void BossSpeed::IdleUpdate()
 	//m_angle = atan2f(m_direction.x, m_direction.z);
 
 	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
-	if (m_actionTime > kIdleToWalkTime && m_length > kIdleToWalkLength)
+	if (m_actionTime > kIdleToAttackTime && m_bossToPlayerLength > kIdleToDashLength)
 	{
 		OnDash();
 	}
+	//プレイヤーと十分な距離の場合 && タイマー
+	else if (m_actionTime > kIdleToAvoidTime && m_bossToPlayerLength < kIdleToAttackLength)
+	{
+		//ランダム関数かなんか使ってやる
 
+		m_attackKind = GetRand(kAttackKind);
+
+		//ランダムで攻撃を行う
+		switch (m_attackKind)
+		{
+		case 0:
+			OnAttack1();
+			break;
+		case 1:
+			OnAttack2();
+			break;
+		case 2:
+			OnAttack3();
+			break;
+		case 3:
+			OnAttack3();
+			break;
+		default:
+			break;
+		}
+
+	}
 	m_nextAngle = atan2(m_direction.x, m_direction.z);
 
 	SmoothAngle(m_angle, m_nextAngle);
@@ -235,26 +279,57 @@ void BossSpeed::IdleUpdate()
 
 void BossSpeed::DashUpdate()
 {
-	//注視点の座標
-	VECTOR playerAimPos = VGet(0.0f, 0.0f, 0.0f);
-	//ベクトルの方向(注視点-カメラのポジション)
-	VECTOR posToAim = VSub(playerAimPos, m_pos);
+	m_actionTime++;
 
-	m_moveAngle += 0.01f;
+	//プレイヤーへの向きを取得
+	m_direction = VSub(m_playerPos, m_pos);
 
-	m_anglePos.x += cosf(m_moveAngle) * 24;
-	m_anglePos.y += 0.0f;
-	m_anglePos.z += sinf(m_moveAngle) * 24;
-
-	m_anglePos = VNorm(m_anglePos);
+	VECTOR length = VSub(m_pos, m_playerPos);
+	float size = VSize(length);
 
 
-	if (m_length < 80)
+	m_direction = VNorm(m_direction);
+
+	m_angle = atan2f(m_direction.x, m_direction.z);
+
+	//ベクトルを、正規化し、向きだけを保存させる
+	m_velocity = VScale(m_direction, kDashSpeed);
+
+	//敵の移動
+	m_rigidbody.SetVelocity(m_velocity);
+
+	if (m_actionTime > kIdleToAvoidTime && m_bossToPlayerLength < kIdleToAttackLength)
 	{
-		OnPlayerToDash();
+		//ランダム関数かなんか使ってやる
+		OnIdle();
 	}
 
-	m_rigidbody.SetVelocity(m_anglePos);
+	//m_direction = VSub(m_playerPos, m_pos);
+
+	//m_direction = VNorm(m_direction);
+
+	//m_angle = atan2f(m_direction.x, m_direction.z);
+
+	////注視点の座標
+	//VECTOR playerAimPos = VGet(0.0f, 0.0f, 0.0f);
+	////ベクトルの方向(注視点-カメラのポジション)
+	//VECTOR posToAim = VSub(playerAimPos, m_pos);
+
+	//m_moveAngle += 0.05f;
+
+	//m_anglePos.x += cosf(m_moveAngle) * 24;
+	//m_anglePos.y += 0.0f;
+	//m_anglePos.z += sinf(m_moveAngle) * 24;
+
+	//m_anglePos = VNorm(m_anglePos);
+
+
+	//if (m_bossToPlayerLength < 160)
+	//{
+	//	OnPlayerToDash();
+	//}
+
+	//m_rigidbody.SetVelocity(m_anglePos);
 }
 
 void BossSpeed::PlayerToDashUpdate()
@@ -267,6 +342,7 @@ void BossSpeed::PlayerToDashUpdate()
 	VECTOR length = VSub(m_pos, m_playerPos);
 	float size = VSize(length);
 
+
 	m_direction = VNorm(m_direction);
 
 	m_angle = atan2f(m_direction.x, m_direction.z);
@@ -277,7 +353,7 @@ void BossSpeed::PlayerToDashUpdate()
 	//敵の移動
 	m_rigidbody.SetVelocity(m_velocity);
 
-	if (m_actionTime > kIdleToAttackTime && m_length < kIdleToAttackLength)
+	if (m_actionTime > kIdleToAvoidTime && m_bossToPlayerLength < kIdleToAttackLength)
 	{
 		//ランダム関数かなんか使ってやる
 
@@ -305,12 +381,38 @@ void BossSpeed::PlayerToDashUpdate()
 	}
 }
 
+void BossSpeed::HomePosDashUpdate()
+{
+	//定位置の向きを取得
+	m_direction = VSub(m_homePos, m_pos);
+
+	m_direction = VNorm(m_direction);
+
+	m_angle = atan2f(m_direction.x, m_direction.z);
+
+	//ベクトルを、正規化し、向きだけを保存させる
+	m_velocity = VScale(m_direction, kDashSpeed);
+
+	//敵の移動
+	m_rigidbody.SetVelocity(m_velocity);
+
+	if (m_bossToHomePosLength < 120)
+	{
+		OnDash();
+	}
+
+}
+
 void BossSpeed::Attack1Update()
 {
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
+	if (m_pAnim->IsLoop() && m_isAvoid)
 	{
 		OnAvoid();
+	}
+	else if (m_pAnim->IsLoop() && !m_isAvoid)
+	{
+		OnIdle();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 }
@@ -318,9 +420,13 @@ void BossSpeed::Attack1Update()
 void BossSpeed::Attack2Update()
 {
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
+	if (m_pAnim->IsLoop() && m_isAvoid)
 	{
 		OnAvoid();
+	}
+	else if (m_pAnim->IsLoop() && !m_isAvoid)
+	{
+		OnIdle();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 }
@@ -332,12 +438,13 @@ void BossSpeed::Attack3Update()
 	{
 		OnAttackCoolTime();
 	}
+
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 }
 
 void BossSpeed::AvoidUpdate()
 {
-	m_attackCoolTime++;
+	m_actionTime++;
 
 	//プレイヤーへの向きを取得
 	m_direction = VSub(m_playerPos, m_pos);
@@ -353,7 +460,7 @@ void BossSpeed::AvoidUpdate()
 	m_rigidbody.SetVelocity(m_velocity);
 
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_attackCoolTime > kAvoidToIdleTime)
+	if (m_actionTime > kAvoidToIdleTime)
 	{
 		OnIdle();
 	}
@@ -362,11 +469,15 @@ void BossSpeed::AvoidUpdate()
 
 void BossSpeed::AttackCoolTimeUpdate()
 {
-	m_attackCoolTime++;
+	m_actionTime++;
 
-	if (m_attackCoolTime > kCoolTimeToIdleTime)
+	if (m_actionTime > kCoolTimeToAvoidTime && m_isAvoid)
 	{
 		OnAvoid();
+	}
+	else if (m_actionTime > kCoolTimeToAvoidTime && !m_isAvoid)
+	{
+		OnIdle();
 	}
 }
 
@@ -388,7 +499,7 @@ void BossSpeed::DeadUpdate()
 
 void BossSpeed::OnIdle()
 {
-	m_attackCoolTime = 0;
+	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossSpeed::IdleUpdate;
 }
@@ -407,8 +518,16 @@ void BossSpeed::OnPlayerToDash()
 	m_updateFunc = &BossSpeed::PlayerToDashUpdate;
 }
 
+void BossSpeed::OnHomePosDash()
+{
+	m_actionTime = 0;
+	m_pAnim->ChangeAnim(kAnimDash);
+	m_updateFunc = &BossSpeed::HomePosDashUpdate;
+}
+
 void BossSpeed::OnAttack1()
 {
+	m_attackNum++;
 	m_attackKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
@@ -417,6 +536,7 @@ void BossSpeed::OnAttack1()
 
 void BossSpeed::OnAttack2()
 {
+	m_attackNum++;
 	m_attackKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
@@ -425,6 +545,7 @@ void BossSpeed::OnAttack2()
 
 void BossSpeed::OnAttack3()
 {
+	m_attackNum++;
 	m_attackKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
@@ -433,6 +554,7 @@ void BossSpeed::OnAttack3()
 
 void BossSpeed::OnAvoid()
 {
+	m_attackNum = 0;
 	m_attackKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAvoid, true, true, false);
