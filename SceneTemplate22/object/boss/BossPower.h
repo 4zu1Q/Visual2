@@ -62,21 +62,11 @@ private:
 	using UpdateFunc_t = void(BossPower::*)();
 	UpdateFunc_t m_updateFunc;
 
-	//モデルハンドル
-	//int m_modelH;
-
-	//タイマー関連の変数
-	//std::shared_ptr<ActionTime> m_pOnWlakTime;
-	//std::shared_ptr<ActionTime> m_pOnDashTime;
-	//std::shared_ptr<ActionTime> m_pOnIdleTime;
-	//std::shared_ptr<ActionTime> m_pOnDownTime;
-	//std::shared_ptr<ActionTime> m_pOnAttackTime;
-
-	int m_attackCoolTime;
-	int m_actionTime;
 	bool m_isAttack;
 
-	int m_attackKind;
+	//次の行動に移るための変数
+	int m_actionTime;
+	int m_actionKind;
 
 
 	//攻撃判定の半径

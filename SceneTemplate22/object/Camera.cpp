@@ -245,7 +245,6 @@ void Camera::Update(int stageHandle ,VECTOR targetPos)
 
 	SetCameraPositionAndTarget_UpVecY(m_cameraPos, m_aimPos);
 
-
 	//// 更新前の座標の設定
 	//m_prevPos = m_nextPos;
 
@@ -403,16 +402,16 @@ void Camera::NormalUpdate(VECTOR targetPos)
 	VECTOR posToAim = VSub(m_playerPos, m_prevPos);
 
 	//入力から角度を計算する
-	if (analogX > 50.0f)
+	if (analogX > 100.0f)
 	{
 		m_cameraAngleX -= m_angleMoveScale * std::abs(analogX);
 	}
-	else if (analogX < -50.0f)
+	else if (analogX < -100.0f)
 	{
 		m_cameraAngleX += m_angleMoveScale * std::abs(analogX);
 	}
 
-	if (analogY > 50.0f)
+	if (analogY > 100.0f)
 	{
 		m_cameraAngleY += m_angleMoveScale * std::abs(analogY);
 		//角度が90度超えてしまった場合
@@ -421,7 +420,7 @@ void Camera::NormalUpdate(VECTOR targetPos)
 			m_cameraAngleY = 88;
 		}
 	}
-	else if (analogY < -50.0f)
+	else if (analogY < -100.0f)
 	{
 		m_cameraAngleY -= m_angleMoveScale * std::abs(analogY);
 		//角度が-90度超えてしまった場合

@@ -155,7 +155,8 @@ void AnimController::AnimUpdate(const std::string& id, int attachIndex, float ra
 	// アニメーションの再生時間を取得
 	auto time = MV1GetAttachAnimTime(m_modelH, attachIndex);
 	// スピード分アニメを進める
-	rate = std::max<float>(0.0f, std::min<float>(1.0f, rate));
+	rate = std::max<float>(0.0f ,rate);		//アニメーション速度のリミッター解除
+	//rate = std::max<float>(0.0f, std::min<float>(1.0f, rate));
 	float speed = m_idTable.at(id).speed * rate;
 	time += speed;
 	// 総裁時間を超えたら再生時間から総再生時間分へらす

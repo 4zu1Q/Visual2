@@ -140,6 +140,8 @@ void SceneGamePlay::Update()
 
 	m_pPhysics->Update();
 
+
+
 	m_pFaceUi->Update();
 	////m_pHpBarUi->Update(*m_pBossPower);
 	m_pPlayerBarUi->Update(*m_pPlayer);

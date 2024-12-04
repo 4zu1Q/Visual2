@@ -206,9 +206,9 @@ void BossSpeed::Draw()
 {
 	MV1DrawModel(m_modelH);
 
-	DrawFormatString(0, 262, 0xff0fff, "BossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
-	DrawFormatString(0, 368, 0xff0fff, "BossToPlayer:%f", m_bossToPlayerLength);
-	DrawFormatString(0, 388, 0xff0fff, "BossToHomePos:%f", m_bossToHomePosLength);
+	DrawFormatString(0, 262, 0xff0fff, "SpeedBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
+	DrawFormatString(0, 368, 0xff0fff, "SpeedBossToPlayer:%f", m_bossToPlayerLength);
+	DrawFormatString(0, 408, 0xff0fff, "BossToHomePos:%f", m_bossToHomePosLength);
 
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 }

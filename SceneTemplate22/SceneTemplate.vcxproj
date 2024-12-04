@@ -165,6 +165,7 @@
     <ClCompile Include="object\ObjectBase.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
     <ClCompile Include="object\player\PlayerWeapon.cpp" />
+    <ClCompile Include="object\shot\ShotBase.cpp" />
     <ClCompile Include="object\stage\Field.cpp" />
     <ClCompile Include="object\stage\SkyDome.cpp" />
     <ClCompile Include="object\stage\Tomb.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="object\ObjectBase.h" />
     <ClInclude Include="object\player\Player.h" />
     <ClInclude Include="object\player\PlayerWeapon.h" />
+    <ClInclude Include="object\shot\ShotBase.h" />
     <ClInclude Include="object\stage\Field.h" />
     <ClInclude Include="object\stage\SkyDome.h" />
     <ClInclude Include="object\stage\Tomb.h" />

@@ -7,6 +7,7 @@
 #include "SceneManager.h"
 #include "SceneTitle.h"
 #include "SceneSelect.h"
+#include "SceneGamePlay.h"
 #include "SceneOption.h"
 #include "SceneDebug.h"
 
@@ -110,6 +111,7 @@ void SceneTitle::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
+				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
 				return;
 			}

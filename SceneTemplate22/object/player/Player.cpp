@@ -53,11 +53,17 @@ namespace
 	constexpr float kShotDashSpeed = 1.1f;
 	constexpr float kStrongestDashSpeed = 1.2f;
 
-	//ジャンプ力
-	constexpr float kNormalJumpPower = 6.0f;
-	constexpr float kPowerJumpPower = 3.0f;
-	constexpr float kSpeedJumpPower = 9.0f;
-	constexpr float kShotJumpPower = 5.0f;
+	//ジャンプ力最小値
+	constexpr float kMinNormalJumpPower = 0.25f;
+	constexpr float kMinPowerJumpPower = 0.25f;
+	constexpr float kMinSpeedJumpPower = 0.90f;
+	constexpr float kMinShotJumpPower = 0.50f;
+
+	//ジャンプ力最大値
+	constexpr float kMaxNormalJumpPower = 0.8f;
+	constexpr float kMaxPowerJumpPower = 0.25f;
+	constexpr float kMaxSpeedJumpPower = 0.90f;
+	constexpr float kMaxShotJumpPower = 0.50f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
@@ -189,7 +195,8 @@ Player::Player() :
 	m_isMove(false),
 	m_multiAttack(0),
 	m_isNextAttackFlag(false),
-	m_chargeTime(0)
+	m_chargeTime(0),
+	m_jumpCount(0)
 {
 
 #ifdef _DEBUG
@@ -605,8 +612,6 @@ void Player::WalkUpdate()
 		m_move = move;
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		//m_attackDir = VNorm(move);
-		//m_avoid = VNorm(move);
 
 	}
 	//動かなかったらアイドル状態へ
@@ -747,8 +752,6 @@ void Player::DashUpdate()
 		m_rigidbody.SetVelocity(move);
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		//m_attackDir = VNorm(move);
-		//m_avoid = VNorm(move);
 
 	}
 
@@ -823,6 +826,52 @@ void Player::JumpUpdate()
 		OnAir();
 	}
 
+	m_jumpCount++;
+
+	//プレイヤーのタイプでジャンプ力を変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse )
+	{
+		auto vel = m_rigidbody.GetVelocity();
+		vel.y += kMinPowerJumpPower;
+		m_rigidbody.SetVelocity(vel);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse )
+	{
+		auto vel = m_rigidbody.GetVelocity();
+		vel.y += kMinSpeedJumpPower;
+		m_rigidbody.SetVelocity(vel);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse )
+	{
+		auto vel = m_rigidbody.GetVelocity();
+		vel.y += kMinShotJumpPower;
+		m_rigidbody.SetVelocity(vel);
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse )
+	{
+		auto vel = m_rigidbody.GetVelocity();
+		vel.y += kMinNormalJumpPower;
+		m_rigidbody.SetVelocity(vel);
+	}
+
+	if (!m_isFaceUse)
+	{
+		auto vel = m_rigidbody.GetVelocity();
+		//vel.y += kMinNormalJumpPower;
+
+		if (m_jumpCount < 6)
+		{
+			vel.y += kMaxNormalJumpPower;
+		}
+		else
+		{
+			vel.y += kMinNormalJumpPower;
+		}
+
+		m_rigidbody.SetVelocity(vel);
+	}
+
+
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
@@ -853,8 +902,6 @@ void Player::JumpUpdate()
 	if (VSquareSize(move) > 0.0f)
 	{
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		//m_attackDir = VNorm(move);
-		//m_avoid = VNorm(move);
 	}
 
 	move.y = m_rigidbody.GetVelocity().y;
@@ -871,12 +918,20 @@ void Player::AirUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
 
+	//if (m_jumpCount > 5)
+	//{
+	//	auto vel = m_rigidbody.GetVelocity();
+	//	vel.y += kMinNormalJumpPower;
+	//	m_rigidbody.SetVelocity(vel);
+	//}
+
+
 	// カメラの角度によって進む方向を変える
 	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
 	m_frame++;
 
-	if (m_frame > 6)
+	if (m_frame > 25)
 	{
 		m_frame = 0;
 		m_isJump = false;
@@ -913,11 +968,9 @@ void Player::AirUpdate()
 	if (VSquareSize(move) > 0.0f)
 	{
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-		//m_attackDir = VNorm(move);
-		//m_avoid = VNorm(move);
 	}
 
-	move.y = m_rigidbody.GetVelocity().y;
+	move.y = m_rigidbody.GetVelocity().y * 0.5;
 	m_rigidbody.SetVelocity(move);
 }
 
@@ -936,8 +989,8 @@ void Player::AttackCharge()
 	//Yボタンを離した場合
 	if (Pad::IsRelase(kPadButtonY) && m_chargeTime > 60)
 	{
-		m_isUseMp = true;
 		m_chargeTime = 0;
+		m_isUseMp = true;
 		OnAttackY();
 	}
 	else if(Pad::IsRelase(kPadButtonY) && m_chargeTime < 60)
@@ -994,7 +1047,6 @@ void Player::AttackYUpdate()
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
-
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
@@ -1089,9 +1141,11 @@ void Player::WeaponDraw()
 
 void Player::OnIdle()
 {
+	m_jumpCount = 0;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	m_pCamera->SetIsDash(false);
+
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalIdle, kAnimPowerIdle, kAnimSpeedIdle, kAnimNormalIdle);
 
@@ -1174,32 +1228,6 @@ void Player::OnJump()
 	m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
 
-	//プレイヤーのタイプでジャンプ力を変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		vel.y = kPowerJumpPower;
-
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		vel.y = kSpeedJumpPower;
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		vel.y = kShotJumpPower;
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
-	{
-		vel.y = kNormalJumpPower;
-	}
-
-	if (!m_isFaceUse)
-	{
-		vel.y = kNormalJumpPower;
-	}
-
-	m_rigidbody.SetVelocity(vel);
-
 	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kBbutton;
@@ -1210,6 +1238,7 @@ void Player::OnJump()
 
 void Player::OnAir()
 {
+	m_jumpCount = 0;
 	m_pAnim->ChangeAnim(kAnimAir);
 	m_updateFunc = &Player::AirUpdate;
 }

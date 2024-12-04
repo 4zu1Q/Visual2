@@ -205,6 +205,8 @@ private:
 	bool m_isStamina;
 
 	int m_weaponH;
+	
+	int m_jumpCount;
 
 	int m_frame;
 

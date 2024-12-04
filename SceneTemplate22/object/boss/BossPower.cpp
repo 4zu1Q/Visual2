@@ -79,10 +79,9 @@ BossPower::BossPower():
 	m_angle(0.0f),
 	m_nextAngle(0.0f),
 	m_length(0.0f),
-	m_attackCoolTime(0),
 	m_actionTime(0),
 	m_isAttack(false),
-	m_attackKind(0),
+	m_actionKind(0),
 	m_hp(350.0f)
 {
 
@@ -188,8 +187,8 @@ void BossPower::Draw()
 {
 	MV1DrawModel(m_modelH);
 
-	DrawFormatString(0, 248, 0xff0fff, "BossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
-	DrawFormatString(0, 348, 0xff0fff, "BossToPlayer:%f", m_length);
+	DrawFormatString(0, 248, 0xff0fff, "PowerBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
+	DrawFormatString(0, 348, 0xff0fff, "PowerBossToPlayer:%f", m_length);
 	
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 }
@@ -226,10 +225,10 @@ void BossPower::IdleUpdate()
 	{
 		//ランダム関数かなんか使ってやる
 
-		m_attackKind = GetRand(kAttackKind);
+		m_actionKind = GetRand(kAttackKind);
 		
 		//ランダムで攻撃を行う
-		switch (m_attackKind)
+		switch (m_actionKind)
 		{
 		case 0:
 			OnAttack1();
@@ -351,7 +350,7 @@ void BossPower::Attack3Update()
 
 void BossPower::AvoidUpdate()
 {
-	m_attackCoolTime++;
+	m_actionTime++;
 
 	//プレイヤーへの向きを取得
 	m_direction = VSub(m_playerPos, m_pos);
@@ -367,7 +366,7 @@ void BossPower::AvoidUpdate()
 	m_rigidbody.SetVelocity(m_velocity);
 
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_attackCoolTime > kAvoidToIdleTime)
+	if (m_actionTime > kAvoidToIdleTime)
 	{
 		OnIdle();
 	}
@@ -375,9 +374,9 @@ void BossPower::AvoidUpdate()
 
 void BossPower::AttackCoolTimeUpdate()
 {
-	m_attackCoolTime++;
+	m_actionTime++;
 
-	if (m_attackCoolTime > kCoolTimeToAvoidTime)
+	if (m_actionTime > kCoolTimeToAvoidTime)
 	{
 		OnIdle();
 	}
@@ -401,7 +400,7 @@ void BossPower::DeadUpdate()
 
 void BossPower::OnIdle()
 {
-	m_attackCoolTime = 0;
+	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossPower::IdleUpdate;
 }
@@ -422,7 +421,7 @@ void BossPower::OnDash()
 
 void BossPower::OnAttack1()
 {
-	m_attackKind = 0;
+	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
 	m_updateFunc = &BossPower::Attack1Update;
@@ -430,7 +429,7 @@ void BossPower::OnAttack1()
 
 void BossPower::OnAttack2()
 {
-	m_attackKind = 0;
+	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
 	m_updateFunc = &BossPower::Attack2Update;
@@ -438,7 +437,7 @@ void BossPower::OnAttack2()
 
 void BossPower::OnAttack3()
 {
-	m_attackKind = 0;
+	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updateFunc = &BossPower::Attack3Update;
@@ -446,7 +445,7 @@ void BossPower::OnAttack3()
 
 void BossPower::OnAvoid()
 {
-	m_attackKind = 0;
+	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAvoid, true, true, false);
 	m_updateFunc = &BossPower::AvoidUpdate;
@@ -454,7 +453,7 @@ void BossPower::OnAvoid()
 
 void BossPower::OnAttackCoolTime()
 {
-	m_attackKind = 0;
+	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossPower::AttackCoolTimeUpdate;
@@ -462,7 +461,7 @@ void BossPower::OnAttackCoolTime()
 
 void BossPower::OnDown()
 {
-	m_attackKind = 0;
+	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDown);
 	m_updateFunc = &BossPower::DownUpdate;
@@ -470,7 +469,7 @@ void BossPower::OnDown()
 
 void BossPower::OnDead()
 {
-	m_attackKind = 0;
+	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updateFunc = &BossPower::DeadUpdate;

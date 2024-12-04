@@ -79,6 +79,12 @@
     <Filter Include="ヘッダー ファイル\object\face">
       <UniqueIdentifier>{90156e82-432e-4f8b-8427-578805bf931b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\object\shot">
+      <UniqueIdentifier>{e1666975-3d42-46b0-bc23-01c264b4c9f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\shot">
+      <UniqueIdentifier>{245245f0-6f26-485c-a802-c6ec917e5582}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -245,6 +251,9 @@
     </ClCompile>
     <ClCompile Include="object\boss\BossRast.cpp">
       <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="object\shot\ShotBase.cpp">
+      <Filter>ソース ファイル\object\shot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -424,6 +433,9 @@
     </ClInclude>
     <ClInclude Include="object\boss\BossRast.h">
       <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\shot\ShotBase.h">
+      <Filter>ヘッダー ファイル\object\shot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

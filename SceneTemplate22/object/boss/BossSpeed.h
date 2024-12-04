@@ -64,15 +64,6 @@ private:
 	using UpdateFunc_t = void(BossSpeed::*)();
 	UpdateFunc_t m_updateFunc;
 
-	//モデルハンドル
-	//int m_modelH;
-
-	//タイマー関連の変数
-	//std::shared_ptr<ActionTime> m_pOnWlakTime;
-	//std::shared_ptr<ActionTime> m_pOnDashTime;
-	//std::shared_ptr<ActionTime> m_pOnIdleTime;
-	//std::shared_ptr<ActionTime> m_pOnDownTime;
-	//std::shared_ptr<ActionTime> m_pOnAttackTime;
 
 	VECTOR m_anglePos;
 

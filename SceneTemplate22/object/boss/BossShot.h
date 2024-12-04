@@ -29,33 +29,40 @@ private:
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
-	void WalkUpdate();
-	void DashUpdate();
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
-	void AvoidFrontUpdate();
-	void AvoidBackUpdate();
-	void AvoidRightUpdate();
-	void AvoidLeftUpdate();
+	void DashFrontUpdate();
+	void DashBackUpdate();
+	void DashRightUpdate();
+	void DashLeftUpdate();
 	void AttackCoolTimeUpdate();
 	void DownUpdate();
 	void DeadUpdate();
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
-	void OnWalk();
-	void OnDash();
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
-	void OnAvoidFront();
-	void OnAvoidBack();
-	void OnAvoidRight();
-	void OnAvoidLeft();
+	void OnDashFront();
+	void OnDashBack();
+	void OnDashRight();
+	void OnDashLeft();
 	void OnAttackCoolTime();
 	void OnDown();
 	void OnDead();
+
+private:
+
+	//ステージ名
+	enum class e_AvoidKind
+	{
+		kFront,	
+		kBack,
+		kRight,
+		kLeft,
+	};
 
 private:
 
@@ -67,22 +74,23 @@ private:
 	using UpdateFunc_t = void(BossShot::*)();
 	UpdateFunc_t m_updateFunc;
 
-	//モデルハンドル
-	//int m_modelH;
+	//ボスが移動する場所との長さを入れる変数
+	float m_dashFrontLength;
+	float m_dashBackLength;
+	float m_dashRightLength;
+	float m_avoidLeftLength;
 
-	//タイマー関連の変数
-	//std::shared_ptr<ActionTime> m_pOnWlakTime;
-	//std::shared_ptr<ActionTime> m_pOnDashTime;
-	//std::shared_ptr<ActionTime> m_pOnIdleTime;
-	//std::shared_ptr<ActionTime> m_pOnDownTime;
-	//std::shared_ptr<ActionTime> m_pOnAttackTime;
+	VECTOR m_dashFrontPos;
+	VECTOR m_dashBackPos;
+	VECTOR m_dashRightPos;
+	VECTOR m_dashLeftPos;
 
-	int m_attackCoolTime;
 	int m_actionTime;
+	int m_actionKind;
 	bool m_isAttack;
 	bool m_isAvoid;
 
-	int m_attackKind;
+	e_AvoidKind m_avoidKind;
 
 
 	//攻撃判定の半径
