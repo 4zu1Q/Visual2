@@ -35,6 +35,8 @@ SceneOption::SceneOption(SceneManager& manager) :
 
 	FadeInSkip();
 
+	// メンバ関数ポインタの初期化
+	m_updateFunc = &SceneOption::BgmUpdate;
 }
 
 SceneOption::~SceneOption()
@@ -44,9 +46,12 @@ SceneOption::~SceneOption()
 
 void SceneOption::Update()
 {
+	(this->*m_updateFunc)();
+
 	Pad::Update();
 	UpdateFade();
 
+	//Bボタンを押したら前のシーンに戻る
 	if (Pad::IsTrigger(PAD_INPUT_2))
 	{
 		m_pManager.PopScene();
@@ -95,7 +100,7 @@ void SceneOption::BgmUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
-			m_sensitivityScale++;
+			m_bgmScale++;
 		}
 	}
 
@@ -111,7 +116,6 @@ void SceneOption::BgmUpdate()
 
 void SceneOption::SeUpdate()
 {
-	Pad::Update();
 
 	if (Pad::IsTrigger(PAD_INPUT_UP))
 	{
@@ -144,7 +148,6 @@ void SceneOption::SeUpdate()
 
 void SceneOption::SensitivityUpdate()
 {
-	Pad::Update();
 
 	if (Pad::IsTrigger(PAD_INPUT_UP))
 	{
@@ -177,7 +180,6 @@ void SceneOption::SensitivityUpdate()
 
 void SceneOption::FullScreenUpdate()
 {
-	Pad::Update();
 
 	if (Pad::IsTrigger(PAD_INPUT_UP))
 	{

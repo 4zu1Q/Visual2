@@ -66,6 +66,8 @@ private:
 
 private:
 
+	int m_weaponModelH;
+
 	//スマートポインタ
 	std::shared_ptr<AnimController> m_pAnim;
 	std::shared_ptr<Player> m_pPlayer;
@@ -84,6 +86,10 @@ private:
 	VECTOR m_dashBackPos;
 	VECTOR m_dashRightPos;
 	VECTOR m_dashLeftPos;
+
+	//アタッチする座標
+	VECTOR m_attachFramePos;
+	int m_modelRightFrame;	//アタッチするモデルの右手のフレーム
 
 	int m_actionTime;
 	int m_actionKind;

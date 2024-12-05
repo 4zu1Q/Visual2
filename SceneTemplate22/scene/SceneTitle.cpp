@@ -16,6 +16,13 @@
 
 namespace
 {
+
+	enum e_Ui
+	{
+		kLogo,
+		kP,
+	};
+
 	constexpr int kTextX = 64;
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
@@ -36,12 +43,23 @@ SceneTitle::SceneTitle(SceneManager& manager):
 {
 	m_sceneTrans = e_SceneTrans::kSelect;
 
+	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
 
 	//SoundManager::GetInstance().Load("")
 }
 
 SceneTitle::~SceneTitle()
 {
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
+
+	m_handles.clear();
 }
 
 void SceneTitle::Update()
@@ -50,12 +68,14 @@ void SceneTitle::Update()
 	UpdateFade();
 
 #ifdef _DEBUG
+
 	//デバッグに遷移する
 	if (Pad::IsTrigger PAD_INPUT_7)
 	{
 		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
 		return;
 	}
+
 #endif
 	
 	if (!m_isToNextScene)
@@ -67,6 +87,10 @@ void SceneTitle::Update()
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 			}
+			else if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_sceneTrans = e_SceneTrans::kQuit;
+			}
 		}
 
 		//下を押した場合
@@ -75,6 +99,10 @@ void SceneTitle::Update()
 			if (m_sceneTrans != e_SceneTrans::kQuit)
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
+			}
+			else if (m_sceneTrans == e_SceneTrans::kQuit)
+			{
+				m_sceneTrans = e_SceneTrans::kSelect;
 			}
 		}
 

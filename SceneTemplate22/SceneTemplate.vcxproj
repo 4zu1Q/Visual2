@@ -173,6 +173,7 @@
     <ClCompile Include="object\weapon\Dagger.cpp" />
     <ClCompile Include="object\weapon\Sword.cpp" />
     <ClCompile Include="object\weapon\WeaponBase.cpp" />
+    <ClCompile Include="SceneSaveDataSelect.cpp" />
     <ClCompile Include="scene\SceneBase.cpp" />
     <ClCompile Include="scene\SceneDebug.cpp" />
     <ClCompile Include="scene\SceneGameClear.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="object\weapon\Dagger.h" />
     <ClInclude Include="object\weapon\Sword.h" />
     <ClInclude Include="object\weapon\WeaponBase.h" />
+    <ClInclude Include="SceneSaveDataSelect.h" />
     <ClInclude Include="scene\SceneBase.h" />
     <ClInclude Include="scene\SceneDebug.h" />
     <ClInclude Include="scene\SceneGameClear.h" />

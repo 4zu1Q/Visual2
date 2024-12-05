@@ -3,11 +3,11 @@
 #include <vector>
 #include <memory>
 
-class SceneTitle : public SceneBase
+class SceneSaveDataSelect : public SceneBase
 {
 public:
-    SceneTitle(SceneManager& manager);
-    virtual ~SceneTitle();
+	SceneSaveDataSelect(SceneManager& manager);
+	virtual ~SceneSaveDataSelect();
 
 	/// <summary>
 	/// 更新処理
@@ -18,21 +18,18 @@ public:
 	/// 描画処理
 	/// </summary>
 	virtual void Draw() override final;	//毎フレーム行う描画処理
-    
+
 private:
 
 	//遷移先
 	enum class e_SceneTrans : int
 	{
-		kSelect,	//セレクト
-		kOption,	//オプション
-		kQuit,		//ゲーム終了
+		kSaveData1,	//セーブデータ1
+		kSaveData2,	//セーブデータ2
+		kSaveData3,	//セーブデータ3
 	};
 
-	//画像ハンドルこれで全ての画像をロードする
-	std::vector<int> m_handles;
-
+	//
 	e_SceneTrans m_sceneTrans;
-
 };
 

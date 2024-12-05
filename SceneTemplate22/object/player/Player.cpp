@@ -54,16 +54,16 @@ namespace
 	constexpr float kStrongestDashSpeed = 1.2f;
 
 	//ジャンプ力最小値
-	constexpr float kMinNormalJumpPower = 0.25f;
-	constexpr float kMinPowerJumpPower = 0.25f;
-	constexpr float kMinSpeedJumpPower = 0.90f;
-	constexpr float kMinShotJumpPower = 0.50f;
+	constexpr float kMinJumpPower = 0.22f;
+	//constexpr float kMinPowerJumpPower = 0.25f;
+	//constexpr float kMinSpeedJumpPower = 0.90f;
+	//constexpr float kMinShotJumpPower = 0.50f;
 
 	//ジャンプ力最大値
-	constexpr float kMaxNormalJumpPower = 0.8f;
-	constexpr float kMaxPowerJumpPower = 0.25f;
-	constexpr float kMaxSpeedJumpPower = 0.90f;
-	constexpr float kMaxShotJumpPower = 0.50f;
+	constexpr float kMaxJumpPower = 0.85f;
+	//constexpr float kMaxPowerJumpPower = 0.25f;
+	//constexpr float kMaxSpeedJumpPower = 0.90f;
+	//constexpr float kMaxShotJumpPower = 0.50f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
@@ -129,7 +129,7 @@ namespace
 
 	//ジャンプアニメーション
 	const char* const kAnimJump = "Jump";
-	const char* const kAnimAir = "Jumping";
+	const char* const kAnimFall = "Jumping";
 
 	//ダメージとダウンアニメーション
 	const char* const kAnimHit = "Hit";
@@ -196,7 +196,8 @@ Player::Player() :
 	m_multiAttack(0),
 	m_isNextAttackFlag(false),
 	m_chargeTime(0),
-	m_jumpCount(0)
+	m_jumpCount(0),
+	m_jumpPower(0.0f)
 {
 
 #ifdef _DEBUG
@@ -230,7 +231,7 @@ Player::Player() :
 	m_buttonKind = e_ButtonKind::kNone;
 
 	//
-	m_pWeapon = std::make_shared<PlayerWeapon>();
+	//m_pWeapon = std::make_shared<PlayerWeapon>();
 	m_pAnim = std::make_shared<AnimController>();
 
 	m_pWeaponBase = std::make_shared<WeaponBase>();
@@ -257,7 +258,7 @@ Player::~Player()
 
 }
 
-void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos)
+void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon)
 {
 
 	Collidable::Initialize(physics);
@@ -271,8 +272,11 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos)
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
 	//武器の初期化
-	m_pWeapon->Load();
-	m_pWeapon->Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
+	//m_pWeapon->Load();
+	//m_pWeapon->Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
+
+	weapon.Load();
+	weapon.Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
 
 	//アニメーションの初期化
 	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimNormalIdle);
@@ -292,18 +296,11 @@ void Player::Finalize(std::shared_ptr<MyLib::Physics> physics)
 	Collidable::Finalize(physics);
 }
 
-void Player::Update(std::shared_ptr<MyLib::Physics> physics)
+void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon)
 {
 
 	//アップデート
 	(this->*m_updateFunc)();
-
-	/*フレームにアタッチするための更新処理*/
-	m_pWeapon->SwordUpdate();
-	m_pWeapon->AxeUpdate();
-	m_pWeapon->DaggerUpdate();
-	m_pWeapon->MagicWandUpdate();
-	m_pWeapon->LongSwordUpdate();
 		
 	//SetCameraAngle(m_pCamera->GetAngle());
 
@@ -330,7 +327,6 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	//モデルに回転をセットする
 	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
 
-
 	//HPがゼロより下にいった場合
 	if (m_hp <= 0)
 	{
@@ -345,12 +341,12 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 		m_isMp = true;
 		m_mp = 0;
 	}
+
 	//MPが最大値を超えたら
 	if (m_mp > kMaxMp)
 	{
 		m_mp = kMaxMp;
 	}
-	
 
 	//スタミナ関連
 	if (m_stamina <= 0)
@@ -370,10 +366,11 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics)
 	}
 }
 
-void Player::Draw()
+void Player::Draw(PlayerWeapon& weapon)
 {
 	//武器の描画
-	WeaponDraw();
+	WeaponDraw(weapon);
+	
 
 	//モデルの描画
 	MV1DrawModel(m_modelH);
@@ -398,6 +395,7 @@ void Player::Draw()
 
 }
 
+//この判定処理はまた使えるようになりたい(これでアイテム触った時と敵の攻撃とかを判定したいから)
 //void Player::OnCollide(const Collidable& colider)
 //{
 //	std::string message = "プレイヤーが";
@@ -821,15 +819,18 @@ void Player::JumpUpdate()
 	// カメラの角度によって進む方向を変える
 	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
-	if (m_pAnim->IsLoop())
-	{
-		OnAir();
-	}
+	//if (m_pAnim->IsLoop())
+	//{
+	//	OnAir();
+	//}
+
+	
 
 	m_jumpCount++;
+	m_frame++;
 
-	//プレイヤーのタイプでジャンプ力を変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse )
+	//プレイヤーのタイプでジャンプ力を変える ワンちゃん入れるかも
+	/*if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse )
 	{
 		auto vel = m_rigidbody.GetVelocity();
 		vel.y += kMinPowerJumpPower;
@@ -850,27 +851,42 @@ void Player::JumpUpdate()
 	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse )
 	{
 		auto vel = m_rigidbody.GetVelocity();
-		vel.y += kMinNormalJumpPower;
+		vel.y += kMinJumpPower;
 		m_rigidbody.SetVelocity(vel);
-	}
+	}*/
 
-	if (!m_isFaceUse)
+	//if (!m_isFaceUse)
 	{
 		auto vel = m_rigidbody.GetVelocity();
-		//vel.y += kMinNormalJumpPower;
+		//vel.y += kMinJumpPower;
 
 		if (m_jumpCount < 6)
 		{
-			vel.y += kMaxNormalJumpPower;
+			vel.y += kMaxJumpPower;
+			m_jumpPower += kMaxJumpPower;
 		}
 		else
 		{
-			vel.y += kMinNormalJumpPower;
+			vel.y += kMinJumpPower;
+			m_jumpPower += kMinJumpPower;
+		}
+
+		if (m_jumpPower > 4)
+		{
+			OnAir();
 		}
 
 		m_rigidbody.SetVelocity(vel);
 	}
 
+	if (m_frame > 52)
+	{
+		m_frame = 0;
+		m_isJump = false;
+		m_isButtonPush = false;
+		m_buttonKind = e_ButtonKind::kNone;
+		OnIdle();
+	}
 
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
@@ -907,36 +923,19 @@ void Player::JumpUpdate()
 	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(move);
 
-	//if (Pad::IsTrigger(kPadButtonB) && !m_isJump)
-	//{
-	//	OnJump();
-	//}
-
 }
 
-void Player::AirUpdate()
+void Player::FallUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
 
-	//if (m_jumpCount > 5)
-	//{
-	//	auto vel = m_rigidbody.GetVelocity();
-	//	vel.y += kMinNormalJumpPower;
-	//	m_rigidbody.SetVelocity(vel);
-	//}
-
-
-	// カメラの角度によって進む方向を変える
-	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
-
 	m_frame++;
 
+	//地面に着いたら待機状態に移動する条件式を書く予定
 	if (m_frame > 25)
 	{
 		m_frame = 0;
 		m_isJump = false;
-		m_isButtonPush = false;
-		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
 	}
 
@@ -1107,35 +1106,40 @@ void Player::TalkUpdate()
 
 }
 
-void Player::WeaponDraw()
+void Player::WeaponDraw(PlayerWeapon& weapon)
 {
 	//顔を付けている場合
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 	{
 		//武器をアタッチする描画関数
-		m_pWeapon->AxeDraw();
+		//m_pWeapon->AxeDraw();
+		weapon.AxeDraw();
 	}
 	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
 		//武器をアタッチする描画関数
-		m_pWeapon->DaggerDraw();
+		//m_pWeapon->DaggerDraw();
+		weapon.DaggerDraw();
 	}
 	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
 	{
 		//武器をアタッチする描画関数
-		m_pWeapon->MagicWandDraw();
+		//m_pWeapon->MagicWandDraw();
+		weapon.MagicWandDraw();
 	}
 	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
 	{
 		//武器をアタッチする描画関数
-		m_pWeapon->LongSwordDraw();
+		//m_pWeapon->LongSwordDraw();
+		weapon.LongSwordDraw();
 	}
 
 	//顔を付けていない場合
 	if (!m_isFaceUse)
 	{
 		//武器をアタッチする描画関数
-		m_pWeapon->SwordDraw();
+		//m_pWeapon->SwordDraw();
+		weapon.SwordDraw();
 	}
 }
 
@@ -1238,9 +1242,16 @@ void Player::OnJump()
 
 void Player::OnAir()
 {
+	m_pAnim->ChangeAnim(kAnimFall);
+	m_updateFunc = &Player::JumpUpdate;
+}
+
+void Player::OnFall()
+{
 	m_jumpCount = 0;
-	m_pAnim->ChangeAnim(kAnimAir);
-	m_updateFunc = &Player::AirUpdate;
+	m_isJump = true;
+	m_pAnim->ChangeAnim(kAnimFall);
+	m_updateFunc = &Player::FallUpdate;
 }
 
 void Player::OnAttackCharge()

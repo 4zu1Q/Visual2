@@ -27,6 +27,7 @@ private:
 	{
 		kDebug,
 		kTitle,
+		kSaveDataSelect,
 		kSelect,
 		kGamePlay,
 		kGameClear,
@@ -34,6 +35,13 @@ private:
 		kOption,
 		kPause
 	};
+
+
+
+	//押し込んだ時間
+	int m_pushCount;
+	//押したかどうか
+	bool m_isPush;
 
 	e_SceneTrans m_sceneTrans;
 

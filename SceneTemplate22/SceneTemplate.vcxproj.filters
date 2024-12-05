@@ -255,6 +255,9 @@
     <ClCompile Include="object\shot\ShotBase.cpp">
       <Filter>ソース ファイル\object\shot</Filter>
     </ClCompile>
+    <ClCompile Include="SceneSaveDataSelect.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -436,6 +439,9 @@
     </ClInclude>
     <ClInclude Include="object\shot\ShotBase.h">
       <Filter>ヘッダー ファイル\object\shot</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneSaveDataSelect.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

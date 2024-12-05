@@ -9,6 +9,7 @@
 #include "SceneDebug.h"
 
 #include "object/player/Player.h"
+#include "object/player/PlayerWeapon.h"
 #include "object/boss/BossPower.h"
 #include "object/boss/BossSpeed.h"
 #include "object/boss/BossShot.h"
@@ -45,6 +46,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_cameraAngle(0.0f)
 {
 	m_pPlayer = std::make_shared<Player>();
+	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
 
 	m_pHpBarUi = std::make_shared<HpBar>();
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
@@ -52,8 +54,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
 	m_pButtonUi = std::make_shared<ButtonUi>();
 
-	m_pBossPower = std::make_shared<BossPower>();
-	m_pBossSpeed = std::make_shared<BossSpeed>();
+	//m_pBossPower = std::make_shared<BossPower>();
+	//m_pBossSpeed = std::make_shared<BossSpeed>();
 	m_pBossShot = std::make_shared<BossShot>();
 
 	m_pSkyDome = std::make_shared<SkyDome>();
@@ -67,9 +69,9 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_cameraPos = VGet(0, 0, 0);
 
 	//初期位置をセット
-	m_pPlayer->Initialize(m_pPhysics, kInitPos);
-	m_pBossPower->Initialize(m_pPhysics);
-	m_pBossSpeed->Initialize(m_pPhysics);
+	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
+	//m_pBossPower->Initialize(m_pPhysics);
+	//m_pBossSpeed->Initialize(m_pPhysics);
 	m_pBossShot->Initialize(m_pPhysics);
 	m_pCamera->Initialize();
 
@@ -79,8 +81,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 SceneGamePlay::~SceneGamePlay()
 {
 	m_pPlayer->Finalize(m_pPhysics);
-	m_pBossPower->Finalize(m_pPhysics);
-	m_pBossSpeed->Finalize(m_pPhysics);
+	//m_pBossPower->Finalize(m_pPhysics);
+	//m_pBossSpeed->Finalize(m_pPhysics);
 	m_pBossShot->Finalize(m_pPhysics);
 }
 
@@ -128,18 +130,25 @@ void SceneGamePlay::Update()
 	}
 
 	m_pSkyDome->Update();
-	m_pBossPower->Update(m_pPhysics, *m_pPlayer);
-	m_pBossSpeed->Update(m_pPhysics, *m_pPlayer);
+	//m_pBossPower->Update(m_pPhysics, *m_pPlayer);
+	//m_pBossSpeed->Update(m_pPhysics, *m_pPlayer);
 	m_pBossShot->Update(m_pPhysics, *m_pPlayer);
 
 	m_pCamera->Update(m_pField->GetModelHandle(), m_pPlayer->GetPos());
 	m_pCamera->SetPlayerPos(m_pPlayer->GetPosUp());
 
 	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
-	m_pPlayer->Update(m_pPhysics);
+	m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon);
 
 	m_pPhysics->Update();
 
+	/*フレームにアタッチするための更新処理*/
+	//Physicsの後に入れておかないと補正の影響でワンテンポ遅れる
+	m_pPlayerWeapon->SwordUpdate();
+	m_pPlayerWeapon->AxeUpdate();
+	m_pPlayerWeapon->DaggerUpdate();
+	m_pPlayerWeapon->MagicWandUpdate();
+	m_pPlayerWeapon->LongSwordUpdate();
 
 
 	m_pFaceUi->Update();
@@ -168,11 +177,11 @@ void SceneGamePlay::Draw()
 	m_pField->Draw();
 	m_pSkyDome->Draw();
 
-	m_pBossPower->Draw();
-	m_pBossSpeed->Draw();
+	//m_pBossPower->Draw();
+	//m_pBossSpeed->Draw();
 	m_pBossShot->Draw();
 
-	m_pPlayer->Draw();
+	m_pPlayer->Draw(*m_pPlayerWeapon);
 
 	m_pHpBarUi->Draw();
 	m_pPlayerBarUi->Draw();

@@ -8,6 +8,7 @@
 #include "SceneDebug.h"
 
 #include "object/player/Player.h"
+#include "object/player/PlayerWeapon.h"
 #include "object/Camera.h"
 
 #include "object/item/ItemHp.h"
@@ -48,6 +49,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
 
 	m_pPlayer = std::make_shared<Player>();
+	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
 	m_pCamera = std::make_shared<Camera>();
 
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
@@ -67,7 +69,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_playerPos = VGet(0, 0, -120);
 	m_cameraPos = VGet(0, 0, 0);
 
-	m_pPlayer->Initialize(m_pPhysics, kInitPos);
+	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
 	m_pCamera->Initialize();
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
@@ -138,9 +140,17 @@ void SceneSelect::Update()
 	m_pCamera->DebugUpdate(m_pPlayer->GetPosUp());
 
 	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
-	m_pPlayer->Update(m_pPhysics);
+	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon);
 
 	m_pPhysics->Update();
+
+	/*フレームにアタッチするための更新処理*/
+	//Physicsの後に入れておかないと補正の影響でワンテンポ遅れる
+	m_pPlayerWeapon->SwordUpdate();
+	m_pPlayerWeapon->AxeUpdate();
+	m_pPlayerWeapon->DaggerUpdate();
+	m_pPlayerWeapon->MagicWandUpdate();
+	m_pPlayerWeapon->LongSwordUpdate();
 
 	m_pFaceUi->Update();
 	m_pPlayerBarUi->Update(*m_pPlayer);
@@ -162,7 +172,7 @@ void SceneSelect::Update()
 
 void SceneSelect::Draw()
 {
-	m_pPlayer->Draw();
+	m_pPlayer->Draw(*m_pPlayerWeapon);
 
 	m_pSkyDome->Draw();
 	m_pField->Draw();

@@ -39,7 +39,8 @@ private:
 	int m_pushCount;
 
 	//更新メンバ関数ポインタ
-	void (SceneOption::* m_updateFunc)();
+	using UpdateFunc_t = void(SceneOption::*)(/*引数書く*/);
+	UpdateFunc_t m_updateFunc;
 
 	//BGM
 	void BgmUpdate();

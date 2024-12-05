@@ -21,7 +21,9 @@ namespace
 }
 
 SceneDebug::SceneDebug(SceneManager& manager) :
-	SceneBase(manager)
+	SceneBase(manager),
+	m_pushCount(0),
+	m_isPush(false)
 {
 	m_sceneTrans = e_SceneTrans::kDebug;
 }
@@ -39,10 +41,39 @@ void SceneDebug::Update()
 	//
 	if (Pad::IsTrigger(PAD_INPUT_UP))
 	{
-		if (m_sceneTrans != e_SceneTrans::kDebug)
+		if (!m_isPush)
 		{
-			m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
+			if (m_sceneTrans != e_SceneTrans::kDebug)
+			{
+				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
+			}
+			else if (m_sceneTrans == e_SceneTrans::kDebug)
+			{
+				m_sceneTrans = e_SceneTrans::kPause;
+			}
 		}
+		else
+		{
+			m_pushCount++;
+
+			if (m_pushCount > 0)
+			{
+				if (m_sceneTrans != e_SceneTrans::kDebug)
+				{
+					m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
+				}
+				else if (m_sceneTrans == e_SceneTrans::kDebug)
+				{
+					m_sceneTrans = e_SceneTrans::kPause;
+				}
+				m_pushCount = 0;
+			}
+		}
+
+	}
+	else
+	{
+		m_isPush = false;
 	}
 
 	//
@@ -51,6 +82,10 @@ void SceneDebug::Update()
 		if (m_sceneTrans != e_SceneTrans::kPause)
 		{
 			m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
+		}
+		else if (m_sceneTrans == e_SceneTrans::kPause)
+		{
+			m_sceneTrans = e_SceneTrans::kDebug;
 		}
 	}
 
@@ -115,6 +150,7 @@ void SceneDebug::Draw()
 
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kDebug) * kTextIntervalY, 0xffffff, "Scene Debug");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Scene Title");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSaveDataSelect) * kTextIntervalY, 0xffffff, "Scene SaveData Select");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Scene Select");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Scene Game Play");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGameClear) * kTextIntervalY, 0xffffff, "Scene Game Clear");

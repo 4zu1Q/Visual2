@@ -7,6 +7,7 @@
 #include <memory>
 
 class Player;
+class PlayerWeapon;
 class Camera;
 class SkyDome;
 class FaceUi;
@@ -40,6 +41,7 @@ private:
 
 	//スマートポインタ
 	std::shared_ptr<Player> m_pPlayer;
+	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
 	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	

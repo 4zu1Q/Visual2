@@ -7,6 +7,7 @@
 #include <List>
 
 class Player;
+class PlayerWeapon;
 class Camera;
 class SkyDome;
 class HpBar;
@@ -45,6 +46,7 @@ private:
 
 	//スマートポインタ
 	std::shared_ptr<Player> m_pPlayer;
+	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
 	std::shared_ptr<Camera> m_pCamera;
 	
 	std::shared_ptr<BossPower> m_pBossPower;

@@ -52,11 +52,11 @@ public:
 	Player();
 	virtual ~Player();
 
-	void Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos);
+	void Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon);
 	void Finalize(std::shared_ptr<MyLib::Physics> physics);
 
-	void Update(std::shared_ptr<MyLib::Physics> physics);
-	void Draw();
+	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon);
+	void Draw(PlayerWeapon& weapon);
 
 	// 衝突したとき
 	//virtual void OnCollide(const Collidable& colider);
@@ -138,7 +138,7 @@ private:
 	void WalkUpdate();
 	void DashUpdate();
 	void JumpUpdate();
-	void AirUpdate();
+	void FallUpdate();
 	void AttackCharge();
 	void AttackXUpdate();
 	void AttackYUpdate();
@@ -155,6 +155,7 @@ private:
 	void OnDash();
 	void OnJump();
 	void OnAir();
+	void OnFall();
 	void OnAttackCharge();
 	void OnAttackX();
 	void OnAttackY();
@@ -166,7 +167,7 @@ private:
 	void OnTalk();
 
 	//武器を描画するだけの関数
-	void WeaponDraw();
+	void WeaponDraw(PlayerWeapon& weapon);
 	
 	/// <summary>
 	/// プレイヤーが顔を使用時の関数
@@ -181,7 +182,7 @@ private:
 private:
 
 	//スマートポインタ
-	std::shared_ptr<PlayerWeapon> m_pWeapon;
+	//std::shared_ptr<PlayerWeapon> m_pWeapon;
 	std::shared_ptr<WeaponBase> m_pWeaponBase;
 	std::shared_ptr<AnimController> m_pAnim;
 	std::shared_ptr<Camera> m_pCamera;
@@ -206,6 +207,8 @@ private:
 
 	int m_weaponH;
 	
+	//ジャンプ量を見る
+	float m_jumpPower;
 	int m_jumpCount;
 
 	int m_frame;
@@ -251,7 +254,7 @@ private:
 	int m_chargeTime;
 
 	//ジャンプ力
-	float m_jumpPower;
+	//float m_jumpPower;
 
 	float m_speed;
 

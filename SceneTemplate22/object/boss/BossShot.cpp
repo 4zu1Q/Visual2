@@ -11,6 +11,7 @@ namespace
 {
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Boss/BossShot.mv1";
+	const char* const kWeaponModelFilename = "Data/Model/Weapon/Player_MagicWand.mv1";
 	//モデルのスケール値
 	constexpr float kModelScale = 10.0f;
 
@@ -86,7 +87,9 @@ BossShot::BossShot() :
 	m_dashBackLength(0.0f),
 	m_dashRightLength(0.0f),
 	m_avoidLeftLength(0.0f),
-	m_hp(350.0f)
+	m_hp(350.0f),
+	m_attachFramePos({0,0,0}),
+	m_modelRightFrame(54)
 {
 
 	m_avoidKind = e_AvoidKind::kFront;
@@ -98,6 +101,7 @@ BossShot::BossShot() :
 	m_dashLeftPos = { -200.0f, 0.0f, 0.0f };
 
 	m_modelH = MV1LoadModel(kModelFilename);
+	m_weaponModelH = MV1LoadModel(kWeaponModelFilename);
 
 	m_pAnim = std::make_shared<AnimController>();
 
@@ -151,7 +155,9 @@ void BossShot::Initialize(std::shared_ptr<MyLib::Physics> physics)
 void BossShot::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
 	MV1DeleteModel(m_modelH);
+	MV1DeleteModel(m_weaponModelH);
 	m_modelH = -1;
+	m_weaponModelH = -1;
 
 	Collidable::Finalize(physics);
 }
@@ -161,6 +167,26 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	//アップデート
 	(this->*m_updateFunc)();
 
+	/*武器のアタッチ*/
+	MATRIX transMat;
+	MATRIX attachFrameMat;
+	MATRIX mixMatrix;
+
+	//アタッチするモデルのMV1SetMatrixの設定を無効にする
+	MV1SetMatrix(m_weaponModelH, MGetIdent());
+
+	m_attachFramePos = MV1GetFramePosition(m_weaponModelH, 0);
+
+	transMat = MGetTranslate(VScale(m_attachFramePos, -1.0f));
+
+	attachFrameMat = MV1GetFrameLocalWorldMatrix(m_modelH, m_modelRightFrame);
+
+	mixMatrix = MMult(transMat, attachFrameMat);
+
+	MV1SetMatrix(m_weaponModelH, mixMatrix);
+
+
+	/*座標の取得*/
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
 
@@ -217,6 +243,7 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 void BossShot::Draw()
 {
 	MV1DrawModel(m_modelH);
+	MV1DrawModel(m_weaponModelH);
 
 	DrawFormatString(0, 280, 0xff0fff, "ShotBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(0, 388, 0xff0fff, "ShotBossToPlayer:%f", m_length);

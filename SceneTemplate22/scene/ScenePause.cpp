@@ -54,6 +54,10 @@ void ScenePause::Update()
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 			}
+			else if (m_sceneTrans == e_SceneTrans::kRestart)
+			{
+				m_sceneTrans = e_SceneTrans::kSelect;
+			}
 		}
 
 		//下を押した場合
@@ -62,6 +66,10 @@ void ScenePause::Update()
 			if (m_sceneTrans != e_SceneTrans::kSelect)
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
+			}
+			else if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_sceneTrans = e_SceneTrans::kRestart;
 			}
 		}
 
