@@ -321,6 +321,7 @@ void Camera::DebugUpdate(VECTOR playerPos)
 	m_prevPos = VAdd(m_prevPos, posToAim);
 
 
+	SetLightDirectionHandle(m_lightHandle, VSub(m_aimPos, m_cameraPos));
 	SetCameraPositionAndTarget_UpVecY(m_prevPos, playerPos);
 
 	////アナログスティックを使ってカメラ回転

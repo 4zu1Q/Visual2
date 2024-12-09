@@ -10,6 +10,7 @@
 #include "object/player/Player.h"
 #include "object/player/PlayerWeapon.h"
 #include "object/Camera.h"
+#include "object/boss/BossShot.h"
 
 #include "object/item/ItemHp.h"
 #include "object/item/ItemMp.h"
@@ -57,6 +58,8 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
 	m_pButtonUi = std::make_shared<ButtonUi>();
 
+	m_pBossShot = std::make_shared<BossShot>();
+
 	m_pField = std::make_shared<Field>();
 	m_pSkyDome = std::make_shared<SkyDome>();
 
@@ -73,6 +76,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pCamera->Initialize();
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
+	m_pBossShot->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
 	SetCameraNearFar(kCameraNear, kCameraFar);
@@ -83,6 +87,7 @@ SceneSelect::~SceneSelect()
 	m_pPlayer->Finalize(m_pPhysics);
 	m_pItemHp->Finalize(m_pPhysics);
 	m_pItemMp->Finalize(m_pPhysics);
+	m_pBossShot->Finalize(m_pPhysics);
 }
 
 void SceneSelect::Update()
@@ -135,6 +140,7 @@ void SceneSelect::Update()
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update(m_pPhysics);
 
+	m_pBossShot->Update(m_pPhysics, *m_pPlayer);
 	//m_pCamera->Update(m_pField->GetModelHandle());
 	//m_pCamera->SetPlayerPos(m_pPlayer->GetPosUp());
 	m_pCamera->DebugUpdate(m_pPlayer->GetPosUp());
@@ -180,6 +186,7 @@ void SceneSelect::Draw()
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
 
+	m_pBossShot->Draw();
 	m_pPlayerBarUi->Draw();
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);
