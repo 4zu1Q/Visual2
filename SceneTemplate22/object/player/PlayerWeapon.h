@@ -62,7 +62,6 @@ public:
 
 private:
 
-
 	//武器のモデルハンドル
 	int m_swordModelH;
 	int m_axeModelH;

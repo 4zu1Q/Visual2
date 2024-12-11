@@ -4,11 +4,12 @@
 namespace 
 {
 
-	const char* const kFieldModelFilename = "Data/Model/Stage/Field03.mv1";
+	const char* const kFieldModelFilename = "Data/Model/Stage/Field07.mv1";
 	const char* const kTestModelFilename = "Data/Model/Weapon/Boss_Shield.mv1";
 
-	constexpr VECTOR kModelScale = { 0.45f , 0.45f , 0.45f };
+	constexpr VECTOR kModelScale = { 0.4f , 0.4f , 0.4f };
 
+	constexpr VECTOR kModelPosition = { 0.0f, 0.0f, 0.0f };
 }
 
 Field::Field():

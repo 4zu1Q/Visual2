@@ -54,8 +54,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
 	m_pButtonUi = std::make_shared<ButtonUi>();
 
-	//m_pBossPower = std::make_shared<BossPower>();
-	//m_pBossSpeed = std::make_shared<BossSpeed>();
+	m_pBossPower = std::make_shared<BossPower>();
+	m_pBossSpeed = std::make_shared<BossSpeed>();
 	m_pBossShot = std::make_shared<BossShot>();
 
 	m_pSkyDome = std::make_shared<SkyDome>();
@@ -70,8 +70,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 
 	//初期位置をセット
 	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
-	//m_pBossPower->Initialize(m_pPhysics);
-	//m_pBossSpeed->Initialize(m_pPhysics);
+	m_pBossPower->Initialize(m_pPhysics);
+	m_pBossSpeed->Initialize(m_pPhysics);
 	m_pBossShot->Initialize(m_pPhysics);
 	m_pCamera->Initialize();
 
@@ -81,8 +81,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 SceneGamePlay::~SceneGamePlay()
 {
 	m_pPlayer->Finalize(m_pPhysics);
-	//m_pBossPower->Finalize(m_pPhysics);
-	//m_pBossSpeed->Finalize(m_pPhysics);
+	m_pBossPower->Finalize(m_pPhysics);
+	m_pBossSpeed->Finalize(m_pPhysics);
 	m_pBossShot->Finalize(m_pPhysics);
 }
 
@@ -130,8 +130,8 @@ void SceneGamePlay::Update()
 	}
 
 	m_pSkyDome->Update();
-	//m_pBossPower->Update(m_pPhysics, *m_pPlayer);
-	//m_pBossSpeed->Update(m_pPhysics, *m_pPlayer);
+	m_pBossPower->Update(m_pPhysics, *m_pPlayer);
+	m_pBossSpeed->Update(m_pPhysics, *m_pPlayer);
 	m_pBossShot->Update(m_pPhysics, *m_pPlayer);
 
 	m_pCamera->Update(m_pField->GetModelHandle(), m_pPlayer->GetPos());
@@ -152,7 +152,6 @@ void SceneGamePlay::Update()
 
 
 	m_pFaceUi->Update();
-	////m_pHpBarUi->Update(*m_pBossPower);
 	m_pPlayerBarUi->Update(*m_pPlayer);
 
 
@@ -177,8 +176,8 @@ void SceneGamePlay::Draw()
 	m_pField->Draw();
 	m_pSkyDome->Draw();
 
-	//m_pBossPower->Draw();
-	//m_pBossSpeed->Draw();
+	m_pBossPower->Draw();
+	m_pBossSpeed->Draw();
 	m_pBossShot->Draw();
 
 	m_pPlayer->Draw(*m_pPlayerWeapon);
