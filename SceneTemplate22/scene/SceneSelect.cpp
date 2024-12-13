@@ -40,7 +40,7 @@ namespace
 	constexpr float kCameraFar = 5000.0f;
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
+	constexpr VECTOR kInitPos = { 0.0f,35.0f,0.0f };
 }
 
 
