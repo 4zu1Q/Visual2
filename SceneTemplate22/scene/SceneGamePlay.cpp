@@ -187,7 +187,6 @@ void SceneGamePlay::Draw()
 	m_pButtonUi->Draw(*m_pPlayer);
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);
-	//m_pGamePlayUi->Draw(*m_pPlayer);
 
 	DrawFade(0x000000);
 

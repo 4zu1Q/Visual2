@@ -14,39 +14,8 @@ public:
 	void Finalize();
 
 
-	void Update(VECTOR moveVec);
+	void Update();
 	void Draw();
-
-
-	/// <summary>
-	/// 右手に武器を持たせたいとき用の関数
-	/// </summary>
-	/// <param name="modelH"></param>
-	void OneHandUpdate(VECTOR moveVec);
-
-	/// <summary>
-	/// 両手に武器を持たせたいとき用の関数
-	/// </summary>
-	/// <param name="modelH"></param>
-	void BothHandsUpdate(VECTOR moveVec);
-
-	/// <summary>
-	/// 片手だけ描画
-	/// </summary>
-	void OneHandDraw();
-
-	/// <summary>
-	/// 両手だけ描画
-	/// </summary>
-	void BothHandsDraw(int rightWeaponModelH, int leftWeaponModelH);
-
-private:
-
-	void SetAttachFrame(const TCHAR* frameLeftName,const TCHAR* frameRightName);
-
-protected:
-
-	void SetModelSize(float modelSize);
 
 private:
 
