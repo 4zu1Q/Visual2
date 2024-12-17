@@ -174,9 +174,6 @@
     <ClCompile Include="object\item\ItemHp.cpp">
       <Filter>ソース ファイル\object\item</Filter>
     </ClCompile>
-    <ClCompile Include="util\Collision.cpp">
-      <Filter>ソース ファイル\util</Filter>
-    </ClCompile>
     <ClCompile Include="util\AnimController.cpp">
       <Filter>ソース ファイル\util</Filter>
     </ClCompile>
@@ -254,9 +251,6 @@
     </ClCompile>
     <ClCompile Include="object\shot\ShotBase.cpp">
       <Filter>ソース ファイル\object\shot</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneSaveDataSelect.cpp">
-      <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -347,9 +341,6 @@
     <ClInclude Include="object\item\ItemHp.h">
       <Filter>ヘッダー ファイル\object\item</Filter>
     </ClInclude>
-    <ClInclude Include="util\Collision.h">
-      <Filter>ヘッダー ファイル\util</Filter>
-    </ClInclude>
     <ClInclude Include="util\AnimController.h">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
@@ -439,9 +430,6 @@
     </ClInclude>
     <ClInclude Include="object\shot\ShotBase.h">
       <Filter>ヘッダー ファイル\object\shot</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneSaveDataSelect.h">
-      <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

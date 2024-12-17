@@ -29,6 +29,9 @@ private:
 		kTitle,		//オプション
 	};
 
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
+
 	e_SceneTrans m_sceneTrans;
 
 };

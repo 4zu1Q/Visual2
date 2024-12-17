@@ -21,6 +21,7 @@ namespace
 	enum e_Ui
 	{
 		kLogo,
+		kPleasePress,
 		kNewGame,
 		kLoadGame,
 		kOption,
@@ -35,12 +36,11 @@ namespace
 	//タイトルロゴのポジション　※この型で画像などの移動を行っていく
 	const Vec2 kTitleLogoPos = { 40.0f , 40.0f };
 	
-	//スタートのポジション
-	constexpr VECTOR kStartPos = { 900.0f , 320.0f };
-	//オプションのポジション
-	constexpr VECTOR kLoadGamePos = { 900.0f , 440.0f };
-	//やめるのポジション
-	constexpr VECTOR kQuitPos = { 900.0f , 560.0f };
+	//UIのポジション定数
+	constexpr VECTOR kNewGamePos = { 900.0f , 320.0f };
+	constexpr VECTOR kLoadGamePos = { 900.0f , 320.0f };
+	constexpr VECTOR kOptionPos = { 900.0f , 440.0f };
+	constexpr VECTOR EndPos = { 900.0f , 560.0f };
 }
 
 SceneTitle::SceneTitle(SceneManager& manager):
@@ -53,13 +53,13 @@ SceneTitle::SceneTitle(SceneManager& manager):
 
 	//使用する画像を入れていく
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Start.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Start.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Option.png"));
-	m_handles.push_back(LoadGraph("Data/Image/End.png"));
-	m_handles.push_back(LoadGraph("Data/Image/RB_Push.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Stamp.png"));
-	m_handles.push_back(LoadGraph("Data/Image/End.png"));
+	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton1.png"));
+	m_handles.push_back(LoadGraph("Data/Image/NewGame.png"));					//NewGame
+	m_handles.push_back(LoadGraph("Data/Image/LoadGame.png"));				//LoadGame
+	m_handles.push_back(LoadGraph("Data/Image/Option1.png"));					//Option
+	m_handles.push_back(LoadGraph("Data/Image/End1.png"));					//End
+	m_handles.push_back(LoadGraph("Data/Image/RB_Push.png"));				//矢印
+	m_handles.push_back(LoadGraph("Data/Image/Stamp.png"));					
 
 	//SoundManager::GetInstance().Load("")
 }
@@ -183,47 +183,37 @@ void SceneTitle::Draw()
 
 	if (!m_isStart)
 	{
+		//ロゴ
 		DrawGraph(255, 200, m_handles[kLogo], true);
+		DrawGraph(520, 420, m_handles[kPleasePress], true);
 
 	}
 	else if(m_isStart)
 	{
-		//タイトル画面の座標
-		//DrawBox(40, 40, 740, 240, 0xff00ff, true);
 
-		//スタート
-		//DrawBox(900, 320, 1260, 420, 0xffffff, true);
-		DrawGraph(900, 320, m_handles[kNewGame], true);
+		//ニューゲーム
+		DrawGraph(440, 320, m_handles[kNewGame], true);
+		//ロード
+		DrawGraph(440, 380, m_handles[kLoadGame], true);
 		//オプション
-		//DrawBox(900, 440, 1260, 540, 0xffffff, true);
-		DrawGraph(900, 440, m_handles[kLoadGame], true);
+		DrawGraph(440, 440, m_handles[kOption], true);
 		//エンド
-		//DrawBox(900, 560, 1260, 660, 0xffffff, true);
-		DrawGraph(900, 560, m_handles[kOption], true);
+		DrawGraph(440, 500, m_handles[kQuit], true);
 
-		DrawGraph(900, 680, m_handles[kQuit], true);
-		DrawGraph(900, 320, m_handles[kNewGame], true);
-
+		//選択
 		if (m_sceneTrans == e_SceneTrans::kSelect)
 		{
-			DrawGraph(820, 320, m_handles[kSelect], true);
+			DrawGraph(Game::kScreenWidthHalf - 150, 320, m_handles[kSelect], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kOption)
 		{
-			DrawGraph(820, 440, m_handles[kSelect], true);
+			DrawGraph(Game::kScreenWidthHalf - 150, 440, m_handles[kSelect], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kQuit)
 		{
-			DrawGraph(820, 560, m_handles[kSelect], true);
+			DrawGraph(Game::kScreenWidthHalf - 150, 560, m_handles[kSelect], true);
 		}
-
 	}
-
-	
-
-
-
-
 
 #ifdef _DEBUG
 

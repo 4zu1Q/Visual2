@@ -173,7 +173,6 @@
     <ClCompile Include="object\weapon\Dagger.cpp" />
     <ClCompile Include="object\weapon\Sword.cpp" />
     <ClCompile Include="object\weapon\WeaponBase.cpp" />
-    <ClCompile Include="SceneSaveDataSelect.cpp" />
     <ClCompile Include="scene\SceneBase.cpp" />
     <ClCompile Include="scene\SceneDebug.cpp" />
     <ClCompile Include="scene\SceneGameClear.cpp" />
@@ -191,7 +190,6 @@
     <ClCompile Include="ui\PlayerBarUi.cpp" />
     <ClCompile Include="util\ActionTime.cpp" />
     <ClCompile Include="util\AnimController.cpp" />
-    <ClCompile Include="util\Collision.cpp" />
     <ClCompile Include="util\EffectManager.cpp" />
     <ClCompile Include="util\OnAttackFrame.cpp" />
     <ClCompile Include="util\Pad.cpp" />
@@ -235,7 +233,6 @@
     <ClInclude Include="object\weapon\Dagger.h" />
     <ClInclude Include="object\weapon\Sword.h" />
     <ClInclude Include="object\weapon\WeaponBase.h" />
-    <ClInclude Include="SceneSaveDataSelect.h" />
     <ClInclude Include="scene\SceneBase.h" />
     <ClInclude Include="scene\SceneDebug.h" />
     <ClInclude Include="scene\SceneGameClear.h" />
@@ -253,7 +250,6 @@
     <ClInclude Include="ui\PlayerBarUi.h" />
     <ClInclude Include="util\ActionTime.h" />
     <ClInclude Include="util\AnimController.h" />
-    <ClInclude Include="util\Collision.h" />
     <ClInclude Include="util\EffectManager.h" />
     <ClInclude Include="util\Game.h" />
     <ClInclude Include="util\OnAttackFrame.h" />

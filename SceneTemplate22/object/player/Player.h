@@ -182,7 +182,6 @@ private:
 private:
 
 	//スマートポインタ
-	//std::shared_ptr<PlayerWeapon> m_pWeapon;
 	std::shared_ptr<WeaponBase> m_pWeaponBase;
 	std::shared_ptr<AnimController> m_pAnim;
 	std::shared_ptr<Camera> m_pCamera;
