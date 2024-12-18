@@ -56,7 +56,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetUseBackCulling(true);
 
 	//エフェクシアを初期化
-	Effekseer_Init(8000);
+	Effekseer_Init(800);
 
 	//エフェクシアの歪み機能を初期化する
 	Effekseer_InitDistortion();
@@ -68,6 +68,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
 
 	//SoundManager::GetInstance().ChangeBGMVolume()
+
+	//サウンドのボリュームをここで変える
+	//SoundManager::GetInstance().ChangeBGMVolume(Setting::GetInstance().GetBGMVolume());
+	//SoundManager::GetInstance().ChangeSEVolume(Setting::GetInstance().GetSEVolume());
 
 	//std::shared_ptr<SceneManager> pSceneManager = std::make_shared<SceneManager>();
 	SceneManager pSceneManager;
@@ -88,8 +92,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// 描画を行う前に画面をクリアする
 		ClearDrawScreen();
 
+		Effekseer_Sync3DSetting();
+
 		// ゲームの処理
 		pSceneManager.Update();
+		UpdateEffekseer3D();
 		pSceneManager.Draw();
 
 
@@ -117,6 +124,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	}
 
+	SoundManager::GetInstance().Destroy();
 	EffectManager::GetInstance().Destroy();
 
 	Effkseer_End();				// エフェクシア使用の終了処理

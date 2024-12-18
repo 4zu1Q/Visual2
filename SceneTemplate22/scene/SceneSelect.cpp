@@ -27,6 +27,7 @@
 #include "ui/PlayerBarUi.h"
 
 #include "util/Pad.h"
+#include "util/SoundManager.h"
 
 #include "myLib/Physics.h"
 
@@ -47,6 +48,7 @@ namespace
 SceneSelect::SceneSelect(SceneManager& manager) :
 	SceneBase(manager)
 {
+
 	m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
 
 	m_pPlayer = std::make_shared<Player>();
@@ -80,6 +82,9 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pField->Initialize();
 
 	SetCameraNearFar(kCameraNear, kCameraFar);
+
+	//タイトルのBgmが流れていたら止める用
+	SoundManager::GetInstance().StopBgm("selectBgm");
 }
 
 SceneSelect::~SceneSelect()
@@ -88,6 +93,9 @@ SceneSelect::~SceneSelect()
 	m_pItemHp->Finalize(m_pPhysics);
 	m_pItemMp->Finalize(m_pPhysics);
 	m_pBossShot->Finalize(m_pPhysics);
+
+	SoundManager::GetInstance().StopBgm("selectBgm");
+
 }
 
 void SceneSelect::Update()
@@ -104,9 +112,12 @@ void SceneSelect::Update()
 	Pad::Update();
 	UpdateFade();
 
+	SoundManager::GetInstance().PlayBgm("selectBgm", true);
+
 #ifdef _DEBUG
 	if (Pad::IsTrigger PAD_INPUT_7)
 	{
+		SoundManager::GetInstance().StopBgm("selectBgm");
 		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
 		return;
 	}

@@ -1,6 +1,9 @@
 ﻿#include "SceneBase.h"
 #include "util/Game.h"
 
+#include "util/SoundManager.h"
+#include "util/EffectManager.h"
+
 namespace
 {
 	//フェード速度
@@ -19,6 +22,31 @@ SceneBase::SceneBase(SceneManager& manager):
 	m_fadeSpeed = -kFadeSpeed;
 	m_isToNextScene = false;
 	m_isFadeColor = false;
+
+	/*サウンドのロード*/
+
+	//BGM
+	SoundManager::GetInstance().Load("titleBgm", "Data/Sound/Bgm/Select.mp3", true);
+	SoundManager::GetInstance().Load("selectBgm", "Data/Sound/Bgm/Select.mp3", true);
+	SoundManager::GetInstance().Load("battleBgm", "Data/Sound/Bgm/Select.mp3", true);
+	
+	//カーソル用SE
+	SoundManager::GetInstance().Load("selectSe", "Data/Sound/Se/Select.mp3", false);
+	SoundManager::GetInstance().Load("dectionSe", "Data/Sound/Se/Dection.mp3", false);
+	SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
+
+	//プレイヤー用SE
+	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
+	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
+	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
+	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
+
+	//ボス用SE
+	
+
+	/*エフェクトのロード*/
+	EffectManager::GetInstance().Load("hitEffect", "Data/Effect/player_hit.efk", 120);
+
 }
 
 void SceneBase::UpdateFade()
@@ -26,7 +54,6 @@ void SceneBase::UpdateFade()
 
 	m_fadeBright += m_fadeSpeed;
 
-	//
 	if (m_fadeBright >= 255)
 	{
 		m_fadeBright = 255;
@@ -36,7 +63,6 @@ void SceneBase::UpdateFade()
 		}
 	}
 
-	//
 	if (m_fadeBright <= 0)
 	{
 		m_fadeBright = 0;

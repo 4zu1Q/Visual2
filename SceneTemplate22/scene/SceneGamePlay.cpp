@@ -29,7 +29,7 @@
 namespace
 {
 	//初期位置
-	constexpr VECTOR kInitPos = { 20.0f,5.0f,-100.0f };
+	constexpr VECTOR kInitPos = { 20.0f,15.0f,-100.0f };
 }
 
 SceneGamePlay::SceneGamePlay(SceneManager& manager) :

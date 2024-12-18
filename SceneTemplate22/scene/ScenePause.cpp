@@ -7,6 +7,7 @@
 
 #include "util/Game.h"
 #include "util/Pad.h"
+#include "util/SoundManager.h"
 
 namespace
 {
@@ -29,7 +30,6 @@ ScenePause::ScenePause(SceneManager& manager) :
 {
 	m_sceneTrans = e_SceneTrans::kRestart;
 	FadeInSkip();
-
 }
 
 ScenePause::~ScenePause()
@@ -41,7 +41,6 @@ void ScenePause::Update()
 {
 	//パッドを更新
 	Pad::Update();
-
 	//フェードを更新
 	UpdateFade();
 
@@ -52,10 +51,12 @@ void ScenePause::Update()
 		{
 			if (m_sceneTrans != e_SceneTrans::kRestart)
 			{
+				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 			}
 			else if (m_sceneTrans == e_SceneTrans::kRestart)
 			{
+				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kSelect;
 			}
 		}
@@ -65,10 +66,12 @@ void ScenePause::Update()
 		{
 			if (m_sceneTrans != e_SceneTrans::kSelect)
 			{
+				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 			}
 			else if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
+				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kRestart;
 			}
 		}
@@ -79,14 +82,17 @@ void ScenePause::Update()
 			//enum変数が同じだった場合
 			if (m_sceneTrans == e_SceneTrans::kRestart)
 			{
+				SoundManager::GetInstance().PlaySe("dectionSe");
 				m_pManager.PopScene();
 			}
 			if (m_sceneTrans == e_SceneTrans::kOption)
 			{
+				SoundManager::GetInstance().PlaySe("dectionSe");
 				m_pManager.PushScene(std::make_shared<SceneOption>(m_pManager));
 			}
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
+				SoundManager::GetInstance().PlaySe("dectionSe");
 				m_isToNextScene = true;
 				StartFadeOut();	//フェードアウト開始
 			}
@@ -95,6 +101,7 @@ void ScenePause::Update()
 		//スタートボタンを押した場合
 		if (Pad::IsTrigger(PAD_INPUT_8))
 		{
+			//バックSEを入れる
 			m_pManager.PopScene();
 		}
 	}

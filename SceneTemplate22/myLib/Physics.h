@@ -92,12 +92,23 @@ namespace MyLib
 		/// <param name="col">登録したコライダー情報</param>
 		void FixNowPositionWithFloor(std::shared_ptr<Collidable>& col);
 
+		//当たり判定の種類
+		enum class eOnCollideInfoKind
+		{
+			CollideEnter,
+			CollideStay,
+			CollideExit,
+			TriggerEnter,
+			TriggerStay,
+			TriggerExit
+		};
 
 		// OnCollideの遅延通知のためのデータ
 		struct OnCollideInfo_
 		{
 			Collidable* owner_;
 			Collidable* colider_;
+			eOnCollideInfoKind colKind_;
 			//void OnCollide() { owner_->OnCollide(*colider_); }
 		};
 

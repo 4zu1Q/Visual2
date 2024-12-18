@@ -83,8 +83,8 @@ public:
 	/// <summary>
 	/// 指定した名前のすべてのエフェクトの座標を回転させる
 	/// </summary>
-	/// <param name="name">移動させたいエフェクトの名前</param>
-	/// <param name="pos">移動先座標</param>
+	/// <param name="name">回転させたいエフェクトの名前</param>
+	/// <param name="pos">回転先座標</param>
 	void SetRotation(std::string name, VECTOR rot);
 
 private:

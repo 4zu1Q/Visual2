@@ -51,7 +51,7 @@ SceneTitle::SceneTitle(SceneManager& manager):
 
 	m_startTime = 0;
 
-	//使用する画像を入れていく
+	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
 	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton1.png"));
 	m_handles.push_back(LoadGraph("Data/Image/NewGame.png"));					//NewGame
@@ -61,7 +61,6 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_handles.push_back(LoadGraph("Data/Image/RB_Push.png"));				//矢印
 	m_handles.push_back(LoadGraph("Data/Image/Stamp.png"));					
 
-	//SoundManager::GetInstance().Load("")
 }
 
 SceneTitle::~SceneTitle()
@@ -72,28 +71,36 @@ SceneTitle::~SceneTitle()
 		DeleteGraph(m_handles[i]);
 	}
 
+
 	m_handles.clear();
 }
 
 void SceneTitle::Update()
 {
+
 	Pad::Update();
 	UpdateFade();
+
+	SoundManager::GetInstance().PlayBgm("titleBgm", true);
+
 
 #ifdef _DEBUG
 
 	//デバッグに遷移する
 	if (Pad::IsTrigger PAD_INPUT_7)
 	{
+		SoundManager::GetInstance().StopBgm("titleBgm");
 		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
 		return;
 	}
 
 #endif
 
-	if (Pad::IsTrigger(PAD_INPUT_1))
+	if (Pad::IsTrigger(PAD_INPUT_1) && !m_isStart)
 	{
 		m_isStart = true;
+		SoundManager::GetInstance().PlaySe("dectionSe");
+
 	}
 
 	if (m_isStart)
@@ -108,10 +115,12 @@ void SceneTitle::Update()
 		{
 			if (m_sceneTrans != e_SceneTrans::kSelect)
 			{
+				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 			}
 			else if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
+				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kQuit;
 			}
 		}
@@ -121,10 +130,12 @@ void SceneTitle::Update()
 		{
 			if (m_sceneTrans != e_SceneTrans::kQuit)
 			{
+				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 			}
 			else if (m_sceneTrans == e_SceneTrans::kQuit)
 			{
+				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kSelect;
 			}
 		}
@@ -135,18 +146,21 @@ void SceneTitle::Update()
 			//enum変数が同じだった場合
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
+				SoundManager::GetInstance().PlaySe("dectionSe");
 				StartFadeOut();
 				m_isToNextScene = true;
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kOption)
 			{
+				SoundManager::GetInstance().PlaySe("dectionSe");
 				m_pManager.PushScene(std::make_shared<SceneOption>(m_pManager));
 				return;
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kQuit)
 			{
+				SoundManager::GetInstance().PlaySe("dectionSe");
 				DxLib_End();
 			}
 		}
@@ -168,6 +182,7 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
 				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+				SoundManager::GetInstance().StopBgm("titleBgm");
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
 				return;
 			}

@@ -5,6 +5,7 @@
 
 #include "util/Game.h"
 #include "util/Pad.h"
+#include "util/SoundManager.h"
 
 
 namespace
@@ -88,10 +89,10 @@ void SceneOption::Draw()
 
 void SceneOption::BgmUpdate()
 {
-	Pad::Update();
 	
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
 	{
+		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kSe;
 		m_updateFunc = &SceneOption::SeUpdate;
 	}
@@ -100,6 +101,7 @@ void SceneOption::BgmUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
+			SoundManager::GetInstance().PlaySe("selectSe");
 			m_bgmScale++;
 		}
 	}
@@ -108,6 +110,7 @@ void SceneOption::BgmUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
+			SoundManager::GetInstance().PlaySe("selectSe");
 			m_bgmScale--;
 		}
 	}
@@ -119,12 +122,14 @@ void SceneOption::SeUpdate()
 
 	if (Pad::IsTrigger(PAD_INPUT_UP))
 	{
+		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kBgm;
 		m_updateFunc = &SceneOption::BgmUpdate;
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
 	{
+		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kSensitivity;
 		m_updateFunc = &SceneOption::SensitivityUpdate;
 	}
@@ -133,6 +138,7 @@ void SceneOption::SeUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
+			SoundManager::GetInstance().PlaySe("selectSe");
 			m_seScale++;
 		}
 	}
@@ -141,6 +147,7 @@ void SceneOption::SeUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
+			SoundManager::GetInstance().PlaySe("selectSe");
 			m_seScale--;
 		}
 	}
@@ -151,12 +158,14 @@ void SceneOption::SensitivityUpdate()
 
 	if (Pad::IsTrigger(PAD_INPUT_UP))
 	{
+		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kSe;
 		m_updateFunc = &SceneOption::SeUpdate;
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
 	{
+		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kFullScreen;
 		m_updateFunc = &SceneOption::FullScreenUpdate;
 	}
@@ -165,6 +174,7 @@ void SceneOption::SensitivityUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
+			SoundManager::GetInstance().PlaySe("selectSe");
 			m_sensitivityScale++;
 		}
 	}
@@ -173,6 +183,7 @@ void SceneOption::SensitivityUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
+			SoundManager::GetInstance().PlaySe("selectSe");
 			m_sensitivityScale--;
 		}
 	}
@@ -183,12 +194,14 @@ void SceneOption::FullScreenUpdate()
 
 	if (Pad::IsTrigger(PAD_INPUT_UP))
 	{
+		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kSensitivity;
 		m_updateFunc = &SceneOption::SensitivityUpdate;
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_1))
 	{
+		SoundManager::GetInstance().PlaySe("dectionSe");
 		ChangeWindowMode(m_isFullScreen);
 		m_isFullScreen = !m_isFullScreen;
 	}

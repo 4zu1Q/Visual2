@@ -46,7 +46,6 @@ public:
 		kLTbutton,	//LTボタン
 	};
 
-
 public:
 
 	Player();
@@ -132,6 +131,8 @@ public:
 	void SetIsStrongestFace(const bool isStrongestFace) { m_isStrongestFace = isStrongestFace; }
 
 private:
+	void OnCollide(const Collidable& colider);
+
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();

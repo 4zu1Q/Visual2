@@ -6,7 +6,7 @@
 
 #include "util/Pad.h"
 #include "util/AnimController.h"
-
+#include "util/EffectManager.h"
 
 #include "myLib/MyLib.h"
 
@@ -55,15 +55,8 @@ namespace
 
 	//ジャンプ力最小値
 	constexpr float kMinJumpPower = 0.22f;
-	//constexpr float kMinPowerJumpPower = 0.25f;
-	//constexpr float kMinSpeedJumpPower = 0.90f;
-	//constexpr float kMinShotJumpPower = 0.50f;
-
 	//ジャンプ力最大値
 	constexpr float kMaxJumpPower = 0.85f;
-	//constexpr float kMaxPowerJumpPower = 0.25f;
-	//constexpr float kMaxSpeedJumpPower = 0.90f;
-	//constexpr float kMaxShotJumpPower = 0.50f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
@@ -288,7 +281,7 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, Pla
 
 void Player::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
-
+	
 	//モデルをデリートする
 	MV1DeleteModel(m_modelH);
 	m_modelH = -1;
@@ -396,28 +389,28 @@ void Player::Draw(PlayerWeapon& weapon)
 }
 
 //この判定処理はまた使えるようになりたい(これでアイテム触った時と敵の攻撃とかを判定したいから)
-//void Player::OnCollide(const Collidable& colider)
-//{
-//	std::string message = "プレイヤーが";
-//	auto tag = colider.GetTag();
-//	switch (tag)
-//	{
-//	case Game::e_GameObjectTag::kItemHp:
-//		message += "アイテムHp";
-//		m_hp += 1;
-//		break;
-//	case Game::e_GameObjectTag::kBoss:
-//		message += "ボス";
-//		break;
-//	case Game::e_GameObjectTag::kStepGround:
-//		message += "足場";
-//		break;
-//	default:
-//		break;
-//	}
-//	message += "と当たった！\n";
-//	printfDx(message.c_str());
-//}
+void Player::OnCollide(const Collidable& colider)
+{
+	std::string message = "プレイヤーが";
+	auto tag = colider.GetTag();
+	switch (tag)
+	{
+	case Game::e_GameObjectTag::kItemHp:
+		message += "アイテムHp";
+		m_hp += 1;
+		break;
+	case Game::e_GameObjectTag::kBoss:
+		message += "ボス";
+		break;
+	//case Game::e_GameObjectTag:::
+	//	message += "足場";
+	//	break;
+	default:
+		break;
+	}
+	message += "と当たった！\n";
+	printfDx(message.c_str());
+}
 
 const VECTOR& Player::GetPos() const
 {
@@ -1004,6 +997,8 @@ void Player::AttackCharge()
 void Player::AttackXUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("hitEffect", pos);
 
 	//攻撃ボタンが押されたとき
 	if (Pad::IsTrigger(PAD_INPUT_3) && !m_isNextAttackFlag)
@@ -1180,8 +1175,10 @@ void Player::OnDash()
 
 void Player::OnAttackX()
 {
-
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("hitEffect", pos);
 
 	//タイプによって攻撃アニメーションを変える
 	switch (m_multiAttack)

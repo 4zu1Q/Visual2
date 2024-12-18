@@ -20,7 +20,7 @@ namespace
 	constexpr float kAvoidSpeed = 2.0f;
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
+	constexpr VECTOR kInitPos = { 0.0f,15.0f,0.0f };
 
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
@@ -137,7 +137,7 @@ void BossSpeed::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	//m_speed = 0.1f;
 
 	//初期位置を代入
-	m_pos = VGet(0, 0, 100);
+	m_pos = VGet(0, 15, 100);
 
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
