@@ -25,6 +25,7 @@
 //#include "ui/GamePlayUi.h"
 
 #include "util/Pad.h"
+#include "util/SoundManager.h"
 
 namespace
 {
@@ -125,6 +126,7 @@ void SceneGamePlay::Update()
 	{
 		if (Pad::IsTrigger(PAD_INPUT_8))
 		{
+			SoundManager::GetInstance().PlaySe("pouseSe");
 			m_pManager.PushScene(std::make_shared<ScenePause>(m_pManager));
 		}
 	}

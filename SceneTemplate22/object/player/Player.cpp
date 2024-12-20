@@ -381,7 +381,6 @@ void Player::Draw(PlayerWeapon& weapon)
 
 	DrawFormatString(0, 200, 0xffffff, "DashFlag:%d", m_pCamera->GetIsDash());
 
-	//DrawFormatString(0, 80, 0x000fff, " PlayerKind : %d ", m_playerKind);
 #endif
 
 	//m_pCamera->Draw();
