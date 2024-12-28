@@ -252,6 +252,9 @@
     <ClCompile Include="object\shot\ShotBase.cpp">
       <Filter>ソース ファイル\object\shot</Filter>
     </ClCompile>
+    <ClCompile Include="util\Setting.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -430,6 +433,9 @@
     </ClInclude>
     <ClInclude Include="object\shot\ShotBase.h">
       <Filter>ヘッダー ファイル\object\shot</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Setting.h">
+      <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

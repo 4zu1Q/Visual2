@@ -99,8 +99,8 @@ private:
 	std::vector<std::shared_ptr<Sound>> m_bgm;
 	std::vector<std::shared_ptr<Sound>> m_se;
 
-	float m_bgmVolume = 2;
-	float m_seVolume = 5;
+	float m_bgmVolume;
+	float m_seVolume;
 
 };
 

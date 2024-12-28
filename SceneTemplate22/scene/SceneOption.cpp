@@ -6,6 +6,7 @@
 #include "util/Game.h"
 #include "util/Pad.h"
 #include "util/SoundManager.h"
+#include "util/Setting.h"
 
 
 namespace
@@ -36,6 +37,9 @@ SceneOption::SceneOption(SceneManager& manager) :
 
 	FadeInSkip();
 
+	m_bgmScale = static_cast<int>(Setting::GetInstance().GetBGMVolume() * 100);
+	m_seScale = static_cast<int>(Setting::GetInstance().GetSEVolume() * 100);
+
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &SceneOption::BgmUpdate;
 }
@@ -52,9 +56,18 @@ void SceneOption::Update()
 	Pad::Update();
 	UpdateFade();
 
+	if (Pad::IsPress(PAD_INPUT_RIGHT) && Pad::IsPress(PAD_INPUT_LEFT))
+	{
+		m_pushCount = 0;
+	}
+
 	//Bボタンを押したら前のシーンに戻る
 	if (Pad::IsTrigger(PAD_INPUT_2))
 	{
+		Setting::GetInstance().SetBGMVolume(static_cast<float>(m_bgmScale) / 100);
+		Setting::GetInstance().SetSEVolume(static_cast<float>(m_seScale) / 100);
+		
+		Setting::GetInstance().Save();
 		m_pManager.PopScene();
 	}
 
@@ -103,7 +116,14 @@ void SceneOption::BgmUpdate()
 		{
 			SoundManager::GetInstance().PlaySe("selectSe");
 			m_bgmScale++;
+
+			if (m_bgmScale > 100)
+			{
+				m_bgmScale = 100;
+			}
+			SoundManager::GetInstance().ChangeBGMVolume(static_cast<float>(m_bgmScale) / 100);
 		}
+		m_pushCount++;
 	}
 
 	if (Pad::IsPress(PAD_INPUT_LEFT))
@@ -112,7 +132,14 @@ void SceneOption::BgmUpdate()
 		{
 			SoundManager::GetInstance().PlaySe("selectSe");
 			m_bgmScale--;
+
+			if (m_bgmScale < 0)
+			{
+				m_bgmScale = 0;
+			}
+			SoundManager::GetInstance().ChangeBGMVolume(static_cast<float>(m_bgmScale) / 100);
 		}
+		m_pushCount++;
 	}
 
 }
@@ -140,7 +167,14 @@ void SceneOption::SeUpdate()
 		{
 			SoundManager::GetInstance().PlaySe("selectSe");
 			m_seScale++;
+
+			if (m_seScale > 100)
+			{
+				m_seScale = 100;
+			}
+			SoundManager::GetInstance().ChangeSEVolume(static_cast<float>(m_seScale) / 100);
 		}
+		m_pushCount++;
 	}
 
 	if (Pad::IsPress(PAD_INPUT_LEFT))
@@ -149,7 +183,14 @@ void SceneOption::SeUpdate()
 		{
 			SoundManager::GetInstance().PlaySe("selectSe");
 			m_seScale--;
+
+			if (m_seScale < 0)
+			{
+				m_seScale = 0;
+			}
+			SoundManager::GetInstance().ChangeSEVolume(static_cast<float>(m_seScale) / 100);
 		}
+		m_pushCount++;
 	}
 }
 

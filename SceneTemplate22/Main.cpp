@@ -11,6 +11,7 @@
 #include "util/Pad.h"
 #include "util/SoundManager.h"
 #include "util/EffectManager.h"
+#include  "util/Setting.h"
 
 #include <memory>
 
@@ -70,8 +71,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//SoundManager::GetInstance().ChangeBGMVolume()
 
 	//サウンドのボリュームをここで変える
-	//SoundManager::GetInstance().ChangeBGMVolume(Setting::GetInstance().GetBGMVolume());
-	//SoundManager::GetInstance().ChangeSEVolume(Setting::GetInstance().GetSEVolume());
+	SoundManager::GetInstance().ChangeBGMVolume(Setting::GetInstance().GetBGMVolume());
+	SoundManager::GetInstance().ChangeSEVolume(Setting::GetInstance().GetSEVolume());
 
 	//std::shared_ptr<SceneManager> pSceneManager = std::make_shared<SceneManager>();
 	SceneManager pSceneManager;
@@ -124,8 +125,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	}
 
+	Setting::GetInstance().Destroy();
 	SoundManager::GetInstance().Destroy();
 	EffectManager::GetInstance().Destroy();
+
 
 	Effkseer_End();				// エフェクシア使用の終了処理
 	DxLib_End();				// ＤＸライブラリ使用の終了処理
