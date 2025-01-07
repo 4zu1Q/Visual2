@@ -44,7 +44,7 @@ public:
 	bool GetIsDash() const { return m_isDash; }
 	void SetIsDash(bool isDash) { m_isDash = isDash; }
 
-	void CameraProcess(VECTOR target);
+	void CameraProcess(VECTOR playerPos);
 
 private:
 	
@@ -146,6 +146,10 @@ private:
 	float m_angleV;		//垂直角度 弧度法
 
 	float m_cameraToTargetLength;	//カメラからプレイヤーの距離
+
+	VECTOR m_setEye;
+	VECTOR m_setTarget;
+
 
 };
 

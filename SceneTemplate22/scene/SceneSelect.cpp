@@ -10,6 +10,7 @@
 #include "object/player/Player.h"
 #include "object/player/PlayerWeapon.h"
 #include "object/Camera.h"
+#include "object/Camera2.h"
 #include "object/boss/BossShot.h"
 
 #include "object/item/ItemHp.h"
@@ -37,8 +38,7 @@ namespace
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
 
-	constexpr float kCameraNear = 5.0f;
-	constexpr float kCameraFar = 5000.0f;
+
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,35.0f,0.0f };
@@ -54,6 +54,7 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_pPlayer = std::make_shared<Player>();
 	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
 	m_pCamera = std::make_shared<Camera>();
+	m_pCamera2 = std::make_shared<Camera2>();
 
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
 	m_pFaceUi = std::make_shared<FaceUi>();
@@ -75,13 +76,13 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
-	m_pCamera->Initialize();
+	//m_pCamera->Initialize();
+	m_pCamera2->Initialize(m_pPlayer->GetPos());
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
-	m_pBossShot->Initialize(m_pPhysics);
+	//m_pBossShot->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
-	SetCameraNearFar(kCameraNear, kCameraFar);
 
 	//タイトルのBgmが流れていたら止める用
 	SoundManager::GetInstance().StopBgm("selectBgm");
@@ -92,7 +93,7 @@ SceneSelect::~SceneSelect()
 	m_pPlayer->Finalize(m_pPhysics);
 	m_pItemHp->Finalize(m_pPhysics);
 	m_pItemMp->Finalize(m_pPhysics);
-	m_pBossShot->Finalize(m_pPhysics);
+	//m_pBossShot->Finalize(m_pPhysics);
 
 	SoundManager::GetInstance().StopBgm("selectBgm");
 
@@ -153,13 +154,16 @@ void SceneSelect::Update()
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update(m_pPhysics);
 
-	m_pBossShot->Update(m_pPhysics, *m_pPlayer);
+	//m_pBossShot->Update(m_pPhysics, *m_pPlayer);
 	//m_pCamera->Update(m_pField->GetModelHandle());
 	//m_pCamera->SetPlayerPos(m_pPlayer->GetPosUp());
-	m_pCamera->DebugUpdate(m_pPlayer->GetPosUp());
+	//m_pCamera->DebugUpdate(m_pPlayer->GetPosUp());
 
-	m_pPlayer->SetCameraAngle(m_pCamera->GetAngle());
-	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon);
+	//m_pCamera->CameraProcess(m_pPlayer->GetPos());
+	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
+	m_pCamera2->Update(m_pPlayer->GetPos(),m_pField->GetModelHandle());
+
+	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon,m_pCamera2->GetCameraAngleX());
 
 	m_pPhysics->Update();
 
@@ -199,7 +203,7 @@ void SceneSelect::Draw()
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
 
-	m_pBossShot->Draw();
+	//m_pBossShot->Draw();
 	m_pPlayerBarUi->Draw();
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);

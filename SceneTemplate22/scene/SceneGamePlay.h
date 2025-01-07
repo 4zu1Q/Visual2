@@ -9,6 +9,7 @@
 class Player;
 class PlayerWeapon;
 class Camera;
+class Camera2;
 class SkyDome;
 class HpBar;
 class PlayerBarUi;
@@ -48,6 +49,7 @@ private:
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
 	std::shared_ptr<Camera> m_pCamera;
+	std::shared_ptr<Camera2> m_pCamera2;
 	
 	std::shared_ptr<BossPower> m_pBossPower;
 	std::shared_ptr<BossSpeed> m_pBossSpeed;

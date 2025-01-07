@@ -1,5 +1,6 @@
 ﻿#include "FaceFrameUi.h"
 #include "object/player/Player.h"
+#include "FaceFrameUi.h"
 
 namespace
 {

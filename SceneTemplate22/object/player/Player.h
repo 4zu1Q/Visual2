@@ -54,7 +54,7 @@ public:
 	void Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon);
 	void Finalize(std::shared_ptr<MyLib::Physics> physics);
 
-	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon);
+	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX);
 	void Draw(PlayerWeapon& weapon);
 
 	// 衝突したとき
@@ -227,6 +227,9 @@ private:
 
 	VECTOR m_avoid;
 	VECTOR m_move;
+
+	MATRIX m_playerRotMtx;
+
 	float m_rate;
 
 	//回転

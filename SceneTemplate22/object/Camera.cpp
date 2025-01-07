@@ -107,7 +107,9 @@ Camera::Camera() :
 	m_angleH(0.0f),
 	m_rotX(MGetRotX(m_angleV)),
 	m_rotY(MGetRotX(m_angleH)),
-	m_angle(-DX_PI_F / 2)
+	m_angle(-DX_PI_F / 2),
+	m_setEye(VGet(0, 0, 0)),
+	m_setTarget(VGet(0,0,0))
 {
 	m_cameraDist = kCameraDist;
 
@@ -131,6 +133,13 @@ void Camera::Initialize()
 	m_cameraAngleX = 0.0f;
 	m_cameraAngleY = 12.0f;
 	SetCameraNearFar(kCameraNear, kCameraFar);
+
+
+	// カメラの初期水平角度は１８０度
+	m_angleH = DX_PI_F;
+
+	// 垂直角度は０度
+	m_angleV = 0.0f;
 
 	m_updateFunc = &Camera::NormalUpdate;
 }
@@ -644,54 +653,60 @@ void Camera::LockOnUpdate(VECTOR targetPos)
 }
 
 // カメラの処理
-void Camera::CameraProcess(VECTOR target)
+void Camera::CameraProcess(VECTOR playerPos)
 {
+	//アナログスティックを使ってカメラ回転
+	int analogX = 0;
+	int analogY = 0;
+
+	//アナログスティックを取得
+	GetJoypadAnalogInputRight(&analogX, &analogY, DX_INPUT_PAD1);
 
 	// スティックが左に押されていたら水平角度をマイナスする
 	if (analogX >= 10)
 	{
-		AngleH -= 0.05f;
+		m_angleH -= 0.05f;
 
 		// －１８０度以下になったら角度値が大きくなりすぎないように３６０度を足す
-		if (AngleH < -DX_PI_F)
+		if (m_angleH < -DX_PI_F)
 		{
-			AngleH += DX_TWO_PI_F;
+			m_angleH += DX_TWO_PI_F;
 		}
 	}
 
 	// スティックが右に押されていたら水平角度をプラスする
 	if (analogX >= -10)
 	{
-		AngleH += 0.05f;
+		m_angleH += 0.05f;
 
 		// １８０度以上になったら角度値が大きくなりすぎないように３６０度を引く
-		if (AngleH > DX_PI_F)
+		if (m_angleH > DX_PI_F)
 		{
-			AngleH -= DX_TWO_PI_F;
+			m_angleH -= DX_TWO_PI_F;
 		}
 	}
 
 	// スティックが上に押されていたら垂直角度をマイナスする
 	if (analogY > 10.0f)
 	{
-		AngleV -= 0.05f;
+		m_angleV -= 0.05f;
 
 		// ある一定角度以下にはならないようにする
-		if (AngleV < -DX_PI_F / 2.0f + 0.6f)
+		if (m_angleV < -DX_PI_F / 2.0f + 0.6f)
 		{
-			AngleV = -DX_PI_F / 2.0f + 0.6f;
+			m_angleV = -DX_PI_F / 2.0f + 0.6f;
 		}
 	}
 
 	// スティックが下に押されていたら垂直角度をプラスする
 	if (analogY > -10.0f)
 	{
-		AngleV += 0.05f;
+		m_angleV += 0.05f;
 
 		// ある一定角度以上にはならないようにする
-		if (AngleV > DX_PI_F / 2.0f - 0.6f)
+		if (m_angleV > DX_PI_F / 2.0f - 0.6f)
 		{
-			AngleV = DX_PI_F / 2.0f - 0.6f;
+			m_angleV = DX_PI_F / 2.0f - 0.6f;
 		}
 	}
 
@@ -723,7 +738,7 @@ void Camera::CameraProcess(VECTOR target)
 	////////////////////////////////////////////////////////////////////////////////////
 
 	// カメラの注視点はプレイヤー座標から規定値分高い座標
-	cam.Target = VAdd(pl.Position, VGet(0.0f, 600.0f, 0.0f));
+	m_targetPos = VAdd(playerPos, VGet(0.0f, 600.0f, 0.0f));
 
 	// カメラの座標を決定する
 	//MV1_COLL_RESULT_POLY_DIM HRes;
@@ -733,22 +748,22 @@ void Camera::CameraProcess(VECTOR target)
 	VECTOR posBase;
 
 	// カメラの奥行方向を算出
-	forwardVector.x = cos(cam.AngleV) * cos(-cam.AngleH);
-	forwardVector.y = sin(cam.AngleV);
-	forwardVector.z = cos(cam.AngleV) * sin(-cam.AngleH);
+	forwardVector.x = cos(m_angleV) * cos(-m_angleH);
+	forwardVector.y = sin(m_angleV);
+	forwardVector.z = cos(m_angleV) * sin(-m_angleH);
 
 	// カメラの水平方向を算出
-	rightVector.x = cos(-cam.AngleH - DX_PI_F / 2.0f);
+	rightVector.x = cos(-m_angleH - DX_PI_F / 2.0f);
 	rightVector.y = 0.0f;
-	rightVector.z = sin(-cam.AngleH - DX_PI_F / 2.0f);
+	rightVector.z = sin(-m_angleH - DX_PI_F / 2.0f);
 
 	// カメラの座標を算出
-	Eye = VAdd(VAdd(Position, VScale(rightVector, 400.0f)), VScale(forwardVector, -800.0f));
-	Eye.y += 600.0f;
+	m_pos = VAdd(VAdd(playerPos, VScale(rightVector, 400.0f)), VScale(forwardVector, -800.0f));
+	m_pos.y += 600.0f;
 
 	// カメラの注視点を算出
-	Target = VAdd(pl.Position, VScale(rightVector, 400.0f));
-	Target.y += 600.0f;
+	m_targetPos = VAdd(playerPos, VScale(rightVector, 400.0f));
+	m_targetPos.y += 600.0f;
 
 /*
 		// カメラの座標からプレイヤーの間にステージのポリゴンがあるか調べる
@@ -808,7 +823,7 @@ void Camera::CameraProcess(VECTOR target)
 	*/
 
 	// カメラの情報をライブラリのカメラに反映させる
-	SetEye = VAdd(cam.SetEye, VScale(VSub(cam.Eye, cam.SetEye), 0.2f));
-	SetTarget = VAdd(cam.SetTarget, VScale(VSub(cam.Target, cam.SetTarget), 0.2f));
-	SetCameraPositionAndTarget_UpVecY(cam.SetEye, cam.SetTarget);
+	m_setEye = VAdd(m_setEye, VScale(VSub(m_pos, m_setEye), 0.2f));
+	m_setTarget = VAdd(m_setTarget, VScale(VSub(m_targetPos, m_setTarget), 0.2f));
+	SetCameraPositionAndTarget_UpVecY(m_setEye, m_setTarget);
 }

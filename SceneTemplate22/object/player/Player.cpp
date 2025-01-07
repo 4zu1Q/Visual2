@@ -190,7 +190,8 @@ Player::Player() :
 	m_isNextAttackFlag(false),
 	m_chargeTime(0),
 	m_jumpCount(0),
-	m_jumpPower(0.0f)
+	m_jumpPower(0.0f),
+	m_playerRotMtx()
 {
 
 #ifdef _DEBUG
@@ -289,7 +290,7 @@ void Player::Finalize(std::shared_ptr<MyLib::Physics> physics)
 	Collidable::Finalize(physics);
 }
 
-void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon)
+void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX)
 {
 
 	//アップデート
@@ -313,6 +314,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	//モデルのポジションを合わせるよう
 	//VECTOR modelPos = VGet(m_pos.x, m_pos.y, m_pos.z);
 
+	m_playerRotMtx = MGetRotY(cameraAngleX);
 
 	//モデルに座標をセットする
 	MV1SetPosition(m_modelH, m_pos);
@@ -521,11 +523,13 @@ void Player::WalkUpdate()
 			{
 				speed = kPowerMinSpeed * rate;
 				move = VScale(move, speed);
+				//move = VTransform(move, m_playerRotMtx);
 			}
 			if (rate >= 0.6f)
 			{
 				speed = kPowerMaxSpeed * rate;
 				move = VScale(move, speed);
+				//move = VTransform(move, m_playerRotMtx);
 			}
 		}
 		if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
@@ -578,11 +582,13 @@ void Player::WalkUpdate()
 			{
 				speed = kNormalMinSpeed * rate;
 				move = VScale(move, speed);
+				//move = VTransform(move, m_playerRotMtx);
 			}
 			if (rate >= 0.6f)
 			{
 				speed = kNormalMaxSpeed * rate;
 				move = VScale(move, speed);
+				//move = VTransform(move, m_playerRotMtx);
 			}
 		}
 
