@@ -44,6 +44,8 @@ public:
 	bool GetIsDash() const { return m_isDash; }
 	void SetIsDash(bool isDash) { m_isDash = isDash; }
 
+	void CameraProcess(VECTOR target);
+
 private:
 	
 	/// <summary>

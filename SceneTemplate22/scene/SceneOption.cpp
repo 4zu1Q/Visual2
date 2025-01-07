@@ -15,6 +15,8 @@ namespace
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
 
+	constexpr int kMaxVolume = 100;
+
 	//BGMやSEなどのテキストポジション
 	constexpr int kTextPosY[4] = { 180, 280, 380, 480 };
 
@@ -56,7 +58,7 @@ void SceneOption::Update()
 	Pad::Update();
 	UpdateFade();
 
-	if (Pad::IsPress(PAD_INPUT_RIGHT) && Pad::IsPress(PAD_INPUT_LEFT))
+	if (!Pad::IsPress(PAD_INPUT_RIGHT) && !Pad::IsPress(PAD_INPUT_LEFT))
 	{
 		m_pushCount = 0;
 	}
@@ -96,6 +98,9 @@ void SceneOption::Draw()
 	DrawBox(128, 48, 128 + m_seScale, 61, 0xff00ff, true);
 	DrawBox(128, 64, 128 + m_sensitivityScale, 77, 0xff00ff, true);
 	
+	DrawBox(128, 32, 128 + kMaxVolume, 45, 0xffffff, false);
+	DrawBox(128, 48, 128 + kMaxVolume, 61, 0xffffff, false);
+	DrawBox(128, 64, 128 + kMaxVolume, 77, 0xffffff, false);
 #endif
 
 }
@@ -114,7 +119,6 @@ void SceneOption::BgmUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
-			SoundManager::GetInstance().PlaySe("selectSe");
 			m_bgmScale++;
 
 			if (m_bgmScale > 100)
@@ -130,7 +134,6 @@ void SceneOption::BgmUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
-			SoundManager::GetInstance().PlaySe("selectSe");
 			m_bgmScale--;
 
 			if (m_bgmScale < 0)
@@ -165,7 +168,6 @@ void SceneOption::SeUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
-			SoundManager::GetInstance().PlaySe("selectSe");
 			m_seScale++;
 
 			if (m_seScale > 100)
@@ -181,7 +183,6 @@ void SceneOption::SeUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
-			SoundManager::GetInstance().PlaySe("selectSe");
 			m_seScale--;
 
 			if (m_seScale < 0)

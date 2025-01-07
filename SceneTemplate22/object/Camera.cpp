@@ -643,24 +643,172 @@ void Camera::LockOnUpdate(VECTOR targetPos)
 {
 }
 
-//void Camera::DrawGrid()
-//{
-//	for (int x = -350; x <= 350; x += 5)
-//	{
-//		DrawLine3D(VGet(static_cast<float>(x), 0, -350), VGet(static_cast<float>(x), 0, 350), 0xffff00);
-//	}
-//	for (int z = -350; z <= 350; z += 5)
-//	{
-//		DrawLine3D(VGet(-350, 0, static_cast<float>(z)), VGet(350, 0, static_cast<float>(z)), 0xff0000);
-//	}
-//
-//	// X+-,Z+-の方向が分かりやすいように表示を追加する
-//	VECTOR dispPos = ConvWorldPosToScreenPos(VGet(50, 0, 0));
-//	DrawStringF(dispPos.x, dispPos.y, "X+", 0xffffff);
-//	dispPos = ConvWorldPosToScreenPos(VGet(-50, 0, 0));
-//	DrawStringF(dispPos.x, dispPos.y, "X-", 0xffffff);
-//	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, 50));
-//	DrawStringF(dispPos.x, dispPos.y, "Z+", 0xffffff);
-//	dispPos = ConvWorldPosToScreenPos(VGet(0, 0, -50));
-//	DrawStringF(dispPos.x, dispPos.y, "Z-", 0xffffff);
-//}
+// カメラの処理
+void Camera::CameraProcess(VECTOR target)
+{
+
+	// スティックが左に押されていたら水平角度をマイナスする
+	if (analogX >= 10)
+	{
+		AngleH -= 0.05f;
+
+		// －１８０度以下になったら角度値が大きくなりすぎないように３６０度を足す
+		if (AngleH < -DX_PI_F)
+		{
+			AngleH += DX_TWO_PI_F;
+		}
+	}
+
+	// スティックが右に押されていたら水平角度をプラスする
+	if (analogX >= -10)
+	{
+		AngleH += 0.05f;
+
+		// １８０度以上になったら角度値が大きくなりすぎないように３６０度を引く
+		if (AngleH > DX_PI_F)
+		{
+			AngleH -= DX_TWO_PI_F;
+		}
+	}
+
+	// スティックが上に押されていたら垂直角度をマイナスする
+	if (analogY > 10.0f)
+	{
+		AngleV -= 0.05f;
+
+		// ある一定角度以下にはならないようにする
+		if (AngleV < -DX_PI_F / 2.0f + 0.6f)
+		{
+			AngleV = -DX_PI_F / 2.0f + 0.6f;
+		}
+	}
+
+	// スティックが下に押されていたら垂直角度をプラスする
+	if (analogY > -10.0f)
+	{
+		AngleV += 0.05f;
+
+		// ある一定角度以上にはならないようにする
+		if (AngleV > DX_PI_F / 2.0f - 0.6f)
+		{
+			AngleV = DX_PI_F / 2.0f - 0.6f;
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// DirectInput の入力を取得
+	//DINPUT_JOYSTATE DInputState;
+	//GetJoypadDirectInputState(DX_INPUT_PAD1, &DInputState);
+
+	//// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
+	//cam.AngleH += DInputState.Rx / 1000.0f * CAMERA_ANGLE_SPEED;
+	//if (cam.AngleH < -DX_PI_F)
+	//{
+	//	cam.AngleH += DX_TWO_PI_F;
+	//}
+	//if (cam.AngleH > DX_PI_F)
+	//{
+	//	cam.AngleH -= DX_TWO_PI_F;
+	//}
+
+	//cam.AngleV += DInputState.Ry / 1000.0f * CAMERA_ANGLE_SPEED;
+	//if (cam.AngleV < -DX_PI_F / 2.0f + 0.6f)
+	//{
+	//	cam.AngleV = -DX_PI_F / 2.0f + 0.6f;
+	//}
+	//if (cam.AngleV > DX_PI_F / 2.0f - 0.6f)
+	//{
+	//	cam.AngleV = DX_PI_F / 2.0f - 0.6f;
+	//}
+	////////////////////////////////////////////////////////////////////////////////////
+
+	// カメラの注視点はプレイヤー座標から規定値分高い座標
+	cam.Target = VAdd(pl.Position, VGet(0.0f, 600.0f, 0.0f));
+
+	// カメラの座標を決定する
+	//MV1_COLL_RESULT_POLY_DIM HRes;
+	int HitNum;
+	VECTOR rightVector;
+	VECTOR forwardVector;
+	VECTOR posBase;
+
+	// カメラの奥行方向を算出
+	forwardVector.x = cos(cam.AngleV) * cos(-cam.AngleH);
+	forwardVector.y = sin(cam.AngleV);
+	forwardVector.z = cos(cam.AngleV) * sin(-cam.AngleH);
+
+	// カメラの水平方向を算出
+	rightVector.x = cos(-cam.AngleH - DX_PI_F / 2.0f);
+	rightVector.y = 0.0f;
+	rightVector.z = sin(-cam.AngleH - DX_PI_F / 2.0f);
+
+	// カメラの座標を算出
+	Eye = VAdd(VAdd(Position, VScale(rightVector, 400.0f)), VScale(forwardVector, -800.0f));
+	Eye.y += 600.0f;
+
+	// カメラの注視点を算出
+	Target = VAdd(pl.Position, VScale(rightVector, 400.0f));
+	Target.y += 600.0f;
+
+/*
+		// カメラの座標からプレイヤーの間にステージのポリゴンがあるか調べる
+	//	posBase = pl.Position;
+	//	posBase.y += CAMERA_PLAYER_TARGET_HEIGHT;
+	//	HRes = MV1CollCheck_Capsule(stg.ModelHandle, -1, posBase, cam.Eye, CAMERA_COLLISION_SIZE);
+	//	HitNum = HRes.HitNum;
+	//	MV1CollResultPolyDimTerminate(HRes);
+	//	if (HitNum != 0)
+	//	{
+	//		float NotHitLength;
+	//		float HitLength;
+	//		float TestLength;
+	//		VECTOR TestPosition;
+	//		VECTOR Direction;
+
+	//		// あったら無い位置までプレイヤーに近づく
+
+	//		// ポリゴンに当たらない距離をセット
+	//		NotHitLength = 0.0f;
+
+	//		// ポリゴンに当たる距離をセット
+	//		HitLength = VSize(VSub(cam.Eye, posBase));
+
+	//		// プレイヤーからカメラへの方向を算出
+	//		Direction = VNorm(VSub(cam.Eye, posBase));
+	//		do
+	//		{
+	//			// 当たるかどうかテストする距離をセット( 当たらない距離と当たる距離の中間 )
+	//			TestLength = NotHitLength + (HitLength - NotHitLength) / 2.0f;
+
+	//			// テスト用のカメラ座標を算出
+	//			TestPosition = VAdd(VScale(Direction, TestLength), posBase);
+
+	//			// 新しい座標で壁に当たるかテスト
+	//			HRes = MV1CollCheck_Capsule(stg.ModelHandle, -1, posBase, TestPosition, CAMERA_COLLISION_SIZE);
+	//			HitNum = HRes.HitNum;
+	//			MV1CollResultPolyDimTerminate(HRes);
+	//			if (HitNum != 0)
+	//			{
+	//				// 当たったら当たる距離を TestLength に変更する
+	//				HitLength = TestLength;
+	//			}
+	//			else
+	//			{
+	//				// 当たらなかったら当たらない距離を TestLength に変更する
+	//				NotHitLength = TestLength;
+	//			}
+
+	//			// HitLength と NoHitLength が十分に近づいていなかったらループ
+	//		} while (HitLength - NotHitLength > 0.1f);
+
+	//		// カメラの座標をセット
+	//		cam.Eye = TestPosition;
+	//	}
+
+	*/
+
+	// カメラの情報をライブラリのカメラに反映させる
+	SetEye = VAdd(cam.SetEye, VScale(VSub(cam.Eye, cam.SetEye), 0.2f));
+	SetTarget = VAdd(cam.SetTarget, VScale(VSub(cam.Target, cam.SetTarget), 0.2f));
+	SetCameraPositionAndTarget_UpVecY(cam.SetEye, cam.SetTarget);
+}
