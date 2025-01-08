@@ -11,6 +11,7 @@
 #include "util/Pad.h"
 #include "util/SoundManager.h"
 #include "util/EffectManager.h"
+#include "util/Font.h"
 #include  "util/Setting.h"
 
 #include <memory>
@@ -21,16 +22,16 @@
 // プログラムは WinMain から始まります
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+
+	ChangeWindowMode(true);
 	//画面サイズの設定
 	SetGraphMode(Game::kScreenWidth, Game::kScreenHeight, Game::kColorDepth);
 
 	// 一部の関数はDxLib_Init()の前に実行する必要がある
+	Setting::GetInstance().Load();
+
 	//ウィンドウモードの設定
-#ifdef _DEBUG
-	ChangeWindowMode(true);
-#else
-	ChangeWindowMode(false);
-#endif
+	ChangeWindowMode(Setting::GetInstance().GetIsFullScreen());
 
 	//ウィンドウ名の設定
 	SetMainWindowText(Game::kTitleText);
@@ -115,6 +116,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 
+	Font::GetInstance().Destroy();
 	Setting::GetInstance().Destroy();
 	SoundManager::GetInstance().Destroy();
 	EffectManager::GetInstance().Destroy();

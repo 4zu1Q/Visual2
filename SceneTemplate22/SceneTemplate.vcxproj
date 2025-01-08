@@ -192,6 +192,7 @@
     <ClCompile Include="util\ActionTime.cpp" />
     <ClCompile Include="util\AnimController.cpp" />
     <ClCompile Include="util\EffectManager.cpp" />
+    <ClCompile Include="util\Font.cpp" />
     <ClCompile Include="util\MoveDirectionVec.cpp" />
     <ClCompile Include="util\OnAttackFrame.cpp" />
     <ClCompile Include="util\Pad.cpp" />
@@ -255,6 +256,7 @@
     <ClInclude Include="util\ActionTime.h" />
     <ClInclude Include="util\AnimController.h" />
     <ClInclude Include="util\EffectManager.h" />
+    <ClInclude Include="util\Font.h" />
     <ClInclude Include="util\Game.h" />
     <ClInclude Include="util\MoveDirectionVec.h" />
     <ClInclude Include="util\OnAttackFrame.h" />

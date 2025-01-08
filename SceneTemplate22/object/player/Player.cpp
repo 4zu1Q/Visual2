@@ -7,6 +7,7 @@
 #include "util/Pad.h"
 #include "util/AnimController.h"
 #include "util/EffectManager.h"
+#include "util/SoundManager.h"
 
 #include "myLib/MyLib.h"
 
@@ -191,7 +192,8 @@ Player::Player() :
 	m_chargeTime(0),
 	m_jumpCount(0),
 	m_jumpPower(0.0f),
-	m_playerRotMtx()
+	m_playerRotMtx(),
+	m_moveCount(0)
 {
 
 #ifdef _DEBUG
@@ -501,6 +503,22 @@ void Player::WalkUpdate()
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
 	float len = VSize(move);
 
+	//移動中に足音のSEを鳴らす
+	//キャラクターの種類によって変える
+	if (len != 0.0f)
+	{
+		if (m_moveCount % 25 == 0)
+		{
+			SoundManager::GetInstance().PlaySe("footstepsSe");
+		}
+		m_moveCount++;
+
+	}
+	else
+	{
+		m_moveCount = 0;
+	}
+
 	float rate = len / kAnalogInputMax;
 
 	//アナログスティック無効な範囲を除外する
@@ -693,11 +711,29 @@ void Player::DashUpdate()
 	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
 
+
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
 
 	float len = VSize(move);
+
+	//移動中に足音のSEを鳴らす
+	//キャラクターの種類によって変える
+	if (len != 0.0f)
+	{
+		if (m_moveCount % 15 == 0)
+		{
+			SoundManager::GetInstance().PlaySe("footstepsSe");
+		}
+		m_moveCount++;
+
+	}
+	else
+	{
+		m_moveCount = 0;
+	}
+
 
 	float rate = len / kAnalogInputMax;
 
@@ -1059,16 +1095,30 @@ void Player::AttackCharge()
 
 	m_chargeTime++;
 
+
+	if (m_chargeTime == 60)
+	{
+		SoundManager::GetInstance().PlaySe("healHpSe");
+	}
+
 	if (m_chargeTime > 60)
 	{
 		//エフェクトを入れてチャージされたかを確認できるようにする
 		//後音も入れる
+	}
+	else
+	{
+		if (m_chargeTime % 10 == 0)
+		{
+			SoundManager::GetInstance().PlaySe("attackChargeSe");
+		}
 	}
 
 	//Yボタンを離した場合
 	if (Pad::IsRelase(kPadButtonY) && m_chargeTime > 60)
 	{
 		m_chargeTime = 0;
+
 		m_isUseMp = true;
 		OnAttackY();
 	}
@@ -1275,18 +1325,23 @@ void Player::OnAttackX()
 	case 0:
 		//一番目の攻撃アニメーション
 		AnimChange(kAnimNormalAttackX_First, kAnimPowerAttackX_First, kAnimSpeedAttackX_First, kAnimShotAttackX_First);
+		SoundManager::GetInstance().PlaySe("attackFirstSe");
+
 		break;
 	case 1:
 		//二番目の攻撃アニメーション
 		AnimChange(kAnimNormalAttackX_Second, kAnimPowerAttackX_Second, kAnimSpeedAttackX_Second, kAnimShotAttackX_Second);
+		SoundManager::GetInstance().PlaySe("attackSecondSe");
 		break;
 	case 2:
 		//三番目の攻撃アニメーション
 		AnimChange(kAnimNormalAttackX_Third, kAnimPowerAttackX_Third, kAnimSpeedAttackX_Third, kAnimShotAttackX_Third);
+		SoundManager::GetInstance().PlaySe("attackFirstSe");
 		break;
 	case 3:
 		//四番目の攻撃アニメーション
 		AnimChange(kAnimNormalAttackX_Fourth, kAnimPowerAttackX_Fourth, kAnimSpeedAttackX_Fourth, kAnimShotAttackX_Fourth);
+		SoundManager::GetInstance().PlaySe("attackSecondSe");
 		break;
 	default:
 		break;
@@ -1306,6 +1361,9 @@ void Player::OnAttackY()
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalAttackY, kAnimPowerAttackY, kAnimSpeedAttackY, kAnimShotAttackY);
 
+	SoundManager::GetInstance().PlaySe("attackYSe");
+
+
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
 
@@ -1314,6 +1372,8 @@ void Player::OnAttackY()
 
 void Player::OnJump()
 {
+	SoundManager::GetInstance().PlaySe("jumpSe");
+
 	//地面と接触しているかどうか
 	m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();

@@ -110,7 +110,6 @@ BossPower::BossPower():
 	//circleColliderData->m_radius = 5.0f;
 	//circleColliderData->m_posDown = VGet(0.0f, 0.0f, 0.0f);
 	//circleColliderData->m_posUp = VGet(0.0f, 0.0f, 0.0f);
-	
 
 }
 

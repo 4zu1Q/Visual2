@@ -271,6 +271,9 @@ private:
 	//ジャンプしているかどうか
 	bool m_isJump;
 
+	//動いたときの音を出すやつ
+	int m_moveCount;
+
 	//顔の保持しているかどうかのフラグ
 	bool m_isPowerFace;
 	bool m_isSpeedFace;

@@ -39,8 +39,12 @@ SceneBase::SceneBase(SceneManager& manager):
 	//プレイヤー用SE
 	SoundManager::GetInstance().Load("healHpSe", "Data/Sound/Se/HealHp.mp3", false);
 	SoundManager::GetInstance().Load("healMpSe", "Data/Sound/Se/HealMp.mp3", false);
-	SoundManager::GetInstance().Load("healSe", "Data/Sound/Se/HealHp.mp3", false);
-	SoundManager::GetInstance().Load("healSe", "Data/Sound/Se/HealHp.mp3", false);
+	SoundManager::GetInstance().Load("footstepsSe", "Data/Sound/Se/FootSteps.mp3", false);
+	SoundManager::GetInstance().Load("jumpSe", "Data/Sound/Se/Jump.mp3", false);
+	SoundManager::GetInstance().Load("attackFirstSe", "Data/Sound/Se/AttackXActionFirst.mp3", false);
+	SoundManager::GetInstance().Load("attackSecondSe", "Data/Sound/Se/AttackXActionSecond.mp3", false);
+	SoundManager::GetInstance().Load("attackYSe", "Data/Sound/Se/AttackYAction.mp3", false);
+	SoundManager::GetInstance().Load("attackChargeSe", "Data/Sound/Se/Charge.mp3", false);
 
 	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
