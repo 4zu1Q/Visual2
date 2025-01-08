@@ -79,6 +79,7 @@ private:
 	int m_analogZ;
 
 	int m_gameOverTime;
+	int m_selectTime;
 
 	int m_radius;
 	float m_angle;

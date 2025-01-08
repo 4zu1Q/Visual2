@@ -49,22 +49,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	//Zバッファを使用する
 	SetUseZBuffer3D(true);
-
 	//Zバッファへの書き込みを行う
 	SetWriteZBuffer3D(true);
-
 	//ポリゴンの裏面を描画しない
 	SetUseBackCulling(true);
 
 	//エフェクシアを初期化
 	Effekseer_Init(800);
-
 	//エフェクシアの歪み機能を初期化する
 	Effekseer_InitDistortion();
-
 	// 画面モード変更時( とウインドウモード変更時 )にグラフィックスシステムの設定やグラフィックハンドルをリセットするかどうかを設定する( TRUE:リセットする( デフォルト )  FALSE:リセットしない )
 	SetChangeScreenModeGraphicsSystemResetFlag(false);
-
 	//デバイスがロストした時のコールバックを設定
 	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
 
@@ -100,9 +95,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		UpdateEffekseer3D();
 		pSceneManager.Draw();
 
-
-
-
 		// 画面が切り替わるのを待つ
 		ScreenFlip();
 
@@ -121,8 +113,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 
 		}
-
-
 	}
 
 	Setting::GetInstance().Destroy();

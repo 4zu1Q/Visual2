@@ -1,5 +1,5 @@
 ﻿#include "Camera2.h"
-
+#include "util/Setting.h"
 
 namespace 
 {
@@ -20,12 +20,14 @@ Camera2::Camera2():
 	m_setTarget(VGet(0, 0, 0)),
 	m_angleH(0.0f),
 	m_angleV(0.0f),
-	m_lightHandle(0)
+	m_lightHandle(0),
+	m_angleMoveScale(0.0f)
 {
 }
 
 Camera2::~Camera2()
 {
+	DeleteLightHandle(m_lightHandle);
 }
 
 void Camera2::Initialize(VECTOR playerPos)
@@ -43,6 +45,7 @@ void Camera2::Initialize(VECTOR playerPos)
 
 void Camera2::Finalize()
 {
+
 }
 
 void Camera2::Update(VECTOR playerPos, int stageHandle)
@@ -51,8 +54,10 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 	DINPUT_JOYSTATE DInputState;
 	GetJoypadDirectInputState(DX_INPUT_PAD1, &DInputState);
 
+
+
 	// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
-	m_angleH += DInputState.Rx / 1000.0f * kCameraAngleSpeed;
+	m_angleH += DInputState.Rx / 10000.0f * Setting::GetInstance().GetSensitivity();
 	if (m_angleH < -DX_PI_F)
 	{
 		m_angleH += DX_TWO_PI_F;
@@ -62,7 +67,7 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 		m_angleH -= DX_TWO_PI_F;
 	}
 
-	m_angleV += DInputState.Ry / 1000.0f * 0.02f;
+	m_angleV += DInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
 	if (m_angleV < -DX_PI_F / 2.0f + 0.6f)
 	{
 		m_angleV = -DX_PI_F / 2.0f + 0.6f;
@@ -167,6 +172,7 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 
 void Camera2::Draw()
 {
+
 }
 
 const VECTOR Camera2::GetDirection() const

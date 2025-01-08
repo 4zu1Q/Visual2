@@ -30,8 +30,10 @@
 
 namespace
 {
+
 	//初期位置
 	constexpr VECTOR kInitPos = { 20.0f,15.0f,-100.0f };
+
 }
 
 SceneGamePlay::SceneGamePlay(SceneManager& manager) :
@@ -45,6 +47,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_angle(0.0f),
 #endif 
 	m_gameOverTime(0),
+	m_selectTime(0),
 	m_cameraAngle(0.0f)
 {
 	m_pPlayer = std::make_shared<Player>();
@@ -80,6 +83,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager) :
 	m_pCamera2->Initialize(m_pPlayer->GetPos());
 
 	m_pField->Initialize();
+
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -113,15 +117,31 @@ void SceneGamePlay::Update()
 	}
 #endif
 
+	//ボスのHPが0になった場合
+	if (m_pBossPower->GetHp() > 0)
+	{
+		m_selectTime++;
+	}
+
+	//プレイヤーのゲームオーバーフラグがtrueの場合
 	if (m_pPlayer->GetIsGameOver())
 	{
 		m_gameOverTime++;
 	}
+	
 
+	//ゲームオーバー時間が過ぎたら
 	if (m_gameOverTime > 240)
 	{
 		m_isToNextScene = true;
 		StartFadeOut();
+
+		//なんか入らん後でやる
+		//if (!IsFadingOut())
+		{
+			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager));
+			return;
+		}
 	}
 
 
@@ -158,27 +178,19 @@ void SceneGamePlay::Update()
 	m_pPlayerWeapon->MagicWandUpdate();
 	m_pPlayerWeapon->LongSwordUpdate();
 
-
 	m_pFaceUi->Update();
 	m_pPlayerBarUi->Update(*m_pPlayer);
-
 
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
-		//なんか入らん後でやる
-		if (!IsFadingOut())
-		{
-			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager));
-			return;
-		}
+
 	}
 
 }
 
 void SceneGamePlay::Draw()
 {
-
 
 	m_pField->Draw();
 	m_pSkyDome->Draw();

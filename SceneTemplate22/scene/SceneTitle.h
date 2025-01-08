@@ -24,7 +24,8 @@ private:
 	//遷移先
 	enum class e_SceneTrans : int
 	{
-		kSelect,	//セレクト
+		kNewGame,	//ニューゲーム
+		kLoadGame,	//ロードゲーム
 		kOption,	//オプション
 		kQuit,		//ゲーム終了
 	};

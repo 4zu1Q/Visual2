@@ -41,6 +41,8 @@ SceneOption::SceneOption(SceneManager& manager) :
 
 	m_bgmScale = static_cast<int>(Setting::GetInstance().GetBGMVolume() * 100);
 	m_seScale = static_cast<int>(Setting::GetInstance().GetSEVolume() * 100);
+	m_sensitivityScale = static_cast<int>(Setting::GetInstance().GetSensitivity() * 100);
+	m_isFullScreen = !Setting::GetInstance().GetIsFullScreen();
 
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &SceneOption::BgmUpdate;
@@ -68,7 +70,9 @@ void SceneOption::Update()
 	{
 		Setting::GetInstance().SetBGMVolume(static_cast<float>(m_bgmScale) / 100);
 		Setting::GetInstance().SetSEVolume(static_cast<float>(m_seScale) / 100);
-		
+		Setting::GetInstance().SetSensitivity(static_cast<float>(m_sensitivityScale) / 100);
+		Setting::GetInstance().SetIsFullScreen(m_isFullScreen);
+
 		Setting::GetInstance().Save();
 		m_pManager.PopScene();
 	}
@@ -218,7 +222,13 @@ void SceneOption::SensitivityUpdate()
 		{
 			SoundManager::GetInstance().PlaySe("selectSe");
 			m_sensitivityScale++;
+			if (m_sensitivityScale > 100)
+			{
+				m_sensitivityScale = 100;
+			}
 		}
+		m_pushCount++;
+
 	}
 
 	if (Pad::IsPress(PAD_INPUT_LEFT))
@@ -227,7 +237,12 @@ void SceneOption::SensitivityUpdate()
 		{
 			SoundManager::GetInstance().PlaySe("selectSe");
 			m_sensitivityScale--;
+			if (m_sensitivityScale < 0)
+			{
+				m_sensitivityScale = 0;
+			}
 		}
+		m_pushCount++;
 	}
 }
 

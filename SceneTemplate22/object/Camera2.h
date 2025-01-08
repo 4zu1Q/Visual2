@@ -32,5 +32,7 @@ private:
 
 	int m_lightHandle;		//ライトハンドル
 
+	float m_angleMoveScale;
+
 };
 

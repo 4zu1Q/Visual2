@@ -326,6 +326,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	if (m_hp <= 0)
 	{
 		m_hp = 0;
+
 		//死亡状態へ遷移
 		OnDead();
 	}
@@ -508,6 +509,19 @@ void Player::WalkUpdate()
 	rate = max(rate, 0.0f);
 
 	float speed = 0;
+
+	//カメラの正面方向ベクトル
+	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+	//カメラの右方向ベクトル
+	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+	//向きベクトル*移動量
+	front = VScale(front, -move.x);
+	//向きベクトル*移動量
+	right = VScale(right, -move.z);
+
+	move = VAdd(front, right);
+	move = VNorm(move);
 
 	//動いている間
 	if (len != 0.0f)
@@ -694,6 +708,18 @@ void Player::DashUpdate()
 
 	float speed = 0;
 
+	//カメラの正面方向ベクトル
+	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+	//カメラの右方向ベクトル
+	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+	//向きベクトル*移動量
+	front = VScale(front, -move.x);
+	//向きベクトル*移動量
+	right = VScale(right, -move.z);
+
+	move = VAdd(front, right);
+	move = VNorm(move);
 
 	//動いている間
 	if (VSquareSize(move) > 0.0f)
@@ -827,32 +853,6 @@ void Player::JumpUpdate()
 	m_jumpCount++;
 	m_frame++;
 
-	//プレイヤーのタイプでジャンプ力を変える ワンちゃん入れるかも
-	/*if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse )
-	{
-		auto vel = m_rigidbody.GetVelocity();
-		vel.y += kMinPowerJumpPower;
-		m_rigidbody.SetVelocity(vel);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse )
-	{
-		auto vel = m_rigidbody.GetVelocity();
-		vel.y += kMinSpeedJumpPower;
-		m_rigidbody.SetVelocity(vel);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse )
-	{
-		auto vel = m_rigidbody.GetVelocity();
-		vel.y += kMinShotJumpPower;
-		m_rigidbody.SetVelocity(vel);
-	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse )
-	{
-		auto vel = m_rigidbody.GetVelocity();
-		vel.y += kMinJumpPower;
-		m_rigidbody.SetVelocity(vel);
-	}*/
-
 	//if (!m_isFaceUse)
 	{
 		auto vel = m_rigidbody.GetVelocity();
@@ -901,8 +901,49 @@ void Player::JumpUpdate()
 	rate = min(rate, 1.0f);
 	rate = max(rate, 0.0f);
 
-	//ダッシュ
-	float speed = kNormalDashSpeed * rate;
+	//カメラの正面方向ベクトル
+	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+	//カメラの右方向ベクトル
+	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+	//向きベクトル*移動量
+	front = VScale(front, -move.x);
+	//向きベクトル*移動量
+	right = VScale(right, -move.z);
+
+	move = VAdd(front, right);
+	move = VNorm(move);
+
+	float speed = 0;
+
+	//プレイヤーのタイプで攻撃アニメーションを変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kPowerDashSpeed * rate;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kSpeedDashSpeed * rate;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kShotDashSpeed * rate;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kStrongestDashSpeed * rate;
+	}
+
+	if (!m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kNormalDashSpeed * rate;
+	}
+
 	move = VScale(move, speed);
 
 	//カメラのいる場所(角度)から
@@ -952,8 +993,49 @@ void Player::FallUpdate()
 	rate = min(rate, 1.0f);
 	rate = max(rate, 0.0f);
 
-	//ダッシュ
-	float speed = kNormalDashSpeed * rate;
+	//カメラの正面方向ベクトル
+	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+	//カメラの右方向ベクトル
+	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+	//向きベクトル*移動量
+	front = VScale(front, -move.x);
+	//向きベクトル*移動量
+	right = VScale(right, -move.z);
+
+	move = VAdd(front, right);
+	move = VNorm(move);
+
+	float speed = 0;
+
+	//プレイヤーのタイプで攻撃アニメーションを変える
+	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kPowerDashSpeed * rate;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kSpeedDashSpeed * rate;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kShotDashSpeed * rate;
+	}
+	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kStrongestDashSpeed * rate;
+	}
+
+	if (!m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kNormalDashSpeed * rate;
+	}
+
 	move = VScale(move, speed);
 
 	//カメラのいる場所(角度)から
@@ -1181,6 +1263,8 @@ void Player::OnDash()
 void Player::OnAttackX()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	m_hp -= 1;
 
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("hitEffect", pos);

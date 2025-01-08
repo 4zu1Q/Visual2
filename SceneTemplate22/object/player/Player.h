@@ -92,9 +92,8 @@ public:
 	void SetFaceKind(const e_PlayerKind playerKind) { m_playerKind = playerKind; }
 
 	//カメラの方向を取得
-	void SetCameraAngle(float angle) { m_cameraAngle = angle; }
-
 	void SetCameraDirection(VECTOR dir) { m_cameraDirection = dir; }
+	void SetCameraAngle(float angle) { m_cameraAngle = angle; }
 
 	//ジャンプフラグを取得
 	const bool& GetIsJump() const { return m_isJump; }

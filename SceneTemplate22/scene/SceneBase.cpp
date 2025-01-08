@@ -41,15 +41,17 @@ SceneBase::SceneBase(SceneManager& manager):
 	SoundManager::GetInstance().Load("healMpSe", "Data/Sound/Se/HealMp.mp3", false);
 	SoundManager::GetInstance().Load("healSe", "Data/Sound/Se/HealHp.mp3", false);
 	SoundManager::GetInstance().Load("healSe", "Data/Sound/Se/HealHp.mp3", false);
+
 	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 
 	//ボス用SE
-	
+
 
 	/*エフェクトのロード*/
-	EffectManager::GetInstance().Load("hitEffect", "Data/Effect/player_hit.efk", 120);
+	EffectManager::GetInstance().Load("hitEffect", "Data/Effect/player_hit.efk", 1200.0f , 10.0f);
+
 
 }
 
