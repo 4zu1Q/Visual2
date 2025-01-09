@@ -1,5 +1,4 @@
-﻿// 2024 Takeru Yui All Rights Reserved.
-#include <cassert>
+﻿#include <cassert>
 #include "DxLib.h"
 #include "MyLib.h"
 #include "MathHelper.h"
@@ -432,6 +431,7 @@ void Physics::FixPosition()
 
 void MyLib::Physics::CheckWallAndFloor(std::shared_ptr<Collidable>& col)
 {
+
 	// 壁ポリゴンと床ポリゴンの数を初期化する
 	m_wallNum = 0;
 	m_floorNum = 0;

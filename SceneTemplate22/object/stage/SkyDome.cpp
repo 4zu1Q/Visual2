@@ -3,7 +3,7 @@
 namespace
 {
 	//回転速度
-	constexpr float kRotSpeed = 0.0009f;
+	constexpr float kRotSpeed = 0.00009f;
 	//ファイル名
 	const char* const kSkyDomeFileName = "data/model/skyDome/Dome.mv1";
 	//スカイドームのスケール

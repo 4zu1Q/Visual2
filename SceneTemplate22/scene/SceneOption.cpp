@@ -24,6 +24,21 @@ namespace
 
 	//オプションの背景アルファ値
 	constexpr int kAlpha = 200;
+
+	//使う画像の種類
+	enum e_Ui
+	{
+		kBgmH,
+		kSeH,
+		kSensitivityH,
+		kFullScreenH,
+		kBarH,
+		kMathH,
+		kPointH,
+		kCheckH,
+		kSelectH,
+		kBackH,
+	};
 	
 }
 
@@ -36,6 +51,18 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_isFullScreen(false)
 {
 	m_nowItem = e_Item::kBgm;
+
+	//画像のロード
+	m_handles.push_back(LoadGraph("Data/Image/Bgm2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Se2.png"));				
+	m_handles.push_back(LoadGraph("Data/Image/Sensitivity2.png"));		
+	m_handles.push_back(LoadGraph("Data/Image/FullScreen2.png"));		
+	m_handles.push_back(LoadGraph("Data/Image/Bar.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Math.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Point.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Check.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Select.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Back.png"));
 
 	FadeInSkip();
 
@@ -51,6 +78,14 @@ SceneOption::SceneOption(SceneManager& manager) :
 SceneOption::~SceneOption()
 {
 
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
+
+
+	m_handles.clear();
 }
 
 void SceneOption::Update()
@@ -86,6 +121,57 @@ void SceneOption::Draw()
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	//BGM
+	DrawGraph(150, 60, m_handles[kBgmH], true);
+	//SE
+	DrawGraph(150, 180, m_handles[kSeH], true);
+	//Sensitivity
+	DrawGraph(150, 300, m_handles[kSensitivityH], true);
+	//FullScreen
+	DrawGraph(150, 420, m_handles[kFullScreenH], true);
+
+	DrawGraph(450, 60, m_handles[kBarH], true);
+	DrawGraph(450, 180, m_handles[kBarH], true);
+	DrawGraph(450, 300, m_handles[kBarH], true);
+	DrawGraph(450, 420, m_handles[kMathH], true);
+
+	DrawGraph(450 + m_bgmScale * 3.68, 64, m_handles[kPointH], true);
+	DrawGraph(450 + m_seScale * 3.68, 184, m_handles[kPointH], true);
+	DrawGraph(450 + m_sensitivityScale * 3.68, 304, m_handles[kPointH], true);
+
+	if (m_isFullScreen)
+	{
+		DrawGraph(450, 424, m_handles[kCheckH], true);
+	}
+
+	DrawGraph(0, 660, m_handles[kBackH], true);
+
+	DrawFormatString(900, 75, 0xffffff, "%d", m_bgmScale);
+	DrawFormatString(900, 195, 0xffffff, "%d", m_seScale);
+	DrawFormatString(900, 315, 0xffffff, "%d", m_sensitivityScale);
+
+	//選択
+	if (m_nowItem == e_Item::kBgm)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
+		DrawGraph(100, 70, m_handles[kSelectH], true);
+	}
+	if (m_nowItem == e_Item::kSe)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
+		DrawGraph(100, 190, m_handles[kSelectH], true);
+	}
+	else if (m_nowItem == e_Item::kSensitivity)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 550, m_handles[kSelect], true);
+		DrawGraph(100, 310, m_handles[kSelectH], true);
+	}
+	else if (m_nowItem == e_Item::kFullScreen)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 610, m_handles[kSelect], true);
+		DrawGraph(100, 430, m_handles[kSelectH], true);
+	}
 
 #ifdef _DEBUG
 

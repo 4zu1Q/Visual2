@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "SceneBase.h"
+#include <vector>
+#include <memory>
 
 class SceneOption :
 	public SceneBase
@@ -37,6 +39,9 @@ private:
 	bool m_isFullScreen;
 
 	int m_pushCount;
+
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
 
 	//更新メンバ関数ポインタ
 	using UpdateFunc_t = void(SceneOption::*)(/*引数書く*/);

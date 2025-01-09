@@ -31,6 +31,9 @@ private:
 		kSelect,				//セレクト
 	};
 
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
+
 	//画像ハンドル
 	int m_pauseHandle;
 

@@ -20,11 +20,28 @@ SceneGameOver::SceneGameOver(SceneManager& manager) :
 	SceneBase(manager)
 {
 	m_sceneTrans = e_SceneTrans::kSelect;
+
+	//画像のロード
+	m_handles.push_back(LoadGraph("Data/Image/GameOver.png"));
+	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton1.png"));
+	m_handles.push_back(LoadGraph("Data/Image/NewGame2.png"));					//NewGame
+	m_handles.push_back(LoadGraph("Data/Image/LoadGame2.png"));				//LoadGame
+	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));					//Option
+	m_handles.push_back(LoadGraph("Data/Image/End2.png"));					//End
+	m_handles.push_back(LoadGraph("Data/Image/Select2.png"));				//矢印
+	m_handles.push_back(LoadGraph("Data/Image/Stamp.png"));
 }
 
 SceneGameOver::~SceneGameOver()
 {
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
 
+
+	m_handles.clear();
 }
 
 void SceneGameOver::Update()
@@ -103,6 +120,7 @@ void SceneGameOver::Update()
 
 void SceneGameOver::Draw()
 {
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
 
 #ifdef _DEBUG
 

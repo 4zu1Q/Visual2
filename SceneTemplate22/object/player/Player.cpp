@@ -256,7 +256,7 @@ Player::~Player()
 
 void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon)
 {
-
+	
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
@@ -298,18 +298,10 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	//アップデート
 	(this->*m_updateFunc)();
 		
-	//SetCameraAngle(m_pCamera->GetAngle());
-
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
 	m_pos = m_rigidbody.GetPos();
-
-	//m_pCamera->DebugUpdate(pos);
-
-	//カメラの更新
-	//m_pCamera->Update(pos);
-	//m_cameraToPlayerVec = VSub(pos, m_pCamera->GetNextPos());
 
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
@@ -387,8 +379,6 @@ void Player::Draw(PlayerWeapon& weapon)
 	DrawFormatString(0, 200, 0xffffff, "DashFlag:%d", m_pCamera->GetIsDash());
 
 #endif
-
-	//m_pCamera->Draw();
 
 }
 
@@ -493,8 +483,6 @@ void Player::IdleUpdate()
 
 void Player::WalkUpdate()
 {
-	// カメラの角度によって進む方向を変える
-	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
 
 	m_stamina += kStaminaIncreaseSpeed;
 
@@ -629,11 +617,6 @@ void Player::WalkUpdate()
 		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 		move = VTransform(move, mtx);
 
-		////カメラの角度によって進む方向を変える
-		//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
-		////移動ベクトルとカメラ角度行列を乗算
-		//move = VTransform(move, playerRotMtx);
-
 		move.y = m_rigidbody.GetVelocity().y;
 		m_rigidbody.SetVelocity(move);
 
@@ -707,11 +690,6 @@ void Player::WalkUpdate()
 
 void Player::DashUpdate()
 {
-	// カメラの角度によって進む方向を変える
-	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
-
-
-
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);

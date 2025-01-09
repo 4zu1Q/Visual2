@@ -15,19 +15,41 @@ namespace
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
 
-	const char* const kPauseFilename = "Data/Image/Pause.png";
+	const char* const kPauseFilename = "Data/Image/Pause2.png";
 	const Vec2 kPausePos = { 0.0f , 0.0f };
 
 
 
 	//ポーズの背景アルファ値
 	constexpr int kAlpha = 200;
+
+	//使う画像の種類
+	enum e_Ui
+	{
+		kReStartH,
+		kOptionH,
+		kTitleH,
+		kSelectH,
+		kBackH,
+	};
 }
 
 ScenePause::ScenePause(SceneManager& manager) :
 	SceneBase(manager),
 	m_pauseHandle(LoadGraph(kPauseFilename))
 {
+	//画像のロード
+	m_handles.push_back(LoadGraph("Data/Image/Bgm2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Se2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Sensitivity2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/FullScreen2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Bar.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Math.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Point.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Check.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Select.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Back.png"));
+
 	m_sceneTrans = e_SceneTrans::kRestart;
 	FadeInSkip();
 }
@@ -126,7 +148,7 @@ void ScenePause::Draw()
 	//DrawBlackFade();
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00bfff, true);
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 #ifdef _DEBUG

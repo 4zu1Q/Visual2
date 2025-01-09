@@ -186,9 +186,13 @@ void BossPower::Draw()
 {
 	MV1DrawModel(m_modelH);
 
+#ifdef _DEBUG
+
 	DrawFormatString(0, 248, 0xff0fff, "PowerBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(0, 348, 0xff0fff, "PowerBossToPlayer:%f", m_length);
-	
+
+#endif // DEBUG
+
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 }
 

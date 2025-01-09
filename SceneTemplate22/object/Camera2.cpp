@@ -54,8 +54,6 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 	DINPUT_JOYSTATE DInputState;
 	GetJoypadDirectInputState(DX_INPUT_PAD1, &DInputState);
 
-
-
 	// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
 	m_angleH += DInputState.Rx / 10000.0f * Setting::GetInstance().GetSensitivity();
 	if (m_angleH < -DX_PI_F)

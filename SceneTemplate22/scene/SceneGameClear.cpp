@@ -14,17 +14,45 @@ namespace
 	constexpr int kTextX = 64;
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
+
+	//使う画像の種類
+	enum e_Ui
+	{
+		kLogoH,
+		kPleasePressH,
+		kNewGameH,
+		kLoadGameH,
+		kOptionH,
+		kQuitH,
+		kSelectH,
+	};
 }
 
 SceneGameClear::SceneGameClear(SceneManager& manager) :
 	SceneBase(manager)
 {
 	m_sceneTrans = e_SceneTrans::kSelect;
+
+	//画像のロード
+	m_handles.push_back(LoadGraph("Data/Image/GameClear.png"));
+	m_handles.push_back(LoadGraph("Data/Image/NewGame2.png"));				//NewGame
+	m_handles.push_back(LoadGraph("Data/Image/LoadGame2.png"));				//LoadGame
+	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));				//Option
+	m_handles.push_back(LoadGraph("Data/Image/End2.png"));					//End
+	m_handles.push_back(LoadGraph("Data/Image/Select2.png"));				//矢印
+	m_handles.push_back(LoadGraph("Data/Image/Stamp.png"));
 }
 
 SceneGameClear::~SceneGameClear()
 {
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
 
+
+	m_handles.clear();
 }
 
 void SceneGameClear::Update()
@@ -102,6 +130,7 @@ void SceneGameClear::Update()
 
 void SceneGameClear::Draw()
 {
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
 
 #ifdef _DEBUG
 
