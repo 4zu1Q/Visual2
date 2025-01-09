@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "SceneGameOver.h"
 #include "SceneSelect.h"
+#include "SceneGamePlay.h"
 #include "SceneTitle.h"
 #include "SceneDebug.h"
 
@@ -104,7 +105,7 @@ void SceneGameOver::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
 				return;
 			}
 
@@ -124,15 +125,16 @@ void SceneGameOver::Draw()
 
 #ifdef _DEBUG
 
+
+
+
+#endif
 	DrawString(0, 0, "Scene Game Over", 0xffffff, false);
 
 	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
-
-#endif
-
 
 	DrawFade(0x000000);
 }

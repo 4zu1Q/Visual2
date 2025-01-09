@@ -1292,7 +1292,7 @@ void Player::OnAttackX()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	m_hp -= 1;
+	//m_hp -= 1;
 
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("hitEffect", pos);

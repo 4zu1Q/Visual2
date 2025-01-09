@@ -323,9 +323,9 @@ void SceneOption::SensitivityUpdate()
 		{
 			SoundManager::GetInstance().PlaySe("selectSe");
 			m_sensitivityScale--;
-			if (m_sensitivityScale < 0)
+			if (m_sensitivityScale < 1)
 			{
-				m_sensitivityScale = 0;
+				m_sensitivityScale = 1;
 			}
 		}
 		m_pushCount++;
