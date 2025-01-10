@@ -36,7 +36,7 @@ namespace
 		kMathH,
 		kPointH,
 		kCheckH,
-		kSelectH,
+		kPointerH,
 		kBackH,
 	};
 	
@@ -61,8 +61,8 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_handles.push_back(LoadGraph("Data/Image/Math.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Point.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Check.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Select.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Back.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));
+	m_handles.push_back(LoadGraph("Data/Image/B_Back.png"));
 
 	FadeInSkip();
 
@@ -103,6 +103,7 @@ void SceneOption::Update()
 	//Bボタンを押したら前のシーンに戻る
 	if (Pad::IsTrigger(PAD_INPUT_2))
 	{
+		SoundManager::GetInstance().PlaySe("backSe");
 		Setting::GetInstance().SetBGMVolume(static_cast<float>(m_bgmScale) / 100);
 		Setting::GetInstance().SetSEVolume(static_cast<float>(m_seScale) / 100);
 		Setting::GetInstance().SetSensitivity(static_cast<float>(m_sensitivityScale) / 100);
@@ -155,22 +156,22 @@ void SceneOption::Draw()
 	if (m_nowItem == e_Item::kBgm)
 	{
 		//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
-		DrawGraph(100, 70, m_handles[kSelectH], true);
+		DrawGraph(100, 70, m_handles[kPointerH], true);
 	}
 	if (m_nowItem == e_Item::kSe)
 	{
 		//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
-		DrawGraph(100, 190, m_handles[kSelectH], true);
+		DrawGraph(100, 190, m_handles[kPointerH], true);
 	}
 	else if (m_nowItem == e_Item::kSensitivity)
 	{
 		//DrawGraph(Game::kScreenWidthHalf - 150, 550, m_handles[kSelect], true);
-		DrawGraph(100, 310, m_handles[kSelectH], true);
+		DrawGraph(100, 310, m_handles[kPointerH], true);
 	}
 	else if (m_nowItem == e_Item::kFullScreen)
 	{
 		//DrawGraph(Game::kScreenWidthHalf - 150, 610, m_handles[kSelect], true);
-		DrawGraph(100, 430, m_handles[kSelectH], true);
+		DrawGraph(100, 430, m_handles[kPointerH], true);
 	}
 
 #ifdef _DEBUG
@@ -306,7 +307,6 @@ void SceneOption::SensitivityUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
-			SoundManager::GetInstance().PlaySe("selectSe");
 			m_sensitivityScale++;
 			if (m_sensitivityScale > 100)
 			{
@@ -321,7 +321,6 @@ void SceneOption::SensitivityUpdate()
 	{
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
-			SoundManager::GetInstance().PlaySe("selectSe");
 			m_sensitivityScale--;
 			if (m_sensitivityScale < 1)
 			{

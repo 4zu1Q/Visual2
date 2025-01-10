@@ -174,8 +174,6 @@ private:
 	/// </summary>
 	void FaceSelect();
 
-	void CameraUpdate();
-
 	//タイプによってアニメーションを分ける関数
 	void AnimChange(const char* normal, const char* power, const char* speed, const char* shot);
 
@@ -254,6 +252,7 @@ private:
 
 	//強攻撃のチャージ時間
 	int m_chargeTime;
+	int m_deadTime;
 
 	//ジャンプ力
 	//float m_jumpPower;

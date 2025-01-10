@@ -15,7 +15,7 @@ namespace
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
 
-	const char* const kPauseFilename = "Data/Image/Pause2.png";
+	//const char* const kPauseFilename = "Data/Image/Pause2.png";
 	const Vec2 kPausePos = { 0.0f , 0.0f };
 
 
@@ -26,29 +26,25 @@ namespace
 	//使う画像の種類
 	enum e_Ui
 	{
+		kPauseH,
 		kReStartH,
 		kOptionH,
 		kTitleH,
-		kSelectH,
 		kBackH,
+		kPointerH,
 	};
 }
 
 ScenePause::ScenePause(SceneManager& manager) :
-	SceneBase(manager),
-	m_pauseHandle(LoadGraph(kPauseFilename))
+	SceneBase(manager)
 {
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/Bgm2.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Se2.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Sensitivity2.png"));
-	m_handles.push_back(LoadGraph("Data/Image/FullScreen2.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Bar.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Math.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Point.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Check.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Select.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Back.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Pause2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/ReStart.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Start_Back.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));
 
 	m_sceneTrans = e_SceneTrans::kRestart;
 	FadeInSkip();
@@ -124,6 +120,7 @@ void ScenePause::Update()
 		if (Pad::IsTrigger(PAD_INPUT_8))
 		{
 			//バックSEを入れる
+			SoundManager::GetInstance().PlaySe("backSe");
 			m_pManager.PopScene();
 		}
 	}
@@ -169,7 +166,30 @@ void ScenePause::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 
 
-	DrawGraph(kPausePos.x, kPausePos.y, m_pauseHandle, true);
+	DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
+	DrawGraph(100, 60, m_handles[kReStartH], true);
+	DrawGraph(100, 180, m_handles[kOptionH], true);
+	DrawGraph(100, 300, m_handles[kTitleH], true);
+	DrawGraph(0, 660, m_handles[kBackH], true);
+
+	//選択
+	if (m_sceneTrans == e_SceneTrans::kRestart)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
+		DrawGraph(50, 70, m_handles[kPointerH], true);
+	}
+	if (m_sceneTrans == e_SceneTrans::kOption)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
+		DrawGraph(50, 190, m_handles[kPointerH], true);
+	}
+	else if (m_sceneTrans == e_SceneTrans::kSelect)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 550, m_handles[kSelect], true);
+		DrawGraph(50, 310, m_handles[kPointerH], true);
+	}
+
+	//DrawGraph(kPausePos.x, kPausePos.y, m_pauseHandle, true);
 
 	DrawFade(0x000000);
 

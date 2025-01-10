@@ -27,7 +27,7 @@ namespace
 		kOptionH,
 		kQuitH,
 		kSelectH,
-		kArrow,
+		kPointerH,
 	};
 
 	constexpr int kTextX = 64;
@@ -57,10 +57,10 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton1.png"));
 	m_handles.push_back(LoadGraph("Data/Image/NewGame2.png"));				//NewGame
 	m_handles.push_back(LoadGraph("Data/Image/LoadGame2.png"));				//LoadGame
-	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));				//Option
+	m_handles.push_back(LoadGraph("Data/Image/Option.png"));				//Option
 	m_handles.push_back(LoadGraph("Data/Image/End2.png"));					//End
 	m_handles.push_back(LoadGraph("Data/Image/Select2.png"));				//矢印
-	m_handles.push_back(LoadGraph("Data/Image/Select.png"));					
+	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));					
 
 }
 
@@ -213,25 +213,25 @@ void SceneTitle::Draw()
 		{
 			//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
 			//DrawGraph(550, 420, m_handles[kSelectH], true);
-			DrawGraph(520, 430, m_handles[kArrow], true);
+			DrawGraph(520, 430, m_handles[kPointerH], true);
 		}
 		if (m_sceneTrans == e_SceneTrans::kLoadGame)
 		{
 			//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
 			//DrawGraph(550, 480, m_handles[kSelectH], true);
-			DrawGraph(520, 490, m_handles[kArrow], true);
+			DrawGraph(520, 490, m_handles[kPointerH], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kOption)
 		{
 			//DrawGraph(Game::kScreenWidthHalf - 150, 550, m_handles[kSelect], true);
 			//DrawGraph(550, 540, m_handles[kSelectH], true);
-			DrawGraph(550, 550, m_handles[kArrow], true);
+			DrawGraph(550, 550, m_handles[kPointerH], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kQuit)
 		{
 			//DrawGraph(Game::kScreenWidthHalf - 150, 610, m_handles[kSelect], true);
 			//DrawGraph(550, 600, m_handles[kSelectH], true);
-			DrawGraph(570, 610, m_handles[kArrow], true);
+			DrawGraph(570, 610, m_handles[kPointerH], true);
 		}
 
 		DrawGraph(255, 100, m_handles[kLogoH], true);

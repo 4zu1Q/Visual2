@@ -195,8 +195,6 @@ void Camera::Update(int stageHandle ,VECTOR targetPos)
 	(this->*m_updateFunc)(m_targetPos);
 
 
-
-
 	// 最初はステージ自体と判定
 	//m_hitDim = MV1CollCheck_Capsule(stageHandle, -1, m_aimPos, m_cameraPos, kCameraRadius);
 
@@ -376,6 +374,7 @@ void Camera::CameraPosUpdate()
 	/// 垂直方向回転させた後に水平方向回転してそれに注視点の座標を足す)
 	/// </summary>
 	m_nextPos = VAdd(VTransform(VTransform(VGet(0.0f, 0.0f, m_cameraToTargetLength), RotX), RotY), m_targetPos);
+
 
 }
 

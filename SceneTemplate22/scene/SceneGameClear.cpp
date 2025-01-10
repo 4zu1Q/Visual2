@@ -6,6 +6,7 @@
 #include "SceneTitle.h"
 #include "SceneDebug.h"
 
+#include "util/SoundManager.h"
 #include "util/Pad.h"
 #include "util/Game.h"
 
@@ -18,13 +19,10 @@ namespace
 	//使う画像の種類
 	enum e_Ui
 	{
-		kLogoH,
-		kPleasePressH,
-		kNewGameH,
-		kLoadGameH,
-		kOptionH,
-		kQuitH,
+		kGameClearH,
 		kSelectH,
+		kTitleH,
+		kPointerH,
 	};
 }
 
@@ -35,12 +33,9 @@ SceneGameClear::SceneGameClear(SceneManager& manager) :
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/GameClear.png"));
-	m_handles.push_back(LoadGraph("Data/Image/NewGame2.png"));				//NewGame
-	m_handles.push_back(LoadGraph("Data/Image/LoadGame2.png"));				//LoadGame
-	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));				//Option
-	m_handles.push_back(LoadGraph("Data/Image/End2.png"));					//End
-	m_handles.push_back(LoadGraph("Data/Image/Select2.png"));				//矢印
-	m_handles.push_back(LoadGraph("Data/Image/Stamp.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Select.png"));				//Select
+	m_handles.push_back(LoadGraph("Data/Image/Title.png"));					//Title
+	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				//矢印
 }
 
 SceneGameClear::~SceneGameClear()
@@ -68,24 +63,25 @@ void SceneGameClear::Update()
 		return;
 	}
 #endif
-
 	if (!m_isToNextScene)
 	{
-		//上を押した場合
-		if (Pad::IsTrigger(PAD_INPUT_UP))
+		//左を押した場合
+		if (Pad::IsTrigger(PAD_INPUT_LEFT))
 		{
 			if (m_sceneTrans != e_SceneTrans::kSelect)
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
+				SoundManager::GetInstance().PlaySe("selectSe");
 			}
 		}
 
-		//下を押した場合
-		if (Pad::IsTrigger(PAD_INPUT_DOWN))
+		//右を押した場合
+		if (Pad::IsTrigger(PAD_INPUT_RIGHT))
 		{
 			if (m_sceneTrans != e_SceneTrans::kTitle)
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
+				SoundManager::GetInstance().PlaySe("selectSe");
 			}
 		}
 
@@ -97,12 +93,14 @@ void SceneGameClear::Update()
 			{
 				StartFadeOut();
 				m_isToNextScene = true;
+				SoundManager::GetInstance().PlaySe("dectionSe");
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				StartFadeOut();
 				m_isToNextScene = true;
+				SoundManager::GetInstance().PlaySe("dectionSe");
 			}
 		}
 	}
@@ -138,6 +136,28 @@ void SceneGameClear::Draw()
 
 
 #endif
+
+	//選択
+	if (m_sceneTrans == e_SceneTrans::kSelect)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
+		//DrawGraph(550, 420, m_handles[kSelectH], true);
+		DrawGraph(360, 610, m_handles[kPointerH], true);
+	}
+	if (m_sceneTrans == e_SceneTrans::kTitle)
+	{
+		//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
+		//DrawGraph(550, 480, m_handles[kSelectH], true);
+		DrawGraph(760, 610, m_handles[kPointerH], true);
+	}
+
+	DrawGraph(380, 100, m_handles[kGameClearH], true);
+
+	//Select
+	DrawGraph(400, 600, m_handles[kSelectH], true);
+	//Title
+	DrawGraph(800, 600, m_handles[kTitleH], true);
+
 	DrawString(0, 0, "Scene Game Clear", 0xffffff, false);
 
 

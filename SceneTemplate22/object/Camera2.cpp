@@ -4,10 +4,10 @@
 namespace 
 {
 	constexpr float kCameraAngleSpeed = 0.05f;				//旋回速度
-	constexpr float kCameraPlayerTargetHeight = 15.0f;		// プレイヤー座標からどれだけ高い位置を注視点とするか
+	constexpr float kCameraPlayerTargetHeight = 10.0f;		// プレイヤー座標からどれだけ高い位置を注視点とするか
 	constexpr float kCameraPlayerBackwardDistance = 25.0f;	// プレイヤーとの奥行方向の距離
 	constexpr float kCameraPlayerRightDistance = 0.0f;	// プレイヤーとの水平方向の距離
-	constexpr float kCameraCollisionSize = 5.0f;			// カメラの当たり判定サイズ
+	constexpr float kCameraCollisionSize = 3.0f;			// カメラの当たり判定サイズ
 
 	constexpr float kCameraNear = 5.0f;
 	constexpr float kCameraFar = 5000.0f;
@@ -51,11 +51,11 @@ void Camera2::Finalize()
 void Camera2::Update(VECTOR playerPos, int stageHandle)
 {
 	// DirectInput の入力を取得
-	DINPUT_JOYSTATE DInputState;
-	GetJoypadDirectInputState(DX_INPUT_PAD1, &DInputState);
+	DINPUT_JOYSTATE dInputState;
+	GetJoypadDirectInputState(DX_INPUT_PAD1, &dInputState);
 
 	// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
-	m_angleH += DInputState.Rx / 10000.0f * Setting::GetInstance().GetSensitivity();
+	m_angleH += dInputState.Rx / 10000.0f * Setting::GetInstance().GetSensitivity();
 	if (m_angleH < -DX_PI_F)
 	{
 		m_angleH += DX_TWO_PI_F;
@@ -65,7 +65,7 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 		m_angleH -= DX_TWO_PI_F;
 	}
 
-	m_angleV += DInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
+	m_angleV += dInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
 	if (m_angleV < -DX_PI_F / 2.0f + 0.6f)
 	{
 		m_angleV = -DX_PI_F / 2.0f + 0.6f;
@@ -81,7 +81,9 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 	// カメラの座標を決定する
 	{
 		MV1_COLL_RESULT_POLY_DIM hRes;
+
 		int hitNum;
+		
 		VECTOR rightVector;
 		VECTOR forwardVector;
 		VECTOR camPosBase;
@@ -112,6 +114,7 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 		MV1CollResultPolyDimTerminate(hRes);
 		if (hitNum != 0)
 		{
+
 			float notHitLength;
 			float hitLength;
 			float testLength;
@@ -119,7 +122,6 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 			VECTOR Direction;
 
 			// あったら無い位置までプレイヤーに近づく
-
 			// ポリゴンに当たらない距離をセット
 			notHitLength = 0.0f;
 
@@ -160,8 +162,8 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 	}
 
 	// カメラの情報をライブラリのカメラに反映させる
-	m_setEye = VAdd(m_setEye, VScale(VSub(m_pos, m_setEye), 0.2f));
-	m_setTarget = VAdd(m_setTarget, VScale(VSub(m_targetPos, m_setTarget), 0.2f));
+	m_setEye = VAdd(m_setEye, VScale(VSub(m_pos, m_setEye), 0.4f));
+	m_setTarget = VAdd(m_setTarget, VScale(VSub(m_targetPos, m_setTarget), 0.4f));
 	SetLightDirectionHandle(m_lightHandle, VSub(playerPos, m_pos));
 	SetCameraPositionAndTarget_UpVecY(m_setEye, m_setTarget);
 

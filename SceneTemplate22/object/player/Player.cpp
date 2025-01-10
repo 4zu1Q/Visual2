@@ -142,6 +142,7 @@ namespace
 	constexpr int kPadButtonRB = 0x00000200;
 	constexpr int kPadButtonLB = 0x00000100;
 
+	constexpr int kPadButtonRStick = 0x00002000;
 	constexpr int kPadButtonLStick = 0x00001000;
 
 	//最大値
@@ -193,7 +194,8 @@ Player::Player() :
 	m_jumpCount(0),
 	m_jumpPower(0.0f),
 	m_playerRotMtx(),
-	m_moveCount(0)
+	m_moveCount(0),
+	m_deadTime(0)
 {
 
 #ifdef _DEBUG
@@ -268,9 +270,6 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, Pla
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
 	//武器の初期化
-	//m_pWeapon->Load();
-	//m_pWeapon->Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
-
 	weapon.Load();
 	weapon.Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
 
@@ -361,21 +360,14 @@ void Player::Draw(PlayerWeapon& weapon)
 	//武器の描画
 	WeaponDraw(weapon);
 	
-
 	//モデルの描画
 	MV1DrawModel(m_modelH);
-	//MV1DrawModel(m_weaponH);
-
-	//m_pWeaponBase->Draw();
 
 #ifdef _DEBUG
 
-	//auto pos = m_rigidbody.GetPos();
 	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
-
 	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
-
 	DrawFormatString(0, 200, 0xffffff, "DashFlag:%d", m_pCamera->GetIsDash());
 
 #endif
@@ -427,6 +419,13 @@ void Player::IdleUpdate()
 	if (VSquareSize(input) != 0.0f)
 	{
 		OnWalk();
+		return;
+	}
+
+	
+	if (Pad::IsTrigger(kPadButtonRStick) && !m_isJump && !m_isStamina)
+	{
+		OnHit();
 		return;
 	}
 
@@ -1079,18 +1078,18 @@ void Player::AttackCharge()
 		SoundManager::GetInstance().PlaySe("healHpSe");
 	}
 
-	if (m_chargeTime > 60)
-	{
-		//エフェクトを入れてチャージされたかを確認できるようにする
-		//後音も入れる
-	}
-	else
-	{
-		if (m_chargeTime % 10 == 0)
-		{
-			SoundManager::GetInstance().PlaySe("attackChargeSe");
-		}
-	}
+	//if (m_chargeTime > 60)
+	//{
+	//	//エフェクトを入れてチャージされたかを確認できるようにする
+	//	//後音も入れる
+	//}
+	//else
+	//{
+	//	if (m_chargeTime % 30 == 0)
+	//	{
+	//		SoundManager::GetInstance().PlaySe("attackChargeSe");
+	//	}
+	//}
 
 	//Yボタンを離した場合
 	if (Pad::IsRelase(kPadButtonY) && m_chargeTime > 60)
@@ -1177,13 +1176,20 @@ void Player::HitUpdate()
 void Player::DeadUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
+	m_deadTime++;
+
+	if (!m_isDead && m_deadTime > 30)
+	{
+		m_isDead = true;
+		SoundManager::GetInstance().PlaySe("deadSe");
+	}
 
 	//ゲームオーバーシーンに遷移するためにフラグを立てる
 	m_isGameOver = true;
 
+
 	m_isButtonPush = false;
 	m_buttonKind = e_ButtonKind::kNone;
-
 }
 
 void Player::SpawnUpdate()
@@ -1258,7 +1264,6 @@ void Player::OnIdle()
 	m_jumpCount = 0;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	m_pCamera->SetIsDash(false);
 
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalIdle, kAnimPowerIdle, kAnimSpeedIdle, kAnimNormalIdle);
@@ -1268,7 +1273,6 @@ void Player::OnIdle()
 
 void Player::OnWalk()
 {
-	m_pCamera->SetIsDash(false);
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalWalk, kAnimPowerWalk, kAnimSpeedWalk, kAnimNormalWalk);
 
@@ -1277,8 +1281,6 @@ void Player::OnWalk()
 
 void Player::OnDash()
 {
-	m_pCamera->SetIsDash(true);
-
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimNormalDash, kAnimPowerDash, kAnimSpeedDash, kAnimNormalDash);
 
@@ -1291,8 +1293,6 @@ void Player::OnDash()
 void Player::OnAttackX()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	//m_hp -= 1;
 
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("hitEffect", pos);
@@ -1319,7 +1319,7 @@ void Player::OnAttackX()
 	case 3:
 		//四番目の攻撃アニメーション
 		AnimChange(kAnimNormalAttackX_Fourth, kAnimPowerAttackX_Fourth, kAnimSpeedAttackX_Fourth, kAnimShotAttackX_Fourth);
-		SoundManager::GetInstance().PlaySe("attackSecondSe");
+		SoundManager::GetInstance().PlaySe("attackThirdSe");
 		break;
 	default:
 		break;
@@ -1333,7 +1333,6 @@ void Player::OnAttackX()
 
 void Player::OnAttackY()
 {
-	m_pCamera->SetIsDash(false);
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	//タイプによってアニメーションを変える
@@ -1351,6 +1350,8 @@ void Player::OnAttackY()
 void Player::OnJump()
 {
 	SoundManager::GetInstance().PlaySe("jumpSe");
+
+	m_stamina -= 40;
 
 	//地面と接触しているかどうか
 	m_isJump = true;
@@ -1380,8 +1381,9 @@ void Player::OnFall()
 
 void Player::OnAttackCharge()
 {
-	m_pCamera->SetIsDash(false);
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	
+	SoundManager::GetInstance().PlaySe("attackChargeSe");
 
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge, kAnimShotAttackCharge);
@@ -1395,14 +1397,15 @@ void Player::OnAttackCharge()
 
 void Player::OnHit()
 {
-	m_pCamera->SetIsDash(false);
-	m_pAnim->ChangeAnim(kAnimJump);
+	SoundManager::GetInstance().PlaySe("damageSe");
+	m_hp -= 1;
+
+	m_pAnim->ChangeAnim(kAnimHit);
 	m_updateFunc = &Player::HitUpdate;
 }
 
 void Player::OnDead()
 {
-	m_pCamera->SetIsDash(false);
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updateFunc = &Player::DeadUpdate;
 }
@@ -1443,11 +1446,6 @@ void Player::FaceSelect()
 			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) - 1);
 		}
 	}
-}
-
-void Player::CameraUpdate()
-{
-	//カメラ更新
 }
 
 void Player::AnimChange(const char* normal, const char* power, const char* speed, const char* shot)
