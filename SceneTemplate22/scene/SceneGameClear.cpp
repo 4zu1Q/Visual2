@@ -112,7 +112,7 @@ void SceneGameClear::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
 				return;
 			}
 

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "SceneBase.h"
 #include "myLib/Physics.h"
+#include "util/Game.h"
 
 #include <vector>
 #include <memory>
@@ -26,7 +27,7 @@ class SceneGamePlay :
 	public SceneBase
 {
 public:
-	SceneGamePlay(SceneManager& manager);
+	SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind, Game::e_StageKind stageKind);
 	virtual ~SceneGamePlay();
 
 	/// <summary>
@@ -93,6 +94,8 @@ private:
 	//当たり判定フラグ
 	bool m_isHpHit;
 	bool m_isMpHit;
+
+	Game::e_BossKind m_bossKind;
 	
 
 };

@@ -19,7 +19,6 @@ namespace
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Player/Player.mv1";
 
-	const char* const kSwordModelFileName = "Data/Model/Weapon/Player_Sword.mv1";
 
 
 	//モデルのスケール値
@@ -133,6 +132,8 @@ namespace
 	const char* const kAnimUseFace = "UseFace";
 
 
+
+
 	//パッドのボタン情報
 	constexpr int kPadButtonA = 0x00000010;
 	constexpr int kPadButtonB = 0x00000020;
@@ -198,11 +199,15 @@ Player::Player() :
 	m_deadTime(0)
 {
 
+
+
 #ifdef _DEBUG
+
 	m_isPowerFace = true;
 	m_isSpeedFace = true;
 	m_isShotFace = true;
 	m_isStrongestFace = true;
+
 #else
 
 	m_isPowerFace = false;
@@ -218,7 +223,6 @@ Player::Player() :
 	m_modelH = MV1LoadModel(kModelFilename);
 	assert(m_modelH > -1);
 
-	m_weaponH = MV1LoadModel(kSwordModelFileName);
 
 	//マスク関連の初期化
 	m_isFaceUse = false;
@@ -228,8 +232,6 @@ Player::Player() :
 	m_isButtonPush = false;
 	m_buttonKind = e_ButtonKind::kNone;
 
-	//
-	//m_pWeapon = std::make_shared<PlayerWeapon>();
 	m_pAnim = std::make_shared<AnimController>();
 
 	m_pWeaponBase = std::make_shared<WeaponBase>();
@@ -421,7 +423,6 @@ void Player::IdleUpdate()
 		OnWalk();
 		return;
 	}
-
 	
 	if (Pad::IsTrigger(kPadButtonRStick) && !m_isJump && !m_isStamina)
 	{
@@ -1213,6 +1214,8 @@ void Player::FaceUseUpdate()
 		OnIdle();
 	}
 }
+
+
 
 void Player::TalkUpdate()
 {

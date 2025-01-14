@@ -309,15 +309,15 @@ void Camera::DebugUpdate(VECTOR playerPos)
 	//ベクトルの方向(注視点-カメラのポジション)
 	VECTOR posToAim = VSub(playerAimPos, m_prevPos);
 
-	//右スティックを右に押した場合
-	if (analogX >= 10)
-	{
-		m_angle -= 0.05f;
-	}
-	else if (analogX <= -10)
-	{
-		m_angle += 0.05f;
-	}
+	////右スティックを右に押した場合
+	//if (analogX >= 10)
+	//{
+	//	m_angle -= 0.05f;
+	//}
+	//else if (analogX <= -10)
+	//{
+	//	m_angle += 0.05f;
+	//}
 
 	//カメラの回転
 	m_prevPos.x += cosf(m_angle) * m_cameraDist;

@@ -71,7 +71,7 @@ void SceneGameOver::Update()
 		//左を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_LEFT))
 		{
-			if (m_sceneTrans != e_SceneTrans::kSelect)
+			if (m_sceneTrans != e_SceneTrans::kGamePlay)
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
@@ -81,7 +81,7 @@ void SceneGameOver::Update()
 		//右を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_RIGHT))
 		{
-			if (m_sceneTrans != e_SceneTrans::kTitle)
+			if (m_sceneTrans != e_SceneTrans::kSelect)
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
@@ -92,14 +92,14 @@ void SceneGameOver::Update()
 		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
 			//enum変数が同じだった場合
-			if (m_sceneTrans == e_SceneTrans::kSelect)
+			if (m_sceneTrans == e_SceneTrans::kGamePlay)
 			{
 				StartFadeOut();
 				m_isToNextScene = true;
 				SoundManager::GetInstance().PlaySe("dectionSe");
 			}
 
-			if (m_sceneTrans == e_SceneTrans::kTitle)
+			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
 				StartFadeOut();
 				m_isToNextScene = true;
@@ -113,15 +113,15 @@ void SceneGameOver::Update()
 	{
 		if (!IsFadingOut())
 		{
-			if (m_sceneTrans == e_SceneTrans::kSelect)
+			if (m_sceneTrans == e_SceneTrans::kGamePlay)
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
 				return;
 			}
 
-			if (m_sceneTrans == e_SceneTrans::kTitle)
+			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneTitle>(m_pManager));
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
 				return;
 			}
 		}
@@ -131,23 +131,20 @@ void SceneGameOver::Update()
 
 void SceneGameOver::Draw()
 {
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
+	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 
 #ifdef _DEBUG
-
-
-
 
 #endif
 
 	//選択
-	if (m_sceneTrans == e_SceneTrans::kSelect)
+	if (m_sceneTrans == e_SceneTrans::kGamePlay)
 	{
 		//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
 		//DrawGraph(550, 420, m_handles[kSelectH], true);
 		DrawGraph(360, 610, m_handles[kPointerH], true);
 	}
-	if (m_sceneTrans == e_SceneTrans::kTitle)
+	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
 		//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
 		//DrawGraph(550, 480, m_handles[kSelectH], true);
@@ -165,8 +162,8 @@ void SceneGameOver::Draw()
 
 	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Select");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Title");
 
 	DrawFade(0x000000);
 }

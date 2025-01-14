@@ -25,8 +25,8 @@ private:
 	//遷移先
 	enum class e_SceneTrans : int
 	{
-		kSelect,	//セレクト
-		kTitle,		//オプション
+		kGamePlay,	//ゲームプレイ
+		kSelect,		//セレクト
 	};
 
 	//画像ハンドルこれで全ての画像をロードする

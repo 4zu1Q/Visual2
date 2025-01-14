@@ -6,7 +6,7 @@ class Field
 {
 public:
 
-	Field();
+	Field(Game::e_StageKind stageKind);
 	virtual ~Field();
 
 	void Initialize();

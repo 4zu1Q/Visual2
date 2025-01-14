@@ -165,6 +165,7 @@
     <ClCompile Include="object\item\ItemWarp.cpp" />
     <ClCompile Include="object\ObjectBase.cpp" />
     <ClCompile Include="object\player\Player.cpp" />
+    <ClCompile Include="object\player\PlayerProduction.cpp" />
     <ClCompile Include="object\player\PlayerWeapon.cpp" />
     <ClCompile Include="object\shot\ShotBase.cpp" />
     <ClCompile Include="object\stage\Field.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="object\item\ItemWarp.h" />
     <ClInclude Include="object\ObjectBase.h" />
     <ClInclude Include="object\player\Player.h" />
+    <ClInclude Include="object\player\PlayerProduction.h" />
     <ClInclude Include="object\player\PlayerWeapon.h" />
     <ClInclude Include="object\shot\ShotBase.h" />
     <ClInclude Include="object\stage\Field.h" />

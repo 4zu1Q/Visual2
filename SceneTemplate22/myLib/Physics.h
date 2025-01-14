@@ -33,7 +33,7 @@ namespace MyLib
 	{
 	public:
 
-		Physics();
+		Physics(Game::e_StageKind stageKind);
 
 		// 衝突物の登録・登録解除
 		void Entry(std::shared_ptr<Collidable> collidable );
@@ -143,6 +143,7 @@ namespace MyLib
 		MV1_COLL_RESULT_POLY* m_pPoly = nullptr;
 		// 線分とポリゴンとの当たり判定の結果を代入する構造体
 		HITRESULT_LINE m_lineRes{};
+
 
 	};
 

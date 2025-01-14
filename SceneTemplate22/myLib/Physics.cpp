@@ -31,9 +31,9 @@ namespace
 	constexpr float kHeadHeight = 40.0f;
 }
 
-MyLib::Physics::Physics()
+MyLib::Physics::Physics(Game::e_StageKind stageKind)
 {
-	m_pField = std::make_shared<Field>();
+	m_pField = std::make_shared<Field>(stageKind);
 }
 
 /// <summary>

@@ -45,7 +45,7 @@ namespace
 }
 
 
-SceneSelect::SceneSelect(SceneManager& manager) :
+SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	SceneBase(manager)
 {
 
@@ -63,24 +63,22 @@ SceneSelect::SceneSelect(SceneManager& manager) :
 
 	m_pBossShot = std::make_shared<BossShot>();
 
-	m_pField = std::make_shared<Field>();
+	m_pField = std::make_shared<Field>(stageKind);
 	m_pSkyDome = std::make_shared<SkyDome>();
 
 	m_pItemHp = std::make_shared<ItemHp>();
 	m_pItemMp = std::make_shared<ItemMp>();
 
-	m_pPhysics = std::make_shared<MyLib::Physics>();
+	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
 
 
 	m_playerPos = VGet(0, 0, -120);
 	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
-	//m_pCamera->Initialize();
 	m_pCamera2->Initialize(m_pPlayer->GetPos());
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
-	//m_pBossShot->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
 
@@ -186,7 +184,7 @@ void SceneSelect::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager , Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
 				return;
 			}
 		}

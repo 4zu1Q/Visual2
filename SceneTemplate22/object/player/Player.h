@@ -145,8 +145,8 @@ private:
 	void HitUpdate();
 	void DeadUpdate();
 	void SpawnUpdate();
-
 	void FaceUseUpdate();
+
 	void TalkUpdate();
 
 	/*アップデート処理に移動させるための関数*/
@@ -162,8 +162,8 @@ private:
 	void OnHit();
 	void OnDead();
 	void OnSpawn();
-
 	void OnFaceUse();
+
 	void OnTalk();
 
 	//武器を描画するだけの関数
@@ -278,5 +278,7 @@ private:
 	bool m_isSpeedFace;
 	bool m_isShotFace;
 	bool m_isStrongestFace;
+
+
 
 };

@@ -4,6 +4,10 @@
 #include "util/Game.h"
 #include "util/Vec2.h"
 
+#include "object/player/Player.h"
+#include "object/player/PlayerProduction.h"
+#include "object/Camera.h"
+
 #include "SceneManager.h"
 #include "SceneTitle.h"
 #include "SceneSelect.h"
@@ -42,6 +46,7 @@ namespace
 	constexpr VECTOR kLoadGamePos = { 900.0f , 320.0f };
 	constexpr VECTOR kOptionPos = { 900.0f , 440.0f };
 	constexpr VECTOR EndPos = { 900.0f , 560.0f };
+
 }
 
 SceneTitle::SceneTitle(SceneManager& manager):
@@ -49,8 +54,11 @@ SceneTitle::SceneTitle(SceneManager& manager):
 {
 	m_sceneTrans = e_SceneTrans::kNewGame;
 	m_isStart = false;
-
+	m_isPlayer = true;
 	m_startTime = 0;
+
+	m_pPlayerProduction = std::make_shared<PlayerProduction>();
+	m_pCamera = std::make_shared<Camera>();
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
@@ -81,6 +89,8 @@ void SceneTitle::Update()
 
 	Pad::Update();
 	UpdateFade();
+
+	m_pCamera->DebugUpdate();
 
 	SoundManager::GetInstance().PlayBgm("titleBgm", true);
 
@@ -184,8 +194,8 @@ void SceneTitle::Update()
 			{
 				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
 				SoundManager::GetInstance().StopBgm("titleBgm");
-				//m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
-				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
+				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kSpeed, Game::e_StageKind::kGamePlay));
 				return;
 			}
 		}

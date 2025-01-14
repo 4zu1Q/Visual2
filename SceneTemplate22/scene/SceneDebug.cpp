@@ -107,13 +107,13 @@ void SceneDebug::Update()
 
 		if (m_sceneTrans == e_SceneTrans::kSelect)
 		{
-			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager));
+			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
 			return;
 		}
 
 		if (m_sceneTrans == e_SceneTrans::kGamePlay)
 		{
-			m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+			m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
 			return;
 		}
 

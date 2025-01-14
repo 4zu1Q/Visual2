@@ -2,6 +2,7 @@
 #include "SceneBase.h"
 #include "myLib/Physics.h"
 
+#include "util/Game.h"
 
 #include <vector>
 #include <memory>
@@ -26,7 +27,7 @@ class SceneSelect :
 	public SceneBase
 {
 public:
-	SceneSelect(SceneManager& manager);
+	SceneSelect(SceneManager& manager, Game::e_StageKind stageKind);
 	virtual ~SceneSelect();
 
 	/// <summary>

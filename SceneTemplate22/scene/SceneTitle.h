@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 
+class PlayerProduction;
+class Camera;
 class SceneTitle : public SceneBase
 {
 public:
@@ -19,7 +21,12 @@ public:
 	/// </summary>
 	virtual void Draw() override final;	//毎フレーム行う描画処理
     
+	const bool& GetIsPlayer() const { return m_isPlayer; }
+
 private:
+
+	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
+	std::shared_ptr<Camera> m_pCamera;
 
 	//遷移先
 	enum class e_SceneTrans : int
@@ -32,6 +39,8 @@ private:
 
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
+
+	bool m_isPlayer;	//プレイヤーのタイトルバージョンのアニメーションを行う
 
 	bool m_isStart;
 	int m_startTime;

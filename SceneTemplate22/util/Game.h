@@ -34,13 +34,29 @@ namespace Game
 	//ウィンドウカラーモード
 	constexpr int kColorDepth = 32; //16 or 32
 
-	//ステージ名
+	//ボスの種類
+	enum class e_BossKind
+	{
+		kPower,		//パワー
+		kSpeed,		//スピード
+		kShot,			//ショット
+		kRast,			//ラスボス
+		kBossNum		//ボスの種類の総数
+	};
+
+	//ステージの種類
 	enum class e_StageKind
 	{
-		kPowerStage,		//パワーステージ
-		kSpeedStage,		//スピードステージ
-		kShotStage,			//ショットステージ
-		kRastStage,			//ラスボスステージ
+		kSelect,
+		kGamePlay,
+		kStageNum		//ステージの種類の総数
+	};
+
+	enum class e_PlayerProduction
+	{
+		kTitle,
+		kGameOver,
+		kGameClear,
 	};
 
 	// 当たったものの判別を行うためのタグ
