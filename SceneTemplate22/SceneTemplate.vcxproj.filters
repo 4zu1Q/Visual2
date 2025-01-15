@@ -267,6 +267,12 @@
     <ClCompile Include="object\player\PlayerProduction.cpp">
       <Filter>ソース ファイル\object\player</Filter>
     </ClCompile>
+    <ClCompile Include="object\CameraProduction.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="object\stage\TitleField.cpp">
+      <Filter>ソース ファイル\object\stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -460,6 +466,12 @@
     </ClInclude>
     <ClInclude Include="object\player\PlayerProduction.h">
       <Filter>ヘッダー ファイル\object\player</Filter>
+    </ClInclude>
+    <ClInclude Include="object\CameraProduction.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+    <ClInclude Include="object\stage\TitleField.h">
+      <Filter>ヘッダー ファイル\object\stage</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,6 +3,10 @@
 #include <vector>
 #include <memory>
 
+class PlayerProduction;
+class CameraProduction;
+class SkyDome;
+
 class SceneGameClear :
 	public SceneBase
 {
@@ -22,6 +26,10 @@ public:
 
 private:
 
+	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
+	std::shared_ptr<CameraProduction> m_pCameraProduction;
+	std::shared_ptr<SkyDome> m_pSkyDome;
+
 	//遷移先
 	enum class e_SceneTrans : int
 	{
@@ -31,6 +39,7 @@ private:
 
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
+	float m_selectAnimation;
 
 	e_SceneTrans m_sceneTrans;
 

@@ -11,7 +11,6 @@ class Player;
 class PlayerWeapon;
 class Camera;
 class Camera2;
-class SkyDome;
 class HpBar;
 class PlayerBarUi;
 class FaceUi;
@@ -65,7 +64,6 @@ private:
 	std::shared_ptr<ButtonUi> m_pButtonUi;
 
 
-	std::shared_ptr<SkyDome> m_pSkyDome;
 	std::shared_ptr<Field> m_pField;
 
 	std::shared_ptr<MyLib::Physics> m_pPhysics;

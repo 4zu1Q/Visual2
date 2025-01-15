@@ -7,6 +7,9 @@
 #include "SceneTitle.h"
 #include "SceneDebug.h"
 
+#include "object/player/PlayerProduction.h"
+#include "object/CameraProduction.h"
+
 #include "util/SoundManager.h"
 #include "util/Pad.h"
 #include "util/Game.h"
@@ -25,17 +28,27 @@ namespace
 		kTitleH,
 		kPointerH,
 	};
+
+	constexpr float kSelectSpeed = 0.06f;
+	constexpr float kSelectAnimationSize = 4.0f;
 }
 
 SceneGameOver::SceneGameOver(SceneManager& manager) :
-	SceneBase(manager)
+	SceneBase(manager),
+	m_fadeTime(0)
 {
-	m_sceneTrans = e_SceneTrans::kSelect;
+	m_sceneTrans = e_SceneTrans::kGamePlay;
+
+	m_pPlayerProduction = std::make_shared<PlayerProduction>();
+	m_pCameraProduction = std::make_shared<CameraProduction>();
+
+	m_pPlayerProduction->Initialize(Game::e_PlayerProduction::kGameOver);
+	m_pCameraProduction->Initialize(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kGameOver);
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/GameOver.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Select.png"));				//Select
-	m_handles.push_back(LoadGraph("Data/Image/Title.png"));					//Title
+	m_handles.push_back(LoadGraph("Data/Image/Retry.png"));					//Title
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				//矢印
 }
 
@@ -55,6 +68,9 @@ void SceneGameOver::Update()
 {
 	Pad::Update();
 	UpdateFade();
+
+	m_pCameraProduction->Update();
+	m_pPlayerProduction->Update();
 
 #ifdef _DEBUG
 	//デバッグに遷移する
@@ -108,30 +124,50 @@ void SceneGameOver::Update()
 		}
 	}
 
+	//if (m_isToNextScene)
+	//{
+	//	m_fadeTime++;
+
+	//	if (m_fadeTime > 60)
+	//	{
+	//	}
+	//}
+
+
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
-		if (!IsFadingOut())
+		//if (m_fadeTime > 60)
 		{
-			if (m_sceneTrans == e_SceneTrans::kGamePlay)
+			if (!IsFadingOut())
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
-				return;
-			}
+				if (m_sceneTrans == e_SceneTrans::kGamePlay)
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
+					return;
+				}
 
-			if (m_sceneTrans == e_SceneTrans::kSelect)
-			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
-				return;
+				if (m_sceneTrans == e_SceneTrans::kSelect)
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+					return;
+				}
 			}
 		}
 	}
 
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
 }
 
 void SceneGameOver::Draw()
 {
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+
+	m_pCameraProduction->Draw();
+	m_pPlayerProduction->Draw();
 
 #ifdef _DEBUG
 
@@ -140,30 +176,26 @@ void SceneGameOver::Draw()
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kGamePlay)
 	{
-		//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
-		//DrawGraph(550, 420, m_handles[kSelectH], true);
-		DrawGraph(360, 610, m_handles[kPointerH], true);
+		DrawGraph(360 + m_selectAnimation, 615, m_handles[kPointerH], true);
 	}
 	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-		//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
-		//DrawGraph(550, 480, m_handles[kSelectH], true);
-		DrawGraph(760, 610, m_handles[kPointerH], true);
+		DrawGraph(760 + m_selectAnimation, 615, m_handles[kPointerH], true);
 	}
 
 	DrawGraph(380, 100, m_handles[kGameOverH], true);
 
 	//Select
-	DrawGraph(400, 600, m_handles[kSelectH], true);
-	//Title
-	DrawGraph(800, 600, m_handles[kTitleH], true);
+	DrawGraph(800, 600, m_handles[kSelectH], true);
+	//GamePlay
+	DrawGraph(400, 600, m_handles[kTitleH], true);
 
 	DrawString(0, 0, "Scene Game Over", 0xffffff, false);
 
 	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Select");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Title");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Retry");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 
 	DrawFade(0x000000);
 }

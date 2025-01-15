@@ -13,7 +13,6 @@
 #include "object/boss/BossPower.h"
 #include "object/boss/BossSpeed.h"
 #include "object/boss/BossShot.h"
-#include "object/stage/SkyDome.h"
 #include "object/Camera.h"
 #include "object/Camera2.h"
 
@@ -65,7 +64,6 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 	m_pBossSpeed = std::make_shared<BossSpeed>();
 	m_pBossShot = std::make_shared<BossShot>();
 
-	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pField = std::make_shared<Field>(stageKind);
 
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
@@ -172,7 +170,6 @@ void SceneGamePlay::Update()
 		}
 	}
 
-	m_pSkyDome->Update();
 
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
@@ -221,7 +218,6 @@ void SceneGamePlay::Draw()
 {
 
 	m_pField->Draw();
-	m_pSkyDome->Draw();
 
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{

@@ -3,6 +3,9 @@
 #include <vector>
 #include <memory>
 
+class PlayerProduction;
+class CameraProduction;
+
 class SceneGameOver :
 	public SceneBase
 {
@@ -21,6 +24,12 @@ public:
 	virtual void Draw() override final;	//毎フレーム行う描画処理
 
 private:
+
+	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
+	std::shared_ptr<CameraProduction> m_pCameraProduction;
+
+	int m_fadeTime;	//フェード時間の引き延ばし
+	float m_selectAnimation;
 
 	//遷移先
 	enum class e_SceneTrans : int

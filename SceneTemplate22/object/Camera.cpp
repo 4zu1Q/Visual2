@@ -118,6 +118,17 @@ Camera::Camera() :
 	m_isMovie = false;
 	m_isClear = false;
 
+	m_cameraAngleX = 0.0f;
+	m_cameraAngleY = 12.0f;
+	SetCameraNearFar(kCameraNear, kCameraFar);
+
+
+	// カメラの初期水平角度は１８０度
+	m_angleH = DX_PI_F;
+
+	// 垂直角度は０度
+	m_angleV = 0.0f;
+
 	//SetCameraNearFar(kNear, kFar);
 	m_lightHandle = CreateDirLightHandle(VSub(m_aimPos, m_cameraPos));
 }

@@ -158,6 +158,7 @@
     <ClCompile Include="object\boss\BossSpeed.cpp" />
     <ClCompile Include="object\Camera.cpp" />
     <ClCompile Include="object\Camera2.cpp" />
+    <ClCompile Include="object\CameraProduction.cpp" />
     <ClCompile Include="object\CharaBase.cpp" />
     <ClCompile Include="object\item\ItemBase.cpp" />
     <ClCompile Include="object\item\ItemHp.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="object\shot\ShotBase.cpp" />
     <ClCompile Include="object\stage\Field.cpp" />
     <ClCompile Include="object\stage\SkyDome.cpp" />
+    <ClCompile Include="object\stage\TitleField.cpp" />
     <ClCompile Include="object\stage\Tomb.cpp" />
     <ClCompile Include="object\weapon\Axe.cpp" />
     <ClCompile Include="object\weapon\Dagger.cpp" />
@@ -223,6 +225,7 @@
     <ClInclude Include="object\boss\BossSpeed.h" />
     <ClInclude Include="object\Camera.h" />
     <ClInclude Include="object\Camera2.h" />
+    <ClInclude Include="object\CameraProduction.h" />
     <ClInclude Include="object\CharaBase.h" />
     <ClInclude Include="object\item\ItemBase.h" />
     <ClInclude Include="object\item\ItemHp.h" />
@@ -235,6 +238,7 @@
     <ClInclude Include="object\shot\ShotBase.h" />
     <ClInclude Include="object\stage\Field.h" />
     <ClInclude Include="object\stage\SkyDome.h" />
+    <ClInclude Include="object\stage\TitleField.h" />
     <ClInclude Include="object\stage\Tomb.h" />
     <ClInclude Include="object\weapon\Axe.h" />
     <ClInclude Include="object\weapon\Dagger.h" />

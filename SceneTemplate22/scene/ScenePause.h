@@ -36,6 +36,7 @@ private:
 
 	//画像ハンドル
 	int m_pauseHandle;
+	float m_selectAnimation;
 
 	e_SceneTrans m_sceneTrans;
 };

@@ -4,9 +4,10 @@
 #include "util/Game.h"
 #include "util/Vec2.h"
 
-#include "object/player/Player.h"
 #include "object/player/PlayerProduction.h"
-#include "object/Camera.h"
+#include "object/CameraProduction.h"
+#include "object/stage/SkyDome.h"
+#include "object/stage/TitleField.h"
 
 #include "SceneManager.h"
 #include "SceneTitle.h"
@@ -47,6 +48,8 @@ namespace
 	constexpr VECTOR kOptionPos = { 900.0f , 440.0f };
 	constexpr VECTOR EndPos = { 900.0f , 560.0f };
 
+	constexpr float kSelectSpeed = 0.06f;
+	constexpr float kSelectAnimationSize = 4.0f;
 }
 
 SceneTitle::SceneTitle(SceneManager& manager):
@@ -56,9 +59,15 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_isStart = false;
 	m_isPlayer = true;
 	m_startTime = 0;
+	m_selectAnimation = 0.0f;
 
 	m_pPlayerProduction = std::make_shared<PlayerProduction>();
-	m_pCamera = std::make_shared<Camera>();
+	m_pCameraProduction = std::make_shared<CameraProduction>();
+	m_pSkyDome = std::make_shared<SkyDome>();
+	m_pTitleField = std::make_shared<TitleField>();
+
+	m_pPlayerProduction->Initialize(Game::e_PlayerProduction::kTitle);
+	m_pCameraProduction->Initialize(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kTitle);
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
@@ -90,7 +99,9 @@ void SceneTitle::Update()
 	Pad::Update();
 	UpdateFade();
 
-	m_pCamera->DebugUpdate();
+	m_pCameraProduction->Update();
+	m_pPlayerProduction->Update();
+	m_pSkyDome->Update();
 
 	SoundManager::GetInstance().PlayBgm("titleBgm", true);
 
@@ -119,7 +130,7 @@ void SceneTitle::Update()
 		m_startTime++;
 	}
 	
-	if (!m_isToNextScene && m_isStart && m_startTime >= 180)
+	if (!m_isToNextScene && m_isStart && m_startTime >= 120)
 	{
 		//上を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_UP))
@@ -201,12 +212,20 @@ void SceneTitle::Update()
 		}
 	}
 
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
+
 }
 
 void SceneTitle::Draw()
 {
 	//背景座標
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
+	m_pCameraProduction->Draw();
+	m_pPlayerProduction->Draw();
+	m_pSkyDome->Draw();
+	m_pTitleField->Draw();
 
 	if (!m_isStart)
 	{
@@ -223,25 +242,25 @@ void SceneTitle::Draw()
 		{
 			//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
 			//DrawGraph(550, 420, m_handles[kSelectH], true);
-			DrawGraph(520, 430, m_handles[kPointerH], true);
+			DrawGraph(520 + m_selectAnimation, 430, m_handles[kPointerH], true);
 		}
 		if (m_sceneTrans == e_SceneTrans::kLoadGame)
 		{
 			//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
 			//DrawGraph(550, 480, m_handles[kSelectH], true);
-			DrawGraph(520, 490, m_handles[kPointerH], true);
+			DrawGraph(520 + m_selectAnimation, 490, m_handles[kPointerH], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kOption)
 		{
 			//DrawGraph(Game::kScreenWidthHalf - 150, 550, m_handles[kSelect], true);
 			//DrawGraph(550, 540, m_handles[kSelectH], true);
-			DrawGraph(550, 550, m_handles[kPointerH], true);
+			DrawGraph(550 + m_selectAnimation, 550, m_handles[kPointerH], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kQuit)
 		{
 			//DrawGraph(Game::kScreenWidthHalf - 150, 610, m_handles[kSelect], true);
 			//DrawGraph(550, 600, m_handles[kSelectH], true);
-			DrawGraph(570, 610, m_handles[kPointerH], true);
+			DrawGraph(570 + m_selectAnimation, 610, m_handles[kPointerH], true);
 		}
 
 		DrawGraph(255, 100, m_handles[kLogoH], true);

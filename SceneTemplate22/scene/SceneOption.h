@@ -39,6 +39,7 @@ private:
 	bool m_isFullScreen;
 
 	int m_pushCount;
+	float m_selectAnimation;
 
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;

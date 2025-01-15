@@ -4,12 +4,12 @@
 namespace 
 {
 
-	const char* const kFieldModelFilename = "Data/Model/Stage/Field10.mv1";
+	const char* const kFieldModelFilename = "Data/Model/Stage/Field12.mv1";
 	const char* const kTestModelFilename = "Data/Model/Weapon/Boss_Shield.mv1";
 
 	const char* const kFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
 	{
-		"Data/Model/Stage/Field10.mv1",
+		"Data/Model/Stage/Field12.mv1",
 		"Data/Model/Stage/Field07.mv1",
 	};
 
@@ -17,7 +17,7 @@ namespace
 	constexpr VECTOR kSelectModelScale = { 1.0f , 1.0f , 1.0f };
 	constexpr VECTOR kGamePlayModelScale = { 0.4f , 0.4f , 0.4f };
 
-	constexpr VECTOR kSelectModelPosition = { 0.0f, 0.0f, 0.0f };
+	constexpr VECTOR kSelectModelPosition = { 70.0f, -1600.0f, 1200.0f };
 	constexpr VECTOR kGamePlayModelPosition = { 0.0f, 150.0f, 0.0f };
 }
 

@@ -6,6 +6,10 @@
 #include "SceneTitle.h"
 #include "SceneDebug.h"
 
+#include "object/player/PlayerProduction.h"
+#include "object/CameraProduction.h"
+#include "object/stage/SkyDome.h"
+
 #include "util/SoundManager.h"
 #include "util/Pad.h"
 #include "util/Game.h"
@@ -24,12 +28,22 @@ namespace
 		kTitleH,
 		kPointerH,
 	};
+
+	constexpr float kSelectSpeed = 0.06f;
+	constexpr float kSelectAnimationSize = 4.0f;
 }
 
 SceneGameClear::SceneGameClear(SceneManager& manager) :
 	SceneBase(manager)
 {
 	m_sceneTrans = e_SceneTrans::kSelect;
+
+	m_pPlayerProduction = std::make_shared<PlayerProduction>();
+	m_pCameraProduction = std::make_shared<CameraProduction>();
+	m_pSkyDome = std::make_shared<SkyDome>();
+
+	m_pPlayerProduction->Initialize(Game::e_PlayerProduction::kGameClear);
+	m_pCameraProduction->Initialize(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kGameClear);
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/GameClear.png"));
@@ -54,6 +68,10 @@ void SceneGameClear::Update()
 {
 	Pad::Update();
 	UpdateFade();
+
+	m_pCameraProduction->Update();
+	m_pPlayerProduction->Update();
+	m_pSkyDome->Update();
 
 #ifdef _DEBUG
 	//デバッグに遷移する
@@ -124,11 +142,20 @@ void SceneGameClear::Update()
 		}
 	}
 
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
 }
 
 void SceneGameClear::Draw()
 {
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
+	//DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
+
+	//背景座標
+	m_pCameraProduction->Draw();
+	m_pPlayerProduction->Draw();
+	m_pSkyDome->Draw();
 
 #ifdef _DEBUG
 
@@ -140,15 +167,11 @@ void SceneGameClear::Draw()
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-		//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
-		//DrawGraph(550, 420, m_handles[kSelectH], true);
-		DrawGraph(360, 610, m_handles[kPointerH], true);
+		DrawGraph(360 + m_selectAnimation, 615, m_handles[kPointerH], true);
 	}
 	if (m_sceneTrans == e_SceneTrans::kTitle)
 	{
-		//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
-		//DrawGraph(550, 480, m_handles[kSelectH], true);
-		DrawGraph(760, 610, m_handles[kPointerH], true);
+		DrawGraph(760 + m_selectAnimation, 615, m_handles[kPointerH], true);
 	}
 
 	DrawGraph(380, 100, m_handles[kGameClearH], true);

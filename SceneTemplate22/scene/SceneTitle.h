@@ -4,7 +4,10 @@
 #include <memory>
 
 class PlayerProduction;
-class Camera;
+class CameraProduction;
+class SkyDome;
+class TitleField;
+
 class SceneTitle : public SceneBase
 {
 public:
@@ -26,7 +29,10 @@ public:
 private:
 
 	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
-	std::shared_ptr<Camera> m_pCamera;
+	std::shared_ptr<CameraProduction> m_pCameraProduction;
+	std::shared_ptr<SkyDome> m_pSkyDome;
+	std::shared_ptr<TitleField> m_pTitleField;
+
 
 	//遷移先
 	enum class e_SceneTrans : int
@@ -44,6 +50,7 @@ private:
 
 	bool m_isStart;
 	int m_startTime;
+	float m_selectAnimation;
 
 	e_SceneTrans m_sceneTrans;
 

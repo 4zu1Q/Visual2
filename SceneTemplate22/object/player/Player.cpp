@@ -19,8 +19,6 @@ namespace
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Player/Player.mv1";
 
-
-
 	//モデルのスケール値
 	constexpr float kModelScale = 5.0f;
 	constexpr float kWeaponScale = 1.0f;
@@ -1214,8 +1212,6 @@ void Player::FaceUseUpdate()
 		OnIdle();
 	}
 }
-
-
 
 void Player::TalkUpdate()
 {

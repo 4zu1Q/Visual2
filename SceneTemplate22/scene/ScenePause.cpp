@@ -33,6 +33,9 @@ namespace
 		kBackH,
 		kPointerH,
 	};
+
+	constexpr float kSelectSpeed = 0.06f;
+	constexpr float kSelectAnimationSize = 4.0f;
 }
 
 ScenePause::ScenePause(SceneManager& manager) :
@@ -138,6 +141,11 @@ void ScenePause::Update()
 			}
 		}
 	}
+
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
 }
 
 void ScenePause::Draw()
@@ -175,21 +183,16 @@ void ScenePause::Draw()
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kRestart)
 	{
-		//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
-		DrawGraph(50, 70, m_handles[kPointerH], true);
+		DrawGraph(50 + m_selectAnimation, 70, m_handles[kPointerH], true);
 	}
 	if (m_sceneTrans == e_SceneTrans::kOption)
 	{
-		//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
-		DrawGraph(50, 190, m_handles[kPointerH], true);
+		DrawGraph(50 + m_selectAnimation, 190, m_handles[kPointerH], true);
 	}
 	else if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-		//DrawGraph(Game::kScreenWidthHalf - 150, 550, m_handles[kSelect], true);
-		DrawGraph(50, 310, m_handles[kPointerH], true);
+		DrawGraph(50 + m_selectAnimation, 310, m_handles[kPointerH], true);
 	}
-
-	//DrawGraph(kPausePos.x, kPausePos.y, m_pauseHandle, true);
 
 	DrawFade(0x000000);
 

@@ -4,6 +4,7 @@
 #include <memory>
 
 class AnimController;
+
 class PlayerProduction
 {
 public:
@@ -20,15 +21,18 @@ public:
 	void SetGameOverFlag(float isGameOver) { m_isGameOver = isGameOver; }
 	void SetGameClearFlag(float isGameClear) { m_isGameClear = isGameClear; }
 
-	const VECTOR& GetPosUp() const { return m_pos; }
+	const VECTOR& GetPos() const { return m_pos; }
 
 
 private:
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
-	void TitleUpdate();
-	void TitleStartUpdate();
+	void TitleIdleUpdate();
+	void DashUpdate();
+	void SitUpdate();
+	void SitUpUpdate();
+	void SitDownUpdate();
 	void GameOverUpdate();
 	void RetryUpdate();
 	void GameClearUpdate();
@@ -38,8 +42,11 @@ private:
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
-	void OnTitle();
-	void OnTitleStart();
+	void OnTitleIdle();
+	void OnDash();
+	void OnSit();
+	void OnSitDown();
+	void OnSitUp();
 	void OnGameOver();
 	void OnRetry();
 	void OnGameClear();
@@ -55,6 +62,7 @@ private:
 	Game::e_PlayerProduction m_playerProduction;
 
 	VECTOR m_pos;
+	VECTOR m_cameraPos;
 
 	bool m_isTitle;
 	bool m_isGameOver;
