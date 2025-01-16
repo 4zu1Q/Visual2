@@ -41,7 +41,7 @@ namespace
 
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 0.0f,35.0f,0.0f };
+	constexpr VECTOR kInitPos = { -85.0f,35.0f,740.0f };
 }
 
 
@@ -152,16 +152,8 @@ void SceneSelect::Update()
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update(m_pPhysics);
 
-	//m_pBossShot->Update(m_pPhysics, *m_pPlayer);
-	//m_pCamera->Update(m_pField->GetModelHandle());
-	//m_pCamera->SetPlayerPos(m_pPlayer->GetPosUp());
-	//m_pCamera->DebugUpdate(m_pPlayer->GetPosUp());
-
-	//m_pCamera->CameraProcess(m_pPlayer->GetPos());
-
 	m_pCamera2->Update(m_pPlayer->GetPos(),m_pField->GetModelHandle());
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
-
 	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon,m_pCamera2->GetCameraAngleX());
 
 	m_pPhysics->Update();
@@ -195,6 +187,7 @@ void SceneSelect::Update()
 void SceneSelect::Draw()
 {
 	m_pPlayer->Draw(*m_pPlayerWeapon);
+	m_pPlayer->ShadowRender(m_pField->GetModelHandle());
 
 	m_pSkyDome->Draw();
 	m_pField->Draw();
@@ -202,7 +195,6 @@ void SceneSelect::Draw()
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
 
-	//m_pBossShot->Draw();
 	m_pPlayerBarUi->Draw();
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);

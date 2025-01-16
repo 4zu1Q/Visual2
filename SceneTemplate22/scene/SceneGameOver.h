@@ -41,6 +41,9 @@ private:
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
 
+	bool m_isActionStart;
+	bool m_isActionBack;
+
 	e_SceneTrans m_sceneTrans;
 
 };

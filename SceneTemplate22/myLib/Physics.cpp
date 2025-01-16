@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include "MyLib.h"
 #include "MathHelper.h"
+#include "object/player/Player.h"
 
 
 using namespace MyLib;
@@ -34,6 +35,7 @@ namespace
 MyLib::Physics::Physics(Game::e_StageKind stageKind)
 {
 	m_pField = std::make_shared<Field>(stageKind);
+	m_pPlayer = std::make_shared<Player>();
 }
 
 /// <summary>
@@ -751,6 +753,11 @@ void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
 	{
 		// 接触したポリゴンで一番高いＹ座標をプレイヤーのＹ座標にする
 		col->m_rigidbody.SetNextPos(VGet(col->m_rigidbody.GetNextPos().x, PolyMaxPosY/* + sphere->m_radius*/, col->m_rigidbody.GetNextPos().z));
+		if (m_pPlayer->GetIsJump())
+		{
+			m_pPlayer->SetIsJump(false);
+		}
+		
 	}
 
 }

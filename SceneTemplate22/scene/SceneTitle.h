@@ -52,6 +52,9 @@ private:
 	int m_startTime;
 	float m_selectAnimation;
 
+	bool m_isActionStart;
+	bool m_isActionBack;
+
 	e_SceneTrans m_sceneTrans;
 
 };

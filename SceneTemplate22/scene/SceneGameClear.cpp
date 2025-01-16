@@ -9,6 +9,7 @@
 #include "object/player/PlayerProduction.h"
 #include "object/CameraProduction.h"
 #include "object/stage/SkyDome.h"
+#include "object/stage/TitleField.h"
 
 #include "util/SoundManager.h"
 #include "util/Pad.h"
@@ -36,11 +37,15 @@ namespace
 SceneGameClear::SceneGameClear(SceneManager& manager) :
 	SceneBase(manager)
 {
+	m_isActionStart = false;
+	m_isActionBack = false;
+
 	m_sceneTrans = e_SceneTrans::kSelect;
 
 	m_pPlayerProduction = std::make_shared<PlayerProduction>();
 	m_pCameraProduction = std::make_shared<CameraProduction>();
 	m_pSkyDome = std::make_shared<SkyDome>();
+	m_pTitleField = std::make_shared<TitleField>();
 
 	m_pPlayerProduction->Initialize(Game::e_PlayerProduction::kGameClear);
 	m_pCameraProduction->Initialize(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kGameClear);
@@ -70,7 +75,7 @@ void SceneGameClear::Update()
 	UpdateFade();
 
 	m_pCameraProduction->Update();
-	m_pPlayerProduction->Update();
+	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
 	m_pSkyDome->Update();
 
 #ifdef _DEBUG
@@ -151,6 +156,7 @@ void SceneGameClear::Update()
 void SceneGameClear::Draw()
 {
 	//DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
+	m_pTitleField->Draw();
 
 	//背景座標
 	m_pCameraProduction->Draw();

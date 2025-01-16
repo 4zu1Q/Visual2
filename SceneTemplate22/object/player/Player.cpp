@@ -158,7 +158,8 @@ namespace
 	constexpr float kMpDiminishNum = 30.0f;
 	constexpr float kMpIncreaseNum = 40.0f;
 
-
+	constexpr float kShadowSize = 5.0f;
+	constexpr float kShadowHeight = 50.0f;
 }
 
 Player::Player() :
@@ -194,10 +195,12 @@ Player::Player() :
 	m_jumpPower(0.0f),
 	m_playerRotMtx(),
 	m_moveCount(0),
-	m_deadTime(0)
+	m_deadTime(0),
+	m_shadowH(0)
 {
 
-
+	// 影描画用の画像の読み込み
+	m_shadowH = LoadGraph("Data/Image/Shadow.png");
 
 #ifdef _DEBUG
 
@@ -240,7 +243,7 @@ Player::Player() :
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
-	circleColliderData->m_radius = 5.0f;
+	circleColliderData->m_radius = 6.0f;
 
 
 	//m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
@@ -253,7 +256,7 @@ Player::Player() :
 
 Player::~Player()
 {
-
+	DeleteGraph(m_shadowH);
 }
 
 void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon)
@@ -343,11 +346,13 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 		m_stamina = 0;
 		m_isStamina = true;
 	}
+
 	//スタミナがスタミナの最大値を超えた場合
 	if (m_stamina > kMaxStamina)
 	{
 		m_stamina = kMaxStamina;
 	}
+
 	//スタミナがスタミナの最大値に達した場合
 	if (m_stamina == kMaxStamina)
 	{
@@ -365,7 +370,7 @@ void Player::Draw(PlayerWeapon& weapon)
 
 #ifdef _DEBUG
 
-	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
+	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_rigidbody.GetPos().x, m_rigidbody.GetPos().y, m_rigidbody.GetPos().z);
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
 	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
 	DrawFormatString(0, 200, 0xffffff, "DashFlag:%d", m_pCamera->GetIsDash());
@@ -892,7 +897,7 @@ void Player::JumpUpdate()
 	if (m_frame > 52)
 	{
 		m_frame = 0;
-		m_isJump = false;
+		//m_isJump = false;
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnIdle();
@@ -980,13 +985,12 @@ void Player::FallUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
 
-	m_frame++;
+	//m_frame++;
 
 	//地面に着いたら待機状態に移動する条件式を書く予定
-	if (m_frame > 25)
+	if (!m_isJump)
 	{
 		m_frame = 0;
-		m_isJump = false;
 		OnIdle();
 	}
 
@@ -1472,4 +1476,84 @@ void Player::AnimChange(const char* normal, const char* power, const char* speed
 		m_pAnim->ChangeAnim(normal);
 	}
 }
+
+void Player::ShadowRender(int stageH)
+{
+	int i;
+	MV1_COLL_RESULT_POLY_DIM HitResDim;
+	MV1_COLL_RESULT_POLY* HitRes;
+	VERTEX3D Vertex[3];
+	VECTOR SlideVec;
+
+	// ライティングを無効にする
+	SetUseLighting(FALSE);
+
+	// Ｚバッファを有効にする
+	SetUseZBuffer3D(TRUE);
+
+	// テクスチャアドレスモードを CLAMP にする( テクスチャの端より先は端のドットが延々続く )
+	SetTextureAddressMode(DX_TEXADDRESS_CLAMP);
+
+	// プレイヤーの直下に存在する地面のポリゴンを取得
+	HitResDim = MV1CollCheck_Capsule(stageH, -1, m_rigidbody.GetPos(), VAdd(m_rigidbody.GetPos(), VGet(0.0f, -kShadowHeight, 0.0f)), kShadowSize);
+
+	// 頂点データで変化が無い部分をセット
+	Vertex[0].dif = GetColorU8(255, 255, 255, 255);
+	Vertex[0].spc = GetColorU8(0, 0, 0, 0);
+	Vertex[0].su = 0.0f;
+	Vertex[0].sv = 0.0f;
+	Vertex[1] = Vertex[0];
+	Vertex[2] = Vertex[0];
+
+	// 球の直下に存在するポリゴンの数だけ繰り返し
+	HitRes = HitResDim.Dim;
+	for (i = 0; i < HitResDim.HitNum; i++, HitRes++)
+	{
+		// ポリゴンの座標は地面ポリゴンの座標
+		Vertex[0].pos = HitRes->Position[0];
+		Vertex[1].pos = HitRes->Position[1];
+		Vertex[2].pos = HitRes->Position[2];
+
+		// ちょっと持ち上げて重ならないようにする
+		SlideVec = VScale(HitRes->Normal, 0.1f);
+		Vertex[0].pos = VAdd(Vertex[0].pos, SlideVec);
+		Vertex[1].pos = VAdd(Vertex[1].pos, SlideVec);
+		Vertex[2].pos = VAdd(Vertex[2].pos, SlideVec);
+
+		// ポリゴンの不透明度を設定する
+		Vertex[0].dif.a = 0;
+		Vertex[1].dif.a = 0;
+		Vertex[2].dif.a = 0;
+
+		if (HitRes->Position[0].y > m_rigidbody.GetPos().y - kShadowHeight)
+			Vertex[0].dif.a = 128 * (1.0f - fabs(HitRes->Position[0].y - m_rigidbody.GetPos().y) / kShadowHeight);
+
+		if (HitRes->Position[1].y > m_rigidbody.GetPos().y - kShadowHeight)
+			Vertex[1].dif.a = 128 * (1.0f - fabs(HitRes->Position[1].y - m_rigidbody.GetPos().y) / kShadowHeight);
+
+		if (HitRes->Position[2].y > m_rigidbody.GetPos().y - kShadowHeight)
+			Vertex[2].dif.a = 128 * (1.0f - fabs(HitRes->Position[2].y - m_rigidbody.GetPos().y) / kShadowHeight);
+
+		// ＵＶ値は地面ポリゴンとプレイヤーの相対座標から割り出す
+		Vertex[0].u = (HitRes->Position[0].x - m_rigidbody.GetPos().x) / (kShadowSize * 2.0f) + 0.5f;
+		Vertex[0].v = (HitRes->Position[0].z - m_rigidbody.GetPos().z) / (kShadowSize * 2.0f) + 0.5f;
+		Vertex[1].u = (HitRes->Position[1].x - m_rigidbody.GetPos().x) / (kShadowSize * 2.0f) + 0.5f;
+		Vertex[1].v = (HitRes->Position[1].z - m_rigidbody.GetPos().z) / (kShadowSize * 2.0f) + 0.5f;
+		Vertex[2].u = (HitRes->Position[2].x - m_rigidbody.GetPos().x) / (kShadowSize * 2.0f) + 0.5f;
+		Vertex[2].v = (HitRes->Position[2].z - m_rigidbody.GetPos().z) / (kShadowSize * 2.0f) + 0.5f;
+
+		// 影ポリゴンを描画
+		DrawPolygon3D(Vertex, 1, m_shadowH, TRUE);
+	}
+
+	// 検出した地面ポリゴン情報の後始末
+	MV1CollResultPolyDimTerminate(HitResDim);
+
+	// ライティングを有効にする
+	SetUseLighting(TRUE);
+
+	// Ｚバッファを無効にする
+	SetUseZBuffer3D(FALSE);
+}
+
 

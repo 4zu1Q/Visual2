@@ -14,14 +14,15 @@ public:
 
 	void Initialize(Game::e_PlayerProduction playerScene);
 
-	void Update();
+	void Update(bool isStart, bool isBack);
 	void Draw();
 
-	void SetTitleFlag(float isTitle) { m_isTitle = isTitle; }
-	void SetGameOverFlag(float isGameOver) { m_isGameOver = isGameOver; }
-	void SetGameClearFlag(float isGameClear) { m_isGameClear = isGameClear; }
+	void SetTitleFlag(float isTitle) { m_isStart = isTitle; }
+	void SetGameOverFlag(float isGameOver) { m_isBack = isGameOver; }
 
 	const VECTOR& GetPos() const { return m_pos; }
+
+	void ShadowRender(int stageH);
 
 
 private:
@@ -64,10 +65,17 @@ private:
 	VECTOR m_pos;
 	VECTOR m_cameraPos;
 
-	bool m_isTitle;
-	bool m_isGameOver;
-	bool m_isGameClear;
+	//武器に関する変数
+	VECTOR m_attachFramePosition;
+
+	bool m_isStart;
+	bool m_isBack;
+
+	bool m_isActionStart;
+	bool m_isActionBack;
 
 	int m_modelH;
+	int m_shadowH;
+	int m_modelWeaponH;
 };
 

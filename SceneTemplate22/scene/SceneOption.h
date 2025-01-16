@@ -38,6 +38,8 @@ private:
 	int m_sensitivityScale;
 	bool m_isFullScreen;
 
+	int m_fontHandle;
+
 	int m_pushCount;
 	float m_selectAnimation;
 

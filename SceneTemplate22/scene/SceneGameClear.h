@@ -6,6 +6,7 @@
 class PlayerProduction;
 class CameraProduction;
 class SkyDome;
+class TitleField;
 
 class SceneGameClear :
 	public SceneBase
@@ -29,6 +30,7 @@ private:
 	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
 	std::shared_ptr<CameraProduction> m_pCameraProduction;
 	std::shared_ptr<SkyDome> m_pSkyDome;
+	std::shared_ptr<TitleField> m_pTitleField;
 
 	//遷移先
 	enum class e_SceneTrans : int
@@ -40,6 +42,9 @@ private:
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
 	float m_selectAnimation;
+
+	bool m_isActionStart;
+	bool m_isActionBack;
 
 	e_SceneTrans m_sceneTrans;
 

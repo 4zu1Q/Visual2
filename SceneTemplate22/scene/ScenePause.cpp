@@ -175,23 +175,23 @@ void ScenePause::Draw()
 
 
 	DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
-	DrawGraph(100, 60, m_handles[kReStartH], true);
-	DrawGraph(100, 180, m_handles[kOptionH], true);
-	DrawGraph(100, 300, m_handles[kTitleH], true);
+	DrawGraph(160, 120, m_handles[kReStartH], true);
+	DrawGraph(160, 240, m_handles[kOptionH], true);
+	DrawGraph(160, 360, m_handles[kTitleH], true);
 	DrawGraph(0, 660, m_handles[kBackH], true);
 
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kRestart)
 	{
-		DrawGraph(50 + m_selectAnimation, 70, m_handles[kPointerH], true);
+		DrawGraph(110 + m_selectAnimation, 130, m_handles[kPointerH], true);
 	}
 	if (m_sceneTrans == e_SceneTrans::kOption)
 	{
-		DrawGraph(50 + m_selectAnimation, 190, m_handles[kPointerH], true);
+		DrawGraph(110 + m_selectAnimation, 250, m_handles[kPointerH], true);
 	}
 	else if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-		DrawGraph(50 + m_selectAnimation, 310, m_handles[kPointerH], true);
+		DrawGraph(110 + m_selectAnimation, 370, m_handles[kPointerH], true);
 	}
 
 	DrawFade(0x000000);

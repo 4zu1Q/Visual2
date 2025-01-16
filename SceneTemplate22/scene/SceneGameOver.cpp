@@ -37,6 +37,9 @@ SceneGameOver::SceneGameOver(SceneManager& manager) :
 	SceneBase(manager),
 	m_fadeTime(0)
 {
+	m_isActionStart = false;
+	m_isActionBack = false;
+
 	m_sceneTrans = e_SceneTrans::kGamePlay;
 
 	m_pPlayerProduction = std::make_shared<PlayerProduction>();
@@ -70,7 +73,7 @@ void SceneGameOver::Update()
 	UpdateFade();
 
 	m_pCameraProduction->Update();
-	m_pPlayerProduction->Update();
+	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
 
 #ifdef _DEBUG
 	//デバッグに遷移する
@@ -113,6 +116,7 @@ void SceneGameOver::Update()
 				StartFadeOut();
 				m_isToNextScene = true;
 				SoundManager::GetInstance().PlaySe("dectionSe");
+				m_isActionStart = true;
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kSelect)
@@ -120,6 +124,7 @@ void SceneGameOver::Update()
 				StartFadeOut();
 				m_isToNextScene = true;
 				SoundManager::GetInstance().PlaySe("dectionSe");
+				m_isActionStart = true;
 			}
 		}
 	}

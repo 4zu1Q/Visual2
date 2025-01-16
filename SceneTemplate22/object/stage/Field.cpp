@@ -7,7 +7,7 @@ namespace
 	const char* const kFieldModelFilename = "Data/Model/Stage/Field12.mv1";
 	const char* const kTestModelFilename = "Data/Model/Weapon/Boss_Shield.mv1";
 
-	const char* const kFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
+	const char* const kShadowFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
 	{
 		"Data/Model/Stage/Field12.mv1",
 		"Data/Model/Stage/Field07.mv1",
@@ -25,7 +25,7 @@ Field::Field(Game::e_StageKind stageKind):
 	m_modelH(-1),
 	m_pos(VGet(0,0,0))
 {
-	m_modelH = MV1LoadModel(kFileName[static_cast<int>(stageKind)]);
+	m_modelH = MV1LoadModel(kShadowFileName[static_cast<int>(stageKind)]);
 
 	if (stageKind == Game::e_StageKind::kSelect)
 	{

@@ -61,6 +61,9 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_startTime = 0;
 	m_selectAnimation = 0.0f;
 
+	m_isActionStart = false;
+	m_isActionBack = false;
+
 	m_pPlayerProduction = std::make_shared<PlayerProduction>();
 	m_pCameraProduction = std::make_shared<CameraProduction>();
 	m_pSkyDome = std::make_shared<SkyDome>();
@@ -70,7 +73,7 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_pCameraProduction->Initialize(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kTitle);
 
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
+	m_handles.push_back(LoadGraph("Data/Image/TitleLogo1.png"));
 	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton1.png"));
 	m_handles.push_back(LoadGraph("Data/Image/NewGame2.png"));				//NewGame
 	m_handles.push_back(LoadGraph("Data/Image/LoadGame2.png"));				//LoadGame
@@ -100,7 +103,7 @@ void SceneTitle::Update()
 	UpdateFade();
 
 	m_pCameraProduction->Update();
-	m_pPlayerProduction->Update();
+	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
 	m_pSkyDome->Update();
 
 	SoundManager::GetInstance().PlayBgm("titleBgm", true);
@@ -130,7 +133,7 @@ void SceneTitle::Update()
 		m_startTime++;
 	}
 	
-	if (!m_isToNextScene && m_isStart && m_startTime >= 120)
+	if (!m_isToNextScene && m_isStart && m_startTime >= 60)
 	{
 		//上を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_UP))
@@ -169,6 +172,8 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kNewGame)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
+				m_isActionStart = true;
+				m_isActionBack = false;
 				StartFadeOut();
 				m_isToNextScene = true;
 			}
@@ -190,6 +195,8 @@ void SceneTitle::Update()
 		//Bボタンを押した場合
 		if (Pad::IsTrigger(PAD_INPUT_2))
 		{
+			//m_isActionBack = true;
+			m_isActionStart = false;
 			m_isStart = false;
 			m_startTime = 0;
 		}
@@ -224,6 +231,7 @@ void SceneTitle::Draw()
 	//背景座標
 	m_pCameraProduction->Draw();
 	m_pPlayerProduction->Draw();
+	//m_pPlayerProduction->ShadowRender(m_pTitleField->GetModelHandle());
 	m_pSkyDome->Draw();
 	m_pTitleField->Draw();
 
@@ -240,26 +248,18 @@ void SceneTitle::Draw()
 		//選択
 		if (m_sceneTrans == e_SceneTrans::kNewGame)
 		{
-			//DrawGraph(Game::kScreenWidthHalf - 150, 430, m_handles[kSelect], true);
-			//DrawGraph(550, 420, m_handles[kSelectH], true);
 			DrawGraph(520 + m_selectAnimation, 430, m_handles[kPointerH], true);
 		}
 		if (m_sceneTrans == e_SceneTrans::kLoadGame)
 		{
-			//DrawGraph(Game::kScreenWidthHalf - 150, 490, m_handles[kSelect], true);
-			//DrawGraph(550, 480, m_handles[kSelectH], true);
 			DrawGraph(520 + m_selectAnimation, 490, m_handles[kPointerH], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kOption)
 		{
-			//DrawGraph(Game::kScreenWidthHalf - 150, 550, m_handles[kSelect], true);
-			//DrawGraph(550, 540, m_handles[kSelectH], true);
 			DrawGraph(550 + m_selectAnimation, 550, m_handles[kPointerH], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kQuit)
 		{
-			//DrawGraph(Game::kScreenWidthHalf - 150, 610, m_handles[kSelect], true);
-			//DrawGraph(550, 600, m_handles[kSelectH], true);
 			DrawGraph(570 + m_selectAnimation, 610, m_handles[kPointerH], true);
 		}
 

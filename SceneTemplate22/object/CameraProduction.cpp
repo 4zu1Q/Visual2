@@ -15,11 +15,11 @@ namespace
 
 	constexpr float kTitleCameraPlayerBackwardDistance = 25.0f;	// プレイヤーとの奥行方向の距離
 	constexpr float kGameOverCameraPlayerBackwardDistance = 20.0f;	// プレイヤーとの奥行方向の距離
-	constexpr float kGameClearCameraPlayerBackwardDistance = 20.0f;	// プレイヤーとの奥行方向の距離
+	constexpr float kGameClearCameraPlayerBackwardDistance = 23.0f;	// プレイヤーとの奥行方向の距離
 
 	constexpr float kTitleCameraPlayerRightDistance = -15.0f;		// プレイヤーとの水平方向の距離
 	constexpr float kGameOverCameraPlayerRightDistance = 0.0f;		// プレイヤーとの水平方向の距離
-	constexpr float kGameClearCameraPlayerRightDistance = 0.0;	// プレイヤーとの水平方向の距離
+	constexpr float kGameClearCameraPlayerRightDistance = -0.0;	// プレイヤーとの水平方向の距離
 
 	constexpr float kCameraCollisionSize = 3.0f;			// カメラの当たり判定サイズ
 

@@ -7,7 +7,7 @@
 #include "util/Pad.h"
 #include "util/SoundManager.h"
 #include "util/Setting.h"
-
+#include "util/Font.h"
 
 namespace
 {
@@ -16,6 +16,9 @@ namespace
 	constexpr int kTextIntervalY = 24;
 
 	constexpr int kMaxVolume = 100;
+
+	const char* kFontPath = "Data/Font/Dela-Gothic-One.ttf";
+	constexpr int kFontSize = 34;
 
 	//BGMやSEなどのテキストポジション
 	constexpr int kTextPosY[4] = { 180, 280, 380, 480 };
@@ -65,6 +68,9 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_handles.push_back(LoadGraph("Data/Image/Check.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));
 	m_handles.push_back(LoadGraph("Data/Image/B_Back.png"));
+
+	m_fontHandle = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", kFontSize);
+
 
 	FadeInSkip();
 
@@ -130,22 +136,22 @@ void SceneOption::Draw()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	//BGM
-	DrawGraph(210, 60, m_handles[kBgmH], true);
+	DrawGraph(210, 120, m_handles[kBgmH], true);
 	//SE
-	DrawGraph(210, 180, m_handles[kSeH], true);
+	DrawGraph(210, 240, m_handles[kSeH], true);
 	//Sensitivity
-	DrawGraph(210, 300, m_handles[kSensitivityH], true);
+	DrawGraph(210, 360, m_handles[kSensitivityH], true);
 	//FullScreen
-	DrawGraph(210, 420, m_handles[kFullScreenH], true);
+	DrawGraph(210, 480, m_handles[kFullScreenH], true);
 
-	DrawGraph(510, 60, m_handles[kBarH], true);
-	DrawGraph(510, 180, m_handles[kBarH], true);
-	DrawGraph(510, 300, m_handles[kBarH], true);
-	DrawGraph(510, 420, m_handles[kMathH], true);
+	DrawGraph(510, 120, m_handles[kBarH], true);
+	DrawGraph(510, 240, m_handles[kBarH], true);
+	DrawGraph(510, 360, m_handles[kBarH], true);
+	DrawGraph(510, 480, m_handles[kMathH], true);
 
-	DrawGraph(510 + m_bgmScale * 3.68, 64, m_handles[kPointH], true);
-	DrawGraph(510 + m_seScale * 3.68, 184, m_handles[kPointH], true);
-	DrawGraph(510 + m_sensitivityScale * 3.68, 304, m_handles[kPointH], true);
+	DrawGraph(510 + m_bgmScale * 3.68, 124, m_handles[kPointH], true);
+	DrawGraph(510 + m_seScale * 3.68, 244, m_handles[kPointH], true);
+	DrawGraph(510 + m_sensitivityScale * 3.68, 364, m_handles[kPointH], true);
 
 	if (m_isFullScreen)
 	{
@@ -154,26 +160,30 @@ void SceneOption::Draw()
 
 	DrawGraph(0, 660, m_handles[kBackH], true);
 
-	DrawFormatString(960, 75, 0xffffff, "%d", m_bgmScale);
-	DrawFormatString(960, 195, 0xffffff, "%d", m_seScale);
-	DrawFormatString(960, 315, 0xffffff, "%d", m_sensitivityScale);
+	//DrawFormatString(960, 135, 0xffffff, "%d", m_bgmScale);
+	//DrawFormatString(960, 255, 0xffffff, "%d", m_seScale);
+	//DrawFormatString(960, 375, 0xffffff, "%d", m_sensitivityScale);
+
+	DrawFormatStringToHandle(960, 125, 0xffffff, m_fontHandle, "%d", m_bgmScale);
+	DrawFormatStringToHandle(960, 245, 0xffffff, m_fontHandle, "%d", m_seScale);
+	DrawFormatStringToHandle(960, 365, 0xffffff, m_fontHandle, "%d", m_sensitivityScale);
 
 	//選択
 	if (m_nowItem == e_Item::kBgm)
 	{
-		DrawGraph(100 + m_selectAnimation, 70, m_handles[kPointerH], true);
+		DrawGraph(130 + m_selectAnimation, 130, m_handles[kPointerH], true);
 	}
 	if (m_nowItem == e_Item::kSe)
 	{
-		DrawGraph(100 + m_selectAnimation, 190, m_handles[kPointerH], true);
+		DrawGraph(130 + m_selectAnimation, 250, m_handles[kPointerH], true);
 	}
 	else if (m_nowItem == e_Item::kSensitivity)
 	{
-		DrawGraph(100 + m_selectAnimation, 310, m_handles[kPointerH], true);
+		DrawGraph(130 + m_selectAnimation, 370, m_handles[kPointerH], true);
 	}
 	else if (m_nowItem == e_Item::kFullScreen)
 	{
-		DrawGraph(100 + m_selectAnimation, 430, m_handles[kPointerH], true);
+		DrawGraph(130 + m_selectAnimation, 490, m_handles[kPointerH], true);
 	}
 
 #ifdef _DEBUG
