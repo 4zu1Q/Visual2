@@ -187,7 +187,7 @@ void SceneSelect::Update()
 void SceneSelect::Draw()
 {
 	m_pPlayer->Draw(*m_pPlayerWeapon);
-	m_pPlayer->ShadowRender(m_pField->GetModelHandle());
+	//m_pPlayer->ShadowRender(m_pField->GetModelHandle());
 
 	m_pSkyDome->Draw();
 	m_pField->Draw();
@@ -207,7 +207,7 @@ void SceneSelect::Draw()
 
 #endif
 
-	DrawFormatString(900, 280, 0xffffff, " PlayerHp : %f ", m_pPlayer->GetHp());
+	//DrawFormatString(900, 280, 0xffffff, " PlayerHp : %f ", m_pPlayer->GetHp());
 
 
 	if (!m_isFadeColor)

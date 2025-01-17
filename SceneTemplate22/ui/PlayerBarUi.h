@@ -2,6 +2,7 @@
 
 #include "util/Vec2.h"
 
+#include <vector>
 
 class Player;
 class PlayerBarUi
@@ -19,13 +20,10 @@ private:
 	float m_playerMp;
 	float m_playerStamina;
 
-	//float m_playerPrevMp;
-	//float m_playerPrevStamina;
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
 
 	bool m_isPlayerStamina;
-
-	int m_playerHpH;
-	int m_playerHpLostH;
 
 };
 

@@ -160,10 +160,6 @@ void SceneOption::Draw()
 
 	DrawGraph(0, 660, m_handles[kBackH], true);
 
-	//DrawFormatString(960, 135, 0xffffff, "%d", m_bgmScale);
-	//DrawFormatString(960, 255, 0xffffff, "%d", m_seScale);
-	//DrawFormatString(960, 375, 0xffffff, "%d", m_sensitivityScale);
-
 	DrawFormatStringToHandle(960, 125, 0xffffff, m_fontHandle, "%d", m_bgmScale);
 	DrawFormatStringToHandle(960, 245, 0xffffff, m_fontHandle, "%d", m_seScale);
 	DrawFormatStringToHandle(960, 365, 0xffffff, m_fontHandle, "%d", m_sensitivityScale);

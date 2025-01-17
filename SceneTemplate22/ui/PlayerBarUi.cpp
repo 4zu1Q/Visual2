@@ -23,6 +23,24 @@ namespace
 	//HP座標
 	const Vec2 kHpPos = { 34.0f , 15.0f };
 
+	const Vec2 kMpLeftBarPos = { 60.0f , 60.0f };
+	const Vec2 kMpRightBarPos = { 60.0f , 75.0f };
+	const Vec2 kStaminaLeftBarPos = { 60.0f , 89.0f };
+	const Vec2 kStaminaRightBarPos = { 60.0f , 104.0f };
+
+	const Vec2 kMpBarPos = { 20.0f , 40.0f };
+	const Vec2 kStaminaBarPos = { 20.0f , 70.0f };
+
+
+
+	//使う画像の種類
+	enum e_Ui
+	{
+		kHpH,
+		kHpLostH,
+		kStaminaBarH,
+		kMpBarH,
+	};
 
 }
 
@@ -30,17 +48,25 @@ PlayerBarUi::PlayerBarUi():
 	m_playerHp(0.0f),
 	m_playerMp(0.0f),
 	m_playerStamina(0.0f),
-	m_isPlayerStamina(false),
-	m_playerHpH(LoadGraph(kHpFileName)),
-	m_playerHpLostH(LoadGraph(kHpLostFileName))
+	m_isPlayerStamina(false)
 {
+	m_handles.push_back(LoadGraph("Data/Image/Hp.png"));
+	m_handles.push_back(LoadGraph("Data/Image/HpLost.png"));
+	m_handles.push_back(LoadGraph("Data/Image/StaminaBar01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/StaminaBar01.png"));
 
 }
 
 PlayerBarUi::~PlayerBarUi()
 {
-	DeleteGraph(m_playerHpH);
-	DeleteGraph(m_playerHpLostH);
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
+
+	m_handles.clear();
+
 }
 
 void PlayerBarUi::Update(Player& player)
@@ -53,38 +79,37 @@ void PlayerBarUi::Update(Player& player)
 
 void PlayerBarUi::Draw()
 {
-	//変動しないバー
-	DrawBox(34, 55, 34 + kMaxMp, 70, 0x000000, true);
-	DrawBox(34, 75, 34 + kMaxStamina, 90, 0x000000, true);
+
+	DrawBox(kMpLeftBarPos.x, kMpLeftBarPos.y, kMpRightBarPos.x + kMaxMp, kMpRightBarPos.y, 0x000000, true);
+	DrawBox(kStaminaLeftBarPos.x, kStaminaLeftBarPos.y, kStaminaRightBarPos.x + kMaxStamina, kStaminaRightBarPos.y, 0x000000, true);
 
 	//少し遅れて変動するバー
+	
 
 
 	//変動するバー
-	DrawBox(34, 55, 34 + m_playerMp, 70, 0x00bfff, true);
+	DrawBox(kMpLeftBarPos.x, kMpLeftBarPos.y, kMpRightBarPos.x + m_playerMp, kMpRightBarPos.y, 0x00bfff, true);
 
 	if (!m_isPlayerStamina)
 	{
-		DrawBox(34, 75, 34 + m_playerStamina, 90, 0x00ff00, true);
+		DrawBox(kStaminaLeftBarPos.x, kStaminaLeftBarPos.y, kStaminaRightBarPos.x + m_playerStamina, kStaminaRightBarPos.y, 0x00ff00, true);
 	}
 	else
 	{
-		DrawBox(34, 75, 34 + m_playerStamina, 90, 0xffa500, true);
+		DrawBox(kStaminaLeftBarPos.x, kStaminaLeftBarPos.y, kStaminaRightBarPos.x + m_playerStamina, kStaminaRightBarPos.y, 0xffa500, true);
 	}
-
-	//枠
-	//DrawBox(32, 10, 374, 50, 0xffffff, false);
-	DrawBox(34, 55, 334, 70, 0xffffff, false);
-	DrawBox(34, 75, 334, 90, 0xffffff, false);
 
 	//プレイヤーのロストした時のHP
 	for (int i = 1; i <= static_cast<int>(kMaxHp); i++)
 	{
-		DrawGraph(kHpPos.x * i, kHpPos.y, m_playerHpLostH, true);
+		DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpLostH], true);
 	}
 	//プレイヤーのHP
 	for (int i = 1; i <= static_cast<int>(m_playerHp); i++)
 	{
-		DrawGraph(kHpPos.x * i, kHpPos.y, m_playerHpH, true);
+		DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpH], true);
 	}
+
+	//DrawGraph(kMpBarPos.x, kMpBarPos.y, m_handles[kMpBarH], true);
+	//DrawGraph(kStaminaBarPos.x, kStaminaBarPos.y, m_handles[kStaminaBarH], true);
 }

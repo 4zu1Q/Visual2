@@ -33,9 +33,6 @@ void HpBar::Update(BossPower& boss)
 
 void HpBar::Draw()
 {
-
 	DrawBox(440, 82, 440 + kMaxHp, 90, 0x000000, true);
 	DrawBox(440, 82, 440 + m_bossHp, 90, 0xff6347, true);
-
-	//DrawBox(440, 85, 440 + kMaxHp, 90, 0xffffff, false);
 }

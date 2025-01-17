@@ -178,6 +178,15 @@ void SceneTitle::Update()
 				m_isToNextScene = true;
 			}
 
+			if (m_sceneTrans == e_SceneTrans::kLoadGame)
+			{
+				SoundManager::GetInstance().PlaySe("dectionSe");
+				m_isActionStart = true;
+				m_isActionBack = false;
+				StartFadeOut();
+				m_isToNextScene = true;
+			}
+
 			if (m_sceneTrans == e_SceneTrans::kOption)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
@@ -213,7 +222,16 @@ void SceneTitle::Update()
 				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
 				SoundManager::GetInstance().StopBgm("titleBgm");
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
-				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kSpeed, Game::e_StageKind::kGamePlay));
+				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
+				return;
+			}
+
+			if (m_sceneTrans == e_SceneTrans::kLoadGame)
+			{
+				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
+				SoundManager::GetInstance().StopBgm("titleBgm");
+				//m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
 				return;
 			}
 		}
