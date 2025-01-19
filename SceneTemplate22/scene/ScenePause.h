@@ -29,6 +29,7 @@ private:
 		kRestart,				//リスタート
 		kOption,				//オプション
 		kSelect,				//セレクト
+		kTitle,					//タイトル
 	};
 
 	//画像ハンドルこれで全ての画像をロードする

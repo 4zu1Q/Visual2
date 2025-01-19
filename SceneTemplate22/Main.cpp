@@ -2,7 +2,7 @@
 
 #include "myLib/MyLib.h"
 
-#include "EffekseerForDXLib.h"
+//#include "EffekseerForDXLib.h"
 
 #include "SceneManager.h"
 #include "SceneTitle.h"
@@ -56,13 +56,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetUseBackCulling(true);
 
 	//エフェクシアを初期化
-	Effekseer_Init(800);
+	//Effekseer_Init(800);
 	//エフェクシアの歪み機能を初期化する
-	Effekseer_InitDistortion();
+	//Effekseer_InitDistortion();
 	// 画面モード変更時( とウインドウモード変更時 )にグラフィックスシステムの設定やグラフィックハンドルをリセットするかどうかを設定する( TRUE:リセットする( デフォルト )  FALSE:リセットしない )
-	SetChangeScreenModeGraphicsSystemResetFlag(false);
+	//SetChangeScreenModeGraphicsSystemResetFlag(false);
 	//デバイスがロストした時のコールバックを設定
-	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
+	//Effekseer_SetGraphicsDeviceLostCallbackFunctions();
 
 
 	//サウンドのボリュームをここで変える
@@ -88,11 +88,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// 描画を行う前に画面をクリアする
 		ClearDrawScreen();
 
-		Effekseer_Sync3DSetting();
+		//Effekseer_Sync3DSetting();
 
 		// ゲームの処理
 		pSceneManager.Update();
-		UpdateEffekseer3D();
+		//UpdateEffekseer3D();
 		pSceneManager.Draw();
 
 		// 画面が切り替わるのを待つ

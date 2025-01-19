@@ -1,6 +1,6 @@
 ﻿#include "EffectManager.h"
 #include "EffectManager.h"
-#include "EffekseerForDXLib.h"
+//#include "EffekseerForDXLib.h"
 
 #include <cassert>
 
@@ -11,7 +11,7 @@ EffectManager::~EffectManager()
 	//まずすでに同じパスのエフェクトがロードされていないか確認する
 	for (auto& effect : m_effect)
 	{
-		DeleteEffekseerEffect(effect.second->emitterHandle);
+		//DeleteEffekseerEffect(effect.second->emitterHandle);
 	}
 }
 
@@ -28,7 +28,7 @@ void EffectManager::Load(std::string name, const char* path, int endFrame, float
 
 	//ここまで来たらエフェクトをロードする
 	std::shared_ptr<EffectEmitter> add = std::make_shared<EffectEmitter>();
-	add->emitterHandle = LoadEffekseerEffect(path, scale);
+	//add->emitterHandle = LoadEffekseerEffect(path, scale);
 	assert(add->emitterHandle != -1 && "エフェクトロード失敗");
 	add->endFrame = endFrame;
 
@@ -38,7 +38,7 @@ void EffectManager::Load(std::string name, const char* path, int endFrame, float
 
 void EffectManager::Update()
 {
-	UpdateEffekseer3D();
+	//UpdateEffekseer3D();
 
 	//エフェクトの更新
 	for (auto& effects : m_effect)
@@ -47,7 +47,7 @@ void EffectManager::Update()
 		{
 			if (ef.frame > effects.second->endFrame)
 			{
-				StopEffekseer3DEffect(ef.handle);
+				//StopEffekseer3DEffect(ef.handle);
 				ef.isExist = false;
 			}
 
@@ -65,7 +65,7 @@ void EffectManager::Update()
 
 void EffectManager::Draw()
 {
-	DrawEffekseer3D();
+	//DrawEffekseer3D();
 }
 
 void EffectManager::CreateEffect(std::string name, VECTOR pos, VECTOR rot)
@@ -86,15 +86,15 @@ void EffectManager::CreateEffect(std::string name, VECTOR pos, VECTOR rot)
 	}
 
 	Effect add;
-	add.handle = PlayEffekseer3DEffect(handle);
+	//add.handle = PlayEffekseer3DEffect(handle);
 	add.frame = 0;
 	add.x = pos.x;
 	add.y = pos.y;
 	add.z = pos.z;
 	add.isExist = true;
 
-	SetPosPlayingEffekseer3DEffect(add.handle, add.x, add.y, add.z);
-	SetRotationPlayingEffekseer3DEffect(add.handle, rot.x, rot.y, rot.z);
+	//SetPosPlayingEffekseer3DEffect(add.handle, add.x, add.y, add.z);
+	//SetRotationPlayingEffekseer3DEffect(add.handle, rot.x, rot.y, rot.z);
 
 	m_effect[name]->effects.emplace_back(add);
 
@@ -115,7 +115,7 @@ void EffectManager::SetPos(std::string name, VECTOR pos)
 				ef.y = pos.y;
 				ef.z = pos.z;
 
-				SetPosPlayingEffekseer3DEffect(ef.handle, ef.x, ef.y, ef.z);
+				//SetPosPlayingEffekseer3DEffect(ef.handle, ef.x, ef.y, ef.z);
 
 			}
 		}
@@ -132,7 +132,7 @@ void EffectManager::SetRotation(std::string name, VECTOR rot)
 		{
 			for (auto& ef : effects.second->effects)
 			{
-				SetRotationPlayingEffekseer3DEffect(ef.handle, rot.x, rot.y, rot.z);
+				//SetRotationPlayingEffekseer3DEffect(ef.handle, rot.x, rot.y, rot.z);
 			}
 		}
 	}

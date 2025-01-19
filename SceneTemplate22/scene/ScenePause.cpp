@@ -3,6 +3,7 @@
 #include "SceneManager.h"
 #include "ScenePause.h"
 #include "SceneTitle.h"
+#include "SceneSelect.h"
 #include "SceneOption.h"
 
 #include "util/Game.h"
@@ -17,6 +18,11 @@ namespace
 
 	//const char* const kPauseFilename = "Data/Image/Pause2.png";
 	const Vec2 kPausePos = { 0.0f , 0.0f };
+	const Vec2 kReStartPos = { 160.0f , 120.0f };
+	const Vec2 kOptionPos = { 160.0f , 240.0f };
+	const Vec2 kSelectPos = { 160.0f , 360 };
+	const Vec2 kTitlePos = { 160.0f , 480.0f };
+	const Vec2 kBackPos = { 0.0f , 660.0f };
 
 
 
@@ -29,6 +35,7 @@ namespace
 		kPauseH,
 		kReStartH,
 		kOptionH,
+		kSelectH,
 		kTitleH,
 		kBackH,
 		kPointerH,
@@ -45,6 +52,7 @@ ScenePause::ScenePause(SceneManager& manager) :
 	m_handles.push_back(LoadGraph("Data/Image/Pause2.png"));
 	m_handles.push_back(LoadGraph("Data/Image/ReStart.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Start_Back.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));
@@ -64,6 +72,7 @@ void ScenePause::Update()
 	Pad::Update();
 	//フェードを更新
 	UpdateFade();
+	UpdateFadeGraph();
 
 	if (!m_isToNextScene)
 	{
@@ -74,26 +83,30 @@ void ScenePause::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
+				FadeGraphReset();
 			}
 			else if (m_sceneTrans == e_SceneTrans::kRestart)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kSelect;
+				FadeGraphReset();
 			}
 		}
 
 		//下を押した場合
 		if (Pad::IsTrigger(PAD_INPUT_DOWN))
 		{
-			if (m_sceneTrans != e_SceneTrans::kSelect)
+			if (m_sceneTrans != e_SceneTrans::kTitle)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
+				FadeGraphReset();
 			}
-			else if (m_sceneTrans == e_SceneTrans::kSelect)
+			else if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kRestart;
+				FadeGraphReset();
 			}
 		}
 
@@ -117,6 +130,12 @@ void ScenePause::Update()
 				m_isToNextScene = true;
 				StartFadeOut();	//フェードアウト開始
 			}
+			if (m_sceneTrans == e_SceneTrans::kTitle)
+			{
+				SoundManager::GetInstance().PlaySe("dectionSe");
+				m_isToNextScene = true;
+				StartFadeOut();	//フェードアウト開始
+			}
 		}
 
 		//スタートボタンを押した場合
@@ -135,6 +154,11 @@ void ScenePause::Update()
 		if (!IsFadingOut())
 		{
 			if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_pManager.ChangeAndClearScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
+				return;
+			}
+			else if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				m_pManager.ChangeAndClearScene(std::make_shared<SceneTitle>(m_pManager));
 				return;
@@ -172,26 +196,56 @@ void ScenePause::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRestart) * kTextIntervalY, 0xffffff, "Restart");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
 
 
-	DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
-	DrawGraph(160, 120, m_handles[kReStartH], true);
-	DrawGraph(160, 240, m_handles[kOptionH], true);
-	DrawGraph(160, 360, m_handles[kTitleH], true);
-	DrawGraph(0, 660, m_handles[kBackH], true);
+
+	DrawGraph(kBackPos.x, kBackPos.y, m_handles[kBackH], true);
 
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kRestart)
 	{
 		DrawGraph(110 + m_selectAnimation, 130, m_handles[kPointerH], true);
+
+		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
+		
+		DrawFadeGraph(m_handles[kReStartH], kReStartPos);
+		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
+		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kTitleH], true);
+		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
 	if (m_sceneTrans == e_SceneTrans::kOption)
 	{
 		DrawGraph(110 + m_selectAnimation, 250, m_handles[kPointerH], true);
+
+		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
+
+		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
+		DrawFadeGraph(m_handles[kOptionH], kOptionPos);
+		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kTitleH], true);
+		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
 	else if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
 		DrawGraph(110 + m_selectAnimation, 370, m_handles[kPointerH], true);
+
+		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
+		
+		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
+		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
+		DrawFadeGraph(m_handles[kSelectH], kSelectPos);
+		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
+	}
+	else if (m_sceneTrans == e_SceneTrans::kTitle)
+	{
+		DrawGraph(110 + m_selectAnimation, 490, m_handles[kPointerH], true);
+
+		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
+		
+		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
+		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
+		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
+		DrawFadeGraph(m_handles[kTitleH], kTitlePos);
 	}
 
 	DrawFade(0x000000);

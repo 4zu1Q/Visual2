@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include "DxLib.h"
+#include "util/Vec2.h"
 
 class SceneManager;
 
@@ -90,7 +91,22 @@ protected:
 	/// </summary>
 	void FadeOutSkip();
 
+	/// <summary>
+	/// グラフのフェードを行う関数
+	/// </summary>
+	void UpdateFadeGraph();
 
+	/// <summary>
+	/// 特定の画像をフェード描画させる関数(DrawGraphのみ使うことができる)
+	/// </summary>
+	/// <param name="graphHandle">フェードさせる画像ハンドル</param>
+	/// <param name="graphPos">フェードさせる画像の座標</param>
+	void DrawFadeGraph(int graphHandle , Vec2 graphPos);
+
+	/// <summary>
+	/// フェードの時間を0にリセットする関数
+	/// </summary>
+	void FadeGraphReset();
 
 protected:
 
@@ -105,5 +121,6 @@ private:
 	int m_fadeBright;
 	int m_fadeSpeed;
 
+	int m_fadeGraphTime;
 };
 

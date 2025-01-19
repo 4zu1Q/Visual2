@@ -53,7 +53,7 @@ PlayerBarUi::PlayerBarUi():
 	m_handles.push_back(LoadGraph("Data/Image/Hp.png"));
 	m_handles.push_back(LoadGraph("Data/Image/HpLost.png"));
 	m_handles.push_back(LoadGraph("Data/Image/StaminaBar01.png"));
-	m_handles.push_back(LoadGraph("Data/Image/StaminaBar01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/BarFlame.png"));
 
 }
 
@@ -110,6 +110,6 @@ void PlayerBarUi::Draw()
 		DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpH], true);
 	}
 
-	//DrawGraph(kMpBarPos.x, kMpBarPos.y, m_handles[kMpBarH], true);
-	//DrawGraph(kStaminaBarPos.x, kStaminaBarPos.y, m_handles[kStaminaBarH], true);
+	DrawGraph(kMpBarPos.x, kMpBarPos.y, m_handles[kMpBarH], true);
+	DrawGraph(kStaminaBarPos.x, kStaminaBarPos.y, m_handles[kStaminaBarH], true);
 }

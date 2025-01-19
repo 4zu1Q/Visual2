@@ -22,6 +22,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	m_fadeSpeed = -kFadeSpeed;
 	m_isToNextScene = false;
 	m_isFadeColor = false;
+	m_fadeGraphTime = 0;
 
 	/*サウンドのロード*/
 	//BGM
@@ -56,7 +57,7 @@ SceneBase::SceneBase(SceneManager& manager):
 
 
 	/*エフェクトのロード*/
-	EffectManager::GetInstance().Load("hitEffect", "Data/Effect/player_hit.efk", 1200.0f , 10.0f);
+	//EffectManager::GetInstance().Load("hitEffect", "Data/Effect/player_hit.efk", 1200.0f , 10.0f);
 
 
 }
@@ -135,4 +136,36 @@ void SceneBase::FadeOutSkip()
 {
 	m_fadeBright = 255;
 	m_fadeSpeed = kFadeSpeed;
+}
+
+void SceneBase::UpdateFadeGraph()
+{
+	// スタート指示を点滅させる
+	if (m_fadeGraphTime == 120) {
+		m_fadeGraphTime++;
+	}
+	else if (m_fadeGraphTime == 1) {
+		m_fadeGraphTime--;
+	}
+	else if (m_fadeGraphTime % 2 == 0) {
+		m_fadeGraphTime += 2;
+	}
+	else {
+		m_fadeGraphTime -= 2;
+	}
+}
+
+void SceneBase::DrawFadeGraph(int graphHandle, Vec2 graphPos)
+{
+	// フェードしながら描画
+	int alpha = static_cast<int>(255 * ((float)m_fadeGraphTime / 90));
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+	// 画像の描画
+	DrawGraph(graphPos.x, graphPos.y, graphHandle, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void SceneBase::FadeGraphReset()
+{
+	m_fadeGraphTime = 120;
 }

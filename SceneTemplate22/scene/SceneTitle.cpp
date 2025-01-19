@@ -40,13 +40,16 @@ namespace
 	constexpr int kTextIntervalY = 24;
 
 	//タイトルロゴのポジション　※この型で画像などの移動を行っていく
-	const Vec2 kTitleLogoPos = { 40.0f , 40.0f };
+	const Vec2 kTitleLogoPos = { 255 , 100 };
 	
 	//UIのポジション定数
-	constexpr VECTOR kNewGamePos = { 900.0f , 320.0f };
-	constexpr VECTOR kLoadGamePos = { 900.0f , 320.0f };
-	constexpr VECTOR kOptionPos = { 900.0f , 440.0f };
-	constexpr VECTOR EndPos = { 900.0f , 560.0f };
+	const Vec2 kNewGamePos = { 550.0f , 420.0f };
+	const Vec2 kLoadGamePos = { 550.0f , 480.0f };
+	const Vec2 kOptionPos = { 550.0f , 540.0f };
+	const Vec2 kEndPos = { 550.0f , 600.0f };
+
+	const Vec2 kAnyPreesButtonPos = { 520.0f , 420.0f };
+
 
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
@@ -101,6 +104,7 @@ void SceneTitle::Update()
 
 	Pad::Update();
 	UpdateFade();
+	UpdateFadeGraph();
 
 	m_pCameraProduction->Update();
 	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
@@ -142,11 +146,13 @@ void SceneTitle::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
+				FadeGraphReset();
 			}
 			else if (m_sceneTrans == e_SceneTrans::kNewGame)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kQuit;
+				FadeGraphReset();
 			}
 		}
 
@@ -157,11 +163,13 @@ void SceneTitle::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
+				FadeGraphReset();
 			}
 			else if (m_sceneTrans == e_SceneTrans::kQuit)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kNewGame;
+				FadeGraphReset();
 			}
 		}
 
@@ -249,15 +257,14 @@ void SceneTitle::Draw()
 	//背景座標
 	m_pCameraProduction->Draw();
 	m_pPlayerProduction->Draw();
-	//m_pPlayerProduction->ShadowRender(m_pTitleField->GetModelHandle());
 	m_pSkyDome->Draw();
 	m_pTitleField->Draw();
 
 	if (!m_isStart)
 	{
 		//ロゴ
-		DrawGraph(255, 100, m_handles[kLogoH], true);
-		DrawGraph(520, 420, m_handles[kPleasePressH], true);
+		DrawGraph(kTitleLogoPos.x, kTitleLogoPos.y, m_handles[kLogoH], true);
+		DrawFadeGraph(m_handles[kPleasePressH], kAnyPreesButtonPos);
 
 	}
 	else if(m_isStart)
@@ -267,29 +274,58 @@ void SceneTitle::Draw()
 		if (m_sceneTrans == e_SceneTrans::kNewGame)
 		{
 			DrawGraph(520 + m_selectAnimation, 430, m_handles[kPointerH], true);
+
+			//ニューゲーム
+			DrawFadeGraph(m_handles[kNewGameH], kNewGamePos);
+			//ロード
+			DrawGraph(kLoadGamePos.x, kLoadGamePos.y, m_handles[kLoadGameH], true);
+			//オプション
+			DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
+			//エンド
+			DrawGraph(kEndPos.x, kEndPos.y, m_handles[kQuitH], true);
 		}
 		if (m_sceneTrans == e_SceneTrans::kLoadGame)
 		{
 			DrawGraph(520 + m_selectAnimation, 490, m_handles[kPointerH], true);
+
+			//ニューゲーム
+			DrawGraph(kNewGamePos.x, kNewGamePos.y, m_handles[kNewGameH], true);
+			//ロード
+			DrawFadeGraph(m_handles[kLoadGameH], kLoadGamePos);
+			//オプション
+			DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
+			//エンド
+			DrawGraph(kEndPos.x, kEndPos.y, m_handles[kQuitH], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kOption)
 		{
 			DrawGraph(550 + m_selectAnimation, 550, m_handles[kPointerH], true);
+
+			//ニューゲーム
+			DrawGraph(kNewGamePos.x, kNewGamePos.y, m_handles[kNewGameH], true);
+			//ロード
+			DrawGraph(kLoadGamePos.x, kLoadGamePos.y, m_handles[kLoadGameH], true);
+			//オプション
+			DrawFadeGraph(m_handles[kOptionH], kOptionPos);
+			//エンド
+			DrawGraph(kEndPos.x, kEndPos.y, m_handles[kQuitH], true);
 		}
 		else if (m_sceneTrans == e_SceneTrans::kQuit)
 		{
 			DrawGraph(570 + m_selectAnimation, 610, m_handles[kPointerH], true);
+
+			//ニューゲーム
+			DrawGraph(kNewGamePos.x, kNewGamePos.y, m_handles[kNewGameH], true);
+			//ロード
+			DrawGraph(kLoadGamePos.x, kLoadGamePos.y, m_handles[kLoadGameH], true);
+			//オプション
+			DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
+			//エンド
+			DrawFadeGraph(m_handles[kQuitH], kEndPos);
 		}
 
 		DrawGraph(255, 100, m_handles[kLogoH], true);
-		//ニューゲーム
-		DrawGraph(550, 420, m_handles[kNewGameH], true);
-		//ロード
-		DrawGraph(550, 480, m_handles[kLoadGameH], true);
-		//オプション
-		DrawGraph(550, 540, m_handles[kOptionH], true);
-		//エンド
-		DrawGraph(550, 600, m_handles[kQuitH], true);
+
 
 
 	}

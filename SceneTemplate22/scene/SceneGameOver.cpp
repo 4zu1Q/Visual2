@@ -25,9 +25,12 @@ namespace
 	{
 		kGameOverH,
 		kSelectH,
-		kTitleH,
+		kGamePlayH,
 		kPointerH,
 	};
+
+	const Vec2 kSelectPos = { 800.0f , 600.0f };
+	const Vec2 kGamePlayPos = { 400.0f , 600.0f };
 
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
@@ -71,6 +74,7 @@ void SceneGameOver::Update()
 {
 	Pad::Update();
 	UpdateFade();
+	UpdateFadeGraph();
 
 	m_pCameraProduction->Update();
 	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
@@ -182,18 +186,25 @@ void SceneGameOver::Draw()
 	if (m_sceneTrans == e_SceneTrans::kGamePlay)
 	{
 		DrawGraph(360 + m_selectAnimation, 615, m_handles[kPointerH], true);
+
+		//GamePlay
+		DrawFadeGraph(m_handles[kGamePlayH], kGamePlayPos);
+		//Select
+		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 	}
 	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
 		DrawGraph(760 + m_selectAnimation, 615, m_handles[kPointerH], true);
+
+		//GamePlay
+		DrawGraph(kGamePlayPos.x, kGamePlayPos.y, m_handles[kGamePlayH], true);
+		//Select
+		DrawFadeGraph(m_handles[kSelectH], kSelectPos);
 	}
 
 	DrawGraph(380, 100, m_handles[kGameOverH], true);
 
-	//Select
-	DrawGraph(800, 600, m_handles[kSelectH], true);
-	//GamePlay
-	DrawGraph(400, 600, m_handles[kTitleH], true);
+
 
 	DrawString(0, 0, "Scene Game Over", 0xffffff, false);
 
