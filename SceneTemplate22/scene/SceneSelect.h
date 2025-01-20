@@ -70,7 +70,7 @@ private:
 		kPowerTypeBoss,		//パワータイプのボス
 		kSpeedTypeBoss,		//スピードタイプのボス
 		kShooterTypeBoss,	//遠距離タイプのボス
-		kRastBoss,			//ラスボス
+		kRastTypeBoss,			//ラスボス
 	};
 
 	e_SceneTrans m_sceneTrans;
@@ -89,6 +89,14 @@ private:
 
 	bool m_isFadingOut;
 	float m_cameraAngle;
+
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
+
+	bool m_isPowerStage;
+	bool m_isSpeedStage;
+	bool m_isShotStage;
+	bool m_isRastStage;
 
 };
 

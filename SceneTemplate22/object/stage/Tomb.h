@@ -28,22 +28,33 @@ public:
 	/// </summary>
 	/// <param name="pPlayer"></param>
 	/// <returns></returns>
-	bool TombPHit(std::shared_ptr<Player> pPlayer);
+	bool TombPowerHit(std::shared_ptr<Player> pPlayer);
 
 	/// <summary>
 	/// スピードボスシーンに行くための墓の当たり判定
 	/// </summary>
 	/// <param name="pPlayer"></param>
 	/// <returns></returns>
-	bool TombSHit(std::shared_ptr<Player> pPlayer);
+	bool TombSpeedHit(std::shared_ptr<Player> pPlayer);
+
+	/// <summary>
+	/// ショットボスシーンに行くための墓の当たり判定
+	/// </summary>
+	/// <param name="pPlayer"></param>
+	/// <returns></returns>
+	bool TombShotHit(std::shared_ptr<Player> pPlayer);
 
 	/// <summary>
 	/// ラスボスシーンに行くための墓の当たり判定
 	/// </summary>
 	/// <param name="pPlayer"></param>
 	/// <returns></returns>
-	bool TombRHit(std::shared_ptr<Player> pPlayer);
+	bool TombRastHit(std::shared_ptr<Player> pPlayer);
 
+	const VECTOR& GetPowerPos() const { return m_posPower; }
+	const VECTOR& GetSpeedPos() const { return m_posSpeed; }
+	const VECTOR& GetShotPos() const { return m_posShot; }
+	const VECTOR& GetRastPos() const { return m_posRast; }
 
 private:
 	//ボスの当たり判定の半径
@@ -53,9 +64,10 @@ private:
 	int m_radiusRB;
 
 	//墓のポジション
-	VECTOR m_posP;
-	VECTOR m_posS;
-	VECTOR m_posR;
+	VECTOR m_posPower;
+	VECTOR m_posSpeed;
+	VECTOR m_posShot;
+	VECTOR m_posRast;
 
 };
 

@@ -125,7 +125,7 @@ void SceneDebug::Update()
 
 		if (m_sceneTrans == e_SceneTrans::kGameOver)
 		{
-			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager));
+			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, Game::e_BossKind::kPower));
 			return;
 		}
 

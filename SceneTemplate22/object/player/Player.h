@@ -109,6 +109,10 @@ public:
 	//ゲームオーバーのフラグを取得
 	const bool& GetIsGameOver() const { return m_isGameOver; }
 
+	//半径の取得
+	const float& GetRadius() const;
+
+
 
 	/*プレイヤーがボスを倒したかどうかのフラグを取得する関数*/
 	//これ多分必要ない可能性
@@ -130,6 +134,7 @@ public:
 	void SetIsStrongestFace(const bool isStrongestFace) { m_isStrongestFace = isStrongestFace; }
 
 	void ShadowRender(int stageH);
+
 private:
 	void OnCollide(const Collidable& colider);
 

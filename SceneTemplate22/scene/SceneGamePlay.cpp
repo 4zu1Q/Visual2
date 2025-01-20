@@ -13,6 +13,7 @@
 #include "object/boss/BossPower.h"
 #include "object/boss/BossSpeed.h"
 #include "object/boss/BossShot.h"
+#include "object/boss/BossRast.h"
 #include "object/Camera.h"
 #include "object/Camera2.h"
 
@@ -49,7 +50,6 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 	m_selectTime(0),
 	m_cameraAngle(0.0f)
 {
-	m_bossKind = e_BossKind::kPower;
 
 	m_pPlayer = std::make_shared<Player>();
 	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
@@ -63,6 +63,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 	m_pBossPower = std::make_shared<BossPower>();
 	m_pBossSpeed = std::make_shared<BossSpeed>();
 	m_pBossShot = std::make_shared<BossShot>();
+	m_pBossRast = std::make_shared<BossRast>();
+
 
 	m_pField = std::make_shared<Field>(stageKind);
 
@@ -93,7 +95,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
-		m_pBossShot->Initialize(m_pPhysics);
+		m_pBossRast->Initialize(m_pPhysics);
 	}
 
 	m_pCamera2->Initialize(m_pPlayer->GetPos());
@@ -108,6 +110,7 @@ SceneGamePlay::~SceneGamePlay()
 	m_pBossPower->Finalize(m_pPhysics);
 	m_pBossSpeed->Finalize(m_pPhysics);
 	m_pBossShot->Finalize(m_pPhysics);
+	m_pBossRast->Finalize(m_pPhysics);
 }
 
 
@@ -134,7 +137,7 @@ void SceneGamePlay::Update()
 #endif
 
 	//ボスのHPが0になった場合
-	if (m_pBossPower->GetHp() > 0)
+	if (m_pBossRast->GetHp() > 0)
 	{
 		m_selectTime++;
 	}
@@ -155,7 +158,7 @@ void SceneGamePlay::Update()
 		//なんか入らん後でやる
 		//if (!IsFadingOut())
 		{
-			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager));
+			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
 			return;
 		}
 	}
@@ -185,7 +188,7 @@ void SceneGamePlay::Update()
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
-		//m_pBossRast->Update(m_pPhysics, *m_pPlayer);
+		m_pBossRast->Update(m_pPhysics, *m_pPlayer);
 	}
 
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
@@ -233,7 +236,7 @@ void SceneGamePlay::Draw()
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
-		//m_pBossRast->Draw();
+		m_pBossRast->Draw();
 	}
 
 	m_pPlayer->Draw(*m_pPlayerWeapon);

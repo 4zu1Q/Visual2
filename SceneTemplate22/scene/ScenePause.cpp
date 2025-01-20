@@ -48,11 +48,12 @@ namespace
 ScenePause::ScenePause(SceneManager& manager) :
 	SceneBase(manager)
 {
+
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/Pause2.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Pause3.png"));
 	m_handles.push_back(LoadGraph("Data/Image/ReStart.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Select.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Start_Back.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));
@@ -88,7 +89,7 @@ void ScenePause::Update()
 			else if (m_sceneTrans == e_SceneTrans::kRestart)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
-				m_sceneTrans = e_SceneTrans::kSelect;
+				m_sceneTrans = e_SceneTrans::kTitle;
 				FadeGraphReset();
 			}
 		}
@@ -183,7 +184,12 @@ void ScenePause::Draw()
 #ifdef _DEBUG
 
 
+	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRestart) * kTextIntervalY, 0xffffff, "Restart");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
 
 
 	DrawString(0, 0, "Scene Pause", 0xffffff, false);
@@ -191,12 +197,7 @@ void ScenePause::Draw()
 
 #endif
 
-	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRestart) * kTextIntervalY, 0xffffff, "Restart");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
 
 
 
@@ -211,7 +212,7 @@ void ScenePause::Draw()
 		
 		DrawFadeGraph(m_handles[kReStartH], kReStartPos);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
-		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kTitleH], true);
+		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
 	if (m_sceneTrans == e_SceneTrans::kOption)
@@ -222,7 +223,7 @@ void ScenePause::Draw()
 
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
 		DrawFadeGraph(m_handles[kOptionH], kOptionPos);
-		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kTitleH], true);
+		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
 	else if (m_sceneTrans == e_SceneTrans::kSelect)

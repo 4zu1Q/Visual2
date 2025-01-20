@@ -12,7 +12,6 @@
 
 #include "util/SoundManager.h"
 #include "util/Pad.h"
-#include "util/Game.h"
 
 namespace
 {
@@ -27,6 +26,7 @@ namespace
 		kSelectH,
 		kGamePlayH,
 		kPointerH,
+		kGameOverBgH,
 	};
 
 	const Vec2 kSelectPos = { 800.0f , 600.0f };
@@ -36,7 +36,7 @@ namespace
 	constexpr float kSelectAnimationSize = 4.0f;
 }
 
-SceneGameOver::SceneGameOver(SceneManager& manager) :
+SceneGameOver::SceneGameOver(SceneManager& manager, Game::e_BossKind bossKind) :
 	SceneBase(manager),
 	m_fadeTime(0)
 {
@@ -44,6 +44,7 @@ SceneGameOver::SceneGameOver(SceneManager& manager) :
 	m_isActionBack = false;
 
 	m_sceneTrans = e_SceneTrans::kGamePlay;
+	m_bossKind = bossKind;
 
 	m_pPlayerProduction = std::make_shared<PlayerProduction>();
 	m_pCameraProduction = std::make_shared<CameraProduction>();
@@ -56,6 +57,7 @@ SceneGameOver::SceneGameOver(SceneManager& manager) :
 	m_handles.push_back(LoadGraph("Data/Image/Select.png"));				//Select
 	m_handles.push_back(LoadGraph("Data/Image/Retry.png"));					//Title
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				//矢印
+	m_handles.push_back(LoadGraph("Data/Image/GameOverBg.png"));				//矢印
 }
 
 SceneGameOver::~SceneGameOver()
@@ -98,6 +100,7 @@ void SceneGameOver::Update()
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
+				FadeGraphReset();
 			}
 		}
 
@@ -108,6 +111,7 @@ void SceneGameOver::Update()
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
+				FadeGraphReset();
 			}
 		}
 
@@ -152,7 +156,7 @@ void SceneGameOver::Update()
 			{
 				if (m_sceneTrans == e_SceneTrans::kGamePlay)
 				{
-					m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
+					m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, m_bossKind, Game::e_StageKind::kGamePlay));
 					return;
 				}
 
@@ -174,6 +178,8 @@ void SceneGameOver::Update()
 void SceneGameOver::Draw()
 {
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
+
+	DrawGraph(0, 0, m_handles[kGameOverBgH], true);
 
 	m_pCameraProduction->Draw();
 	m_pPlayerProduction->Draw();

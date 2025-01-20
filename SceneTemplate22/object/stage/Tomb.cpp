@@ -1,200 +1,150 @@
-﻿//#include "Tomb.h"
-//
-//#include "object/player/Player.h"
-//
-//namespace
-//{
-//	constexpr float kRotSpeed = 0.009f;
-//
-//	const char* const kItemHpModelFilename = "Data/Model/Obj/Potion.mv1";
-//
-//	constexpr float kSinSpeed = 0.01f;
-//	constexpr float kHeightSize = 0.01f;
-//
-//	constexpr float kAddPosY = 8.0f;
-//
-//	//モデルのスケール値
-//	constexpr VECTOR kModelScale = { 0.2f , 0.2f , 0.2f };
-//
-//	//モデルのポジション
-//	constexpr VECTOR kTombPPos = { 30.0f , 0.0f , 0.0f };
-//	constexpr VECTOR kTombSPos = { -30.0f , 0.0f , 0.0f };
-//	constexpr VECTOR kTombRPos = { 0.0f , 0.0f , 50.0f };
-//
-//}
-//
-//Tomb::Tomb():
-//	m_radiusB(12),
-//	m_radiusRB(24),
-//	m_posP(kTombPPos),
-//	m_posS(kTombSPos),
-//	m_posR(kTombRPos)
-//{
-//}
-//
-//Tomb::~Tomb()
-//{
-//}
-//
-//void Tomb::Initialize()
-//{
-//}
-//
-//void Tomb::Finalize()
-//{
-//}
-//
-//void Tomb::Update()
-//{
-//
-//}
-//
-//void Tomb::Draw()
-//{
-//	DrawSphere3D(m_posP, m_radiusB, 32, 0xffffff, 0xff0000, false);
-//	DrawSphere3D(m_posS, m_radiusB, 32, 0xffffff, 0xff0000, false);
-//	DrawSphere3D(m_posR, m_radiusRB, 32, 0xffffff, 0xff0000, false);
-//}
-//
-//bool Tomb::Hit(std::shared_ptr<Player> pPlayer, VECTOR pos)
-//{
-//	return false;
-//}
-//
-////bool Tomb::TombPHit(std::shared_ptr<Player> pPlayer)
-////{
-////	/*カプセルと円の当たり判定*/
-////	//カプセルと球のベクトル
-////	VECTOR Cap1ToSph = VSub(m_posP, pPlayer->GetPosDown());
-////
-////	//カプセルの上の座標と下の座標のベクトル
-////	VECTOR Cap1ToCap2 = VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown());
-////
-////	//正規化
-////	VECTOR normal = VNorm(Cap1ToCap2);
-////
-////	//内積
-////	float dot = VDot(Cap1ToSph, normal);
-////
-////
-////	// 球からカプセルへの線上最近点
-////	VECTOR point = VGet(pPlayer->GetPosDown().x + (normal.x * dot), pPlayer->GetPosDown().y + (normal.y * dot), pPlayer->GetPosDown().z + (normal.z * dot));
-////
-////	float temp = VSize(VSub(point, pPlayer->GetPosDown())) / VSize(VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown()));
-////	float distance;
-////
-////
-////	if (temp < 0) // 球からカプセル線分に垂線をおろせず、GetPosDownに近い場所
-////	{
-////		distance = VSize(VSub(point, pPlayer->GetPosDown()));
-////	}
-////	else if (temp > 1) // 球からカプセル線分に垂線をおろせず、GetPosUpに近い場所
-////	{
-////		distance = VSize(VSub(point, pPlayer->GetPosUp()));
-////	}
-////	else // 球からカプセル線分に垂線をおろせる
-////	{
-////		distance = VSize(VSub(point, m_posP));
-////	}
-////
-////	// 当たっているとき
-////	if (distance < m_radiusB + pPlayer->GetRadius())
-////	{
-////
-////		return true;
-////	}
-////
-////	return false;
-////}
-//
-////bool Tomb::TombSHit(std::shared_ptr<Player> pPlayer)
-////{
-////	/*カプセルと円の当たり判定*/
-////	//カプセルと球のベクトル
-////	VECTOR Cap1ToSph = VSub(m_posS, pPlayer->GetPosDown());
-////
-////	//カプセルの上の座標と下の座標のベクトル
-////	VECTOR Cap1ToCap2 = VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown());
-////
-////	//正規化
-////	VECTOR normal = VNorm(Cap1ToCap2);
-////
-////	//内積
-////	float dot = VDot(Cap1ToSph, normal);
-////
-////
-////	// 球からカプセルへの線上最近点
-////	VECTOR point = VGet(pPlayer->GetPosDown().x + (normal.x * dot), pPlayer->GetPosDown().y + (normal.y * dot), pPlayer->GetPosDown().z + (normal.z * dot));
-////
-////	float temp = VSize(VSub(point, pPlayer->GetPosDown())) / VSize(VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown()));
-////	float distance;
-////
-////
-////	if (temp < 0) // 球からカプセル線分に垂線をおろせず、GetPosDownに近い場所
-////	{
-////		distance = VSize(VSub(point, pPlayer->GetPosDown()));
-////	}
-////	else if (temp > 1) // 球からカプセル線分に垂線をおろせず、GetPosUpに近い場所
-////	{
-////		distance = VSize(VSub(point, pPlayer->GetPosUp()));
-////	}
-////	else // 球からカプセル線分に垂線をおろせる
-////	{
-////		distance = VSize(VSub(point, m_posS));
-////	}
-////
-////	// 当たっているとき
-////	if (distance < m_radiusB + pPlayer->GetRadius())
-////	{
-////
-////		return true;
-////	}
-////
-////	return false;
-////}
-////
-////bool Tomb::TombRHit(std::shared_ptr<Player> pPlayer)
-////{
-////	/*カプセルと円の当たり判定*/
-////	//カプセルと球のベクトル
-////	VECTOR Cap1ToSph = VSub(m_posR, pPlayer->GetPosDown());
-////
-////	//カプセルの上の座標と下の座標のベクトル
-////	VECTOR Cap1ToCap2 = VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown());
-////
-////	//正規化
-////	VECTOR normal = VNorm(Cap1ToCap2);
-////
-////	//内積
-////	float dot = VDot(Cap1ToSph, normal);
-////
-////
-////	// 球からカプセルへの線上最近点
-////	VECTOR point = VGet(pPlayer->GetPosDown().x + (normal.x * dot), pPlayer->GetPosDown().y + (normal.y * dot), pPlayer->GetPosDown().z + (normal.z * dot));
-////
-////	float temp = VSize(VSub(point, pPlayer->GetPosDown())) / VSize(VSub(pPlayer->GetPosUp(), pPlayer->GetPosDown()));
-////	float distance;
-////
-////
-////	if (temp < 0) // 球からカプセル線分に垂線をおろせず、GetPosDownに近い場所
-////	{
-////		distance = VSize(VSub(point, pPlayer->GetPosDown()));
-////	}
-////	else if (temp > 1) // 球からカプセル線分に垂線をおろせず、GetPosUpに近い場所
-////	{
-////		distance = VSize(VSub(point, pPlayer->GetPosUp()));
-////	}
-////	else // 球からカプセル線分に垂線をおろせる
-////	{
-////		distance = VSize(VSub(point, m_posR));
-////	}
-////
-////	// 当たっているとき
-////	if (distance < m_radiusRB + pPlayer->GetRadius())
-////	{
-////
-////		return true;
-////	}
-////
-////	return false;
-////}
+﻿#include "Tomb.h"
+
+#include "object/player/Player.h"
+
+namespace
+{
+	constexpr float kRotSpeed = 0.009f;
+
+	//const char* const kItemHpModelFilename = "Data/Model/Obj/Potion.mv1";
+
+	constexpr float kSinSpeed = 0.01f;
+	constexpr float kHeightSize = 0.01f;
+
+	constexpr float kAddPosY = 8.0f;
+
+	//モデルのスケール値
+	constexpr VECTOR kModelScale = { 0.2f , 0.2f , 0.2f };
+
+	//モデルのポジション
+	constexpr VECTOR kTombPowerPos = { -460.0f , 38.0f , 264.0f };
+	constexpr VECTOR kTombSpeedPos = { 327.0f , 138.0f , 602.0f };
+	constexpr VECTOR kTombShotPos = { 0.0f , 68.0f , -50.0f };
+	constexpr VECTOR kTombRastPos = { 0.0f , 38.0f , 50.0f };
+
+}
+
+Tomb::Tomb():
+	m_radiusB(12),
+	m_radiusRB(24),
+	m_posPower(kTombPowerPos),
+	m_posSpeed(kTombSpeedPos),
+	m_posShot(kTombShotPos),
+	m_posRast(kTombRastPos)
+{
+}
+
+Tomb::~Tomb()
+{
+}
+
+void Tomb::Initialize()
+{
+}
+
+void Tomb::Finalize()
+{
+}
+
+void Tomb::Update()
+{
+
+}
+
+void Tomb::Draw()
+{
+	DrawSphere3D(m_posPower, m_radiusB, 32, 0xffffff, 0xff0000, false);
+	DrawSphere3D(m_posSpeed, m_radiusB, 32, 0xffffff, 0xff0000, false);
+	DrawSphere3D(m_posShot, m_radiusB, 32, 0xffffff, 0xff0000, false);
+	DrawSphere3D(m_posRast, m_radiusRB, 32, 0xffffff, 0xff0000, false);
+
+	//DrawFormatString(0, 48, 0xff0fff, "PowerPos:%f,%f,%f", m_posPower.x, m_posPower.y, m_posPower.z);
+	//DrawFormatString(0, 64, 0xff0fff, "SpeedPos:%f,%f,%f", m_posSpeed.x, m_posSpeed.y, m_posSpeed.z);
+	//DrawFormatString(0, 80, 0xff0fff, "ShotPos:%f,%f,%f", m_posShot.x, m_posShot.y, m_posShot.z);
+	//DrawFormatString(0, 96, 0xff0fff, "RastPos:%f,%f,%f", m_posRast.x, m_posRast.y, m_posRast.z);
+}
+
+bool Tomb::Hit(std::shared_ptr<Player> pPlayer, VECTOR pos)
+{
+	return false;
+}
+
+bool Tomb::TombPowerHit(std::shared_ptr<Player> pPlayer)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_posPower.x - pPlayer->GetPos().x) * (m_posPower.x - pPlayer->GetPos().x);
+	float delY = ((m_posPower.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY)) *
+		((m_posPower.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY));
+	float delZ = (m_posPower.z - pPlayer->GetPos().z) * (m_posPower.z - pPlayer->GetPos().z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_radiusB + pPlayer->GetRadius())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Tomb::TombSpeedHit(std::shared_ptr<Player> pPlayer)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_posSpeed.x - pPlayer->GetPos().x) * (m_posSpeed.x - pPlayer->GetPos().x);
+	float delY = ((m_posSpeed.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY)) *
+		((m_posSpeed.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY));
+	float delZ = (m_posSpeed.z - pPlayer->GetPos().z) * (m_posSpeed.z - pPlayer->GetPos().z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_radiusB + pPlayer->GetRadius())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Tomb::TombShotHit(std::shared_ptr<Player> pPlayer)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_posShot.x - pPlayer->GetPos().x) * (m_posShot.x - pPlayer->GetPos().x);
+	float delY = ((m_posShot.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY)) *
+		((m_posShot.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY));
+	float delZ = (m_posShot.z - pPlayer->GetPos().z) * (m_posShot.z - pPlayer->GetPos().z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_radiusB + pPlayer->GetRadius())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Tomb::TombRastHit(std::shared_ptr<Player> pPlayer)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_posRast.x - pPlayer->GetPos().x) * (m_posRast.x - pPlayer->GetPos().x);
+	float delY = ((m_posRast.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY)) *
+		((m_posRast.y + kAddPosY) - (pPlayer->GetPos().y + kAddPosY));
+	float delZ = (m_posRast.z - pPlayer->GetPos().z) * (m_posRast.z - pPlayer->GetPos().z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_radiusRB + pPlayer->GetRadius())
+	{
+		return true;
+	}
+
+	return false;
+}

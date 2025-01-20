@@ -38,10 +38,16 @@ namespace
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
 
-
+	enum e_Ui
+	{
+		kHitH,
+	};
 
 	//初期位置
 	constexpr VECTOR kInitPos = { -85.0f,35.0f,740.0f };
+
+	const Vec2 kHitPos = { 440.0f , 480.0f };
+
 }
 
 
@@ -69,6 +75,8 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_pItemHp = std::make_shared<ItemHp>();
 	m_pItemMp = std::make_shared<ItemMp>();
 
+	m_pTomb = std::make_shared<Tomb>();
+
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
 
 
@@ -81,9 +89,16 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
+	m_isPowerStage = false;
+	m_isSpeedStage = false;
+	m_isShotStage = false;
+	m_isRastStage = false;
 
 	//タイトルのBgmが流れていたら止める用
 	SoundManager::GetInstance().StopBgm("selectBgm");
+
+	m_handles.push_back(LoadGraph("Data/Image/StageButton.png"));
+
 }
 
 SceneSelect::~SceneSelect()
@@ -91,7 +106,15 @@ SceneSelect::~SceneSelect()
 	m_pPlayer->Finalize(m_pPhysics);
 	m_pItemHp->Finalize(m_pPhysics);
 	m_pItemMp->Finalize(m_pPhysics);
-	//m_pBossShot->Finalize(m_pPhysics);
+
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
+
+
+	m_handles.clear();
 
 	SoundManager::GetInstance().StopBgm("selectBgm");
 
@@ -110,8 +133,54 @@ void SceneSelect::Update()
 
 	Pad::Update();
 	UpdateFade();
+	UpdateFadeGraph();
 
 	SoundManager::GetInstance().PlayBgm("selectBgm", true);
+
+	//ゲームステージに移動するための当たり判定
+	m_isPowerStage = m_pTomb->TombPowerHit(m_pPlayer);
+	m_isSpeedStage = m_pTomb->TombSpeedHit(m_pPlayer);
+	m_isShotStage = m_pTomb->TombShotHit(m_pPlayer);
+	m_isRastStage = m_pTomb->TombRastHit(m_pPlayer);
+
+	if (m_isPowerStage)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_2))
+		{
+			m_isToNextScene = true;
+			m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
+		}
+	}
+
+
+	if (m_isSpeedStage)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_2))
+		{
+			m_isToNextScene = true;
+			m_sceneTrans = e_SceneTrans::kSpeedTypeBoss;
+		}
+	}
+
+
+	if (m_isShotStage)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_1))
+		{
+			m_isToNextScene = true;
+			m_sceneTrans = e_SceneTrans::kShooterTypeBoss;
+		}
+	}
+
+
+	if (m_isRastStage)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_1))
+		{
+			m_isToNextScene = true;
+			m_sceneTrans = e_SceneTrans::kRastTypeBoss;
+		}
+	}
 
 #ifdef _DEBUG
 	if (Pad::IsTrigger PAD_INPUT_7)
@@ -136,7 +205,6 @@ void SceneSelect::Update()
 	//	}
 	//}
 
-	//UpdateFade();
 
 	if (!IsFading())
 	{
@@ -179,6 +247,21 @@ void SceneSelect::Update()
 				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager , Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
 				return;
 			}
+			else if (m_sceneTrans == e_SceneTrans::kSpeedTypeBoss)
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kSpeed, Game::e_StageKind::kGamePlay));
+				return;
+			}
+			else if (m_sceneTrans == e_SceneTrans::kShooterTypeBoss)
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kShot, Game::e_StageKind::kGamePlay));
+				return;
+			}
+			else if (m_sceneTrans == e_SceneTrans::kRastTypeBoss)
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kRast, Game::e_StageKind::kGamePlay));
+				return;
+			}
 		}
 	}
 
@@ -186,7 +269,6 @@ void SceneSelect::Update()
 
 void SceneSelect::Draw()
 {
-	m_pPlayer->Draw(*m_pPlayerWeapon);
 	//m_pPlayer->ShadowRender(m_pField->GetModelHandle());
 
 	m_pSkyDome->Draw();
@@ -200,10 +282,22 @@ void SceneSelect::Draw()
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pButtonUi->Draw(*m_pPlayer);
 
+	m_pTomb->Draw();
+	m_pPlayer->Draw(*m_pPlayerWeapon);
+
+	//ゲームシーンに行けるかどうかを分かりやすくするための画像
+	if (m_isPowerStage) DrawFadeGraph(m_handles[kHitH],kHitPos);
+	if (m_isSpeedStage) DrawFadeGraph(m_handles[kHitH], kHitPos);
+	if (m_isShotStage) DrawFadeGraph(m_handles[kHitH], kHitPos);
+	if (m_isRastStage) DrawFadeGraph(m_handles[kHitH], kHitPos);
+
 
 #ifdef _DEBUG
 
 	DrawString(0, 0, "Scene Select", 0xffffff, false);
+
+
+
 
 #endif
 

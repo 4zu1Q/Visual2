@@ -3,6 +3,8 @@
 #include <vector>
 #include <memory>
 
+#include "util/Game.h"
+
 class PlayerProduction;
 class CameraProduction;
 
@@ -10,7 +12,7 @@ class SceneGameOver :
 	public SceneBase
 {
 public:
-	SceneGameOver(SceneManager& manager);
+	SceneGameOver(SceneManager& manager, Game::e_BossKind bossKind);
 	virtual ~SceneGameOver();
 
 	/// <summary>
@@ -45,6 +47,7 @@ private:
 	bool m_isActionBack;
 
 	e_SceneTrans m_sceneTrans;
+	Game::e_BossKind m_bossKind;
 
 };
 

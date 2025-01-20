@@ -245,6 +245,7 @@ Player::Player() :
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 6.0f;
 
+	m_radius = circleColliderData->m_radius;
 
 	//m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
 
@@ -1357,7 +1358,7 @@ void Player::OnJump()
 	m_stamina -= 40;
 
 	//地面と接触しているかどうか
-	m_isJump = true;
+	//m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
 
 	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
@@ -1475,6 +1476,11 @@ void Player::AnimChange(const char* normal, const char* power, const char* speed
 	{
 		m_pAnim->ChangeAnim(normal);
 	}
+}
+
+const float& Player::GetRadius() const
+{
+	return m_radius;
 }
 
 void Player::ShadowRender(int stageH)

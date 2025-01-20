@@ -52,8 +52,8 @@ PlayerBarUi::PlayerBarUi():
 {
 	m_handles.push_back(LoadGraph("Data/Image/Hp.png"));
 	m_handles.push_back(LoadGraph("Data/Image/HpLost.png"));
-	m_handles.push_back(LoadGraph("Data/Image/StaminaBar01.png"));
-	m_handles.push_back(LoadGraph("Data/Image/BarFlame.png"));
+	m_handles.push_back(LoadGraph("Data/Image/BarFlameSt.png"));
+	m_handles.push_back(LoadGraph("Data/Image/BarFlameMp.png"));
 
 }
 
