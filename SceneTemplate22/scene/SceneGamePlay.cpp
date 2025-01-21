@@ -192,7 +192,7 @@ void SceneGamePlay::Update()
 	}
 
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
-	m_pCamera2->Update(m_pPlayer->GetPos(), m_pField->GetModelHandle());
+	m_pCamera2->Update(m_pPlayer->GetPos(), m_pField->GetModelHandle(), m_pPlayer->GetAngle());
 
 	m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon,m_pCamera->GetCameraAngleX());
 

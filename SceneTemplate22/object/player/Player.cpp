@@ -362,6 +362,8 @@ void Player::Draw(PlayerWeapon& weapon)
 	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_rigidbody.GetPos().x, m_rigidbody.GetPos().y, m_rigidbody.GetPos().z);
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
 	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
+	DrawFormatString(0, 348, 0xffffff, "playerAngle:%f", m_angle);
+	DrawFormatString(0, 328, 0xffffff, "playerAngle:%d", GetIsJump());
 	DrawFormatString(0, 200, 0xffffff, "DashFlag:%d", m_pCamera->GetIsDash());
 
 #endif
@@ -425,11 +427,11 @@ void Player::IdleUpdate()
 	}
 	
 	
-	if (Pad::IsTrigger(kPadButtonRStick) && !m_isJump && !m_isStamina)
-	{
-		OnHit();
-		return;
-	}
+	//if (Pad::IsTrigger(kPadButtonRStick) && !m_isJump && !m_isStamina)
+	//{
+	//	OnHit();
+	//	return;
+	//}
 
 	//ジャンプ
 	if (Pad::IsTrigger(kPadButtonB) && GetIsJump() && !m_isStamina)

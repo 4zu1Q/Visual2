@@ -13,12 +13,14 @@ public:
 	void Initialize(VECTOR playerPos);
 	void Finalize();
 
-	void Update(VECTOR playerPos, int stageHandle);
+	void Update(VECTOR playerPos, int stageHandle, float playerAngle);
 	void Draw();
 
 	const VECTOR GetDirection() const;
 
 	float GetCameraAngleX() { return m_angleH; }
+
+	void ResetToPlayerView(float playerAngle);
 
 private:
 

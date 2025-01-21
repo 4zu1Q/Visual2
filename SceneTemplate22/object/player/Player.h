@@ -111,6 +111,8 @@ public:
 	//半径の取得
 	const float& GetRadius() const;
 
+	const float& GetAngle() const { return m_angle; }
+
 	/*プレイヤーがボスを倒したかどうかのフラグを取得する関数*/
 	//これ多分必要ない可能性
 	//void ShadowRender(int stageH);

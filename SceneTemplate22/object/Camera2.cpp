@@ -1,5 +1,6 @@
 ﻿#include "Camera2.h"
 #include "util/Setting.h"
+#include "util/Pad.h"
 
 namespace 
 {
@@ -48,11 +49,16 @@ void Camera2::Finalize()
 
 }
 
-void Camera2::Update(VECTOR playerPos, int stageHandle)
+void Camera2::Update(VECTOR playerPos, int stageHandle, float playerAngle)
 {
 	// DirectInput の入力を取得
 	DINPUT_JOYSTATE dInputState;
 	GetJoypadDirectInputState(DX_INPUT_PAD1, &dInputState);
+
+	if (Pad::IsTrigger(PAD_INPUT_10))
+	{
+		ResetToPlayerView(playerAngle);
+	}
 
 	// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
 	m_angleH += dInputState.Rx / 10000.0f * Setting::GetInstance().GetSensitivity();
@@ -68,11 +74,22 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 	m_angleV += dInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
 	if (m_angleV < -DX_PI_F / 2.0f + 0.6f)
 	{
-		m_angleV = -DX_PI_F / 2.0f + 0.6f;
+		m_angleV = -DX_PI_F / 2.0f - 0.6f;
 	}
 	if (m_angleV > DX_PI_F / 2.0f - 0.6f)
 	{
-		m_angleV = DX_PI_F / 2.0f - 0.6f;
+		m_angleV = DX_PI_F / 2.0f + 0.6f;
+	}
+
+	// カメラの水平角度を制限
+	if (m_angleV < -0.9f)
+	{
+		m_angleV = -0.89f;
+	}
+	// カメラの水平角度を制限
+	if (m_angleV > 0.6f)
+	{
+		m_angleV = 0.59f;
 	}
 
 	// カメラの注視点はプレイヤー座標から規定値分高い座標
@@ -172,10 +189,22 @@ void Camera2::Update(VECTOR playerPos, int stageHandle)
 
 void Camera2::Draw()
 {
+#if _DEBUG
+	// カメラの座標を描画
+	DrawFormatString(0, 550, GetColor(255, 255, 255), "CameraAngle : %f", m_angleV);
+	DrawFormatString(0, 560, GetColor(255, 255, 255), "CameraAngle : %f", m_angleH);
 
+
+#endif
 }
 
 const VECTOR Camera2::GetDirection() const
 {
 	return VNorm(VSub(m_targetPos, m_pos));
+}
+
+void Camera2::ResetToPlayerView(float playerAngle)
+{
+	// プレイヤーの角度をカメラの水平角度に合わせる
+	m_angleH = playerAngle + 1.6f;
 }
