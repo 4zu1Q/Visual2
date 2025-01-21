@@ -1,11 +1,11 @@
 ﻿#include "DxLib.h"
 
-#include "SceneManager.h"
-#include "SceneGameOver.h"
-#include "SceneSelect.h"
-#include "SceneGamePlay.h"
-#include "SceneTitle.h"
-#include "SceneDebug.h"
+#include "scene/SceneManager.h"
+#include "scene/SceneGameOver.h"
+#include "scene/SceneSelect.h"
+#include "scene/SceneGamePlay.h"
+#include "scene/SceneTitle.h"
+#include "scene/SceneDebug.h"
 
 #include "object/player/PlayerProduction.h"
 #include "object/CameraProduction.h"
@@ -179,7 +179,6 @@ void SceneGameOver::Draw()
 {
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 
-	DrawGraph(0, 0, m_handles[kGameOverBgH], true);
 
 	m_pCameraProduction->Draw();
 	m_pPlayerProduction->Draw();
@@ -208,8 +207,9 @@ void SceneGameOver::Draw()
 		DrawFadeGraph(m_handles[kSelectH], kSelectPos);
 	}
 
-	DrawGraph(380, 100, m_handles[kGameOverH], true);
 
+	DrawGraph(0, -10 + m_selectAnimation, m_handles[kGameOverBgH], true);
+	DrawGraph(380, 100, m_handles[kGameOverH], true);
 
 
 	DrawString(0, 0, "Scene Game Over", 0xffffff, false);

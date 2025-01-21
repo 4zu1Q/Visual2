@@ -92,11 +92,14 @@ private:
 
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
+	int m_fontHandle;
 
 	bool m_isPowerStage;
 	bool m_isSpeedStage;
 	bool m_isShotStage;
 	bool m_isRastStage;
 
+
+	int m_test = 0;
 };
 

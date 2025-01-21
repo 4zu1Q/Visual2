@@ -2,11 +2,11 @@
 
 #include "myLib/MyLib.h"
 
-#include "SceneManager.h"
-#include "SceneGamePlay.h"
-#include "SceneGameOver.h"
-#include "ScenePause.h"
-#include "SceneDebug.h"
+#include "scene/SceneManager.h"
+#include "scene/SceneGamePlay.h"
+#include "scene/SceneGameOver.h"
+#include "scene/ScenePause.h"
+#include "scene/SceneDebug.h"
 
 #include "object/player/Player.h"
 #include "object/player/PlayerWeapon.h"

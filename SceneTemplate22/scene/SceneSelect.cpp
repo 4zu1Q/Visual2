@@ -1,11 +1,11 @@
 ﻿#include "DxLib.h"
 
-#include "SceneManager.h"
-#include "SceneSelect.h"
-#include "ScenePause.h"
-#include "SceneOption.h"
-#include "SceneGamePlay.h"
-#include "SceneDebug.h"
+#include "scene/SceneManager.h"
+#include "scene/SceneSelect.h"
+#include "scene/ScenePause.h"
+#include "scene/SceneOption.h"
+#include "scene/SceneGamePlay.h"
+#include "scene/SceneDebug.h"
 
 #include "object/player/Player.h"
 #include "object/player/PlayerWeapon.h"
@@ -20,7 +20,6 @@
 #include "object/stage/SkyDome.h"
 #include "object/stage/Tomb.h"
 
-
 #include "ui/HpBar.h"
 #include "ui/FaceUi.h"
 #include "ui/FaceFrameUi.h"
@@ -29,6 +28,8 @@
 
 #include "util/Pad.h"
 #include "util/SoundManager.h"
+#include "util/Font.h"
+#include "util/SaveDataManager.h"
 
 #include "myLib/Physics.h"
 
@@ -41,12 +42,30 @@ namespace
 	enum e_Ui
 	{
 		kHitH,
+		kPowerH,
+		kSpeedH,
+		kShotH,
+		kRastH,
+		kNoClearItemH,
+		kPowerClearItemH,
+		kSpeedClearItemH,
+		kShotClearItemH,
 	};
+
+	//フォントのパス
+	const char* kFontPath = "Data/Font/Dela-Gothic-One.ttf";
+
+	//フォントサイズ	
+	constexpr int kFontSize = 38;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { -85.0f,35.0f,740.0f };
 
 	const Vec2 kHitPos = { 440.0f , 480.0f };
+	const Vec2 kHitBossPos = { 340.0f , 30.0f };
+	const Vec2 kHitTextPos = { 740.0f , 230.0f };
+	const Vec2 kHitText2Pos = { 743.0f , 230.0f };
+	const Vec2 kHitStarPos = { 790.0f , 110.0f };
 
 }
 
@@ -98,6 +117,16 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	SoundManager::GetInstance().StopBgm("selectBgm");
 
 	m_handles.push_back(LoadGraph("Data/Image/StageButton.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Power.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Speed.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Shot.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Rast.png"));
+	m_handles.push_back(LoadGraph("Data/Image/NoClearItem.png"));
+	m_handles.push_back(LoadGraph("Data/Image/PowerClearItem.png"));
+	m_handles.push_back(LoadGraph("Data/Image/SpeedClearItem.png"));
+	m_handles.push_back(LoadGraph("Data/Image/ShotClearItem.png"));
+
+	m_fontHandle = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", kFontSize);
 
 }
 
@@ -165,7 +194,7 @@ void SceneSelect::Update()
 
 	if (m_isShotStage)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_1))
+		if (Pad::IsTrigger(PAD_INPUT_2))
 		{
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kShooterTypeBoss;
@@ -175,7 +204,7 @@ void SceneSelect::Update()
 
 	if (m_isRastStage)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_1))
+		if (Pad::IsTrigger(PAD_INPUT_2))
 		{
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kRastTypeBoss;
@@ -190,21 +219,11 @@ void SceneSelect::Update()
 		return;
 	}
 
-	if (Pad::IsPress(PAD_INPUT_1) && Pad::IsPress(PAD_INPUT_2))
-	{
-		m_isToNextScene = true;
-	}
-#endif
-
-	//if (m_isFadingOut)
+	//if (Pad::IsPress(PAD_INPUT_1) && Pad::IsPress(PAD_INPUT_2))
 	//{
-	//	if (IsFadingOut())
-	//	{
-	//		SceneBase::StartFadeIn();
-	//		m_isFadingOut = false;
-	//	}
+	//	m_isToNextScene = true;
 	//}
-
+#endif
 
 	if (!IsFading())
 	{
@@ -286,10 +305,80 @@ void SceneSelect::Draw()
 	m_pPlayer->Draw(*m_pPlayerWeapon);
 
 	//ゲームシーンに行けるかどうかを分かりやすくするための画像
-	if (m_isPowerStage) DrawFadeGraph(m_handles[kHitH],kHitPos);
-	if (m_isSpeedStage) DrawFadeGraph(m_handles[kHitH], kHitPos);
-	if (m_isShotStage) DrawFadeGraph(m_handles[kHitH], kHitPos);
-	if (m_isRastStage) DrawFadeGraph(m_handles[kHitH], kHitPos);
+	if (m_isPowerStage) 
+	{
+		DrawFadeGraph(m_handles[kHitH], kHitPos);
+		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kPowerH], true);
+
+		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
+		//クリアしていた場合
+		//if(SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kPowerPlayer))
+		{
+			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kPowerClearItemH], true);
+		}
+
+		DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
+		DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
+	}
+	if (m_isSpeedStage)
+	{
+		DrawFadeGraph(m_handles[kHitH], kHitPos);
+		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kSpeedH], true);
+
+		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
+		//クリアしていた場合
+		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kSpeedPlayer))
+		{
+			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kSpeedClearItemH], true);
+		}
+
+		DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
+		DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
+	}
+	if (m_isShotStage)
+	{
+		DrawFadeGraph(m_handles[kHitH], kHitPos);
+		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kShotH], true);
+
+		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
+		//クリアしていた場合
+		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kShotPlayer))
+		{
+			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kShotClearItemH], true);
+		}
+
+		DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
+		DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
+	}
+	if (m_isRastStage)
+	{
+		DrawFadeGraph(m_handles[kHitH], kHitPos);
+		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kRastH], true);
+
+		DrawGraph(kHitStarPos.x - 25, kHitStarPos.y + 10, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitStarPos.x, kHitStarPos.y - 30, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitStarPos.x + 25, kHitStarPos.y + 10, m_handles[kNoClearItemH], true);
+
+		//条件を満たしていた場合していた場合
+		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kPowerPlayer))
+		{
+			DrawGraph(kHitStarPos.x - 25, kHitStarPos.y + 10, m_handles[kPowerClearItemH], true);
+		}
+
+		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kShotPlayer))
+		{
+			DrawGraph(kHitStarPos.x, kHitStarPos.y - 30, m_handles[kShotClearItemH], true);
+		}
+
+		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kSpeedPlayer))
+		{
+			DrawGraph(kHitStarPos.x + 25, kHitStarPos.y + 10, m_handles[kSpeedClearItemH], true);
+		}
+
+
+		DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
+		DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
+	}
 
 
 #ifdef _DEBUG
@@ -297,11 +386,8 @@ void SceneSelect::Draw()
 	DrawString(0, 0, "Scene Select", 0xffffff, false);
 
 
-
-
 #endif
 
-	//DrawFormatString(900, 280, 0xffffff, " PlayerHp : %f ", m_pPlayer->GetHp());
 
 
 	if (!m_isFadeColor)

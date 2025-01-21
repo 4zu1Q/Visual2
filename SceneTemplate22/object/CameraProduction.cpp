@@ -40,6 +40,12 @@ CameraProduction::CameraProduction():
 	//カメラ
 	SetCameraNearFar(0.1f, 1000.0f);
 
+	// カメラの初期水平角度は１８０度
+	m_angleH = DX_PI_F;
+
+	// 垂直角度は０度
+	m_angleV = 0.0f;
+
 	// FOV(視野角)を60度に
 	SetupCamera_Perspective(60.0f * (static_cast<float>(M_PI) / 180.0f));
 }
@@ -123,7 +129,7 @@ void CameraProduction::Finalize()
 
 void CameraProduction::Update()
 {
-	
+
 }
 
 void CameraProduction::Draw()

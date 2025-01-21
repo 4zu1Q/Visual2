@@ -33,10 +33,25 @@ namespace MyLib
 		// トリガーかどうか
 		bool IsTrigger() const { return m_isTrigger; }
 
-	private:
+		/// <summary>
+		/// ステージの床に触れているかどうか
+		/// </summary>
+		/// <returns>ステージの床に触れていたら</returns>
+		bool IsGround() { return m_isGround; }
 
+		/// <summary>
+		/// ステージの床に触れているかどうかを設定する
+		/// </summary>
+		/// <param name="flag">ステージの床に触れていたら</param>
+		void SetIsGround(bool flag) { m_isGround = flag; }
+
+	private:
+		//当たり判定の種類
 		e_Kind	m_kind;
-		bool	m_isTrigger;
+		//物理挙動をしないときにtrueにする
+		bool m_isTrigger;
+		//地面とぶつかってる時にtrueにする
+		bool m_isGround;
 	};
 
 }

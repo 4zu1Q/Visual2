@@ -681,7 +681,12 @@ void MyLib::Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable>& co
 void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
 {
 	//床ポリゴンがない場合は何もしない
-	if (m_floorNum == 0) return;
+	if (m_floorNum == 0)
+	{
+		//床とぶつかっているかどうかをfalseにしておく
+		col->m_pColliderData->SetIsGround(false);
+		return;
+	}
 
 	// 床ポリゴンとの当たり判定処理
 	// あたったかどうかのフラグ初期化
@@ -752,11 +757,14 @@ void MyLib::Physics::FixNowPositionWithFloor(std::shared_ptr<Collidable>& col)
 	//床ポリゴンの当たり判定かつ、ジャンプ力が0よりも小さい(下降中の場合)どうかで処理を分岐
 	if (m_isHitFlag)
 	{
+
 		// 接触したポリゴンで一番高いＹ座標をプレイヤーのＹ座標にする
 		col->m_rigidbody.SetNextPos(VGet(col->m_rigidbody.GetNextPos().x, PolyMaxPosY/* + sphere->m_radius*/, col->m_rigidbody.GetNextPos().z));
 		if (m_pPlayer->GetIsJump())
 		{
-			m_pPlayer->SetIsJump(false);
+
+			col->m_pColliderData->SetIsGround(true);
+
 		}
 		
 	}

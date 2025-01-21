@@ -11,21 +11,20 @@ class AnimController;
 class Camera;
 
 class WeaponBase;
+//プレイヤーの特殊攻撃の種類(顔の種類)
+enum class e_PlayerKind : int
+{
+	kPowerPlayer,		//パワー型
+	kSpeedPlayer,		//スピード型
+	kShotPlayer,		//ショット型
+	kStrongestPlayer,	//ラスボス型
+	kMax,				// 最大数
+};
 
 class Player : public CharaBase
 {
 
 public:
-
-	//プレイヤーの特殊攻撃の種類(顔の種類)
-	enum class e_PlayerKind : int
-	{
-		kPowerPlayer,		//パワー型
-		kSpeedPlayer,		//スピード型
-		kShotPlayer,		//ショット型
-		kStrongestPlayer	//ラスボス型
-	};
-
 	//ボタンの種類
 	enum class e_ButtonKind : int
 	{
@@ -96,8 +95,8 @@ public:
 	void SetCameraAngle(float angle) { m_cameraAngle = angle; }
 
 	//ジャンプフラグを取得
-	const bool& GetIsJump() const { return m_isJump; }
-	void SetIsJump(const bool isJump) { m_isJump = isJump; }
+	const bool& GetIsJump() const { return m_pColliderData->IsGround(); }
+	//void SetIsJump(const bool isJump) { m_isJump = isJump; }
 
 	//ボタンを押しているかどうかのフラグを取得
 	const bool& GetIsButtonPush() const { return m_isButtonPush; }
@@ -112,28 +111,9 @@ public:
 	//半径の取得
 	const float& GetRadius() const;
 
-
-
 	/*プレイヤーがボスを倒したかどうかのフラグを取得する関数*/
 	//これ多分必要ない可能性
-
-	//Power型のBossを倒したかどうかのフラグを取得
-	const bool& GetIsPowerFace() const { return m_isPowerFace; }
-	void SetIsPowerFace(const bool isPowerFace) { m_isPowerFace = isPowerFace; }
-
-	//Speed型のBossを倒したかどうかのフラグを取得
-	const bool& GetIsSpeedFace() const { return m_isSpeedFace; }
-	void SetIsSpeedFace(const bool isSpeedFace) { m_isSpeedFace = isSpeedFace; }
-
-	//Shot型のBossを倒したかどうかのフラグを取得
-	const bool& GetIsShotFace() const { return m_isShotFace; }
-	void SetIsShotFace(const bool isShotFace) { m_isShotFace = isShotFace; }
-
-	//Strongest型のBossを倒したかどうかのフラグを取得
-	const bool& GetIsStrongestFace() const { return m_isStrongestFace; }
-	void SetIsStrongestFace(const bool isStrongestFace) { m_isStrongestFace = isStrongestFace; }
-
-	void ShadowRender(int stageH);
+	//void ShadowRender(int stageH);
 
 private:
 	void OnCollide(const Collidable& colider);
@@ -143,7 +123,9 @@ private:
 	void WalkUpdate();
 	void DashUpdate();
 	void JumpUpdate();
+	void DashJumpUpdate();
 	void FallUpdate();
+	void DashFallUpdate();
 	void AttackCharge();
 	void AttackXUpdate();
 	void AttackYUpdate();
@@ -159,8 +141,11 @@ private:
 	void OnWalk();
 	void OnDash();
 	void OnJump();
+	void OnDashJump();
 	void OnAir();
+	void OnDashAir();
 	void OnFall();
+	void OnDashFall();
 	void OnAttackCharge();
 	void OnAttackX();
 	void OnAttackY();
@@ -280,105 +265,4 @@ private:
 	//動いたときの音を出すやつ
 	int m_moveCount;
 
-	//顔の保持しているかどうかのフラグ
-	bool m_isPowerFace;
-	bool m_isSpeedFace;
-	bool m_isShotFace;
-	bool m_isStrongestFace;
-
-
-
 };
-
-//int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-//{
-//	int StageModelHandle;
-//	int CharaModelHandle;
-//	int ShadowMapHandle;
-//
-//	// ＤＸライブラリの初期化
-//	if (DxLib_Init() < 0)
-//	{
-//		// エラーが発生したら終了
-//		return -1;
-//	}
-//
-//	// 描画先を裏画面に変更
-//	SetDrawScreen(DX_SCREEN_BACK);
-//
-//	// キャラクターモデルの読み込み
-//	CharaModelHandle = MV1LoadModel("DxChara.x");
-//
-//	// ステージモデルの読み込み
-//	StageModelHandle = MV1LoadModel("Plane.mqo");
-//
-//	// シャドウマップハンドルの作成
-//	ShadowMapHandle = MakeShadowMap(1024, 1024);
-//
-//	// カメラの位置と向きを設定
-//	SetCameraPositionAndTarget_UpVecY(VGet(0.0f, 800.0f, -800.0f), VGet(0.000f, 500.000f, 0.000f));
-//
-//	// 描画する奥行き方向の範囲を設定
-//	SetCameraNearFar(40.000f, 2000.000f);
-//
-//	// ライトの方向を設定
-//	SetLightDirection(VGet(0.5f, -0.5f, 0.5f));
-//
-//	// シャドウマップが想定するライトの方向もセット
-//	SetShadowMapLightDirection(ShadowMapHandle, VGet(0.5f, -0.5f, 0.5f));
-//
-//	// シャドウマップに描画する範囲を設定
-//	SetShadowMapDrawArea(ShadowMapHandle, VGet(-1000.0f, -1.0f, -1000.0f), VGet(1000.0f, 1000.0f, 1000.0f));
-//
-//	// メインループ
-//	while (ProcessMessage() == 0)
-//	{
-//		// 画面をクリア
-//		ClearDrawScreen();
-//
-//
-//		// シャドウマップへの描画の準備
-//		ShadowMap_DrawSetup(ShadowMapHandle);
-//
-//		// シャドウマップへステージモデルの描画
-//		MV1DrawModel(StageModelHandle);
-//
-//		// シャドウマップへキャラクターモデルの描画
-//		MV1DrawModel(CharaModelHandle);
-//
-//		// シャドウマップへの描画を終了
-//		ShadowMap_DrawEnd();
-//
-//
-//		// 描画に使用するシャドウマップを設定
-//		SetUseShadowMap(0, ShadowMapHandle);
-//
-//		// ステージモデルの描画
-//		MV1DrawModel(StageModelHandle);
-//
-//		// キャラクターモデルの描画
-//		MV1DrawModel(CharaModelHandle);
-//
-//		// 描画に使用するシャドウマップの設定を解除
-//		SetUseShadowMap(0, -1);
-//
-//
-//		// 裏画面の内容を表画面に反映
-//		ScreenFlip();
-//	}
-//
-//	// シャドウマップの削除
-//	DeleteShadowMap(ShadowMapHandle);
-//
-//	// ステージモデルの削除
-//	MV1DeleteModel(StageModelHandle);
-//
-//	// キャラクターモデルの削除
-//	MV1DeleteModel(CharaModelHandle);
-//
-//	// ＤＸライブラリの後始末
-//	DxLib_End();
-//
-//	// ソフトの終了
-//	return 0;
-//}

@@ -36,22 +36,22 @@ void FaceUi::Update()
 void FaceUi::Draw(Player& player)
 {
 	//プレイヤーの仮面UI
-	if (player.GetFaceKind() == Player::e_PlayerKind::kPowerPlayer)
+	if (player.GetFaceKind() == e_PlayerKind::kPowerPlayer)
 	{
 		DrawGraph(kFacePos.x, kFacePos.y, m_PowerFaceHandle, true);
 
 	}
-	else if (player.GetFaceKind() == Player::e_PlayerKind::kSpeedPlayer)
+	else if (player.GetFaceKind() == e_PlayerKind::kSpeedPlayer)
 	{
 		DrawGraph(kFacePos.x, kFacePos.y, m_SpeedFaceHandle, true);
 
 	}
-	else if (player.GetFaceKind() == Player::e_PlayerKind::kShotPlayer)
+	else if (player.GetFaceKind() == e_PlayerKind::kShotPlayer)
 	{
 		DrawGraph(kFacePos.x, kFacePos.y, m_ShotFaceHandle, true);
 
 	}
-	else if (player.GetFaceKind() == Player::e_PlayerKind::kStrongestPlayer)
+	else if (player.GetFaceKind() == e_PlayerKind::kStrongestPlayer)
 	{
 		DrawGraph(kFacePos.x, kFacePos.y, m_RastFaceHandle, true);
 

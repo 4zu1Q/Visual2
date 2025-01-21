@@ -1,7 +1,7 @@
 ﻿#include "DxLib.h"
 
-#include "SceneOption.h"
-#include "SceneManager.h"
+#include "scene/SceneOption.h"
+#include "scene/SceneManager.h"
 
 #include "util/Game.h"
 #include "util/Pad.h"
@@ -19,6 +19,7 @@ namespace
 
 	const char* kFontPath = "Data/Font/Dela-Gothic-One.ttf";
 
+	//フォントサイズ	
 	constexpr int kFontSize = 34;
 
 	//BGMやSEなどのテキストポジション
@@ -159,6 +160,10 @@ void SceneOption::Draw()
 	}
 
 	DrawGraph(0, 660, m_handles[kBackH], true);
+
+	DrawFormatStringToHandle(963, 125, 0xa9a9a9, m_fontHandle, "%d", m_bgmScale);
+	DrawFormatStringToHandle(963, 245, 0xa9a9a9, m_fontHandle, "%d", m_seScale);
+	DrawFormatStringToHandle(963, 365, 0xa9a9a9, m_fontHandle, "%d", m_sensitivityScale);
 
 	DrawFormatStringToHandle(960, 125, 0xffffff, m_fontHandle, "%d", m_bgmScale);
 	DrawFormatStringToHandle(960, 245, 0xffffff, m_fontHandle, "%d", m_seScale);

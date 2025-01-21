@@ -1,14 +1,15 @@
 ﻿#include "DxLib.h"
 
-#include "SceneManager.h"
-#include "ScenePause.h"
-#include "SceneTitle.h"
-#include "SceneSelect.h"
-#include "SceneOption.h"
+#include "scene/SceneManager.h"
+#include "scene/ScenePause.h"
+#include "scene/SceneTitle.h"
+#include "scene/SceneSelect.h"
+#include "scene/SceneOption.h"
 
 #include "util/Game.h"
 #include "util/Pad.h"
 #include "util/SoundManager.h"
+#include "util/SaveDataManager.h"
 
 namespace
 {
@@ -136,6 +137,7 @@ void ScenePause::Update()
 				SoundManager::GetInstance().PlaySe("dectionSe");
 				m_isToNextScene = true;
 				StartFadeOut();	//フェードアウト開始
+				SaveDataManager::GetInstance().Save(); //セーブデータの保存
 			}
 		}
 

@@ -28,7 +28,6 @@ private:
 		kSe,
 		kSensitivity,
 		kFullScreen
-		//バイブレーションも欲しいかも？
 	};
 
 	e_Item m_nowItem;

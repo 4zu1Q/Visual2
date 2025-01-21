@@ -199,6 +199,7 @@
     <ClCompile Include="util\MoveDirectionVec.cpp" />
     <ClCompile Include="util\OnAttackFrame.cpp" />
     <ClCompile Include="util\Pad.cpp" />
+    <ClCompile Include="util\SaveDataManager.cpp" />
     <ClCompile Include="util\Setting.cpp" />
     <ClCompile Include="util\SoundManager.cpp" />
     <ClCompile Include="util\StringUtility.cpp" />
@@ -267,6 +268,7 @@
     <ClInclude Include="util\MoveDirectionVec.h" />
     <ClInclude Include="util\OnAttackFrame.h" />
     <ClInclude Include="util\Pad.h" />
+    <ClInclude Include="util\SaveDataManager.h" />
     <ClInclude Include="util\Setting.h" />
     <ClInclude Include="util\SoundManager.h" />
     <ClInclude Include="util\StringUtility.h" />

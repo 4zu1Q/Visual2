@@ -1,14 +1,14 @@
 ﻿#include "DxLib.h"
 
-#include "SceneManager.h"
-#include "SceneDebug.h"
-#include "SceneTitle.h"
-#include "SceneSelect.h"
-#include "SceneGamePlay.h"
-#include "SceneGameClear.h"
-#include "SceneGameOver.h"
-#include "SceneOption.h"
-#include "ScenePause.h"
+#include "scene/SceneManager.h"
+#include "scene/SceneDebug.h"
+#include "scene/SceneTitle.h"
+#include "scene/SceneSelect.h"
+#include "scene/SceneGamePlay.h"
+#include "scene/SceneGameClear.h"
+#include "scene/SceneGameOver.h"
+#include "scene/SceneOption.h"
+#include "scene/ScenePause.h"
 
 
 #include "util/Pad.h"

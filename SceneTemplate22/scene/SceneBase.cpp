@@ -10,6 +10,9 @@ namespace
 	constexpr int kFadeSpeed = 5;
 
 	constexpr int kFadeColor = 0xffffff;
+
+	const char* kFontPath = "Data/Font/Dela-Gothic-One.ttf";
+
 }
 
 

@@ -1,5 +1,5 @@
-﻿#include "SceneManager.h"
-#include "SceneTitle.h"
+﻿#include "scene/SceneManager.h"
+#include "scene/SceneTitle.h"
 #include "util/Game.h"
 
 namespace

@@ -1,10 +1,10 @@
 ﻿#include "DxLib.h"
 
-#include"SceneManager.h"
-#include "SceneGameClear.h"
-#include "SceneSelect.h"
-#include "SceneTitle.h"
-#include "SceneDebug.h"
+#include "scene/SceneManager.h"
+#include "scene/SceneGameClear.h"
+#include "scene/SceneSelect.h"
+#include "scene/SceneTitle.h"
+#include "scene/SceneDebug.h"
 
 #include "object/player/PlayerProduction.h"
 #include "object/CameraProduction.h"

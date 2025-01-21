@@ -8,16 +8,17 @@
 #include "object/CameraProduction.h"
 #include "object/stage/SkyDome.h"
 #include "object/stage/TitleField.h"
+#include "object/stage/Field.h"
 
-#include "SceneManager.h"
-#include "SceneTitle.h"
-#include "SceneSelect.h"
-#include "SceneGamePlay.h"
-#include "SceneOption.h"
-#include "SceneDebug.h"
+#include "scene/SceneManager.h"
+#include "scene/SceneTitle.h"
+#include "scene/SceneSelect.h"
+#include "scene/SceneGamePlay.h"
+#include "scene/SceneOption.h"
+#include "scene/SceneDebug.h"
 
 #include "util/SoundManager.h"
-
+#include "util/SaveDataManager.h"
 
 namespace
 {
@@ -71,12 +72,13 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_pCameraProduction = std::make_shared<CameraProduction>();
 	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pTitleField = std::make_shared<TitleField>();
+	m_pField = std::make_shared<Field>(Game::e_StageKind::kTitle);
 
 	m_pPlayerProduction->Initialize(Game::e_PlayerProduction::kTitle);
 	m_pCameraProduction->Initialize(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kTitle);
 
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/TitleLogo1.png"));
+	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
 	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton1.png"));
 	m_handles.push_back(LoadGraph("Data/Image/NewGame2.png"));				//NewGame
 	m_handles.push_back(LoadGraph("Data/Image/LoadGame2.png"));				//LoadGame
@@ -101,6 +103,7 @@ SceneTitle::~SceneTitle()
 
 void SceneTitle::Update()
 {
+
 
 	Pad::Update();
 	UpdateFade();
@@ -180,6 +183,7 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kNewGame)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
+				SaveDataManager::GetInstance().Init();	//セーブデータの初期化
 				m_isActionStart = true;
 				m_isActionBack = false;
 				StartFadeOut();
@@ -189,6 +193,7 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kLoadGame)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
+				SaveDataManager::GetInstance().Load();	//セーブデータの読み込み
 				m_isActionStart = true;
 				m_isActionBack = false;
 				StartFadeOut();
@@ -205,6 +210,8 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kQuit)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
+				SaveDataManager::GetInstance().Save(); //セーブデータの保存
+
 				DxLib_End();
 			}
 		}
@@ -227,19 +234,15 @@ void SceneTitle::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kNewGame)
 			{
-				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
 				SoundManager::GetInstance().StopBgm("titleBgm");
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
-				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
 				return;
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kLoadGame)
 			{
-				//m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager));
 				SoundManager::GetInstance().StopBgm("titleBgm");
-				//m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
-				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
 				return;
 			}
 		}
@@ -259,6 +262,7 @@ void SceneTitle::Draw()
 	m_pPlayerProduction->Draw();
 	m_pSkyDome->Draw();
 	m_pTitleField->Draw();
+	//m_pField->Draw();
 
 	if (!m_isStart)
 	{
@@ -334,12 +338,12 @@ void SceneTitle::Draw()
 
 	DrawString(0, 0, "Scene Title", 0xffffff, false);
 
-	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
+	//DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kNewGame) * kTextIntervalY, 0xffffff, "NewStart");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kLoadGame) * kTextIntervalY, 0xffffff, "LoadStart");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kQuit) * kTextIntervalY, 0xffffff, "Quit");
+	//DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kNewGame) * kTextIntervalY, 0xffffff, "NewStart");
+	//DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kLoadGame) * kTextIntervalY, 0xffffff, "LoadStart");
+	//DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
+	//DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kQuit) * kTextIntervalY, 0xffffff, "Quit");
 
 #endif
 

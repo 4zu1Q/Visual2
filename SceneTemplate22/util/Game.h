@@ -47,6 +47,7 @@ namespace Game
 	//ステージの種類
 	enum class e_StageKind
 	{
+		kTitle,
 		kSelect,
 		kGamePlay,
 		kStageNum		//ステージの種類の総数

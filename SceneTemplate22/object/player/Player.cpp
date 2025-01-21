@@ -55,6 +55,8 @@ namespace
 	constexpr float kMinJumpPower = 0.22f;
 	//ジャンプ力最大値
 	constexpr float kMaxJumpPower = 0.85f;
+	//落ちるときの重力
+	constexpr float kGravityPower = 0.005f;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
@@ -129,7 +131,9 @@ namespace
 	//顔の使用アニメーション
 	const char* const kAnimUseFace = "UseFace";
 
-
+	//落ちる速度の倍率
+	constexpr float kMinFallScale = 1.5f;
+	constexpr float kMaxFallScale = 4.0f;
 
 
 	//パッドのボタン情報
@@ -201,22 +205,6 @@ Player::Player() :
 
 	// 影描画用の画像の読み込み
 	m_shadowH = LoadGraph("Data/Image/Shadow.png");
-
-#ifdef _DEBUG
-
-	m_isPowerFace = true;
-	m_isSpeedFace = true;
-	m_isShotFace = true;
-	m_isStrongestFace = true;
-
-#else
-
-	m_isPowerFace = false;
-	m_isSpeedFace = false;
-	m_isShotFace = false;
-	m_isStrongestFace = false;
-
-#endif
 
 	m_isJump = false;
 
@@ -422,11 +410,20 @@ void Player::IdleUpdate()
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR input = VGet(m_analogX, 0.0f, -m_analogZ);
 
+	//地面についていなかったら
+	if (!GetIsJump())
+	{
+		OnFall();
+		return;
+	}
+
+	//スティックの入力があったら
 	if (VSquareSize(input) != 0.0f)
 	{
 		OnWalk();
 		return;
 	}
+	
 	
 	if (Pad::IsTrigger(kPadButtonRStick) && !m_isJump && !m_isStamina)
 	{
@@ -434,12 +431,14 @@ void Player::IdleUpdate()
 		return;
 	}
 
-	if (Pad::IsTrigger(kPadButtonB) && !m_isJump && !m_isStamina)
+	//ジャンプ
+	if (Pad::IsTrigger(kPadButtonB) && GetIsJump() && !m_isStamina)
 	{
 		OnJump();
 		return;
 	}
 
+	//攻撃X
 	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
 		OnAttackX();
@@ -636,6 +635,13 @@ void Player::WalkUpdate()
 		return;
 	}
 
+	//地面についていなかったら
+	if (!GetIsJump())
+	{
+		OnFall();
+		return;
+	}
+
 	//攻撃X
 	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
@@ -675,7 +681,7 @@ void Player::WalkUpdate()
 	}
 
 	//ジャンプ
-	if (Pad::IsTrigger(kPadButtonB) && !m_isJump && !m_isStamina)
+	if (Pad::IsTrigger(kPadButtonB) && GetIsJump() && !m_isStamina)
 	{
 		OnJump();
 		return;
@@ -749,22 +755,22 @@ void Player::DashUpdate()
 		move = VNorm(move);
 
 		//プレイヤーのタイプで攻撃アニメーションを変える
-		if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+		if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 		{
 			//ダッシュ
 			speed = kPowerDashSpeed * rate;
 		}
-		else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+		else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 		{
 			//ダッシュ
 			speed = kSpeedDashSpeed * rate;
 		}
-		else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+		else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
 		{
 			//ダッシュ
 			speed = kShotDashSpeed * rate;
 		}
-		else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+		else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
 		{
 			//ダッシュ
 			speed = kStrongestDashSpeed * rate;
@@ -793,6 +799,13 @@ void Player::DashUpdate()
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
 
+	}
+
+	//地面についていなかったら
+	if (!GetIsJump())
+	{
+		OnFall();
+		return;
 	}
 
 	//歩き
@@ -836,11 +849,11 @@ void Player::DashUpdate()
 	}
 
 	//ジャンプ
-	if (Pad::IsTrigger(kPadButtonB) && !m_isJump && !m_isStamina)
+	if (Pad::IsTrigger(kPadButtonB) && GetIsJump() && !m_isStamina)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
-		OnJump();
+		OnDashJump();
 	}
 
 	//顔を決定する	ここはZRで決定にする
@@ -857,19 +870,8 @@ void Player::DashUpdate()
 void Player::JumpUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
-
-	// カメラの角度によって進む方向を変える
-	//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
-
-	//if (m_pAnim->IsLoop())
-	//{
-	//	OnAir();
-	//}
-
 	
-
 	m_jumpCount++;
-	m_frame++;
 
 	//if (!m_isFaceUse)
 	{
@@ -895,13 +897,9 @@ void Player::JumpUpdate()
 		m_rigidbody.SetVelocity(vel);
 	}
 
-	if (m_frame > 52)
+	if (m_jumpCount > 30)
 	{
-		m_frame = 0;
-		//m_isJump = false;
-		m_isButtonPush = false;
-		m_buttonKind = e_ButtonKind::kNone;
-		OnIdle();
+		OnFall();
 	}
 
 	//アナログスティックを取得
@@ -935,22 +933,136 @@ void Player::JumpUpdate()
 	float speed = 0;
 
 	//プレイヤーのタイプで攻撃アニメーションを変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kPowerMaxSpeed * rate;
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kSpeedMaxSpeed * rate;
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kShotMaxSpeed * rate;
+	}
+	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kStrongestDashSpeed * rate;
+	}
+
+	if (!m_isFaceUse)
+	{
+		//ダッシュ
+		speed = kNormalMaxSpeed * rate;
+	}
+
+	move = VScale(move, speed);
+
+	//カメラのいる場所(角度)から
+	//コントローラーによる移動方向を決定する
+	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
+	move = VTransform(move, mtx);
+
+
+
+	//動いている間
+	if (VSquareSize(move) > 0.0f)
+	{
+		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+	}
+
+	move.y = m_rigidbody.GetVelocity().y;
+	m_rigidbody.SetVelocity(move);
+
+}
+
+void Player::DashJumpUpdate()
+{
+	m_stamina += kStaminaIncreaseSpeed;
+
+	m_jumpCount++;
+	//m_frame++;
+
+	//if (!m_isFaceUse)
+	{
+		auto vel = m_rigidbody.GetVelocity();
+		//vel.y += kMinJumpPower;
+
+		if (m_jumpCount < 6)
+		{
+			vel.y += kMaxJumpPower;
+			m_jumpPower += kMaxJumpPower;
+		}
+		else
+		{
+			vel.y += kMinJumpPower;
+			m_jumpPower += kMinJumpPower;
+		}
+
+		if (m_jumpPower > 4)
+		{
+			OnDashAir();
+		}
+
+		m_rigidbody.SetVelocity(vel);
+	}
+
+	if (m_jumpCount > 30)
+	{
+		OnDashFall();
+	}
+
+	//アナログスティックを取得
+	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
+	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
+
+	float len = VSize(move);
+	float rate = len / kAnalogInputMax;
+
+	//速度が決定できるので移動ベクトルに反映する
+	move = VNorm(move);
+
+	//アナログスティック無効な範囲を除外する
+	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	rate = min(rate, 1.0f);
+	rate = max(rate, 0.0f);
+
+	//カメラの正面方向ベクトル
+	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+	//カメラの右方向ベクトル
+	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+	//向きベクトル*移動量
+	front = VScale(front, -move.x);
+	//向きベクトル*移動量
+	right = VScale(right, -move.z);
+
+	move = VAdd(front, right);
+	move = VNorm(move);
+
+	float speed = 0;
+
+	//プレイヤーのタイプで攻撃アニメーションを変える
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 	{
 		//ダッシュ
 		speed = kPowerDashSpeed * rate;
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
 		//ダッシュ
 		speed = kSpeedDashSpeed * rate;
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
 	{
 		//ダッシュ
 		speed = kShotDashSpeed * rate;
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
 	{
 		//ダッシュ
 		speed = kStrongestDashSpeed * rate;
@@ -979,19 +1091,39 @@ void Player::JumpUpdate()
 
 	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(move);
-
 }
 
 void Player::FallUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
 
-	//m_frame++;
+	m_jumpCount++;
 
-	//地面に着いたら待機状態に移動する条件式を書く予定
-	if (!m_isJump)
+	auto vel = m_rigidbody.GetVelocity();
+
+	if (m_jumpCount < 15)
 	{
-		m_frame = 0;
+		vel.y += kMinJumpPower;
+	}
+	else if (m_jumpCount < 30)
+	{
+		vel.y -= kMinJumpPower;
+	}
+	else if (m_jumpCount < 45)
+	{
+		vel.y -= kMinJumpPower * kMinFallScale;
+	}
+	else
+	{
+		vel.y -= kMinJumpPower * kMaxFallScale;
+	}
+
+	m_rigidbody.SetVelocity(vel);
+
+	if (GetIsJump())
+	{
+		m_buttonKind = e_ButtonKind::kNone;
+		m_isButtonPush = false;
 		OnIdle();
 	}
 
@@ -1026,22 +1158,22 @@ void Player::FallUpdate()
 	float speed = 0;
 
 	//プレイヤーのタイプで攻撃アニメーションを変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 	{
 		//ダッシュ
-		speed = kPowerDashSpeed * rate;
+		speed = kPowerMaxSpeed * rate;
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
 		//ダッシュ
-		speed = kSpeedDashSpeed * rate;
+		speed = kSpeedMaxSpeed * rate;
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
 	{
 		//ダッシュ
-		speed = kShotDashSpeed * rate;
+		speed = kShotMaxSpeed * rate;
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
 	{
 		//ダッシュ
 		speed = kStrongestDashSpeed * rate;
@@ -1050,6 +1182,111 @@ void Player::FallUpdate()
 	if (!m_isFaceUse)
 	{
 		//ダッシュ
+		speed = kNormalMaxSpeed * rate;
+	}
+
+	move = VScale(move, speed);
+
+	//カメラのいる場所(角度)から
+	//コントローラーによる移動方向を決定する
+	MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
+	move = VTransform(move, mtx);
+
+	//動いている間
+	if (VSquareSize(move) > 0.0f)
+	{
+		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+	}
+
+	move.y = m_rigidbody.GetVelocity().y;
+	m_rigidbody.SetVelocity(move);
+}
+
+void Player::DashFallUpdate()
+{
+	m_stamina += kStaminaIncreaseSpeed;
+
+	m_jumpCount++;
+
+	auto vel = m_rigidbody.GetVelocity();
+
+	if (m_jumpCount < 15)
+	{
+		//vel.y -= kGravityPower * 0.75f;
+		vel.y += kMinJumpPower;
+	}
+	else if (m_jumpCount < 30)
+	{
+		vel.y -= kMinJumpPower;
+	}
+	else if (m_jumpCount < 45)
+	{
+		vel.y -= kMinJumpPower * kMinFallScale;
+	}
+	else
+	{
+		vel.y -= kMinJumpPower * kMaxFallScale;
+	}
+
+	m_rigidbody.SetVelocity(vel);
+
+	if (GetIsJump())
+	{
+		m_buttonKind = e_ButtonKind::kNone;
+		m_isButtonPush = false;
+		OnIdle();
+	}
+
+	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
+
+	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
+
+	float len = VSize(move);
+	float rate = len / kAnalogInputMax;
+
+	//速度が決定できるので移動ベクトルに反映する
+	move = VNorm(move);
+
+	//アナログスティック無効な範囲を除外する
+	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	rate = min(rate, 1.0f);
+	rate = max(rate, 0.0f);
+
+	//カメラの正面方向ベクトル
+	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+	//カメラの右方向ベクトル
+	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+	//向きベクトル*移動量
+	front = VScale(front, -move.x);
+	//向きベクトル*移動量
+	right = VScale(right, -move.z);
+
+	move = VAdd(front, right);
+	move = VNorm(move);
+
+	float speed = 0;
+
+	//プレイヤーのタイプで攻撃アニメーションを変える
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		speed = kPowerDashSpeed * rate;
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		speed = kSpeedDashSpeed * rate;
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		speed = kShotDashSpeed * rate;
+	}
+	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	{
+		speed = kStrongestDashSpeed * rate;
+	}
+
+	if (!m_isFaceUse)
+	{
 		speed = kNormalDashSpeed * rate;
 	}
 
@@ -1066,7 +1303,7 @@ void Player::FallUpdate()
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
 	}
 
-	move.y = m_rigidbody.GetVelocity().y * 0.5;
+	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(move);
 }
 
@@ -1266,6 +1503,7 @@ void Player::WeaponDraw(PlayerWeapon& weapon)
 void Player::OnIdle()
 {
 	m_jumpCount = 0;
+	m_frame = 0;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 
@@ -1299,7 +1537,7 @@ void Player::OnAttackX()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("hitEffect", pos);
+	//EffectManager::GetInstance().CreateEffect("hitEffect", pos);
 
 	//タイプによって攻撃アニメーションを変える
 	switch (m_multiAttack)
@@ -1355,11 +1593,12 @@ void Player::OnJump()
 {
 	SoundManager::GetInstance().PlaySe("jumpSe");
 
-	m_stamina -= 40;
-
 	//地面と接触しているかどうか
 	//m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
+
+	m_jumpCount = 0;
+	m_jumpPower = 0;
 
 	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
 	m_isButtonPush = true;
@@ -1369,18 +1608,56 @@ void Player::OnJump()
 
 }
 
+void Player::OnDashJump()
+{
+	SoundManager::GetInstance().PlaySe("jumpSe");
+
+	m_stamina -= 20;
+
+	//地面と接触しているかどうか
+	//m_isJump = true;
+	auto vel = m_rigidbody.GetVelocity();
+
+	m_jumpCount = 0;
+	m_jumpPower = 0;
+
+	m_pAnim->ChangeAnim(kAnimJump, true, true, true);
+	m_isButtonPush = true;
+	m_buttonKind = e_ButtonKind::kBbutton;
+
+	m_updateFunc = &Player::DashJumpUpdate;
+}
+
 void Player::OnAir()
 {
 	m_pAnim->ChangeAnim(kAnimFall);
 	m_updateFunc = &Player::JumpUpdate;
 }
 
+void Player::OnDashAir()
+{
+	m_pAnim->ChangeAnim(kAnimFall);
+	m_updateFunc = &Player::DashJumpUpdate;
+}
+
 void Player::OnFall()
 {
-	m_jumpCount = 0;
 	m_isJump = true;
+
+	m_jumpCount = 0;
+
 	m_pAnim->ChangeAnim(kAnimFall);
 	m_updateFunc = &Player::FallUpdate;
+}
+
+void Player::OnDashFall()
+{
+	m_isJump = true;
+
+	m_jumpCount = 0;
+
+	m_pAnim->ChangeAnim(kAnimFall);
+	m_updateFunc = &Player::DashFallUpdate;
 }
 
 void Player::OnAttackCharge()
@@ -1455,19 +1732,19 @@ void Player::FaceSelect()
 void Player::AnimChange(const char* normal, const char* power, const char* speed, const char* shot)
 {
 	//プレイヤーのタイプでアニメーションを変える
-	if (m_playerKind == Player::e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 	{
 		m_pAnim->ChangeAnim(power);
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
 		m_pAnim->ChangeAnim(speed);
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
 	{
 		m_pAnim->ChangeAnim(shot);
 	}
-	else if (m_playerKind == Player::e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
 	{
 		m_pAnim->ChangeAnim(normal);
 	}
@@ -1482,84 +1759,3 @@ const float& Player::GetRadius() const
 {
 	return m_radius;
 }
-
-void Player::ShadowRender(int stageH)
-{
-	int i;
-	MV1_COLL_RESULT_POLY_DIM HitResDim;
-	MV1_COLL_RESULT_POLY* HitRes;
-	VERTEX3D Vertex[3];
-	VECTOR SlideVec;
-
-	// ライティングを無効にする
-	SetUseLighting(FALSE);
-
-	// Ｚバッファを有効にする
-	SetUseZBuffer3D(TRUE);
-
-	// テクスチャアドレスモードを CLAMP にする( テクスチャの端より先は端のドットが延々続く )
-	SetTextureAddressMode(DX_TEXADDRESS_CLAMP);
-
-	// プレイヤーの直下に存在する地面のポリゴンを取得
-	HitResDim = MV1CollCheck_Capsule(stageH, -1, m_rigidbody.GetPos(), VAdd(m_rigidbody.GetPos(), VGet(0.0f, -kShadowHeight, 0.0f)), kShadowSize);
-
-	// 頂点データで変化が無い部分をセット
-	Vertex[0].dif = GetColorU8(255, 255, 255, 255);
-	Vertex[0].spc = GetColorU8(0, 0, 0, 0);
-	Vertex[0].su = 0.0f;
-	Vertex[0].sv = 0.0f;
-	Vertex[1] = Vertex[0];
-	Vertex[2] = Vertex[0];
-
-	// 球の直下に存在するポリゴンの数だけ繰り返し
-	HitRes = HitResDim.Dim;
-	for (i = 0; i < HitResDim.HitNum; i++, HitRes++)
-	{
-		// ポリゴンの座標は地面ポリゴンの座標
-		Vertex[0].pos = HitRes->Position[0];
-		Vertex[1].pos = HitRes->Position[1];
-		Vertex[2].pos = HitRes->Position[2];
-
-		// ちょっと持ち上げて重ならないようにする
-		SlideVec = VScale(HitRes->Normal, 0.1f);
-		Vertex[0].pos = VAdd(Vertex[0].pos, SlideVec);
-		Vertex[1].pos = VAdd(Vertex[1].pos, SlideVec);
-		Vertex[2].pos = VAdd(Vertex[2].pos, SlideVec);
-
-		// ポリゴンの不透明度を設定する
-		Vertex[0].dif.a = 0;
-		Vertex[1].dif.a = 0;
-		Vertex[2].dif.a = 0;
-
-		if (HitRes->Position[0].y > m_rigidbody.GetPos().y - kShadowHeight)
-			Vertex[0].dif.a = 128 * (1.0f - fabs(HitRes->Position[0].y - m_rigidbody.GetPos().y) / kShadowHeight);
-
-		if (HitRes->Position[1].y > m_rigidbody.GetPos().y - kShadowHeight)
-			Vertex[1].dif.a = 128 * (1.0f - fabs(HitRes->Position[1].y - m_rigidbody.GetPos().y) / kShadowHeight);
-
-		if (HitRes->Position[2].y > m_rigidbody.GetPos().y - kShadowHeight)
-			Vertex[2].dif.a = 128 * (1.0f - fabs(HitRes->Position[2].y - m_rigidbody.GetPos().y) / kShadowHeight);
-
-		// ＵＶ値は地面ポリゴンとプレイヤーの相対座標から割り出す
-		Vertex[0].u = (HitRes->Position[0].x - m_rigidbody.GetPos().x) / (kShadowSize * 2.0f) + 0.5f;
-		Vertex[0].v = (HitRes->Position[0].z - m_rigidbody.GetPos().z) / (kShadowSize * 2.0f) + 0.5f;
-		Vertex[1].u = (HitRes->Position[1].x - m_rigidbody.GetPos().x) / (kShadowSize * 2.0f) + 0.5f;
-		Vertex[1].v = (HitRes->Position[1].z - m_rigidbody.GetPos().z) / (kShadowSize * 2.0f) + 0.5f;
-		Vertex[2].u = (HitRes->Position[2].x - m_rigidbody.GetPos().x) / (kShadowSize * 2.0f) + 0.5f;
-		Vertex[2].v = (HitRes->Position[2].z - m_rigidbody.GetPos().z) / (kShadowSize * 2.0f) + 0.5f;
-
-		// 影ポリゴンを描画
-		DrawPolygon3D(Vertex, 1, m_shadowH, TRUE);
-	}
-
-	// 検出した地面ポリゴン情報の後始末
-	MV1CollResultPolyDimTerminate(HitResDim);
-
-	// ライティングを有効にする
-	SetUseLighting(TRUE);
-
-	// Ｚバッファを無効にする
-	SetUseZBuffer3D(FALSE);
-}
-
-
