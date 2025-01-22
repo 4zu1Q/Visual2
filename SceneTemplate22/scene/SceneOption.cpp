@@ -111,7 +111,7 @@ void SceneOption::Update()
 
 	Pad::Update();
 	UpdateFade();
-	UpdateFadeGraph();
+	UpdateFadeSelectGraph();
 
 	if (!Pad::IsPress(PAD_INPUT_RIGHT) && !Pad::IsPress(PAD_INPUT_LEFT))
 	{
@@ -175,7 +175,7 @@ void SceneOption::Draw()
 		DrawGraph(130 + m_selectAnimation, 130, m_handles[kPointerH], true);
 
 		//BGM
-		DrawFadeGraph(m_handles[kBgmH], kBgmPos);
+		DrawFadeSelectGraph(m_handles[kBgmH], kBgmPos);
 		//SE
 		DrawGraph(kSePos.x, kSePos.y, m_handles[kSeH], true);
 		//Sensitivity
@@ -190,7 +190,7 @@ void SceneOption::Draw()
 		//BGM
 		DrawGraph(kBgmPos.x, kBgmPos.y, m_handles[kBgmH], true);
 		//SE
-		DrawFadeGraph(m_handles[kSeH], kSePos);
+		DrawFadeSelectGraph(m_handles[kSeH], kSePos);
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
 		//FullScreen
@@ -205,7 +205,7 @@ void SceneOption::Draw()
 		//SE
 		DrawGraph(kSePos.x, kSePos.y, m_handles[kSeH], true);
 		//Sensitivity
-		DrawFadeGraph(m_handles[kSensitivityH], kSensitivityPos);
+		DrawFadeSelectGraph(m_handles[kSensitivityH], kSensitivityPos);
 		//FullScreen
 		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
 	}
@@ -220,7 +220,7 @@ void SceneOption::Draw()
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
 		//FullScreen
-		DrawFadeGraph(m_handles[kFullScreenH], kFullScreenPos);
+		DrawFadeSelectGraph(m_handles[kFullScreenH], kFullScreenPos);
 	}
 
 #ifdef _DEBUG
@@ -253,7 +253,7 @@ void SceneOption::BgmUpdate()
 		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kFullScreen;
 		m_updateFunc = &SceneOption::FullScreenUpdate;
-		FadeGraphReset();
+		FadeGraphSelectReset();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
@@ -261,7 +261,7 @@ void SceneOption::BgmUpdate()
 		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kSe;
 		m_updateFunc = &SceneOption::SeUpdate;
-		FadeGraphReset();
+		FadeGraphSelectReset();
 	}
 
 	if (Pad::IsPress(PAD_INPUT_RIGHT))
@@ -304,7 +304,7 @@ void SceneOption::SeUpdate()
 		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kBgm;
 		m_updateFunc = &SceneOption::BgmUpdate;
-		FadeGraphReset();
+		FadeGraphSelectReset();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
@@ -312,7 +312,7 @@ void SceneOption::SeUpdate()
 		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kSensitivity;
 		m_updateFunc = &SceneOption::SensitivityUpdate;
-		FadeGraphReset();
+		FadeGraphSelectReset();
 	}
 
 	if (Pad::IsPress(PAD_INPUT_RIGHT))
@@ -354,7 +354,7 @@ void SceneOption::SensitivityUpdate()
 		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kSe;
 		m_updateFunc = &SceneOption::SeUpdate;
-		FadeGraphReset();
+		FadeGraphSelectReset();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
@@ -362,7 +362,7 @@ void SceneOption::SensitivityUpdate()
 		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kFullScreen;
 		m_updateFunc = &SceneOption::FullScreenUpdate;
-		FadeGraphReset();
+		FadeGraphSelectReset();
 	}
 
 	if (Pad::IsPress(PAD_INPUT_RIGHT))
@@ -401,7 +401,7 @@ void SceneOption::FullScreenUpdate()
 		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kSensitivity;
 		m_updateFunc = &SceneOption::SensitivityUpdate;
-		FadeGraphReset();
+		FadeGraphSelectReset();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
@@ -409,7 +409,7 @@ void SceneOption::FullScreenUpdate()
 		SoundManager::GetInstance().PlaySe("selectSe");
 		m_nowItem = e_Item::kBgm;
 		m_updateFunc = &SceneOption::BgmUpdate;
-		FadeGraphReset();
+		FadeGraphSelectReset();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_1))

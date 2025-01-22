@@ -162,7 +162,7 @@ void SceneSelect::Update()
 
 	Pad::Update();
 	UpdateFade();
-	UpdateFadeGraph();
+	UpdateFadeSelectGraph();
 
 	SoundManager::GetInstance().PlayBgm("selectBgm", true);
 
@@ -307,7 +307,7 @@ void SceneSelect::Draw()
 	//ゲームシーンに行けるかどうかを分かりやすくするための画像
 	if (m_isPowerStage) 
 	{
-		DrawFadeGraph(m_handles[kHitH], kHitPos);
+		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kPowerH], true);
 
 		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
@@ -322,7 +322,7 @@ void SceneSelect::Draw()
 	}
 	if (m_isSpeedStage)
 	{
-		DrawFadeGraph(m_handles[kHitH], kHitPos);
+		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kSpeedH], true);
 
 		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
@@ -337,7 +337,7 @@ void SceneSelect::Draw()
 	}
 	if (m_isShotStage)
 	{
-		DrawFadeGraph(m_handles[kHitH], kHitPos);
+		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kShotH], true);
 
 		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
@@ -352,7 +352,7 @@ void SceneSelect::Draw()
 	}
 	if (m_isRastStage)
 	{
-		DrawFadeGraph(m_handles[kHitH], kHitPos);
+		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kRastH], true);
 
 		DrawGraph(kHitStarPos.x - 25, kHitStarPos.y + 10, m_handles[kNoClearItemH], true);
@@ -360,7 +360,7 @@ void SceneSelect::Draw()
 		DrawGraph(kHitStarPos.x + 25, kHitStarPos.y + 10, m_handles[kNoClearItemH], true);
 
 		//条件を満たしていた場合していた場合
-		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kPowerPlayer))
+		//if ()
 		{
 			DrawGraph(kHitStarPos.x - 25, kHitStarPos.y + 10, m_handles[kPowerClearItemH], true);
 		}

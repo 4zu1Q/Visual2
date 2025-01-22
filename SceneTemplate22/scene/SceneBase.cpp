@@ -13,6 +13,9 @@ namespace
 
 	const char* kFontPath = "Data/Font/Dela-Gothic-One.ttf";
 
+	constexpr float kCursorSpeed = 0.2f;
+
+
 }
 
 
@@ -25,7 +28,8 @@ SceneBase::SceneBase(SceneManager& manager):
 	m_fadeSpeed = -kFadeSpeed;
 	m_isToNextScene = false;
 	m_isFadeColor = false;
-	m_fadeGraphTime = 0;
+	m_fadeGraphSelectTime = 0;
+	m_fadeGraphTitleTime = 0;
 
 	/*サウンドのロード*/
 	//BGM
@@ -141,34 +145,71 @@ void SceneBase::FadeOutSkip()
 	m_fadeSpeed = kFadeSpeed;
 }
 
-void SceneBase::UpdateFadeGraph()
+void SceneBase::UpdateFadeSelectGraph()
 {
 	// スタート指示を点滅させる
-	if (m_fadeGraphTime == 120) {
-		m_fadeGraphTime++;
+	if (m_fadeGraphSelectTime == 120) 
+	{
+		m_fadeGraphSelectTime++;
 	}
-	else if (m_fadeGraphTime == 1) {
-		m_fadeGraphTime--;
+	else if (m_fadeGraphSelectTime == 1) 
+	{
+		m_fadeGraphSelectTime--;
 	}
-	else if (m_fadeGraphTime % 2 == 0) {
-		m_fadeGraphTime += 2;
+	else if (m_fadeGraphSelectTime % 2 == 0) 
+	{
+		m_fadeGraphSelectTime += 2;
 	}
-	else {
-		m_fadeGraphTime -= 2;
+	else 
+	{
+		m_fadeGraphSelectTime -= 2;
 	}
 }
 
-void SceneBase::DrawFadeGraph(int graphHandle, Vec2 graphPos)
+void SceneBase::DrawFadeSelectGraph(int graphHandle, Vec2 graphPos)
 {
 	// フェードしながら描画
-	int alpha = static_cast<int>(255 * ((float)m_fadeGraphTime / 90));
+	int alpha = static_cast<int>(255 * ((float)m_fadeGraphSelectTime / 120));
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 	// 画像の描画
 	DrawGraph(graphPos.x, graphPos.y, graphHandle, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
-void SceneBase::FadeGraphReset()
+void SceneBase::FadeGraphSelectReset()
 {
-	m_fadeGraphTime = 120;
+	m_fadeGraphSelectTime = 120;
 }
+
+void SceneBase::UpdateFadeGraphTitleLogo()
+{
+	// スタート指示を点滅させる
+	if (m_fadeGraphTitleTime == 300)
+	{
+		m_fadeGraphTitleTime++;
+	}
+	else if (m_fadeGraphTitleTime % 2 == 0)
+	{
+		m_fadeGraphTitleTime += 2;
+	}
+
+}
+
+void SceneBase::DrawFadeGraphTitleLogo(int graphHandle, Vec2 graphPos)
+{
+	// フェードしながら描画
+	int alpha = static_cast<int>(255 * ((float)m_fadeGraphTitleTime / 300));
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+	// 画像の描画
+	DrawGraph(graphPos.x, graphPos.y, graphHandle, true);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void SceneBase::FadeGraphTitleLogoReset()
+{
+	m_fadeGraphTitleTime = 0;
+}
+
+
+
+

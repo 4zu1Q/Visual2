@@ -14,11 +14,11 @@ public:
 
 	void Initialize(Game::e_PlayerProduction playerScene);
 
-	void Update(bool isStart, bool isBack);
+	void Update(bool isStart, bool isTitle);
 	void Draw();
 
 	void SetTitleFlag(float isTitle) { m_isStart = isTitle; }
-	void SetGameOverFlag(float isGameOver) { m_isBack = isGameOver; }
+	void SetGameOverFlag(float isGameOver) { m_isTitle = isGameOver; }
 
 	const VECTOR& GetPos() const { return m_pos; }
 
@@ -34,6 +34,7 @@ private:
 	void SitUpdate();
 	void SitUpUpdate();
 	void SitDownUpdate();
+	void PlayStartUpdate();
 	void GameOverUpdate();
 	void RetryUpdate();
 	void GameClearUpdate();
@@ -48,6 +49,7 @@ private:
 	void OnSit();
 	void OnSitDown();
 	void OnSitUp();
+	void OnPlayStart();
 	void OnGameOver();
 	void OnRetry();
 	void OnGameClear();
@@ -69,7 +71,7 @@ private:
 	VECTOR m_attachFramePosition;
 
 	bool m_isStart;
-	bool m_isBack;
+	bool m_isTitle;
 
 	bool m_isActionStart;
 	bool m_isActionBack;

@@ -28,6 +28,11 @@ public:
 	const bool& GetIsPlayer() const { return m_isPlayer; }
 
 private:
+	void DrawCursor();
+	void UpdateCursorUp();
+	void UpdateCursorDown();
+
+private:
 
 	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
 	std::shared_ptr<CameraProduction> m_pCameraProduction;
@@ -50,12 +55,28 @@ private:
 
 	bool m_isPlayer;	//プレイヤーのタイトルバージョンのアニメーションを行う
 
+	bool m_isSkip;
 	bool m_isStart;
+	
+
 	int m_startTime;
+	int m_titleLogoTime;
+	int m_fadeGraphTime;
+
 	float m_selectAnimation;
+
+	VECTOR m_PlayerPos;
+
+
+	Vec2 m_titleLogoPos;
 
 	bool m_isActionStart;
 	bool m_isActionBack;
+
+	// カーソルの現在位置と目標位置
+	Vec2 m_cursorPos;
+	Vec2 m_targetCursorUpPos;
+	Vec2 m_targetCursorDownPos;
 
 	e_SceneTrans m_sceneTrans;
 

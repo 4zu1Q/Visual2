@@ -94,19 +94,28 @@ protected:
 	/// <summary>
 	/// グラフのフェードを行う関数
 	/// </summary>
-	void UpdateFadeGraph();
+	void UpdateFadeSelectGraph();
 
 	/// <summary>
 	/// 特定の画像をフェード描画させる関数(DrawGraphのみ使うことができる)
 	/// </summary>
 	/// <param name="graphHandle">フェードさせる画像ハンドル</param>
 	/// <param name="graphPos">フェードさせる画像の座標</param>
-	void DrawFadeGraph(int graphHandle , Vec2 graphPos);
+	void DrawFadeSelectGraph(int graphHandle , Vec2 graphPos);
 
 	/// <summary>
 	/// フェードの時間を0にリセットする関数
 	/// </summary>
-	void FadeGraphReset();
+	void FadeGraphSelectReset();
+
+
+	void UpdateFadeGraphTitleLogo();
+
+	void DrawFadeGraphTitleLogo(int graphHandle, Vec2 graphPos);
+
+	void FadeGraphTitleLogoReset();
+
+
 
 protected:
 
@@ -121,6 +130,7 @@ private:
 	int m_fadeBright;
 	int m_fadeSpeed;
 
-	int m_fadeGraphTime;
+	int m_fadeGraphSelectTime;
+	int m_fadeGraphTitleTime;
 };
 

@@ -9,17 +9,18 @@ namespace
 
 	const char* const kShadowFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
 	{
-		"Data/Model/Stage/Field12.mv1",
+		"Data/Model/Stage/TitleStage.mv1",
 		"Data/Model/Stage/Field12.mv1",
 		"Data/Model/Stage/Field07.mv1",
 	};
 
 	//ステージのスケール値
+	constexpr VECTOR kTitleModelScale = { 0.2f , 0.2f , 0.2f };
 	constexpr VECTOR kSelectModelScale = { 1.0f , 1.0f , 1.0f };
 	constexpr VECTOR kGamePlayModelScale = { 0.4f , 0.4f , 0.4f };
 
 	//ステージの座標
-	constexpr VECTOR kTitleModelPosition = { 570.0f, -3050.0f, 2700.0f };
+	constexpr VECTOR kTitleModelPosition = { 0, 60, 0 };
 	constexpr VECTOR kSelectModelPosition = { 70.0f, -1600.0f, 1200.0f };
 	constexpr VECTOR kGamePlayModelPosition = { 0.0f, 150.0f, 0.0f };
 }
@@ -32,7 +33,7 @@ Field::Field(Game::e_StageKind stageKind):
 
 	if (stageKind == Game::e_StageKind::kTitle)
 	{
-		MV1SetScale(m_modelH, kSelectModelScale);
+		MV1SetScale(m_modelH, kTitleModelScale);
 	}
 	else if (stageKind == Game::e_StageKind::kSelect)
 	{
@@ -46,6 +47,7 @@ Field::Field(Game::e_StageKind stageKind):
 	if (stageKind == Game::e_StageKind::kTitle)
 	{
 		m_pos = kTitleModelPosition;
+		MV1SetRotationXYZ(m_modelH, VGet(0, 14.1, 0));
 	}
 	else if (stageKind == Game::e_StageKind::kSelect)
 	{

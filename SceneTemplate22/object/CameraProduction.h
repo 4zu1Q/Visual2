@@ -12,7 +12,7 @@ public:
 	void Initialize(VECTOR playerPos, Game::e_PlayerProduction playerPro);
 	void Finalize();
 
-	void Update();
+	void Update(VECTOR playerPos, Game::e_PlayerProduction playerPro);
 	void Draw();
 
 	const VECTOR GetDirection() const;
@@ -25,6 +25,8 @@ private:
 	VECTOR m_targetPos;			//注視点
 	float m_angleH;		//水平角度 弧度法
 	float m_angleV;		//垂直角度 弧度法
+
+	float m_cameraAnimation;
 
 	VECTOR m_setEye;
 	VECTOR m_setTarget;

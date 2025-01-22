@@ -77,9 +77,9 @@ void SceneGameClear::Update()
 {
 	Pad::Update();
 	UpdateFade();
-	UpdateFadeGraph();
+	UpdateFadeSelectGraph();
 
-	m_pCameraProduction->Update();
+	m_pCameraProduction->Update(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kGameClear);
 	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
 	m_pSkyDome->Update();
 
@@ -100,7 +100,7 @@ void SceneGameClear::Update()
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
-				FadeGraphReset();
+				FadeGraphSelectReset();
 			}
 		}
 
@@ -111,7 +111,7 @@ void SceneGameClear::Update()
 			{
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
-				FadeGraphReset();
+				FadeGraphSelectReset();
 			}
 		}
 
@@ -183,7 +183,7 @@ void SceneGameClear::Draw()
 		DrawGraph(360 + m_selectAnimation, 615, m_handles[kPointerH], true);
 
 		//Select
-		DrawFadeGraph(m_handles[kSelectH], kSelectPos);
+		DrawFadeSelectGraph(m_handles[kSelectH], kSelectPos);
 		//Title
 		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
@@ -194,7 +194,7 @@ void SceneGameClear::Draw()
 		//Select
 		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 		//Title
-		DrawFadeGraph(m_handles[kTitleH], kTitlePos);
+		DrawFadeSelectGraph(m_handles[kTitleH], kTitlePos);
 	}
 
 	DrawGraph(380, 100, m_handles[kGameClearH], true);

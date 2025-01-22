@@ -52,7 +52,7 @@ PlayerProduction::PlayerProduction():
 	m_pos(VGet(0,0,0)),
 	m_cameraPos(VGet(0,0,0)),
 	m_isStart(false),
-	m_isBack(false)
+	m_isTitle(false)
 {
 	m_modelH = MV1LoadModel(kModelFilename);
 	m_modelWeaponH = MV1LoadModel(kSwordModelFileName);
@@ -102,7 +102,7 @@ void PlayerProduction::Initialize(Game::e_PlayerProduction playerScene)
 	m_updateFunc = &PlayerProduction::IdleUpdate;
 }
 
-void PlayerProduction::Update(bool isStart, bool isBack)
+void PlayerProduction::Update(bool isStart, bool isTitle)
 {
 	//アップデート
 	(this->*m_updateFunc)();
@@ -126,7 +126,7 @@ void PlayerProduction::Update(bool isStart, bool isBack)
 	MV1SetMatrix(m_modelWeaponH, mixMatrix);
 
 	m_isStart = isStart;
-	m_isBack = isBack;
+	m_isTitle = isTitle;
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
@@ -237,11 +237,13 @@ void PlayerProduction::IdleUpdate()
 
 void PlayerProduction::TitleIdleUpdate()
 {
-	if (m_isStart && !m_isBack)
+	if (m_isStart && m_isTitle)
 	{
 		//後で名前とか変える
-		OnGameClear();
+		OnPlayStart();
 	}
+
+
 
 	if (!m_isStart && Pad::IsTrigger(PAD_INPUT_2))
 	{
@@ -257,7 +259,7 @@ void PlayerProduction::DashUpdate()
 
 void PlayerProduction::SitUpdate()
 {
-	if (Pad::IsTrigger(PAD_INPUT_1))
+	if (m_isTitle && Pad::IsTrigger(PAD_INPUT_1))
 	{
 		OnSitUp();
 	}
@@ -277,6 +279,11 @@ void PlayerProduction::SitDownUpdate()
 	{
 		OnSit();
 	}
+}
+
+void PlayerProduction::PlayStartUpdate()
+{
+
 }
 
 void PlayerProduction::GameOverUpdate()
@@ -337,6 +344,13 @@ void PlayerProduction::OnSitUp()
 	//タイプによってアニメーションを変える
 	m_pAnim->ChangeAnim(kAnimSitUp, false, true, true);
 	m_updateFunc = &PlayerProduction::SitUpUpdate;
+}
+
+void PlayerProduction::OnPlayStart()
+{
+	//タイプによってアニメーションを変える
+	m_pAnim->ChangeAnim(kAnimGameClear);
+	m_updateFunc = &PlayerProduction::PlayStartUpdate;
 }
 
 void PlayerProduction::OnGameOver()

@@ -17,11 +17,14 @@ namespace
 	constexpr float kGameOverCameraPlayerBackwardDistance = 20.0f;	// プレイヤーとの奥行方向の距離
 	constexpr float kGameClearCameraPlayerBackwardDistance = 23.0f;	// プレイヤーとの奥行方向の距離
 
-	constexpr float kTitleCameraPlayerRightDistance = -15.0f;		// プレイヤーとの水平方向の距離
+	constexpr float kTitleCameraPlayerRightDistance = -18.0f;		// プレイヤーとの水平方向の距離
 	constexpr float kGameOverCameraPlayerRightDistance = 0.0f;		// プレイヤーとの水平方向の距離
 	constexpr float kGameClearCameraPlayerRightDistance = -0.0;	// プレイヤーとの水平方向の距離
 
 	constexpr float kCameraCollisionSize = 3.0f;			// カメラの当たり判定サイズ
+
+	constexpr float kSelectSpeed = 0.01f;
+	constexpr float kSelectAnimationSize = 1.0f;
 
 	constexpr float kCameraNear = 5.0f;
 	constexpr float kCameraFar = 5000.0f;
@@ -35,7 +38,8 @@ CameraProduction::CameraProduction():
 	m_angleH(0.0f),
 	m_angleV(0.0f),
 	m_lightHandle(0),
-	m_angleMoveScale(0.0f)
+	m_angleMoveScale(0.0f),
+	m_cameraAnimation(0.0f)
 {
 	//カメラ
 	SetCameraNearFar(0.1f, 1000.0f);
@@ -59,6 +63,18 @@ void CameraProduction::Initialize(VECTOR playerPos, Game::e_PlayerProduction pla
 {
 	m_lightHandle = CreateDirLightHandle(VSub(m_targetPos, m_pos));
 	SetCameraNearFar(kCameraNear, kCameraFar);
+
+}
+
+void CameraProduction::Finalize()
+{
+
+
+}
+
+void CameraProduction::Update(VECTOR playerPos, Game::e_PlayerProduction playerPro)
+{
+
 
 	// カメラの初期水平角度は１８０度
 	m_angleH = DX_PI_F;
@@ -86,7 +102,7 @@ void CameraProduction::Initialize(VECTOR playerPos, Game::e_PlayerProduction pla
 	// カメラの座標を算出
 	if (playerPro == Game::e_PlayerProduction::kTitle)
 	{
-		m_pos = VAdd(VAdd(playerPos, VScale(rightVector, kTitleCameraPlayerRightDistance)), VScale(forwardVector, -kTitleCameraPlayerBackwardDistance));
+		m_pos = VAdd(VAdd(playerPos, VAdd(VScale(rightVector, kTitleCameraPlayerRightDistance), VGet(0,0, m_cameraAnimation))), VScale(forwardVector, -kTitleCameraPlayerBackwardDistance));
 	}
 	else if (playerPro == Game::e_PlayerProduction::kGameOver)
 	{
@@ -119,17 +135,11 @@ void CameraProduction::Initialize(VECTOR playerPos, Game::e_PlayerProduction pla
 	m_setTarget = VAdd(m_setTarget, VScale(VSub(m_targetPos, m_setTarget), 1.0f));
 	SetLightDirectionHandle(m_lightHandle, VSub(playerPos, m_pos));
 	SetCameraPositionAndTarget_UpVecY(m_setEye, m_setTarget);
-}
 
-void CameraProduction::Finalize()
-{
-
-
-}
-
-void CameraProduction::Update()
-{
-
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_cameraAnimation = sinf(SinCount) * kSelectAnimationSize;
 }
 
 void CameraProduction::Draw()

@@ -74,7 +74,7 @@ void ScenePause::Update()
 	Pad::Update();
 	//フェードを更新
 	UpdateFade();
-	UpdateFadeGraph();
+	UpdateFadeSelectGraph();
 
 	if (!m_isToNextScene)
 	{
@@ -85,13 +85,13 @@ void ScenePause::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
-				FadeGraphReset();
+				FadeGraphSelectReset();
 			}
 			else if (m_sceneTrans == e_SceneTrans::kRestart)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kTitle;
-				FadeGraphReset();
+				FadeGraphSelectReset();
 			}
 		}
 
@@ -102,13 +102,13 @@ void ScenePause::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
-				FadeGraphReset();
+				FadeGraphSelectReset();
 			}
 			else if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kRestart;
-				FadeGraphReset();
+				FadeGraphSelectReset();
 			}
 		}
 
@@ -212,7 +212,7 @@ void ScenePause::Draw()
 
 		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 		
-		DrawFadeGraph(m_handles[kReStartH], kReStartPos);
+		DrawFadeSelectGraph(m_handles[kReStartH], kReStartPos);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
 		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
@@ -224,7 +224,7 @@ void ScenePause::Draw()
 		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
-		DrawFadeGraph(m_handles[kOptionH], kOptionPos);
+		DrawFadeSelectGraph(m_handles[kOptionH], kOptionPos);
 		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
@@ -236,7 +236,7 @@ void ScenePause::Draw()
 		
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
-		DrawFadeGraph(m_handles[kSelectH], kSelectPos);
+		DrawFadeSelectGraph(m_handles[kSelectH], kSelectPos);
 		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
 	else if (m_sceneTrans == e_SceneTrans::kTitle)
@@ -248,7 +248,7 @@ void ScenePause::Draw()
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
 		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
-		DrawFadeGraph(m_handles[kTitleH], kTitlePos);
+		DrawFadeSelectGraph(m_handles[kTitleH], kTitlePos);
 	}
 
 	DrawFade(0x000000);
