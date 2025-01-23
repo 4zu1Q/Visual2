@@ -33,6 +33,8 @@ namespace
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 20.0f,15.0f,-100.0f };
+	constexpr VECTOR kLightUpPos = { -15.0f,15.0f, -27.0f };
+	constexpr VECTOR kLightDownPos = { -15.0f,15.0f, -27.0f };
 
 }
 
@@ -73,6 +75,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 	m_pCamera = std::make_shared<Camera>();
 	m_pCamera2 = std::make_shared<Camera2>();
 
+
 	m_playerPos = VGet(30, 0, 20);
 	m_cameraPos = VGet(0, 0, 0);
 
@@ -102,6 +105,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 
 	m_pField->Initialize();
 
+	//m_lightHandle = CreateDirLightHandle(VSub(kLightDownPos, kLightUpPos));
+
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -111,6 +116,9 @@ SceneGamePlay::~SceneGamePlay()
 	m_pBossSpeed->Finalize(m_pPhysics);
 	m_pBossShot->Finalize(m_pPhysics);
 	m_pBossRast->Finalize(m_pPhysics);
+
+	DeleteLightHandle(m_lightHandle);
+
 }
 
 
@@ -214,6 +222,9 @@ void SceneGamePlay::Update()
 	{
 
 	}
+
+	//SetLightDirectionHandle(m_lightHandle, VSub(kLightUpPos , kLightDownPos));
+
 
 }
 

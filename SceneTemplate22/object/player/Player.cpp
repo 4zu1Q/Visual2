@@ -17,7 +17,11 @@
 namespace
 {
 	//プレイヤーのモデルファイル名
-	const char* const kModelFilename = "Data/Model/Player/Player.mv1";
+	const char* const kNormalModelFilename = "Data/Model/Player/Player.mv1";
+	const char* const kPowerModelFilename = "Data/Model/Player/Barbarian.mv1";
+	const char* const kSpeedModelFilename = "Data/Model/Player/RogueHooded.mv1";
+	const char* const kShotModelFilename = "Data/Model/Player/Mage.mv1";
+	const char* const kRassModelFilename = "Data/Model/Player/Knight.mv1";
 
 	//モデルのスケール値
 	constexpr float kModelScale = 5.0f;
@@ -64,61 +68,75 @@ namespace
 	constexpr VECTOR kUpPos = { 0.0f,12.0f,0.0f };
 
 	/*　プレイヤーのアニメーションの種類　*/
-	const char* const kAnimInfoFilename = "Data/Master/AnimPlayerMaster.csv";
+	const char* const kNormalAnimInfoFilename = "Data/Master/AnimPlayerNormalMaster.csv";
+	const char* const kPowerAnimInfoFilename = "Data/Master/AnimPlayerPowerMaster.csv";
+	const char* const kSpeedAnimInfoFilename = "Data/Master/AnimPlayerSpeedMaster.csv";
+	const char* const kShotAnimInfoFilename = "Data/Master/AnimPlayerShotMaster.csv";
+	const char* const kRassAnimInfoFilename = "Data/Master/AnimPlayerRassMaster.csv";
 
 	//スポーン
-	const char* const kAnimSpawn = "Spawn";
+	//const char* const kAnimSpawn = "Spawn";
 
 	//アイドル状態
-	const char* const kAnimNormalIdle = "Idle";
-	const char* const kAnimPowerIdle = "PowerIdle";
-	const char* const kAnimSpeedIdle = "SpeedIdle";
+	const char* const kAnimIdle = "Idle";
+	//const char* const kAnimNormalIdle = "Idle";
+	//const char* const kAnimPowerIdle = "PowerIdle";
+	//const char* const kAnimSpeedIdle = "SpeedIdle";
 
 	//歩き状態
-	const char* const kAnimNormalWalk = "Walk";
-	const char* const kAnimPowerWalk = "PowerWalk";
-	const char* const kAnimSpeedWalk = "SpeedWalk";
+	const char* const kAnimWalk = "Walk";
+	//const char* const kAnimNormalWalk = "Walk";
+	//const char* const kAnimPowerWalk = "PowerWalk";
+	//const char* const kAnimSpeedWalk = "SpeedWalk";
 
 	//ダッシュ状態
-	const char* const kAnimNormalDash = "NormalDash";
-	const char* const kAnimPowerDash = "PowerDash";
-	const char* const kAnimSpeedDash = "SpeedDash";
+	const char* const kAnimDash = "Dash";
+	//const char* const kAnimNormalDash = "NormalDash";
+	//const char* const kAnimPowerDash = "PowerDash";
+	//const char* const kAnimSpeedDash = "SpeedDash";
 
 	//Y攻撃をするためのチャージアニメーション
 	const char* const kAnimAttackCharge = "AttackCharge";
-	const char* const kAnimShotAttackCharge = "ShotAttackCharge";
+	//const char* const kAnimShotAttackCharge = "ShotAttackCharge";
+
+	const char* const kAnimAttackX_First = "AttackX_First";
+	const char* const kAnimAttackX_Second = "AttackX_Second";
+	const char* const kAnimAttackX_Third = "AttackX_Third";
+	const char* const kAnimAttackX_Fourth = "AttackX_Fourth";
+
+	const char* const kAnimAttackY = "AttackY";
 
 	//通常時の攻撃アニメーション
-	const char* const kAnimNormalAttackX_First = "NormalAttackX_First";
-	const char* const kAnimNormalAttackX_Second = "NormalAttackX_Second";
-	const char* const kAnimNormalAttackX_Third = "NormalAttackX_Third";
-	const char* const kAnimNormalAttackX_Fourth = "NormalAttackX_Fourth";
+	//const char* const kAnimNormalAttackX_First = "NormalAttackX_First";
+	//const char* const kAnimNormalAttackX_Second = "NormalAttackX_Second";
+	//const char* const kAnimNormalAttackX_Third = "NormalAttackX_Third";
+	//const char* const kAnimNormalAttackX_Fourth = "NormalAttackX_Fourth";
 
-	const char* const kAnimNormalAttackY = "NormalAttackY";
+	//const char* const kAnimNormalAttackY = "NormalAttackY";
 
-	//パワー型の攻撃アニメーション
-	const char* const kAnimPowerAttackX_First = "PowerAttackX_First";
-	const char* const kAnimPowerAttackX_Second = "PowerAttackX_Second";
-	const char* const kAnimPowerAttackX_Third = "PowerAttackX_Third";
-	const char* const kAnimPowerAttackX_Fourth = "PowerAttackX_Fourth";
+	////パワー型の攻撃アニメーション
+	//const char* const kAnimPowerAttackX_First = "PowerAttackX_First";
+	//const char* const kAnimPowerAttackX_Second = "PowerAttackX_Second";
+	//const char* const kAnimPowerAttackX_Third = "PowerAttackX_Third";
+	//const char* const kAnimPowerAttackX_Fourth = "PowerAttackX_Fourth";
 
-	const char* const kAnimPowerAttackY = "PowerAttackY";
+	//const char* const kAnimPowerAttackY = "PowerAttackY";
 
-	//スピード型の攻撃アニメーション
-	const char* const kAnimSpeedAttackX_First = "SpeedAttackX_First";
-	const char* const kAnimSpeedAttackX_Second = "SpeedAttackX_Second";
-	const char* const kAnimSpeedAttackX_Third = "SpeedAttackX_Third";
-	const char* const kAnimSpeedAttackX_Fourth = "SpeedAttackX_Fourth";
+	////スピード型の攻撃アニメーション
+	//const char* const kAnimSpeedAttackX_First = "SpeedAttackX_First";
+	//const char* const kAnimSpeedAttackX_Second = "SpeedAttackX_Second";
+	//const char* const kAnimSpeedAttackX_Third = "SpeedAttackX_Third";
+	//const char* const kAnimSpeedAttackX_Fourth = "SpeedAttackX_Fourth";
 
-	const char* const kAnimSpeedAttackY = "SpeedAttackY";
+	//const char* const kAnimSpeedAttackY = "SpeedAttackY";
 
-	//ショット型の攻撃アニメーション
-	const char* const kAnimShotAttackX_First = "ShotAttackX_First";
-	const char* const kAnimShotAttackX_Second = "ShotAttackX_Second";
-	const char* const kAnimShotAttackX_Third = "ShotAttackX_Third";
-	const char* const kAnimShotAttackX_Fourth = "ShotAttackX_Fourth";
+	////ショット型の攻撃アニメーション
+	//const char* const kAnimShotAttackX_First = "ShotAttackX_First";
+	//const char* const kAnimShotAttackX_Second = "ShotAttackX_Second";
+	//const char* const kAnimShotAttackX_Third = "ShotAttackX_Third";
+	//const char* const kAnimShotAttackX_Fourth = "ShotAttackX_Fourth";
 
-	const char* const kAnimShotAttackY = "ShotAttackY";
+	//const char* const kAnimShotAttackY = "ShotAttackY";
 
 	//ジャンプアニメーション
 	const char* const kAnimJump = "Jump";
@@ -209,7 +227,12 @@ Player::Player() :
 	m_isJump = false;
 
 	//モデルのロード
-	m_modelH = MV1LoadModel(kModelFilename);
+	m_modelH = MV1LoadModel(kNormalModelFilename);
+	m_modelPowerH = MV1LoadModel(kPowerModelFilename);
+	m_modelSpeedH = MV1LoadModel(kSpeedModelFilename);
+	m_modelShotH = MV1LoadModel(kShotModelFilename);
+	m_modelRassH = MV1LoadModel(kRassModelFilename);
+
 	assert(m_modelH > -1);
 
 
@@ -246,6 +269,8 @@ Player::Player() :
 Player::~Player()
 {
 	DeleteGraph(m_shadowH);
+
+
 }
 
 void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon)
@@ -260,13 +285,18 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, Pla
 
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
+	MV1SetScale(m_modelPowerH, VGet(kModelScale, kModelScale, kModelScale));
+	MV1SetScale(m_modelSpeedH, VGet(kModelScale, kModelScale, kModelScale));
+	MV1SetScale(m_modelShotH, VGet(kModelScale, kModelScale, kModelScale));
+	MV1SetScale(m_modelRassH, VGet(kModelScale, kModelScale, kModelScale));
 
 	//武器の初期化
 	weapon.Load();
 	weapon.Initialize(m_modelH, kRightModelFrameNo, kLeftModelFrameNo);
 
 	//アニメーションの初期化
-	m_pAnim->Initialize(kAnimInfoFilename, m_modelH, kAnimNormalIdle);
+	m_pAnim->Initialize(kNormalAnimInfoFilename, m_modelH, kAnimIdle);
+
 
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &Player::IdleUpdate;
@@ -278,7 +308,15 @@ void Player::Finalize(std::shared_ptr<MyLib::Physics> physics)
 	
 	//モデルをデリートする
 	MV1DeleteModel(m_modelH);
+	MV1DeleteModel(m_modelPowerH);
+	MV1DeleteModel(m_modelSpeedH);
+	MV1DeleteModel(m_modelShotH);
+	MV1DeleteModel(m_modelRassH);
 	m_modelH = -1;
+	m_modelPowerH = -1;
+	m_modelSpeedH = -1;
+	m_modelShotH = -1;
+	m_modelRassH = -1;
 
 	Collidable::Finalize(physics);
 }
@@ -288,7 +326,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 
 	//アップデート
 	(this->*m_updateFunc)();
-		
+
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
@@ -301,11 +339,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 
 	m_playerRotMtx = MGetRotY(cameraAngleX);
 
-	//モデルに座標をセットする
-	MV1SetPosition(m_modelH, m_pos);
-
-	//モデルに回転をセットする
-	MV1SetRotationXYZ(m_modelH, VGet(0, m_angle, 0));
+	PlayerSetPosAndRotation(m_pos, m_angle);
 
 	//HPがゼロより下にいった場合
 	if (m_hp <= 0)
@@ -354,8 +388,9 @@ void Player::Draw(PlayerWeapon& weapon)
 	//武器の描画
 	WeaponDraw(weapon);
 	
-	//モデルの描画
-	MV1DrawModel(m_modelH);
+	////モデルの描画
+	//MV1DrawModel(m_modelH);
+	PlayerDraw();
 
 #ifdef _DEBUG
 
@@ -426,13 +461,6 @@ void Player::IdleUpdate()
 		return;
 	}
 	
-	
-	//if (Pad::IsTrigger(kPadButtonRStick) && !m_isJump && !m_isStamina)
-	//{
-	//	OnHit();
-	//	return;
-	//}
-
 	//ジャンプ
 	if (Pad::IsTrigger(kPadButtonB) && GetIsJump() && !m_isStamina)
 	{
@@ -585,7 +613,7 @@ void Player::WalkUpdate()
 				move = VScale(move, speed);
 			}
 		}
-		if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+		if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 		{
 			//スティックの押し加減でプレイヤーのスピードを変える
 			if (rate <= 0.6f && rate > 0.0f);
@@ -772,7 +800,7 @@ void Player::DashUpdate()
 			//ダッシュ
 			speed = kShotDashSpeed * rate;
 		}
-		else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+		else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 		{
 			//ダッシュ
 			speed = kStrongestDashSpeed * rate;
@@ -950,7 +978,7 @@ void Player::JumpUpdate()
 		//ダッシュ
 		speed = kShotMaxSpeed * rate;
 	}
-	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 	{
 		//ダッシュ
 		speed = kStrongestDashSpeed * rate;
@@ -1064,7 +1092,7 @@ void Player::DashJumpUpdate()
 		//ダッシュ
 		speed = kShotDashSpeed * rate;
 	}
-	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 	{
 		//ダッシュ
 		speed = kStrongestDashSpeed * rate;
@@ -1175,7 +1203,7 @@ void Player::FallUpdate()
 		//ダッシュ
 		speed = kShotMaxSpeed * rate;
 	}
-	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 	{
 		//ダッシュ
 		speed = kStrongestDashSpeed * rate;
@@ -1282,7 +1310,7 @@ void Player::DashFallUpdate()
 	{
 		speed = kShotDashSpeed * rate;
 	}
-	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 	{
 		speed = kStrongestDashSpeed * rate;
 	}
@@ -1444,6 +1472,40 @@ void Player::SpawnUpdate()
 	}
 }
 
+void Player::FaceChangeUpdate()
+{
+	m_stamina += kStaminaIncreaseSpeed;
+
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	//プレイヤーのタイプで攻撃アニメーションを変える
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeModel(m_modelPowerH, kAnimIdle, kPowerAnimInfoFilename);
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeModel(m_modelSpeedH, kAnimIdle, kSpeedAnimInfoFilename);
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeModel(m_modelShotH, kAnimIdle, kShotAnimInfoFilename);
+	}
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+	{
+		m_pAnim->ChangeModel(m_modelRassH, kAnimIdle, kRassAnimInfoFilename);
+	}
+
+	if (!m_isFaceUse)
+	{
+		m_pAnim->ChangeModel(m_modelH, kAnimIdle, kNormalAnimInfoFilename);
+	}
+
+	OnIdle();
+
+
+}
+
 void Player::FaceUseUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
@@ -1452,8 +1514,7 @@ void Player::FaceUseUpdate()
 
 	if (m_pAnim->IsLoop())
 	{
-		m_isFaceUse = !m_isFaceUse;
-		OnIdle();
+		OnFaceChange();
 	}
 }
 
@@ -1486,7 +1547,7 @@ void Player::WeaponDraw(PlayerWeapon& weapon)
 		//m_pWeapon->MagicWandDraw();
 		weapon.MagicWandDraw();
 	}
-	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 	{
 		//武器をアタッチする描画関数
 		//m_pWeapon->LongSwordDraw();
@@ -1502,6 +1563,56 @@ void Player::WeaponDraw(PlayerWeapon& weapon)
 	}
 }
 
+void Player::PlayerDraw()
+{
+	//顔を付けている場合
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		//モデルの描画
+		MV1DrawModel(m_modelPowerH);
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		//モデルの描画
+		MV1DrawModel(m_modelSpeedH);
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		//モデルの描画
+		MV1DrawModel(m_modelShotH);
+	}
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+	{
+		//モデルの描画
+		MV1DrawModel(m_modelRassH);
+	}
+
+	//顔を付けていない場合
+	if (!m_isFaceUse)
+	{
+		//モデルの描画
+		MV1DrawModel(m_modelH);
+	}
+}
+
+void Player::PlayerSetPosAndRotation(VECTOR pos, float angle)
+{
+	//モデルに座標をセットする
+	MV1SetPosition(m_modelH, pos);
+	MV1SetPosition(m_modelPowerH, pos);
+	MV1SetPosition(m_modelSpeedH, pos);
+	MV1SetPosition(m_modelShotH, pos);
+	MV1SetPosition(m_modelRassH, pos);
+
+	//モデルに回転をセットする
+	MV1SetRotationXYZ(m_modelH, VGet(0, angle, 0));
+	MV1SetRotationXYZ(m_modelPowerH, VGet(0, angle, 0));
+	MV1SetRotationXYZ(m_modelSpeedH, VGet(0, angle, 0));
+	MV1SetRotationXYZ(m_modelShotH, VGet(0, angle, 0));
+	MV1SetRotationXYZ(m_modelRassH, VGet(0, angle, 0));
+
+}
+
 void Player::OnIdle()
 {
 	m_jumpCount = 0;
@@ -1510,7 +1621,7 @@ void Player::OnIdle()
 
 
 	//タイプによってアニメーションを変える
-	AnimChange(kAnimNormalIdle, kAnimPowerIdle, kAnimSpeedIdle, kAnimNormalIdle);
+	AnimChange(kAnimIdle, kAnimIdle, kAnimIdle, kAnimIdle);
 
 	m_updateFunc = &Player::IdleUpdate;
 }
@@ -1518,7 +1629,7 @@ void Player::OnIdle()
 void Player::OnWalk()
 {
 	//タイプによってアニメーションを変える
-	AnimChange(kAnimNormalWalk, kAnimPowerWalk, kAnimSpeedWalk, kAnimNormalWalk);
+	AnimChange(kAnimWalk, kAnimWalk, kAnimWalk, kAnimWalk);
 
 	m_updateFunc = &Player::WalkUpdate;
 }
@@ -1526,7 +1637,7 @@ void Player::OnWalk()
 void Player::OnDash()
 {
 	//タイプによってアニメーションを変える
-	AnimChange(kAnimNormalDash, kAnimPowerDash, kAnimSpeedDash, kAnimNormalDash);
+	AnimChange(kAnimDash, kAnimDash, kAnimDash, kAnimDash);
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kAbutton;
@@ -1546,23 +1657,23 @@ void Player::OnAttackX()
 	{
 	case 0:
 		//一番目の攻撃アニメーション
-		AnimChange(kAnimNormalAttackX_First, kAnimPowerAttackX_First, kAnimSpeedAttackX_First, kAnimShotAttackX_First);
+		AnimChange(kAnimAttackX_First, kAnimAttackX_First, kAnimAttackX_First, kAnimAttackX_First);
 		SoundManager::GetInstance().PlaySe("attackFirstSe");
 
 		break;
 	case 1:
 		//二番目の攻撃アニメーション
-		AnimChange(kAnimNormalAttackX_Second, kAnimPowerAttackX_Second, kAnimSpeedAttackX_Second, kAnimShotAttackX_Second);
+		AnimChange(kAnimAttackX_Second, kAnimAttackX_Second, kAnimAttackX_Second, kAnimAttackX_Second);
 		SoundManager::GetInstance().PlaySe("attackSecondSe");
 		break;
 	case 2:
 		//三番目の攻撃アニメーション
-		AnimChange(kAnimNormalAttackX_Third, kAnimPowerAttackX_Third, kAnimSpeedAttackX_Third, kAnimShotAttackX_Third);
+		AnimChange(kAnimAttackX_Third, kAnimAttackX_Third, kAnimAttackX_Third, kAnimAttackX_Third);
 		SoundManager::GetInstance().PlaySe("attackFirstSe");
 		break;
 	case 3:
 		//四番目の攻撃アニメーション
-		AnimChange(kAnimNormalAttackX_Fourth, kAnimPowerAttackX_Fourth, kAnimSpeedAttackX_Fourth, kAnimShotAttackX_Fourth);
+		AnimChange(kAnimAttackX_Fourth, kAnimAttackX_Fourth, kAnimAttackX_Fourth, kAnimAttackX_Fourth);
 		SoundManager::GetInstance().PlaySe("attackThirdSe");
 		break;
 	default:
@@ -1580,7 +1691,7 @@ void Player::OnAttackY()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	//タイプによってアニメーションを変える
-	AnimChange(kAnimNormalAttackY, kAnimPowerAttackY, kAnimSpeedAttackY, kAnimShotAttackY);
+	AnimChange(kAnimAttackY, kAnimAttackY, kAnimAttackY, kAnimAttackY);
 
 	SoundManager::GetInstance().PlaySe("attackYSe");
 
@@ -1669,7 +1780,7 @@ void Player::OnAttackCharge()
 	SoundManager::GetInstance().PlaySe("attackChargeSe");
 
 	//タイプによってアニメーションを変える
-	AnimChange(kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge, kAnimShotAttackCharge);
+	AnimChange(kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge);
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
@@ -1695,8 +1806,14 @@ void Player::OnDead()
 
 void Player::OnSpawn()
 {
-	m_pAnim->ChangeAnim(kAnimSpawn);
-	m_updateFunc = &Player::SpawnUpdate;
+	//m_pAnim->ChangeAnim(kAnimSpawn);
+	//m_updateFunc = &Player::SpawnUpdate;
+}
+
+void Player::OnFaceChange()
+{
+	m_isFaceUse = !m_isFaceUse;
+	m_updateFunc = &Player::FaceChangeUpdate;
 }
 
 void Player::OnFaceUse()
@@ -1707,7 +1824,7 @@ void Player::OnFaceUse()
 
 void Player::OnTalk()
 {
-	m_pAnim->ChangeAnim(kAnimNormalIdle);
+	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &Player::TalkUpdate;
 }
 
@@ -1716,9 +1833,13 @@ void Player::FaceSelect()
 	//顔を選択
 	if (Pad::IsTrigger(kPadButtonRB) && !m_isFaceUse)
 	{
-		if (m_playerKind != e_PlayerKind::kStrongestPlayer)
+		if (m_playerKind != e_PlayerKind::kRassPlayer)
 		{
 			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) + 1);
+		}
+		else if (m_playerKind == e_PlayerKind::kRassPlayer)
+		{
+			m_playerKind = e_PlayerKind::kPowerPlayer;
 		}
 	}
 	//顔を選択
@@ -1727,6 +1848,10 @@ void Player::FaceSelect()
 		if (m_playerKind != e_PlayerKind::kPowerPlayer)
 		{
 			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) - 1);
+		}
+		else if (m_playerKind == e_PlayerKind::kPowerPlayer)
+		{
+			m_playerKind = e_PlayerKind::kRassPlayer;
 		}
 	}
 }
@@ -1746,7 +1871,7 @@ void Player::AnimChange(const char* normal, const char* power, const char* speed
 	{
 		m_pAnim->ChangeAnim(shot);
 	}
-	else if (m_playerKind == e_PlayerKind::kStrongestPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 	{
 		m_pAnim->ChangeAnim(normal);
 	}

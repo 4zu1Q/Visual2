@@ -70,7 +70,7 @@ private:
 
 	std::shared_ptr<MyLib::Physics> m_pPhysics;
 
-
+	int m_lightHandle;
 
 	//
 	VECTOR m_playerPos;

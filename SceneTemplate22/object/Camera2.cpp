@@ -207,4 +207,6 @@ void Camera2::ResetToPlayerView(float playerAngle)
 {
 	// プレイヤーの角度をカメラの水平角度に合わせる
 	m_angleH = playerAngle + 1.6f;
+	m_angleV = 0.0f;
+
 }

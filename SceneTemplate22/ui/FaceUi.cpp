@@ -51,7 +51,7 @@ void FaceUi::Draw(Player& player)
 		DrawGraph(kFacePos.x, kFacePos.y, m_ShotFaceHandle, true);
 
 	}
-	else if (player.GetFaceKind() == e_PlayerKind::kStrongestPlayer)
+	else if (player.GetFaceKind() == e_PlayerKind::kRassPlayer)
 	{
 		DrawGraph(kFacePos.x, kFacePos.y, m_RastFaceHandle, true);
 

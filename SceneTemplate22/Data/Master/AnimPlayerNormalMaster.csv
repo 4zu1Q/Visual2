@@ -1,0 +1,17 @@
+ID,名前,スピード
+Idle,Idle,0.5
+Spawn,Spawn_Ground_Skeletons,1
+Walk,Walking_B,0.8
+Dash,Running_A,0.8
+Jump,Jump_Start,0.8
+Jumping,Jump_Idle,0.5
+AttackCharge,Blocking,1
+ShotAttackCharge,Spellcasting,0.7
+AttackX_First,1H_Melee_Attack_Slice_Diagonal,0.6
+AttackX_Second,1H_Melee_Attack_Chop,0.7
+AttackX_Third,1H_Melee_Attack_Stab,1
+AttackX_Fourth,Dualwield_Melee_Attack_Slice,0.6
+AttackY,2H_Melee_Attack_Spin,1
+Hit,Hit_A,0.4
+Down,Death_B,0.8
+UseFace,Use_Item,0.8

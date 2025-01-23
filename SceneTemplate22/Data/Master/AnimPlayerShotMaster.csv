@@ -1,0 +1,15 @@
+ID,名前,スピード
+Idle,Idle,0.5
+Walk,Walking_B,0.8
+Dash,Running_B,0.8
+Jump,Jump_Start,0.8
+Jumping,Jump_Idle,0.5
+AttackCharge,Spellcasting,0.7
+AttackX_First,Spellcast_Shoot,0.7
+AttackX_Second,1H_Melee_Attack_Slice_Diagonal,0.5
+AttackX_Third,Throw,0.6
+AttackX_Fourth,Spellcast_Long,0.7
+AttackY,Spellcast_Raise,0.6
+Hit,Hit_A,0.4
+Down,Death_B,0.8
+UseFace,Use_Item,0.8

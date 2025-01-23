@@ -248,10 +248,10 @@ void SceneSelect::Update()
 	/*フレームにアタッチするための更新処理*/
 	//Physicsの後に入れておかないと補正の影響でワンテンポ遅れる
 	m_pPlayerWeapon->SwordUpdate();
-	m_pPlayerWeapon->AxeUpdate();
-	m_pPlayerWeapon->DaggerUpdate();
-	m_pPlayerWeapon->MagicWandUpdate();
-	m_pPlayerWeapon->LongSwordUpdate();
+	//m_pPlayerWeapon->AxeUpdate();
+	//m_pPlayerWeapon->DaggerUpdate();
+	//m_pPlayerWeapon->MagicWandUpdate();
+	//m_pPlayerWeapon->LongSwordUpdate();
 
 	m_pFaceUi->Update();
 	m_pPlayerBarUi->Update(*m_pPlayer);

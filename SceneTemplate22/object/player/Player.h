@@ -17,7 +17,8 @@ enum class e_PlayerKind : int
 	kPowerPlayer,		//パワー型
 	kSpeedPlayer,		//スピード型
 	kShotPlayer,		//ショット型
-	kStrongestPlayer,	//ラスボス型
+	kRassPlayer,	//ラスボス型
+	kNormalPlayer,		//ノーマル型
 	kMax,				// 最大数
 };
 
@@ -134,6 +135,7 @@ private:
 	void HitUpdate();
 	void DeadUpdate();
 	void SpawnUpdate();
+	void FaceChangeUpdate();
 	void FaceUseUpdate();
 
 	void TalkUpdate();
@@ -154,13 +156,18 @@ private:
 	void OnHit();
 	void OnDead();
 	void OnSpawn();
+	void OnFaceChange();
 	void OnFaceUse();
 
 	void OnTalk();
 
 	//武器を描画するだけの関数
 	void WeaponDraw(PlayerWeapon& weapon);
-	
+	//プレイヤーの種類で描画を変える関数
+	void PlayerDraw();
+
+	void PlayerSetPosAndRotation(VECTOR pos, float angle);
+
 	/// <summary>
 	/// プレイヤーが顔を使用時の関数
 	/// </summary>
@@ -186,7 +193,13 @@ private:
 	using UpdateFunc_t = void(Player::*)(/*引数書く*/);
 	UpdateFunc_t m_updateFunc;
 
-	//仮
+	//各種類のキャラクターのモデルハンドル
+	int m_modelPowerH;
+	int m_modelSpeedH;
+	int m_modelShotH;
+	int m_modelRassH;
+
+	//
 	float m_hp;
 	float m_mp;
 	float m_stamina;

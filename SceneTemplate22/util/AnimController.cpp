@@ -46,6 +46,20 @@ void AnimController::Initialize(const char* const path, int modelH, const char* 
 	m_nowAttachIndex = MV1AttachAnim(modelH, index);
 }
 
+void AnimController::ChangeModel(int modelH, const const char* const id, const char* const path)
+{
+	if (m_nowAttachIndex > -1) MV1DetachAnim(m_modelH, m_nowAttachIndex);
+	if (m_preAttachIndex > -1) MV1DetachAnim(m_modelH, m_preAttachIndex);
+
+	if (path != "") LoadIdTable(path);
+	m_updateFunc = &AnimController::NormalUpdate;
+	m_modelH = modelH;
+	auto index = MV1GetAnimIndex(modelH, m_idTable.at(id).name.c_str());
+	assert(index != -1 && "存在しないアニメーション名です");
+	m_nowId = id;
+	m_nowAttachIndex = MV1AttachAnim(modelH, index);
+}
+
 void AnimController::UpdateAnim(float rate)
 {
 	assert(m_nowAttachIndex != -1);
@@ -89,6 +103,7 @@ bool AnimController::ChangeAnim(const char* const id, bool isTopStart, bool isSt
 void AnimController::LoadIdTable(const char* const path)
 {
 	std::list<std::vector<std::string>> data;
+	m_idTable.clear();
 
 	// ファイル読み込み
 	std::ifstream ifs(path);

@@ -63,11 +63,23 @@ private:
 	//ラスボスの当たり判定の半径
 	int m_radiusRB;
 
+	int m_modelTrianglePowerH;
+	int m_modelTriangleSpeedH;
+	int m_modelTriangleShotH;
+	int m_modelTriangleRassH;
+
 	//墓のポジション
 	VECTOR m_posPower;
 	VECTOR m_posSpeed;
 	VECTOR m_posShot;
 	VECTOR m_posRast;
+
+	VECTOR m_posTrianglePower;
+	VECTOR m_posTriangleSpeed;
+	VECTOR m_posTriangleShot;
+
+	//仮の名
+	VECTOR m_posTriangleRass;
 
 };
 

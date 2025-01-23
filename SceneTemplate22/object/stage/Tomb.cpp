@@ -16,11 +16,17 @@ namespace
 	//モデルのスケール値
 	constexpr VECTOR kModelScale = { 0.2f , 0.2f , 0.2f };
 
-	//モデルのポジション
+	//ポジション
 	constexpr VECTOR kTombPowerPos = { -460.0f , 38.0f , 264.0f };
 	constexpr VECTOR kTombSpeedPos = { 327.0f , 138.0f , 602.0f };
 	constexpr VECTOR kTombShotPos = { 0.0f , 68.0f , -50.0f };
 	constexpr VECTOR kTombRastPos = { 0.0f , 38.0f , 50.0f };
+
+	//トライアングルのポジション
+	constexpr VECTOR kTrianglePowerPos = { 0.0f , 38.0f , 50.0f };
+	constexpr VECTOR kTriangleSpeedPos = { 0.0f , 38.0f , 50.0f };
+	constexpr VECTOR kTriangleShotPos = { 0.0f , 38.0f , 50.0f };
+	constexpr VECTOR kTriangleRastPos = { 0.0f , 38.0f , 50.0f };
 
 }
 
@@ -30,8 +36,17 @@ Tomb::Tomb():
 	m_posPower(kTombPowerPos),
 	m_posSpeed(kTombSpeedPos),
 	m_posShot(kTombShotPos),
-	m_posRast(kTombRastPos)
+	m_posRast(kTombRastPos),
+	m_posTrianglePower(),
+	m_posTriangleSpeed(),
+	m_posTriangleShot(),
+	m_posTriangleRass()
 {
+	m_modelTrianglePowerH = 0;
+	m_modelTriangleSpeedH = 0;
+	m_modelTriangleShotH = 0;
+	m_modelTriangleRassH = 0;
+
 }
 
 Tomb::~Tomb()

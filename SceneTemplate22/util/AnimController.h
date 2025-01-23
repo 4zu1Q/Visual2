@@ -23,6 +23,14 @@ public:
 	/// <param name="modelH">モデルハンドル</param>
 	/// <param name="id">使用ID</param>
 	void Initialize(const char* const path, int modelH, const char* const id);
+
+	/// <summary>
+	/// モデルの変更
+	/// </summary>
+	/// <param name="modelH">モデルハンドル</param>
+	/// <param name="id">使用ID</param>
+	/// <param name="path">IDテーブルがあるファイルパス</param>
+	void ChangeModel(int modelH, const char* const id, const char* const path = "");
 	/// <summary>
 	/// アニメーションの更新
 	/// </summary>

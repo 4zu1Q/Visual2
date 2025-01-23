@@ -29,5 +29,6 @@ protected:
 	//モデルハンドル
 	int m_modelH;
 
+
 };
 
