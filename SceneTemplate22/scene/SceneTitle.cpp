@@ -59,7 +59,7 @@ namespace
 	const Vec2 kOptionSelectPos = { 540 , 565 };
 	const Vec2 kEndSelectPos = { 510 , 635 };
 
-	constexpr float kCursorSpeed = 0.1f;
+	constexpr float kCursorSpeed = 0.05f;
 
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
@@ -110,17 +110,7 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_handles.push_back(LoadGraph("Data/Image/Select2.png"));				//矢印
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));		
 
-	// 背景の準備
-	for (int i = 0; i < 8; i++)
-	{
-		// 座標をランダムに設定
-		m_bg[i].posX = GetRand(Game::kScreenWidth);
-		m_bg[i].posY = GetRand(Game::kScreenHeight);
-		// 円の半径を5～20でランダムに設定
-		m_bg[i].range = GetRand(4) + 4;
-		// 移動スピードを1.0～2.0でランダムに設定
-		m_bg[i].speed = GetRand(100) * 0.01f + 1.0f;
-	}
+
 
 }
 
@@ -360,35 +350,6 @@ void SceneTitle::Draw()
 	//m_pTitleField->Draw();
 	m_pField->Draw();
 
-	// 上昇して消えていく円の描画
-	for (int i = 0; i < 8; i++)
-	{
-		// 上昇
-		m_bg[i].posY -= m_bg[i].speed;
-
-		// 画面外に出たらｙ座標を一番下の画面外に再配置してｘ座標をランダムに設定
-		if (m_bg[i].posY + m_bg[i].range < 0)
-		{
-			m_bg[i].posY = Game::kScreenHeight + m_bg[i].range;
-			m_bg[i].posX = GetRand(Game::kScreenWidth);
-		}
-
-		// アルファ値の変化量の設定
-		int alphaMove = 255 / m_bg[i].range;
-		// 座標の上昇によるアルファ値倍率
-		int alphaScale = m_bg[i].posY / Game::kScreenHeight;
-
-		// 円を半径の長さ分に分けて描画
-		for (int range = 0; range <= m_bg[i].range; range++)
-		{
-			// アルファ値を半径に応じて、外側に行くほど薄く、上昇するほど薄く変化
-			SetDrawBlendMode(DX_BLENDMODE_ALPHA, static_cast<int>(255 - alphaMove * range));
-			DrawCircle(static_cast<int>(m_bg[i].posX), static_cast<int>(m_bg[i].posY), range, 0x7fffd4, true);
-		}
-	}
-	// アルファ値を元に戻す
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-
 	// フェードしながら描画
 	int alpha = static_cast<int>(255 * ((float)m_fadeGraphTime / 120));
 
@@ -412,9 +373,6 @@ void SceneTitle::Draw()
 	}
 	else if(m_isStart)
 	{
-
-
-
 		//カーソルの描画
 		DrawCursor();
 

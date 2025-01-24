@@ -42,7 +42,7 @@ Tomb::Tomb():
 	m_posTriangleShot(),
 	m_posTriangleRass()
 {
-	m_modelTrianglePowerH = 0;
+	//m_modelTrianglePowerH = MV1LoadModel(;
 	m_modelTriangleSpeedH = 0;
 	m_modelTriangleShotH = 0;
 	m_modelTriangleRassH = 0;

@@ -23,6 +23,12 @@ public:
 	virtual void Draw() override final;	//毎フレーム行う描画処理
 
 private:
+
+	void DrawCursor();
+	void UpdateCursorUp();
+	void UpdateCursorDown();
+
+private:
 	//遷移先
 	enum class e_SceneTrans : int
 	{
@@ -38,6 +44,10 @@ private:
 	//画像ハンドル
 	int m_pauseHandle;
 	float m_selectAnimation;
+
+	Vec2 m_cursorPos;
+	Vec2 m_targetCursorUpPos;
+	Vec2 m_targetCursorDownPos;
 
 	e_SceneTrans m_sceneTrans;
 };

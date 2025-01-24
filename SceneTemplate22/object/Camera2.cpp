@@ -8,7 +8,7 @@ namespace
 	constexpr float kCameraPlayerTargetHeight = 10.0f;		// プレイヤー座標からどれだけ高い位置を注視点とするか
 	constexpr float kCameraPlayerBackwardDistance = 25.0f;	// プレイヤーとの奥行方向の距離
 	constexpr float kCameraPlayerRightDistance = 0.0f;	// プレイヤーとの水平方向の距離
-	constexpr float kCameraCollisionSize = 3.0f;			// カメラの当たり判定サイズ
+	constexpr float kCameraCollisionSize = 2.0f;			// カメラの当たり判定サイズ
 
 	constexpr float kCameraNear = 5.0f;
 	constexpr float kCameraFar = 5000.0f;

@@ -30,9 +30,14 @@ namespace
 		kPointerH,
 	};
 
+	const Vec2 kSelectSelectPos = { 360 , 615 };
+	const Vec2 kTitleSelectPos = { 760 , 615 };
+
 	const Vec2 kSelectPos = { 400.0f , 600.0f };
 	const Vec2 kTitlePos = { 800.0f , 600.0f };
 
+
+	constexpr float kCursorSpeed = 0.05f;
 
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
@@ -43,6 +48,10 @@ SceneGameClear::SceneGameClear(SceneManager& manager) :
 {
 	m_isActionStart = false;
 	m_isActionBack = false;
+
+	m_cursorPos = kSelectSelectPos;
+	m_targetCursorPos = kTitleSelectPos;
+
 
 	m_sceneTrans = e_SceneTrans::kSelect;
 
@@ -83,6 +92,19 @@ void SceneGameClear::Update()
 	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
 	m_pSkyDome->Update();
 
+	if (m_sceneTrans == e_SceneTrans::kSelect)
+	{
+		m_cursorPos = kSelectSelectPos;
+
+		m_targetCursorPos = kTitleSelectPos;
+	}
+	else if (m_sceneTrans == e_SceneTrans::kTitle)
+	{
+		m_cursorPos = kTitleSelectPos;
+
+		m_targetCursorPos = kSelectSelectPos;
+	}
+
 #ifdef _DEBUG
 	//デバッグに遷移する
 	if (Pad::IsTrigger PAD_INPUT_7)
@@ -101,6 +123,14 @@ void SceneGameClear::Update()
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
 				FadeGraphSelectReset();
+				UpdateCursorLeft();
+			}
+			else if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_sceneTrans = e_SceneTrans::kTitle;
+				SoundManager::GetInstance().PlaySe("selectSe");
+				FadeGraphSelectReset();
+				UpdateCursorLeft();
 			}
 		}
 
@@ -112,6 +142,14 @@ void SceneGameClear::Update()
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
 				FadeGraphSelectReset();
+				UpdateCursorRight();
+			}
+			else if (m_sceneTrans == e_SceneTrans::kTitle)
+			{
+				m_sceneTrans = e_SceneTrans::kSelect;
+				SoundManager::GetInstance().PlaySe("selectSe");
+				FadeGraphSelectReset();
+				UpdateCursorRight();
 			}
 		}
 
@@ -176,11 +214,12 @@ void SceneGameClear::Draw()
 
 
 #endif
+	//
+	DrawCursor();
 
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-		DrawGraph(360 + m_selectAnimation, 615, m_handles[kPointerH], true);
 
 		//Select
 		DrawFadeSelectGraph(m_handles[kSelectH], kSelectPos);
@@ -189,7 +228,6 @@ void SceneGameClear::Draw()
 	}
 	if (m_sceneTrans == e_SceneTrans::kTitle)
 	{
-		DrawGraph(760 + m_selectAnimation, 615, m_handles[kPointerH], true);
 
 		//Select
 		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
@@ -198,7 +236,6 @@ void SceneGameClear::Draw()
 	}
 
 	DrawGraph(380, 100, m_handles[kGameClearH], true);
-
 
 
 	DrawString(0, 0, "Scene Game Clear", 0xffffff, false);
@@ -210,4 +247,21 @@ void SceneGameClear::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
 
 	DrawFade(0xffffff);
+}
+
+void SceneGameClear::DrawCursor()
+{
+	DrawGraph(m_cursorPos.x + m_selectAnimation, m_cursorPos.y, m_handles[kPointerH], true);
+}
+
+void SceneGameClear::UpdateCursorRight()
+{
+	// 線形補間でカーソルの位置を更新
+	m_cursorPos.x += (m_targetCursorPos.x - m_cursorPos.x) * kCursorSpeed;
+}
+
+void SceneGameClear::UpdateCursorLeft()
+{
+	// 線形補間でカーソルの位置を更新
+	m_cursorPos.x += (m_targetCursorPos.x - m_cursorPos.x) * kCursorSpeed;
 }

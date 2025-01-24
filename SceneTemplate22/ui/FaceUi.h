@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "DxLib.h"
 #include "util/Vec2.h"
+#include <vector>
 
 class Player;
 
@@ -16,6 +17,9 @@ public:
 
 private:
 	
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
+
 	//顔のハンドル
 	int m_PowerFaceHandle;
 	int m_SpeedFaceHandle;

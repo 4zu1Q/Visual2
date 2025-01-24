@@ -29,6 +29,11 @@ namespace
 		kGameOverBgH,
 	};
 
+	const Vec2 kGamePlaySelectPos = { 360 , 615 };
+	const Vec2 kSelectSelectPos = { 760 , 615 };
+
+	constexpr float kCursorSpeed = 0.05f;
+
 	const Vec2 kSelectPos = { 800.0f , 600.0f };
 	const Vec2 kGamePlayPos = { 400.0f , 600.0f };
 
@@ -40,6 +45,9 @@ SceneGameOver::SceneGameOver(SceneManager& manager, Game::e_BossKind bossKind) :
 	SceneBase(manager),
 	m_fadeTime(0)
 {
+	m_cursorPos = kGamePlaySelectPos;
+	m_targetCursorPos = kSelectSelectPos;
+
 	m_isActionStart = false;
 	m_isActionBack = false;
 
@@ -57,7 +65,7 @@ SceneGameOver::SceneGameOver(SceneManager& manager, Game::e_BossKind bossKind) :
 	m_handles.push_back(LoadGraph("Data/Image/Select.png"));				//Select
 	m_handles.push_back(LoadGraph("Data/Image/Retry.png"));					//Title
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				//矢印
-	m_handles.push_back(LoadGraph("Data/Image/GameOverBg.png"));				//矢印
+	m_handles.push_back(LoadGraph("Data/Image/GameOverBg.png"));				//
 }
 
 SceneGameOver::~SceneGameOver()
@@ -90,6 +98,19 @@ void SceneGameOver::Update()
 	}
 #endif
 
+	if (m_sceneTrans == e_SceneTrans::kGamePlay)
+	{
+		m_cursorPos = kGamePlaySelectPos;
+
+		m_targetCursorPos = kSelectSelectPos;
+	}
+	else if (m_sceneTrans == e_SceneTrans::kSelect)
+	{
+		m_cursorPos = kSelectSelectPos;
+
+		m_targetCursorPos = kGamePlaySelectPos;
+	}
+
 	//
 	if (!m_isToNextScene)
 	{
@@ -102,6 +123,13 @@ void SceneGameOver::Update()
 				SoundManager::GetInstance().PlaySe("selectSe");
 				FadeGraphSelectReset();
 			}
+			else if (m_sceneTrans == e_SceneTrans::kGamePlay)
+			{
+				m_sceneTrans = e_SceneTrans::kSelect;
+				SoundManager::GetInstance().PlaySe("selectSe");
+				FadeGraphSelectReset();
+				UpdateCursorLeft();
+			}
 		}
 
 		//右を押した場合
@@ -112,6 +140,13 @@ void SceneGameOver::Update()
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 				SoundManager::GetInstance().PlaySe("selectSe");
 				FadeGraphSelectReset();
+			}
+			else if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_sceneTrans = e_SceneTrans::kGamePlay;
+				SoundManager::GetInstance().PlaySe("selectSe");
+				FadeGraphSelectReset();
+				UpdateCursorLeft();
 			}
 		}
 
@@ -187,10 +222,11 @@ void SceneGameOver::Draw()
 
 #endif
 
+	DrawCursor();
+
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kGamePlay)
 	{
-		DrawGraph(360 + m_selectAnimation, 615, m_handles[kPointerH], true);
 
 		//GamePlay
 		DrawFadeSelectGraph(m_handles[kGamePlayH], kGamePlayPos);
@@ -199,7 +235,6 @@ void SceneGameOver::Draw()
 	}
 	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-		DrawGraph(760 + m_selectAnimation, 615, m_handles[kPointerH], true);
 
 		//GamePlay
 		DrawGraph(kGamePlayPos.x, kGamePlayPos.y, m_handles[kGamePlayH], true);
@@ -220,4 +255,21 @@ void SceneGameOver::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 
 	DrawFade(0x000000);
+}
+
+void SceneGameOver::DrawCursor()
+{
+	DrawGraph(m_cursorPos.x + m_selectAnimation, m_cursorPos.y, m_handles[kPointerH], true);
+}
+
+void SceneGameOver::UpdateCursorRight()
+{
+	// 線形補間でカーソルの位置を更新
+	m_cursorPos.x += (m_targetCursorPos.x - m_cursorPos.x) * kCursorSpeed;
+}
+
+void SceneGameOver::UpdateCursorLeft()
+{
+	// 線形補間でカーソルの位置を更新
+	m_cursorPos.x += (m_targetCursorPos.x - m_cursorPos.x) * kCursorSpeed;
 }

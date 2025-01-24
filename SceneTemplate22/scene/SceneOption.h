@@ -19,6 +19,21 @@ public:
 	/// 描画処理
 	/// </summary>
 	virtual void Draw() override final;	//毎フレーム行う描画処理
+private:
+
+
+	//BGM
+	void BgmUpdate();
+	//SE
+	void SeUpdate();
+	//Sensitivity
+	void SensitivityUpdate();
+	//FullScreen
+	void FullScreenUpdate();
+
+	void DrawCursor();
+	void UpdateCursorUp();
+	void UpdateCursorDown();
 
 private:
 
@@ -49,15 +64,9 @@ private:
 	using UpdateFunc_t = void(SceneOption::*)(/*引数書く*/);
 	UpdateFunc_t m_updateFunc;
 
-	//BGM
-	void BgmUpdate();
-	//SE
-	void SeUpdate();
-	//Sensitivity
-	void SensitivityUpdate();
-	//FullScreen
-	void FullScreenUpdate();
-
+	Vec2 m_cursorPos;
+	Vec2 m_targetCursorUpPos;
+	Vec2 m_targetCursorDownPos;
 
 };
 

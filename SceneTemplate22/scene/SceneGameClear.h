@@ -27,6 +27,12 @@ public:
 
 private:
 
+	void DrawCursor();
+	void UpdateCursorRight();
+	void UpdateCursorLeft();
+
+private:
+
 	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
 	std::shared_ptr<CameraProduction> m_pCameraProduction;
 	std::shared_ptr<SkyDome> m_pSkyDome;
@@ -48,7 +54,9 @@ private:
 
 	e_SceneTrans m_sceneTrans;
 
-
+	// カーソルの現在位置と目標位置
+	Vec2 m_cursorPos;
+	Vec2 m_targetCursorPos;
 
 };
 

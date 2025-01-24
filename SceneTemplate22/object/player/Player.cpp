@@ -36,24 +36,26 @@ namespace
 	constexpr float kAnalogRangeMax = 0.8f;
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
+	constexpr float kSpeedConstant = 1.4f;
+
 	//最小移動速度
-	constexpr float kNormalMinSpeed = 0.5f;
-	constexpr float kPowerMinSpeed = 0.3f;
-	constexpr float kSpeedMinSpeed = 0.7f;
-	constexpr float kShotMinSpeed = 0.4f;
+	constexpr float kNormalMinSpeed = 0.5f * kSpeedConstant;
+	constexpr float kPowerMinSpeed = 0.3f * kSpeedConstant;
+	constexpr float kSpeedMinSpeed = 0.7f * kSpeedConstant;
+	constexpr float kShotMinSpeed = 0.4f * kSpeedConstant;
 
 	//最大移動速度
-	constexpr float kNormalMaxSpeed = 0.7f;
-	constexpr float kPowerMaxSpeed = 0.5f;
-	constexpr float kSpeedMaxSpeed = 0.9f;
-	constexpr float kShotMaxSpeed = 0.6f;
+	constexpr float kNormalMaxSpeed = 0.7f * kSpeedConstant;
+	constexpr float kPowerMaxSpeed = 0.5f * kSpeedConstant;
+	constexpr float kSpeedMaxSpeed = 0.9f * kSpeedConstant;
+	constexpr float kShotMaxSpeed = 0.6f * kSpeedConstant;
 
 	//ダッシュスピード
-	constexpr float kNormalDashSpeed = 1.0f;
-	constexpr float kPowerDashSpeed = 0.7f;
-	constexpr float kSpeedDashSpeed = 1.5f;
-	constexpr float kShotDashSpeed = 1.1f;
-	constexpr float kStrongestDashSpeed = 1.2f;
+	constexpr float kNormalDashSpeed = 1.0f * kSpeedConstant;
+	constexpr float kPowerDashSpeed = 0.7f * kSpeedConstant;
+	constexpr float kSpeedDashSpeed = 1.5f * kSpeedConstant;
+	constexpr float kShotDashSpeed = 1.1f * kSpeedConstant;
+	constexpr float kStrongestDashSpeed = 1.2f * kSpeedConstant;
 
 	//ジャンプ力最小値
 	constexpr float kMinJumpPower = 0.22f;
@@ -74,30 +76,17 @@ namespace
 	const char* const kShotAnimInfoFilename = "Data/Master/AnimPlayerShotMaster.csv";
 	const char* const kRassAnimInfoFilename = "Data/Master/AnimPlayerRassMaster.csv";
 
-	//スポーン
-	//const char* const kAnimSpawn = "Spawn";
-
 	//アイドル状態
 	const char* const kAnimIdle = "Idle";
-	//const char* const kAnimNormalIdle = "Idle";
-	//const char* const kAnimPowerIdle = "PowerIdle";
-	//const char* const kAnimSpeedIdle = "SpeedIdle";
 
 	//歩き状態
 	const char* const kAnimWalk = "Walk";
-	//const char* const kAnimNormalWalk = "Walk";
-	//const char* const kAnimPowerWalk = "PowerWalk";
-	//const char* const kAnimSpeedWalk = "SpeedWalk";
 
 	//ダッシュ状態
 	const char* const kAnimDash = "Dash";
-	//const char* const kAnimNormalDash = "NormalDash";
-	//const char* const kAnimPowerDash = "PowerDash";
-	//const char* const kAnimSpeedDash = "SpeedDash";
 
 	//Y攻撃をするためのチャージアニメーション
 	const char* const kAnimAttackCharge = "AttackCharge";
-	//const char* const kAnimShotAttackCharge = "ShotAttackCharge";
 
 	const char* const kAnimAttackX_First = "AttackX_First";
 	const char* const kAnimAttackX_Second = "AttackX_Second";
@@ -105,38 +94,6 @@ namespace
 	const char* const kAnimAttackX_Fourth = "AttackX_Fourth";
 
 	const char* const kAnimAttackY = "AttackY";
-
-	//通常時の攻撃アニメーション
-	//const char* const kAnimNormalAttackX_First = "NormalAttackX_First";
-	//const char* const kAnimNormalAttackX_Second = "NormalAttackX_Second";
-	//const char* const kAnimNormalAttackX_Third = "NormalAttackX_Third";
-	//const char* const kAnimNormalAttackX_Fourth = "NormalAttackX_Fourth";
-
-	//const char* const kAnimNormalAttackY = "NormalAttackY";
-
-	////パワー型の攻撃アニメーション
-	//const char* const kAnimPowerAttackX_First = "PowerAttackX_First";
-	//const char* const kAnimPowerAttackX_Second = "PowerAttackX_Second";
-	//const char* const kAnimPowerAttackX_Third = "PowerAttackX_Third";
-	//const char* const kAnimPowerAttackX_Fourth = "PowerAttackX_Fourth";
-
-	//const char* const kAnimPowerAttackY = "PowerAttackY";
-
-	////スピード型の攻撃アニメーション
-	//const char* const kAnimSpeedAttackX_First = "SpeedAttackX_First";
-	//const char* const kAnimSpeedAttackX_Second = "SpeedAttackX_Second";
-	//const char* const kAnimSpeedAttackX_Third = "SpeedAttackX_Third";
-	//const char* const kAnimSpeedAttackX_Fourth = "SpeedAttackX_Fourth";
-
-	//const char* const kAnimSpeedAttackY = "SpeedAttackY";
-
-	////ショット型の攻撃アニメーション
-	//const char* const kAnimShotAttackX_First = "ShotAttackX_First";
-	//const char* const kAnimShotAttackX_Second = "ShotAttackX_Second";
-	//const char* const kAnimShotAttackX_Third = "ShotAttackX_Third";
-	//const char* const kAnimShotAttackX_Fourth = "ShotAttackX_Fourth";
-
-	//const char* const kAnimShotAttackY = "ShotAttackY";
 
 	//ジャンプアニメーション
 	const char* const kAnimJump = "Jump";
@@ -152,7 +109,6 @@ namespace
 	//落ちる速度の倍率
 	constexpr float kMinFallScale = 1.5f;
 	constexpr float kMaxFallScale = 4.0f;
-
 
 	//パッドのボタン情報
 	constexpr int kPadButtonA = 0x00000010;
@@ -257,20 +213,11 @@ Player::Player() :
 	circleColliderData->m_radius = 6.0f;
 
 	m_radius = circleColliderData->m_radius;
-
-	//m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
-
-	//auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataCapsule>(m_pColliderData);
-	//circleColliderData->m_radius = 2.0f;
-	//circleColliderData->m_posDown = VGet(0,0,0);
-	//circleColliderData->m_posUp = VGet(0,8,0);
 }
 
 Player::~Player()
 {
 	DeleteGraph(m_shadowH);
-
-
 }
 
 void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon)
@@ -312,6 +259,7 @@ void Player::Finalize(std::shared_ptr<MyLib::Physics> physics)
 	MV1DeleteModel(m_modelSpeedH);
 	MV1DeleteModel(m_modelShotH);
 	MV1DeleteModel(m_modelRassH);
+
 	m_modelH = -1;
 	m_modelPowerH = -1;
 	m_modelSpeedH = -1;
@@ -323,7 +271,6 @@ void Player::Finalize(std::shared_ptr<MyLib::Physics> physics)
 
 void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX)
 {
-
 	//アップデート
 	(this->*m_updateFunc)();
 
@@ -1463,15 +1410,6 @@ void Player::DeadUpdate()
 	m_buttonKind = e_ButtonKind::kNone;
 }
 
-void Player::SpawnUpdate()
-{
-	//セレクトシーンの始めに
-	if (m_pAnim->IsLoop())
-	{
-		OnIdle();
-	}
-}
-
 void Player::FaceChangeUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
@@ -1802,12 +1740,6 @@ void Player::OnDead()
 {
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updateFunc = &Player::DeadUpdate;
-}
-
-void Player::OnSpawn()
-{
-	//m_pAnim->ChangeAnim(kAnimSpawn);
-	//m_updateFunc = &Player::SpawnUpdate;
 }
 
 void Player::OnFaceChange()

@@ -33,6 +33,13 @@ namespace
 	const Vec2 kSensitivityPos = { 210.0f , 360.0f };
 	const Vec2 kFullScreenPos = { 210.0f , 480.0f };
 
+	//選択UIのポジション
+	const Vec2 kBgmSelectPos = { 130 , 130 };
+	const Vec2 kSeSelectPos = { 130 , 250 };
+	const Vec2 kSensitivitySelectPos = { 130 , 370 };
+	const Vec2 kFullScreenSelectPos = { 130 , 490 };
+	
+	constexpr float kCursorSpeed = 0.05f;
 
 	//オプションの背景アルファ値
 	constexpr int kAlpha = 200;
@@ -64,13 +71,17 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_sensitivityScale(50),
 	m_isFullScreen(false)
 {
+	m_cursorPos = kBgmSelectPos;
+	m_targetCursorDownPos = kSeSelectPos;
+	m_targetCursorUpPos = kFullScreenSelectPos;
+
 	m_nowItem = e_Item::kBgm;
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/Bgm2.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Se2.png"));				
-	m_handles.push_back(LoadGraph("Data/Image/Sensitivity2.png"));		
-	m_handles.push_back(LoadGraph("Data/Image/FullScreen2.png"));		
+	m_handles.push_back(LoadGraph("Data/Image/Sensitivity.png"));		
+	m_handles.push_back(LoadGraph("Data/Image/FullScreen.png"));		
 	m_handles.push_back(LoadGraph("Data/Image/Bar.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Math.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Point.png"));
@@ -113,6 +124,35 @@ void SceneOption::Update()
 	UpdateFade();
 	UpdateFadeSelectGraph();
 
+	if (m_nowItem == e_Item::kBgm)
+	{
+		m_cursorPos = kBgmSelectPos;
+
+		m_targetCursorUpPos = kFullScreenSelectPos;
+		m_targetCursorDownPos = kSeSelectPos;
+	}
+	else if (m_nowItem == e_Item::kSe)
+	{
+		m_cursorPos = kSeSelectPos;
+
+		m_targetCursorUpPos = kBgmSelectPos;
+		m_targetCursorDownPos = kSensitivitySelectPos;
+	}
+	else if (m_nowItem == e_Item::kSensitivity)
+	{
+		m_cursorPos = kSensitivitySelectPos;
+
+		m_targetCursorUpPos = kSeSelectPos;
+		m_targetCursorDownPos = kFullScreenSelectPos;
+	}
+	else if (m_nowItem == e_Item::kFullScreen)
+	{
+		m_cursorPos = kFullScreenSelectPos;
+
+		m_targetCursorUpPos = kSensitivitySelectPos;
+		m_targetCursorDownPos = kBgmSelectPos;
+	}
+
 	if (!Pad::IsPress(PAD_INPUT_RIGHT) && !Pad::IsPress(PAD_INPUT_LEFT))
 	{
 		m_pushCount = 0;
@@ -140,6 +180,7 @@ void SceneOption::Update()
 void SceneOption::Draw()
 {
 	DrawFade(0x000000);
+
 
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
@@ -169,11 +210,12 @@ void SceneOption::Draw()
 	DrawFormatStringToHandle(960, 245, 0xffffff, m_fontHandle, "%d", m_seScale);
 	DrawFormatStringToHandle(960, 365, 0xffffff, m_fontHandle, "%d", m_sensitivityScale);
 
+	//カーソルの描画
+	DrawCursor();
+
 	//選択
 	if (m_nowItem == e_Item::kBgm)
 	{
-		DrawGraph(130 + m_selectAnimation, 130, m_handles[kPointerH], true);
-
 		//BGM
 		DrawFadeSelectGraph(m_handles[kBgmH], kBgmPos);
 		//SE
@@ -185,8 +227,6 @@ void SceneOption::Draw()
 	}
 	if (m_nowItem == e_Item::kSe)
 	{
-		DrawGraph(130 + m_selectAnimation, 250, m_handles[kPointerH], true);
-
 		//BGM
 		DrawGraph(kBgmPos.x, kBgmPos.y, m_handles[kBgmH], true);
 		//SE
@@ -198,8 +238,6 @@ void SceneOption::Draw()
 	}
 	else if (m_nowItem == e_Item::kSensitivity)
 	{
-		DrawGraph(130 + m_selectAnimation, 370, m_handles[kPointerH], true);
-
 		//BGM
 		DrawGraph(kBgmPos.x, kBgmPos.y, m_handles[kBgmH], true);
 		//SE
@@ -211,8 +249,6 @@ void SceneOption::Draw()
 	}
 	else if (m_nowItem == e_Item::kFullScreen)
 	{
-		DrawGraph(130 + m_selectAnimation, 490, m_handles[kPointerH], true);
-
 		//BGM
 		DrawGraph(kBgmPos.x, kBgmPos.y, m_handles[kBgmH], true);
 		//SE
@@ -254,6 +290,7 @@ void SceneOption::BgmUpdate()
 		m_nowItem = e_Item::kFullScreen;
 		m_updateFunc = &SceneOption::FullScreenUpdate;
 		FadeGraphSelectReset();
+		UpdateCursorUp();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
@@ -262,6 +299,7 @@ void SceneOption::BgmUpdate()
 		m_nowItem = e_Item::kSe;
 		m_updateFunc = &SceneOption::SeUpdate;
 		FadeGraphSelectReset();
+		UpdateCursorDown();
 	}
 
 	if (Pad::IsPress(PAD_INPUT_RIGHT))
@@ -305,6 +343,7 @@ void SceneOption::SeUpdate()
 		m_nowItem = e_Item::kBgm;
 		m_updateFunc = &SceneOption::BgmUpdate;
 		FadeGraphSelectReset();
+		UpdateCursorUp();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
@@ -313,6 +352,7 @@ void SceneOption::SeUpdate()
 		m_nowItem = e_Item::kSensitivity;
 		m_updateFunc = &SceneOption::SensitivityUpdate;
 		FadeGraphSelectReset();
+		UpdateCursorDown();
 	}
 
 	if (Pad::IsPress(PAD_INPUT_RIGHT))
@@ -355,6 +395,7 @@ void SceneOption::SensitivityUpdate()
 		m_nowItem = e_Item::kSe;
 		m_updateFunc = &SceneOption::SeUpdate;
 		FadeGraphSelectReset();
+		UpdateCursorUp();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
@@ -363,6 +404,7 @@ void SceneOption::SensitivityUpdate()
 		m_nowItem = e_Item::kFullScreen;
 		m_updateFunc = &SceneOption::FullScreenUpdate;
 		FadeGraphSelectReset();
+		UpdateCursorDown();
 	}
 
 	if (Pad::IsPress(PAD_INPUT_RIGHT))
@@ -402,6 +444,7 @@ void SceneOption::FullScreenUpdate()
 		m_nowItem = e_Item::kSensitivity;
 		m_updateFunc = &SceneOption::SensitivityUpdate;
 		FadeGraphSelectReset();
+		UpdateCursorUp();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
@@ -410,6 +453,7 @@ void SceneOption::FullScreenUpdate()
 		m_nowItem = e_Item::kBgm;
 		m_updateFunc = &SceneOption::BgmUpdate;
 		FadeGraphSelectReset();
+		UpdateCursorDown();
 	}
 
 	if (Pad::IsTrigger(PAD_INPUT_1))
@@ -418,4 +462,23 @@ void SceneOption::FullScreenUpdate()
 		ChangeWindowMode(m_isFullScreen);
 		m_isFullScreen = !m_isFullScreen;
 	}
+}
+
+void SceneOption::DrawCursor()
+{
+	DrawGraph(m_cursorPos.x + m_selectAnimation, m_cursorPos.y, m_handles[kPointerH], true);
+}
+
+void SceneOption::UpdateCursorUp()
+{
+	// 線形補間でカーソルの位置を更新
+	m_cursorPos.x += (m_targetCursorUpPos.x - m_cursorPos.x) * kCursorSpeed;
+	m_cursorPos.y += (m_targetCursorUpPos.y - m_cursorPos.y) * kCursorSpeed;
+}
+
+void SceneOption::UpdateCursorDown()
+{
+	// 線形補間でカーソルの位置を更新
+	m_cursorPos.x += (m_targetCursorDownPos.x - m_cursorPos.x) * kCursorSpeed;
+	m_cursorPos.y += (m_targetCursorDownPos.y - m_cursorPos.y) * kCursorSpeed;
 }

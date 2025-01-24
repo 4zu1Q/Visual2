@@ -134,7 +134,6 @@ private:
 	void AttackYUpdate();
 	void HitUpdate();
 	void DeadUpdate();
-	void SpawnUpdate();
 	void FaceChangeUpdate();
 	void FaceUseUpdate();
 
@@ -155,7 +154,6 @@ private:
 	void OnAttackY();
 	void OnHit();
 	void OnDead();
-	void OnSpawn();
 	void OnFaceChange();
 	void OnFaceUse();
 

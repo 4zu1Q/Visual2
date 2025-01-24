@@ -24,6 +24,11 @@ public:
 	/// 描画処理
 	/// </summary>
 	virtual void Draw() override final;	//毎フレーム行う描画処理
+private:
+
+	void DrawCursor();
+	void UpdateCursorRight();
+	void UpdateCursorLeft();
 
 private:
 
@@ -48,6 +53,10 @@ private:
 
 	e_SceneTrans m_sceneTrans;
 	Game::e_BossKind m_bossKind;
+
+	// カーソルの現在位置と目標位置
+	Vec2 m_cursorPos;
+	Vec2 m_targetCursorPos;
 
 };
 

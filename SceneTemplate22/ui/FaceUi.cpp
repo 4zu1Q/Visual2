@@ -5,32 +5,60 @@
 namespace
 {
 	//顔の画像ファイル名
-	const char* const kPowerFaceFileName = "Data/Image/Face01.png";
-	const char* const kSpeedFaceFileName = "Data/Image/Face02.png";
-	const char* const kShotFaceFileName = "Data/Image/Face03.png";
-	const char* const kRastFaceFileName = "Data/Image/Face04.png";
+	const char* const kPowerFaceFileName = "Data/Image/PowerFace.png";
+	const char* const kSpeedFaceFileName = "Data/Image/SpeedFace.png";
+	const char* const kShotFaceFileName = "Data/Image/ShotFace.png";
+	const char* const kRastFaceFileName = "Data/Image/RassFace.png";
 
 	//顔の座標
 	const Vec2 kFacePos = { 1128.0f , 40.0f };
 
+	//使う画像の種類
+	enum e_Ui
+	{
+		kPowerH,
+		kPowerShadowH,
+		kSpeedH,
+		kSpeedShadowH,
+		kShotH,
+		kShotShadowH,
+		kRassH,
+		kRassShadowH,
+	};
+
 }
 
-FaceUi::FaceUi():
-	m_PowerFaceHandle(LoadGraph(kPowerFaceFileName)),
-	m_SpeedFaceHandle(LoadGraph(kSpeedFaceFileName)),
-	m_ShotFaceHandle(LoadGraph(kShotFaceFileName)),
-	m_RastFaceHandle(LoadGraph(kRastFaceFileName))
+FaceUi::FaceUi()
 {
 
+	m_handles.push_back(LoadGraph("Data/Image/PowerFace.png"));
+	m_handles.push_back(LoadGraph("Data/Image/PowerFace01.png"));		
+
+	m_handles.push_back(LoadGraph("Data/Image/SpeedFace.png"));
+	m_handles.push_back(LoadGraph("Data/Image/SpeedFace01.png"));			
+
+	m_handles.push_back(LoadGraph("Data/Image/ShotFace.png"));
+	m_handles.push_back(LoadGraph("Data/Image/ShotFace01.png"));				
+
+	m_handles.push_back(LoadGraph("Data/Image/RassFace.png"));
+	m_handles.push_back(LoadGraph("Data/Image/RassFace01.png"));				
 }
 
 FaceUi::~FaceUi()
 {
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
 
+
+	m_handles.clear();
 }
 
 void FaceUi::Update()
 {
+
 }
 
 void FaceUi::Draw(Player& player)
@@ -38,23 +66,23 @@ void FaceUi::Draw(Player& player)
 	//プレイヤーの仮面UI
 	if (player.GetFaceKind() == e_PlayerKind::kPowerPlayer)
 	{
-		DrawGraph(kFacePos.x, kFacePos.y, m_PowerFaceHandle, true);
-
+		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerShadowH], true);
+		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerH], true);
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kSpeedPlayer)
 	{
-		DrawGraph(kFacePos.x, kFacePos.y, m_SpeedFaceHandle, true);
-
+		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedShadowH], true);
+		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedH], true);
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kShotPlayer)
 	{
-		DrawGraph(kFacePos.x, kFacePos.y, m_ShotFaceHandle, true);
-
+		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotH], true);
+		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotShadowH], true);
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kRassPlayer)
 	{
-		DrawGraph(kFacePos.x, kFacePos.y, m_RastFaceHandle, true);
-
+		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassShadowH], true);
+		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassH], true);
 	}
 
 }

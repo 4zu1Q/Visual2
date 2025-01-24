@@ -25,10 +25,16 @@ namespace
 	const Vec2 kTitlePos = { 160.0f , 480.0f };
 	const Vec2 kBackPos = { 0.0f , 660.0f };
 
-
+	//選択UIのポジション
+	const Vec2 kReStartSelectPos = { 110 , 130 };
+	const Vec2 kOptionSelectPos = { 110 , 250 };
+	const Vec2 kSelectSelectPos = { 110 , 370 };
+	const Vec2 kTitleSelectPos = { 110 , 490 };
 
 	//ポーズの背景アルファ値
 	constexpr int kAlpha = 200;
+
+	constexpr float kCursorSpeed = 0.05f;
 
 	//使う画像の種類
 	enum e_Ui
@@ -49,6 +55,9 @@ namespace
 ScenePause::ScenePause(SceneManager& manager) :
 	SceneBase(manager)
 {
+	m_cursorPos = kReStartSelectPos;
+	m_targetCursorDownPos = kOptionSelectPos;
+	m_targetCursorUpPos = kTitleSelectPos;
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/Pause3.png"));
@@ -76,6 +85,35 @@ void ScenePause::Update()
 	UpdateFade();
 	UpdateFadeSelectGraph();
 
+	if (m_sceneTrans == e_SceneTrans::kRestart)
+	{
+		m_cursorPos = kReStartSelectPos;
+
+		m_targetCursorUpPos = kTitleSelectPos;
+		m_targetCursorDownPos = kOptionSelectPos;
+	}
+	else if (m_sceneTrans == e_SceneTrans::kOption)
+	{
+		m_cursorPos = kOptionSelectPos;
+
+		m_targetCursorUpPos = kReStartSelectPos;
+		m_targetCursorDownPos = kSelectSelectPos;
+	}
+	else if (m_sceneTrans == e_SceneTrans::kSelect)
+	{
+		m_cursorPos = kSelectSelectPos;
+
+		m_targetCursorUpPos = kOptionSelectPos;
+		m_targetCursorDownPos = kTitleSelectPos;
+	}
+	else if (m_sceneTrans == e_SceneTrans::kTitle)
+	{
+		m_cursorPos = kTitleSelectPos;
+
+		m_targetCursorUpPos = kSelectSelectPos;
+		m_targetCursorDownPos = kReStartSelectPos;
+	}
+
 	if (!m_isToNextScene)
 	{
 		//上を押した場合
@@ -86,12 +124,14 @@ void ScenePause::Update()
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) - 1);
 				FadeGraphSelectReset();
+				UpdateCursorUp();
 			}
 			else if (m_sceneTrans == e_SceneTrans::kRestart)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kTitle;
 				FadeGraphSelectReset();
+				UpdateCursorUp();
 			}
 		}
 
@@ -103,12 +143,14 @@ void ScenePause::Update()
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = static_cast<e_SceneTrans>(static_cast<int>(m_sceneTrans) + 1);
 				FadeGraphSelectReset();
+				UpdateCursorDown();
 			}
 			else if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				SoundManager::GetInstance().PlaySe("selectSe");
 				m_sceneTrans = e_SceneTrans::kRestart;
 				FadeGraphSelectReset();
+				UpdateCursorDown();
 			}
 		}
 
@@ -185,7 +227,6 @@ void ScenePause::Draw()
 
 #ifdef _DEBUG
 
-
 	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRestart) * kTextIntervalY, 0xffffff, "Restart");
@@ -193,22 +234,18 @@ void ScenePause::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
 
-
 	DrawString(0, 0, "Scene Pause", 0xffffff, false);
-
 
 #endif
 
-
-
-
-
 	DrawGraph(kBackPos.x, kBackPos.y, m_handles[kBackH], true);
+
+	//カーソルの描画
+	DrawCursor();
 
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kRestart)
 	{
-		DrawGraph(110 + m_selectAnimation, 130, m_handles[kPointerH], true);
 
 		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 		
@@ -219,7 +256,6 @@ void ScenePause::Draw()
 	}
 	if (m_sceneTrans == e_SceneTrans::kOption)
 	{
-		DrawGraph(110 + m_selectAnimation, 250, m_handles[kPointerH], true);
 
 		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 
@@ -230,7 +266,6 @@ void ScenePause::Draw()
 	}
 	else if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-		DrawGraph(110 + m_selectAnimation, 370, m_handles[kPointerH], true);
 
 		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 		
@@ -241,7 +276,6 @@ void ScenePause::Draw()
 	}
 	else if (m_sceneTrans == e_SceneTrans::kTitle)
 	{
-		DrawGraph(110 + m_selectAnimation, 490, m_handles[kPointerH], true);
 
 		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 		
@@ -252,5 +286,26 @@ void ScenePause::Draw()
 	}
 
 	DrawFade(0x000000);
+
+}
+
+void ScenePause::DrawCursor()
+{
+	DrawGraph(m_cursorPos.x + m_selectAnimation, m_cursorPos.y, m_handles[kPointerH], true);
+}
+
+void ScenePause::UpdateCursorUp()
+{
+	// 線形補間でカーソルの位置を更新
+	m_cursorPos.x += (m_targetCursorUpPos.x - m_cursorPos.x) * kCursorSpeed;
+	m_cursorPos.y += (m_targetCursorUpPos.y - m_cursorPos.y) * kCursorSpeed;
+
+}
+
+void ScenePause::UpdateCursorDown()
+{
+	// 線形補間でカーソルの位置を更新
+	m_cursorPos.x += (m_targetCursorDownPos.x - m_cursorPos.x) * kCursorSpeed;
+	m_cursorPos.y += (m_targetCursorDownPos.y - m_cursorPos.y) * kCursorSpeed;
 
 }

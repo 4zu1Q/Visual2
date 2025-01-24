@@ -29,19 +29,6 @@ public:
 
 private:
 
-	struct Bg_
-	{
-		// 座標
-		float posX;
-		float posY;
-		// 円の半径
-		int range;
-
-		// 移動スピード
-		float speed;
-	};
-
-
 	void DrawCursor();
 	void UpdateCursorUp();
 	void UpdateCursorDown();
@@ -67,7 +54,6 @@ private:
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
 
-	Bg_ m_bg[8];
 
 	bool m_isPlayer;	//プレイヤーのタイトルバージョンのアニメーションを行う
 

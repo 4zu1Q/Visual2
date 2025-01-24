@@ -96,7 +96,6 @@ private:
 	bool m_isMpHit;
 
 	Game::e_BossKind m_bossKind;
-	
 
 };
 
