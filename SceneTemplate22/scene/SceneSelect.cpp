@@ -219,10 +219,6 @@ void SceneSelect::Update()
 		return;
 	}
 
-	//if (Pad::IsPress(PAD_INPUT_1) && Pad::IsPress(PAD_INPUT_2))
-	//{
-	//	m_isToNextScene = true;
-	//}
 #endif
 
 	if (!IsFading())

@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "DxLib.h"
 #include <memory>
+#include "util/Game.h"
 
 class Player;
 class Tomb
@@ -14,6 +15,8 @@ public:
 
 	virtual void Update();
 	virtual void Draw();
+
+	virtual void DrawTriangle(Game::e_BossKind bossKind);
 
 	/// <summary>
 	/// 
@@ -51,10 +54,20 @@ public:
 	/// <returns></returns>
 	bool TombRastHit(std::shared_ptr<Player> pPlayer);
 
+	/// <summary>
+	/// ゲームプレイからセレクトステージに移動するための当たり判定
+	/// </summary>
+	/// <param name="pPlayer"></param>
+	/// <returns></returns>
+	bool TriangleHit(std::shared_ptr<Player> pPlayer);
+
+
 	const VECTOR& GetPowerPos() const { return m_posPower; }
 	const VECTOR& GetSpeedPos() const { return m_posSpeed; }
 	const VECTOR& GetShotPos() const { return m_posShot; }
 	const VECTOR& GetRastPos() const { return m_posRast; }
+
+	const VECTOR& GetTrianglePos() const { return m_posTriangle; }
 
 private:
 	//ボスの当たり判定の半径
@@ -66,7 +79,6 @@ private:
 	int m_modelTrianglePowerH;
 	int m_modelTriangleSpeedH;
 	int m_modelTriangleShotH;
-	int m_modelTriangleRassH;
 
 	//墓のポジション
 	VECTOR m_posPower;
@@ -74,12 +86,7 @@ private:
 	VECTOR m_posShot;
 	VECTOR m_posRast;
 
-	VECTOR m_posTrianglePower;
-	VECTOR m_posTriangleSpeed;
-	VECTOR m_posTriangleShot;
-
-	//仮の名
-	VECTOR m_posTriangleRass;
+	VECTOR m_posTriangle;
 
 };
 

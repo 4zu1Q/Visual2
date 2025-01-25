@@ -84,6 +84,7 @@ BossPower::BossPower():
 	m_actionKind(0),
 	m_hp(350.0f)
 {
+	m_isClear = false;
 
 	m_modelH = MV1LoadModel(kModelFilename);
 

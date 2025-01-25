@@ -24,6 +24,7 @@ public:
 	const int& GetHp() const { return m_hp; }
 	void SetHp(const int hp) { m_hp = hp; }
 
+	const bool& GetIsClear() const { return m_isClear; }
 
 	void PlayerLockOn(Player& player);
 
@@ -34,6 +35,9 @@ protected:
 
 	//モデルハンドル
 	//int m_modelH;
+
+	//ボスが倒されたかどうかのフラグ
+	bool m_isClear;
 
 	//座標
 	VECTOR m_pos;

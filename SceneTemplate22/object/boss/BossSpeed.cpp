@@ -91,6 +91,7 @@ BossSpeed::BossSpeed() :
 	m_moveAngle(0.0f),
 	m_hp(350.0f)
 {
+	m_isClear = false;
 
 	m_modelH = MV1LoadModel(kModelFilename);
 

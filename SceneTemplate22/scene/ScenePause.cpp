@@ -50,6 +50,7 @@ namespace
 
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
+
 }
 
 ScenePause::ScenePause(SceneManager& manager) :
@@ -60,7 +61,7 @@ ScenePause::ScenePause(SceneManager& manager) :
 	m_targetCursorUpPos = kTitleSelectPos;
 
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/Pause3.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Pause4.png"));
 	m_handles.push_back(LoadGraph("Data/Image/ReStart.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Select.png"));
@@ -238,6 +239,7 @@ void ScenePause::Draw()
 
 #endif
 
+	DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 	DrawGraph(kBackPos.x, kBackPos.y, m_handles[kBackH], true);
 
 	//カーソルの描画
@@ -247,7 +249,6 @@ void ScenePause::Draw()
 	if (m_sceneTrans == e_SceneTrans::kRestart)
 	{
 
-		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 		
 		DrawFadeSelectGraph(m_handles[kReStartH], kReStartPos);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
@@ -257,7 +258,6 @@ void ScenePause::Draw()
 	if (m_sceneTrans == e_SceneTrans::kOption)
 	{
 
-		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
 		DrawFadeSelectGraph(m_handles[kOptionH], kOptionPos);
@@ -267,7 +267,6 @@ void ScenePause::Draw()
 	else if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
 
-		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 		
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
@@ -277,7 +276,6 @@ void ScenePause::Draw()
 	else if (m_sceneTrans == e_SceneTrans::kTitle)
 	{
 
-		DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 		
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);

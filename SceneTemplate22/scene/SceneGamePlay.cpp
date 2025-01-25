@@ -6,6 +6,7 @@
 #include "scene/SceneGamePlay.h"
 #include "scene/SceneGameOver.h"
 #include "scene/ScenePause.h"
+#include "scene/SceneSelect.h"
 #include "scene/SceneDebug.h"
 
 #include "object/player/Player.h"
@@ -16,6 +17,7 @@
 #include "object/boss/BossRast.h"
 #include "object/Camera.h"
 #include "object/Camera2.h"
+#include "object/stage/Tomb.h"
 
 #include "ui/HpBar.h"
 #include "ui/PlayerBarUi.h"
@@ -52,6 +54,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 	m_selectTime(0),
 	m_cameraAngle(0.0f)
 {
+	m_isTriangl = false;
 
 	m_pPlayer = std::make_shared<Player>();
 	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
@@ -69,6 +72,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 
 
 	m_pField = std::make_shared<Field>(stageKind);
+	m_pTomb = std::make_shared<Tomb>();
 
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
 
@@ -144,11 +148,14 @@ void SceneGamePlay::Update()
 	}
 #endif
 
+	//ゲームステージに移動するための当たり判定
+	m_isTriangl = m_pTomb->TombPowerHit(m_pPlayer);
+
 	//ボスのHPが0になった場合
-	if (m_pBossRast->GetHp() > 0)
-	{
-		m_selectTime++;
-	}
+	//if (m_pBossRast->GetHp() > 0)
+	//{
+	//	m_selectTime++;
+	//}
 
 	//プレイヤーのゲームオーバーフラグがtrueの場合
 	if (m_pPlayer->GetIsGameOver())
@@ -181,22 +188,81 @@ void SceneGamePlay::Update()
 		}
 	}
 
+	if (m_isTriangl)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_2))
+		{
+			if (m_bossKind == Game::e_BossKind::kPower)
+			{
+				//ここにパワーボスの顔が使えるようになるフラグをtrueにする
+
+
+				m_isToNextScene = true;
+				StartFadeOut();
+			}
+			if (m_bossKind == Game::e_BossKind::kSpeed)
+			{
+				//ここにスピードの顔が使えるようになるフラグをtrueにする
+
+
+				m_isToNextScene = true;
+				StartFadeOut();
+			}
+			if (m_bossKind == Game::e_BossKind::kShot)
+			{
+				//ここにショットの顔が使えるようになるフラグをtrueにする
+
+
+				m_isToNextScene = true;
+				StartFadeOut();
+			}
+
+		}
+	}
+
 
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
 		m_pBossPower->Update(m_pPhysics, *m_pPlayer);
+
+		//パワーボスを倒した場合
+		if (m_pBossPower->GetIsClear())
+		{
+			m_pTomb->Update();
+		}
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
 		m_pBossSpeed->Update(m_pPhysics, *m_pPlayer);
+
+		//スピードボスを倒した場合
+		if (m_pBossSpeed->GetIsClear())
+		{
+			m_pTomb->Update();
+		}
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
 		m_pBossShot->Update(m_pPhysics, *m_pPlayer);
+		
+		//ショットボスを倒した場合
+		if (m_pBossShot->GetIsClear())
+		{
+			m_pTomb->Update();
+		}
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
 		m_pBossRast->Update(m_pPhysics, *m_pPlayer);
+		
+		//ラスボスを倒した場合
+		if (m_pBossRast->GetIsClear())
+		{
+			//ここにラスボスの顔が使えるようになるフラグをtrueにする
+			
+
+			m_isToNextScene = true;
+		}
 	}
 
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
@@ -209,10 +275,6 @@ void SceneGamePlay::Update()
 	/*フレームにアタッチするための更新処理*/
 	//Physicsの後に入れておかないと補正の影響でワンテンポ遅れる
 	m_pPlayerWeapon->SwordUpdate();
-	m_pPlayerWeapon->AxeUpdate();
-	m_pPlayerWeapon->DaggerUpdate();
-	m_pPlayerWeapon->MagicWandUpdate();
-	m_pPlayerWeapon->LongSwordUpdate();
 
 	m_pFaceUi->Update();
 	m_pPlayerBarUi->Update(*m_pPlayer);
@@ -220,18 +282,39 @@ void SceneGamePlay::Update()
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
-
+		//if (!IsFadingOut())
+		{
+			if (m_pPlayer->GetIsGameOver())
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
+				return;
+			}
+			else if (m_pBossPower->GetIsClear())
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
+				return;
+			}
+			else if (m_pBossSpeed->GetIsClear())
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				return;
+			}
+			else if (m_pBossShot->GetIsClear())
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				return;
+			}
+		}
 	}
 
 	//SetLightDirectionHandle(m_lightHandle, VSub(kLightUpPos , kLightDownPos));
-
-
 }
 
 void SceneGamePlay::Draw()
 {
 
 	m_pField->Draw();
+	m_pTomb->DrawTriangle(m_bossKind);
 
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
@@ -261,10 +344,10 @@ void SceneGamePlay::Draw()
 	DrawFade(0x000000);
 
 #ifdef _DEBUG
+
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 
 #endif // DEBUG
-
 
 }
 

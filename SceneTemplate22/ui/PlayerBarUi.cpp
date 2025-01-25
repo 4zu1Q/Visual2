@@ -31,7 +31,13 @@ namespace
 	const Vec2 kMpBarPos = { 20.0f , 40.0f };
 	const Vec2 kStaminaBarPos = { 20.0f , 70.0f };
 
-
+	//ハンドル名
+	std::array<const char*, 3>kFileName =
+	{
+		"Data/Image/StaminaGaugeGreen.png",
+		"Data/Image/StaminaGaugeRed.png",
+		"Data/Image/StaminaGaugeBlack.png"
+	};
 
 	//使う画像の種類
 	enum e_Ui
@@ -40,7 +46,16 @@ namespace
 		kHpLostH,
 		kStaminaBarH,
 		kMpBarH,
+		kStGreenCircleH,
+		kStRedCircleH,
+		kStBlackCircleH,
 	};
+
+	//スタミナゲージの座標
+	constexpr float kStaminaGaugePosX = 80.0f;
+	constexpr float kStaminaGaugePosY = 120.0f;
+
+	constexpr float kMaxPercent = 20.0f;
 
 }
 
@@ -50,10 +65,22 @@ PlayerBarUi::PlayerBarUi():
 	m_playerStamina(0.0f),
 	m_isPlayerStamina(false)
 {
+	m_percent = 100.0f;
+	m_percentGreenGauge = 0.0f;
+
 	m_handles.push_back(LoadGraph("Data/Image/Hp.png"));
 	m_handles.push_back(LoadGraph("Data/Image/HpLost.png"));
 	m_handles.push_back(LoadGraph("Data/Image/BarFlameSt.png"));
 	m_handles.push_back(LoadGraph("Data/Image/BarFlameMp.png"));
+	m_handles.push_back(LoadGraph("Data/Image/StaminaGaugeGreen.png"));
+	m_handles.push_back(LoadGraph("Data/Image/StaminaGaugeRed.png"));
+	m_handles.push_back(LoadGraph("Data/Image/StaminaGaugeBlack.png"));
+
+	//画像ロード
+	for (int i = 0; i < m_staminaGaugeHandle.size(); i++)
+	{
+		m_staminaGaugeHandle[i] = LoadGraph(kFileName[i]);
+	}
 
 }
 
@@ -63,6 +90,12 @@ PlayerBarUi::~PlayerBarUi()
 	for (int i = 0; i < m_handles.size(); i++)
 	{
 		DeleteGraph(m_handles[i]);
+	}
+
+	//画像削除
+	for (int i = 0; i < m_staminaGaugeHandle.size(); i++)
+	{
+		DeleteGraph(m_staminaGaugeHandle[i]);
 	}
 
 	m_handles.clear();
@@ -75,17 +108,18 @@ void PlayerBarUi::Update(Player& player)
 	m_playerMp = player.GetMp();
 	m_playerStamina = player.GetStamina();
 	m_isPlayerStamina = player.GetIsStamina();
+
+	//スタミナの残り％を計算
+	m_percent = static_cast<double>(m_stamina) /
+		static_cast<double>(kMaxStamina) * kMaxPercent;
+
 }
 
 void PlayerBarUi::Draw()
 {
-
+	//スタミナゲージの位置
 	DrawBox(kMpLeftBarPos.x, kMpLeftBarPos.y, kMpRightBarPos.x + kMaxMp, kMpRightBarPos.y, 0x000000, true);
 	DrawBox(kStaminaLeftBarPos.x, kStaminaLeftBarPos.y, kStaminaRightBarPos.x + kMaxStamina, kStaminaRightBarPos.y, 0x000000, true);
-
-	//少し遅れて変動するバー
-	
-
 
 	//変動するバー
 	DrawBox(kMpLeftBarPos.x, kMpLeftBarPos.y, kMpRightBarPos.x + m_playerMp, kMpRightBarPos.y, 0x00bfff, true);

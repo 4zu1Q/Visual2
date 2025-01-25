@@ -20,6 +20,7 @@ class BossPower;
 class BossSpeed;
 class BossShot;
 class BossRast;
+class Tomb;
 class Field;
 class MyLib::Physics;
 
@@ -65,7 +66,7 @@ private:
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<ButtonUi> m_pButtonUi;
 
-
+	std::shared_ptr<Tomb> m_pTomb;
 	std::shared_ptr<Field> m_pField;
 
 	std::shared_ptr<MyLib::Physics> m_pPhysics;
@@ -90,6 +91,8 @@ private:
 	bool m_isFadingOut;
 	float m_cameraAngle;
 
+	//ゲームプレイからセレクトに戻るためのフラグ
+	bool m_isTriangl;
 
 	//当たり判定フラグ
 	bool m_isHpHit;

@@ -91,6 +91,7 @@ BossShot::BossShot() :
 	m_attachFramePos({0,0,0}),
 	m_modelRightFrame(54)
 {
+	m_isClear = false;
 
 	m_avoidKind = e_AvoidKind::kFront;
 

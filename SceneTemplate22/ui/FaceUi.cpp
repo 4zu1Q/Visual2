@@ -66,23 +66,47 @@ void FaceUi::Draw(Player& player)
 	//プレイヤーの仮面UI
 	if (player.GetFaceKind() == e_PlayerKind::kPowerPlayer)
 	{
-		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerShadowH], true);
-		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerH], true);
+		//if(パワーボスフラグがtrueになっていたら)
+		{
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerH], true);
+		}
+		//else
+		{
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerShadowH], true);
+		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kSpeedPlayer)
 	{
-		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedShadowH], true);
-		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedH], true);
+		//if(スピードボスフラグがtrueになっていたら)
+		{
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedH], true);
+		}
+		//else
+		{
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedShadowH], true);
+		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kShotPlayer)
 	{
-		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotH], true);
-		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotShadowH], true);
+		//if(ショットボスフラグがtrueになっていたら)
+		{
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotH], true);
+		}
+		//else
+		{
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotShadowH], true);
+		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kRassPlayer)
 	{
-		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassShadowH], true);
-		DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassH], true);
+		//if(ラスボスフラグがtrueになっていたら)
+		{
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassShadowH], true);
+		}
+		//else
+		{
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassH], true);
+		}
 	}
 
 }
