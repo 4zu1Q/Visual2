@@ -190,6 +190,7 @@ void SceneGamePlay::Update()
 
 	if (m_isTriangl)
 	{
+
 		if (Pad::IsTrigger(PAD_INPUT_2))
 		{
 			if (m_bossKind == Game::e_BossKind::kPower)
@@ -205,6 +206,12 @@ void SceneGamePlay::Update()
 				//ここにスピードの顔が使えるようになるフラグをtrueにする
 
 
+				//if (m_bossKind == Game::e_BossKind::kSpeed)
+					//else if (m_pBossPower->GetIsClear())
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+					return;
+				}
 				m_isToNextScene = true;
 				StartFadeOut();
 			}
@@ -289,11 +296,7 @@ void SceneGamePlay::Update()
 				m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
 				return;
 			}
-			else if (m_pBossPower->GetIsClear())
-			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
-				return;
-			}
+
 			else if (m_pBossSpeed->GetIsClear())
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
@@ -346,6 +349,11 @@ void SceneGamePlay::Draw()
 #ifdef _DEBUG
 
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
+
+	if (m_isTriangl)
+	{
+		DrawString(0, 600, "Hit", 0xffffff, false);
+	}
 
 #endif // DEBUG
 
