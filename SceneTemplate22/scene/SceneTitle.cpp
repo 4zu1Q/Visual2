@@ -51,7 +51,7 @@ namespace
 	const Vec2 kOptionPos = { 540.0f , 550.0f };
 	const Vec2 kEndPos = { 540.0f , 620.0f };
 
-	const Vec2 kAnyPreesButtonPos = { 440.0f , 320.0f };
+	const Vec2 kAnyPreesButtonPos = { 240.0f , 550.0f };
 
 	//選択UIのポジション
 	const Vec2 kNewGameSelectPos = { 520 , 425 };
@@ -102,7 +102,7 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogoStart.png"));
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
-	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton.png"));
+	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton01.png"));
 	m_handles.push_back(LoadGraph("Data/Image/NewGame.png"));				//NewGame
 	m_handles.push_back(LoadGraph("Data/Image/LoadGame.png"));				//LoadGame
 	m_handles.push_back(LoadGraph("Data/Image/Option.png"));				//Option
@@ -155,7 +155,7 @@ void SceneTitle::Update()
 #endif
 	if(!m_isSkip) m_titleLogoTime++;
 
-	if (m_titleLogoTime >= 300)
+	if (m_titleLogoTime >= 140)
 	{
 		m_isSkip = true;
 	}
@@ -365,8 +365,8 @@ void SceneTitle::Draw()
 			// 画像の描画
 
 			DrawFadeSelectGraph(m_handles[kPleasePressH], kAnyPreesButtonPos);
-			DrawGraph(460 + m_selectAnimation, 330, m_handles[kPointerH], true);
-			DrawTurnGraph(780 - m_selectAnimation, 330, m_handles[kPointerH], true);
+			DrawGraph(360 + m_selectAnimation, 585, m_handles[kPointerH], true);
+			DrawTurnGraph(880 - m_selectAnimation, 585, m_handles[kPointerH], true);
 			
 		}
 
@@ -379,7 +379,6 @@ void SceneTitle::Draw()
 		//選択
 		if (m_sceneTrans == e_SceneTrans::kNewGame)
 		{
-
 			//ニューゲーム
 			DrawFadeSelectGraph(m_handles[kNewGameH], kNewGamePos);
 			//ロード

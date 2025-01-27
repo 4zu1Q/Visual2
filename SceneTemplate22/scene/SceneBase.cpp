@@ -184,7 +184,7 @@ void SceneBase::FadeGraphSelectReset()
 void SceneBase::UpdateFadeGraphTitleLogo()
 {
 	// スタート指示を点滅させる
-	if (m_fadeGraphTitleTime == 300)
+	if (m_fadeGraphTitleTime == 120)
 	{
 		m_fadeGraphTitleTime++;
 	}
@@ -198,7 +198,7 @@ void SceneBase::UpdateFadeGraphTitleLogo()
 void SceneBase::DrawFadeGraphTitleLogo(int graphHandle, Vec2 graphPos)
 {
 	// フェードしながら描画
-	int alpha = static_cast<int>(255 * ((float)m_fadeGraphTitleTime / 300));
+	int alpha = static_cast<int>(255 * ((float)m_fadeGraphTitleTime / 120));
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 	// 画像の描画
 	DrawGraph(graphPos.x, graphPos.y, graphHandle, true);

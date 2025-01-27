@@ -7,6 +7,7 @@ namespace
 	constexpr float kCameraAngleSpeed = 0.05f;				//旋回速度
 	constexpr float kCameraPlayerTargetHeight = 10.0f;		// プレイヤー座標からどれだけ高い位置を注視点とするか
 	constexpr float kCameraPlayerBackwardDistance = 25.0f;	// プレイヤーとの奥行方向の距離
+	constexpr float kCameraTargetBackwardDistance = 25.0f;	// プレイヤーとの奥行方向の距離
 	constexpr float kCameraPlayerRightDistance = 0.0f;	// プレイヤーとの水平方向の距離
 	constexpr float kCameraCollisionSize = 2.0f;			// カメラの当たり判定サイズ
 
@@ -16,13 +17,17 @@ namespace
 
 Camera2::Camera2():
 	m_pos(VGet(0, 0, 0)),
+	m_playerPos(VGet(0, 0, 0)),
+	m_enemyPos(VGet(0, 0, 0)),
 	m_targetPos(VGet(0, 0, 0)), 
 	m_setEye(VGet(0, 0, 0)),
 	m_setTarget(VGet(0, 0, 0)),
 	m_angleH(0.0f),
 	m_angleV(0.0f),
 	m_lightHandle(0),
-	m_angleMoveScale(0.0f)
+	m_angleMoveScale(0.0f),
+	m_cameraDistance(40.0f),
+	m_isLockOn(false)
 {
 }
 
@@ -49,51 +54,100 @@ void Camera2::Finalize()
 
 }
 
-void Camera2::Update(VECTOR playerPos, int stageHandle, float playerAngle)
+void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float playerAngle, bool isLockOn)
 {
-	// DirectInput の入力を取得
-	DINPUT_JOYSTATE dInputState;
-	GetJoypadDirectInputState(DX_INPUT_PAD1, &dInputState);
+	m_playerPos = playerPos;
+	m_enemyPos = enemyPos;
 
-	if (Pad::IsTrigger(PAD_INPUT_10))
+	//プレイヤーとボスの距離を距離を求める
+	VECTOR toPlayer = VSub(m_enemyPos,m_playerPos);
+	float length = VSize(toPlayer);
+
+	if (Pad::IsTrigger(PAD_INPUT_10) && !m_isLockOn)
 	{
 		ResetToPlayerView(playerAngle);
 	}
 
-	// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
-	m_angleH += dInputState.Rx / 10000.0f * Setting::GetInstance().GetSensitivity();
-	if (m_angleH < -DX_PI_F)
+	if (Pad::IsTrigger(PAD_INPUT_7) && isLockOn)
 	{
-		m_angleH += DX_TWO_PI_F;
-	}
-	if (m_angleH > DX_PI_F)
-	{
-		m_angleH -= DX_TWO_PI_F;
+		m_isLockOn = !m_isLockOn;
 	}
 
-	m_angleV += dInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
-	if (m_angleV < -DX_PI_F / 2.0f + 0.6f)
+
+
+	if (m_isLockOn)			//ロックオンされた場合のカメラ処理
 	{
-		m_angleV = -DX_PI_F / 2.0f - 0.6f;
+		// プレイヤーと敵の中間点を計算
+		VECTOR midPoint = VGet(
+			(m_playerPos.x + m_enemyPos.x) / 2.0f,
+			(m_playerPos.y + m_enemyPos.y) / 2.0f,
+			(m_playerPos.z + m_enemyPos.z) / 2.0f
+		);
+
+		// カメラの位置を更新
+		m_pos = VGet(
+			midPoint.x - m_cameraDistance * cosf(m_angleV) * sinf(m_angleH),
+			midPoint.y * sinf(m_angleV),
+			midPoint.z - m_cameraDistance * cosf(m_angleV) * cosf(m_angleH)
+		);
+
+		// カメラの注視点を更新
+		m_targetPos = midPoint;
+
+		VECTOR direction = VSub(m_enemyPos, m_playerPos);
+		m_angleH = atan2f(direction.x, direction.z);
+		m_angleV = atan2f(direction.y, VSize(VGet(direction.x, 0.0f, direction.z)));
+
 	}
-	if (m_angleV > DX_PI_F / 2.0f - 0.6f)
+	else if (!m_isLockOn)	//ロックオンされていない場合のカメラ処理
 	{
-		m_angleV = DX_PI_F / 2.0f + 0.6f;
+		// DirectInput の入力を取得
+		DINPUT_JOYSTATE dInputState;
+		GetJoypadDirectInputState(DX_INPUT_PAD1, &dInputState);
+
+		// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
+		m_angleH += dInputState.Rx / 10000.0f * Setting::GetInstance().GetSensitivity();
+		if (m_angleH < -DX_PI_F)
+		{
+			m_angleH += DX_TWO_PI_F;
+		}
+		if (m_angleH > DX_PI_F)
+		{
+			m_angleH -= DX_TWO_PI_F;
+		}
+
+		m_angleV += dInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
+		if (m_angleV < -DX_PI_F / 2.0f + 0.6f)
+		{
+			m_angleV = -DX_PI_F / 2.0f - 0.6f;
+		}
+		if (m_angleV > DX_PI_F / 2.0f - 0.6f)
+		{
+			m_angleV = DX_PI_F / 2.0f + 0.6f;
+		}
+
+		// カメラの水平角度を制限
+		if (m_angleV < -0.9f)
+		{
+			m_angleV = -0.89f;
+		}
+		// カメラの水平角度を制限
+		if (m_angleV > 0.6f)
+		{
+			m_angleV = 0.59f;
+		}
 	}
 
-	// カメラの水平角度を制限
-	if (m_angleV < -0.9f)
+	if (!m_isLockOn)
 	{
-		m_angleV = -0.89f;
+		// カメラの注視点はプレイヤー座標から規定値分高い座標
+		m_targetPos = VAdd(playerPos, VGet(0.0f, kCameraPlayerTargetHeight, 0.0f));
 	}
-	// カメラの水平角度を制限
-	if (m_angleV > 0.6f)
+	else if (m_isLockOn)
 	{
-		m_angleV = 0.59f;
+		// カメラの注視点はボス座標から規定値分高い座標
+		//m_targetPos = VAdd(enemyPos, VGet(0.0f, kCameraPlayerTargetHeight, 0.0f));
 	}
-
-	// カメラの注視点はプレイヤー座標から規定値分高い座標
-	m_targetPos = VAdd(playerPos, VGet(0.0f, kCameraPlayerTargetHeight, 0.0f));
 
 	// カメラの座標を決定する
 	{
@@ -115,13 +169,28 @@ void Camera2::Update(VECTOR playerPos, int stageHandle, float playerAngle)
 		rightVector.y = 0.0f;
 		rightVector.z = sin(-m_angleH - DX_PI_F / 2.0f);
 
-		// カメラの座標を算出
-		m_pos = VAdd(VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance)), VScale(forwardVector, -kCameraPlayerBackwardDistance));
-		m_pos.y += kCameraPlayerTargetHeight;
+		if (!m_isLockOn)
+		{
+			// カメラの座標を算出
+			m_pos = VAdd(VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance)), VScale(forwardVector, -kCameraPlayerBackwardDistance));
+			m_pos.y += kCameraPlayerTargetHeight;
 
-		// カメラの注視点を算出
-		m_targetPos = VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance));
-		m_targetPos.y += kCameraPlayerTargetHeight;
+			// カメラの注視点を算出
+			m_targetPos = VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance));
+			m_targetPos.y += kCameraPlayerTargetHeight;
+		}
+		else if (m_isLockOn)
+		{
+			 //カメラの座標を算出
+			//m_pos = VAdd(VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance)), VScale(forwardVector, -kCameraTargetBackwardDistance -length /*ここにプレイヤーからボスの距離を入れる？*/));
+			//m_pos.y += kCameraPlayerTargetHeight;
+
+			//// カメラの注視点を算出
+			//m_targetPos = VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance));
+			//m_targetPos.y += kCameraPlayerTargetHeight;
+
+		}
+
 
 		// カメラの座標からプレイヤーの間にステージのポリゴンがあるか調べる
 		camPosBase = playerPos;
@@ -179,12 +248,19 @@ void Camera2::Update(VECTOR playerPos, int stageHandle, float playerAngle)
 	}
 
 	// カメラの情報をライブラリのカメラに反映させる
-	m_setEye = VAdd(m_setEye, VScale(VSub(m_pos, m_setEye), 0.4f));
-	m_setTarget = VAdd(m_setTarget, VScale(VSub(m_targetPos, m_setTarget), 0.4f));
+	if (!m_isLockOn)
+	{
+		m_setEye = VAdd(m_setEye, VScale(VSub(m_pos, m_setEye), 0.4f));
+		m_setTarget = VAdd(m_setTarget, VScale(VSub(m_targetPos, m_setTarget), 0.4f));
+		SetCameraPositionAndTarget_UpVecY(m_setEye, m_setTarget);
+	}
+	else if (m_isLockOn)
+	{
+		// カメラの位置と注視点を設定
+		SetCameraPositionAndTarget_UpVecY(m_pos, m_targetPos);
+	}
+
 	SetLightDirectionHandle(m_lightHandle, VSub(playerPos, m_pos));
-	SetCameraPositionAndTarget_UpVecY(m_setEye, m_setTarget);
-
-
 }
 
 void Camera2::Draw()
@@ -209,4 +285,45 @@ void Camera2::ResetToPlayerView(float playerAngle)
 	m_angleH = playerAngle + 1.6f;
 	m_angleV = 0.0f;
 
+}
+
+void Camera2::LockOn(VECTOR playerPos, VECTOR enemyPos)
+{
+
+
+	// カメラの位置と角度を更新
+	//UpdateLockOnCamera();
+	UpdateCameraAngle();
+}
+
+void Camera2::UpdateCamera()
+{
+	
+}
+
+void Camera2::UpdateLockOnCamera()
+{
+	VECTOR direction = VSub(m_enemyPos, m_playerPos);
+	m_angleV = atan2f(direction.x, direction.z);
+	m_angleH = atan2f(direction.y, VSize(VGet(direction.x, 0.0f, direction.z)));
+}
+
+void Camera2::UpdateCameraAngle()
+{
+	// プレイヤーと敵の中間点を計算
+	VECTOR midPoint = VGet(
+		(m_playerPos.x + m_enemyPos.x) / 2.0f,
+		(m_playerPos.y + m_enemyPos.y) / 2.0f,
+		(m_playerPos.z + m_enemyPos.z) / 2.0f
+	);
+
+	// カメラの位置を更新
+	m_pos = VGet(
+		midPoint.x - m_cameraDistance * cosf(m_angleH) * sinf(m_angleV),
+		midPoint.y + m_cameraDistance * sinf(m_angleH),
+		midPoint.z - m_cameraDistance * cosf(m_angleH) * cosf(m_angleV)
+	);
+
+	// カメラの注視点を更新
+	m_targetPos = midPoint;
 }

@@ -83,7 +83,7 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_handles.push_back(LoadGraph("Data/Image/Sensitivity.png"));		
 	m_handles.push_back(LoadGraph("Data/Image/FullScreen.png"));		
 	m_handles.push_back(LoadGraph("Data/Image/Bar.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Math.png"));
+	m_handles.push_back(LoadGraph("Data/Image/FullScreenMath.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Point.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Check.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));

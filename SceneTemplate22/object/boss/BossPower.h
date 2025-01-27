@@ -24,6 +24,8 @@ public:
 	const VECTOR& GetPosDown() const;
 	void SetPosDown(const VECTOR pos);
 
+	const VECTOR& GetPosUp() const;
+
 	const float& GetHp() const { return m_hp; }
 
 private:

@@ -143,8 +143,8 @@ void SceneGamePlay::Update()
 	//デバッグに遷移する
 	if (Pad::IsTrigger PAD_INPUT_7)
 	{
-		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
-		return;
+		//m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
+		//return;
 	}
 #endif
 
@@ -273,7 +273,25 @@ void SceneGamePlay::Update()
 	}
 
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
-	m_pCamera2->Update(m_pPlayer->GetPos(), m_pField->GetModelHandle(), m_pPlayer->GetAngle());
+
+	//ボス別々にロックオンするための処理
+	if (m_bossKind == Game::e_BossKind::kPower)
+	{
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossPower->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), true);
+	}
+	else if (m_bossKind == Game::e_BossKind::kSpeed)
+	{
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossSpeed->GetPosDown(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), true);
+	}
+	else if (m_bossKind == Game::e_BossKind::kShot)
+	{
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossShot->GetPosDown(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), true);
+	}
+	else if (m_bossKind == Game::e_BossKind::kRast)
+	{
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossRast->GetPosDown(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), true);
+	}
+
 
 	m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon,m_pCamera->GetCameraAngleX());
 

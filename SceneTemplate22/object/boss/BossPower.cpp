@@ -202,6 +202,12 @@ const VECTOR& BossPower::GetPosDown() const
 	return m_rigidbody.GetPos();
 }
 
+const VECTOR& BossPower::GetPosUp() const
+{
+	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 5.0f, 0.0f));
+	return pos;
+}
+
 void BossPower::SetPosDown(const VECTOR pos)
 {
 	m_rigidbody.SetPos(pos);

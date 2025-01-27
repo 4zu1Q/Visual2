@@ -235,7 +235,7 @@ void SceneSelect::Update()
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update(m_pPhysics);
 
-	m_pCamera2->Update(m_pPlayer->GetPos(),m_pField->GetModelHandle(),m_pPlayer->GetAngle());
+	m_pCamera2->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(),m_pField->GetModelHandle(),m_pPlayer->GetAngle(), false);
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
 	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon,m_pCamera2->GetCameraAngleX());
 
