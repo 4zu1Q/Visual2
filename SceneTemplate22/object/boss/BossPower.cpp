@@ -4,6 +4,8 @@
 #include "util/AnimController.h"
 #include "util/ActionTime.h"
 
+#include "util/Pad.h"
+
 #include <cmath>
 #include <cassert>
 
@@ -156,6 +158,11 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	//アップデート
 	(this->*m_updateFunc)();
 
+	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
+	{
+		m_hp -= 40;
+	}
+
 	//プレイヤーとボスの距離を距離を求める
 	VECTOR toPlayer = VSub(m_playerPos, m_pos);
 	m_length = VSize(toPlayer);
@@ -174,6 +181,15 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	//VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
 
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
+
+	//HPがゼロより下にいった場合
+	if (m_hp <= 0)
+	{
+		m_hp = 0;
+
+		//死亡状態へ遷移
+		OnDead();
+	}
 
 	//DrawSphere3D(m_pos, 32, 16, 0xffffff, 0xffffff, false);
 
@@ -204,7 +220,7 @@ const VECTOR& BossPower::GetPosDown() const
 
 const VECTOR& BossPower::GetPosUp() const
 {
-	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 5.0f, 0.0f));
+	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 10.0f, 0.0f));
 	return pos;
 }
 
@@ -404,7 +420,7 @@ void BossPower::DownUpdate()
 void BossPower::DeadUpdate()
 {
 	//ワープアイテムが出現するフラグをおいておく
-
+	m_isClear = true;
 }
 
 
@@ -479,6 +495,8 @@ void BossPower::OnDown()
 
 void BossPower::OnDead()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);

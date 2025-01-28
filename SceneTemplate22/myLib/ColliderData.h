@@ -51,7 +51,7 @@ namespace MyLib
 		//物理挙動をしないときにtrueにする
 		bool m_isTrigger;
 		//地面とぶつかってる時にtrueにする
-		bool m_isGround;
+		bool m_isGround = true;
 	};
 
 }

@@ -2,6 +2,7 @@ ID,名前,スピード
 Idle,Idle,0.5
 Spawn,Spawn_Ground_Skeletons,1
 Walk,Walking_B,1.2
+LockOnWalk,Walking_B,0.7
 Dash,Running_A,1.2
 Jump,Jump_Start,1.2
 Jumping,Jump_Idle,0.75

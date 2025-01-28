@@ -1,6 +1,7 @@
 ID,名前,スピード
 Idle,Idle,0.5
 Walk,Walking_B,1
+LockOnWalk,Walking_B,0.6
 Dash,Running_A,0.8
 Jump,Jump_Start,0.8
 Jumping,Jump_Idle,0.5

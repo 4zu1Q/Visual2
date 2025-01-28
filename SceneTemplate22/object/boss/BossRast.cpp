@@ -4,6 +4,8 @@
 #include "util/AnimController.h"
 #include "util/ActionTime.h"
 
+#include "util/Pad.h"
+
 #include <cmath>
 #include <cassert>
 
@@ -141,6 +143,11 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	//アップデート
 	(this->*m_updateFunc)();
 
+	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
+	{
+		m_hp -= 40;
+	}
+
 	//プレイヤーとボスの距離を距離を求める
 	VECTOR toPlayer = VSub(m_playerPos, m_pos);
 	m_length = VSize(toPlayer);
@@ -179,6 +186,13 @@ void BossRast::Draw()
 
 #endif // DEBUG
 
+}
+
+const VECTOR& BossRast::GetPosUp() const
+{
+	// TODO: return ステートメントをここに挿入します
+	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 10.0f, 0.0f));
+	return pos;
 }
 
 const VECTOR& BossRast::GetPosDown() const

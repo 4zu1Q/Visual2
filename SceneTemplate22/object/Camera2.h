@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include <memory>
 
+class LockOnTargetUi;
 
 class Camera2
 {
@@ -15,6 +16,8 @@ public:
 
 	void Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float playerAngle, bool isLockOn);
 	void Draw();
+
+	const bool GetIsLockOn() { return m_isLockOn; }
 
 	const VECTOR GetDirection() const;
 
@@ -31,6 +34,8 @@ private:
 	void UpdateCameraAngle();
 
 private:
+
+	std::shared_ptr<LockOnTargetUi> m_pLockOnUi;
 
 	VECTOR m_pos;				//カメラ座標
 	VECTOR m_targetPos;			//注視点

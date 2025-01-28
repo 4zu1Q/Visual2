@@ -23,7 +23,7 @@ public:
 	HpBar();
 	virtual ~HpBar();
 
-	void Update(BossPower& boss);
+	void Update(int boss);
 	void Draw();
 
 private:

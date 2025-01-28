@@ -1,4 +1,7 @@
 ﻿#include "Camera2.h"
+
+#include "ui/LockOnTargetUi.h"
+
 #include "util/Setting.h"
 #include "util/Pad.h"
 
@@ -26,9 +29,11 @@ Camera2::Camera2():
 	m_angleV(0.0f),
 	m_lightHandle(0),
 	m_angleMoveScale(0.0f),
-	m_cameraDistance(40.0f),
+	m_cameraDistance(25.0f),
 	m_isLockOn(false)
 {
+	m_pLockOnUi = std::make_shared<LockOnTargetUi>();
+
 }
 
 Camera2::~Camera2()
@@ -59,6 +64,8 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 	m_playerPos = playerPos;
 	m_enemyPos = enemyPos;
 
+	m_pLockOnUi->Update(m_enemyPos);
+
 	//プレイヤーとボスの距離を距離を求める
 	VECTOR toPlayer = VSub(m_enemyPos,m_playerPos);
 	float length = VSize(toPlayer);
@@ -73,7 +80,10 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 		m_isLockOn = !m_isLockOn;
 	}
 
-
+	if (!m_isLockOn)
+	{
+		m_pLockOnUi->CancelLockOn();
+	}
 
 	if (m_isLockOn)			//ロックオンされた場合のカメラ処理
 	{
@@ -84,11 +94,14 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 			(m_playerPos.z + m_enemyPos.z) / 2.0f
 		);
 
+		//プレイヤーと敵の距離が一定の距離より近かった場合
+		//カメラの位置を固定した方がいいかも
+
 		// カメラの位置を更新
 		m_pos = VGet(
-			midPoint.x - m_cameraDistance * cosf(m_angleV) * sinf(m_angleH),
-			midPoint.y * sinf(m_angleV),
-			midPoint.z - m_cameraDistance * cosf(m_angleV) * cosf(m_angleH)
+			m_playerPos.x - m_cameraDistance * cosf(m_angleV) * sinf(m_angleH),
+			m_playerPos.y * 0.5f + 10.0f,
+			m_playerPos.z - m_cameraDistance * cosf(m_angleV) * cosf(m_angleH)
 		);
 
 		// カメラの注視点を更新
@@ -269,9 +282,11 @@ void Camera2::Draw()
 	// カメラの座標を描画
 	DrawFormatString(0, 550, GetColor(255, 255, 255), "CameraAngle : %f", m_angleV);
 	DrawFormatString(0, 560, GetColor(255, 255, 255), "CameraAngle : %f", m_angleH);
-
-
 #endif
+	if (m_isLockOn)
+	{
+		m_pLockOnUi->Draw();
+	}
 }
 
 const VECTOR Camera2::GetDirection() const

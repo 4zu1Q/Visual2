@@ -13,7 +13,7 @@ public:
 	void Initialize();
 	void Finalize();
 
-	virtual void Update();
+	virtual void Update(VECTOR powerPos, VECTOR speedPos, VECTOR shotPos);
 	virtual void Draw();
 
 	virtual void DrawTriangle(Game::e_BossKind bossKind);
@@ -59,7 +59,21 @@ public:
 	/// </summary>
 	/// <param name="pPlayer"></param>
 	/// <returns></returns>
-	bool TriangleHit(std::shared_ptr<Player> pPlayer);
+	bool TrianglePowerHit(std::shared_ptr<Player> pPlayer);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="pPlayer"></param>
+	/// <returns></returns>
+	bool TriangleSpeedHit(std::shared_ptr<Player> pPlayer);
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="pPlayer"></param>
+	/// <returns></returns>
+	bool TriangleShotHit(std::shared_ptr<Player> pPlayer);
 
 
 	const VECTOR& GetPowerPos() const { return m_posPower; }
@@ -67,7 +81,9 @@ public:
 	const VECTOR& GetShotPos() const { return m_posShot; }
 	const VECTOR& GetRastPos() const { return m_posRast; }
 
-	const VECTOR& GetTrianglePos() const { return m_posTriangle; }
+	const VECTOR& GetPowerTrianglePos() const { return m_posPowerTriangle; }
+	const VECTOR& GetSpeedTrianglePos() const { return m_posSpeedTriangle; }
+	const VECTOR& GetShotTrianglePos() const { return m_posShotTriangle; }
 
 private:
 	//ボスの当たり判定の半径
@@ -86,7 +102,12 @@ private:
 	VECTOR m_posShot;
 	VECTOR m_posRast;
 
-	VECTOR m_posTriangle;
+	VECTOR m_posPowerTriangle;
+	VECTOR m_posSpeedTriangle;
+	VECTOR m_posShotTriangle;
 
+	float m_moveHeight;
+
+	float m_angle;
 };
 

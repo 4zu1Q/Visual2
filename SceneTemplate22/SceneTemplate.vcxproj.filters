@@ -276,6 +276,9 @@
     <ClCompile Include="util\SaveDataManager.cpp">
       <Filter>ソース ファイル\util</Filter>
     </ClCompile>
+    <ClCompile Include="ui\LockOnTargetUi.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -478,6 +481,9 @@
     </ClInclude>
     <ClInclude Include="util\SaveDataManager.h">
       <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\LockOnTargetUi.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

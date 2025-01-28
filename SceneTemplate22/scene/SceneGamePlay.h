@@ -71,6 +71,8 @@ private:
 
 	std::shared_ptr<MyLib::Physics> m_pPhysics;
 
+
+
 	int m_lightHandle;
 
 	//
@@ -92,7 +94,9 @@ private:
 	float m_cameraAngle;
 
 	//ゲームプレイからセレクトに戻るためのフラグ
-	bool m_isTriangl;
+	bool m_isPowerTriangl;
+	bool m_isSpeedTriangl;
+	bool m_isShotTriangl;
 
 	//当たり判定フラグ
 	bool m_isHpHit;

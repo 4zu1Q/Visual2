@@ -9,7 +9,6 @@
 
 class Player;
 class PlayerWeapon;
-class Camera;
 class Camera2;
 class SkyDome;
 class FaceUi;
@@ -45,7 +44,6 @@ private:
 	//スマートポインタ
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
-	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<Camera2> m_pCamera2;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	

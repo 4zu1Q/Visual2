@@ -21,6 +21,8 @@ public:
 	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player);
 	void Draw();
 
+	const VECTOR& GetPosUp() const;
+
 	const VECTOR& GetPosDown() const;
 	void SetPosDown(const VECTOR pos);
 

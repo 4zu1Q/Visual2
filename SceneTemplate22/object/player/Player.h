@@ -8,7 +8,6 @@
 class PlayerWeapon;
 class Collidable;
 class AnimController;
-class Camera;
 
 class WeaponBase;
 //プレイヤーの特殊攻撃の種類(顔の種類)
@@ -54,7 +53,7 @@ public:
 	void Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon);
 	void Finalize(std::shared_ptr<MyLib::Physics> physics);
 
-	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX);
+	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX, VECTOR bossPos, bool isLockOn);
 	void Draw(PlayerWeapon& weapon);
 
 	// 衝突したとき
@@ -123,7 +122,9 @@ private:
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
+	void LockOnIdleUpdate();
 	void WalkUpdate();
+	void LockOnWalkUpdate();
 	void DashUpdate();
 	void JumpUpdate();
 	void DashJumpUpdate();
@@ -141,7 +142,9 @@ private:
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
+	void OnLockOnIdle();
 	void OnWalk();
+	void OnLockOnWalk();
 	void OnDash();
 	void OnJump();
 	void OnDashJump();
@@ -180,7 +183,6 @@ private:
 	//スマートポインタ
 	std::shared_ptr<WeaponBase> m_pWeaponBase;
 	std::shared_ptr<AnimController> m_pAnim;
-	std::shared_ptr<Camera> m_pCamera;
 
 
 	//プレイヤーの顔の種類
@@ -219,11 +221,13 @@ private:
 	//	VECTOR m_posDown;
 	VECTOR m_posUp;
 	VECTOR m_pos;
+	VECTOR m_bossPos;
 
 	VECTOR m_attackPos;
 	VECTOR m_attackDir;
 
 	VECTOR m_cameraToPlayerVec;
+	VECTOR m_bossToPlayerVec;
 
 	VECTOR m_cameraDirection;
 
@@ -268,6 +272,9 @@ private:
 	//ボタンを押しているかどうか
 	bool m_isFaceUse;
 	bool m_isButtonPush;
+
+	//ロックオンしてるかどうか
+	bool m_isLockOn;
 
 	//ゲームオーバー画面に遷移するためのフラグ
 	bool m_isGameOver;

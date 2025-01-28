@@ -78,7 +78,6 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 
 	m_pPlayer = std::make_shared<Player>();
 	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
-	m_pCamera = std::make_shared<Camera>();
 	m_pCamera2 = std::make_shared<Camera2>();
 
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
@@ -231,13 +230,16 @@ void SceneSelect::Update()
 		}
 	}
 
+	//ロックオンするのがいないため
+	VECTOR noPos = VGet(0, 0, 0);
+
 	m_pSkyDome->Update();
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update(m_pPhysics);
 
 	m_pCamera2->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(),m_pField->GetModelHandle(),m_pPlayer->GetAngle(), false);
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
-	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon,m_pCamera2->GetCameraAngleX());
+	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon,m_pCamera2->GetCameraAngleX(), noPos, false);
 
 	m_pPhysics->Update();
 

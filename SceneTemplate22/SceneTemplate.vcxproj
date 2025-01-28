@@ -191,6 +191,7 @@
     <ClCompile Include="ui\FaceFrameUi.cpp" />
     <ClCompile Include="ui\FaceUi.cpp" />
     <ClCompile Include="ui\HpBar.cpp" />
+    <ClCompile Include="ui\LockOnTargetUi.cpp" />
     <ClCompile Include="ui\PlayerBarUi.cpp" />
     <ClCompile Include="util\ActionTime.cpp" />
     <ClCompile Include="util\AnimController.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="ui\FaceFrameUi.h" />
     <ClInclude Include="ui\FaceUi.h" />
     <ClInclude Include="ui\HpBar.h" />
+    <ClInclude Include="ui\LockOnTargetUi.h" />
     <ClInclude Include="ui\PlayerBarUi.h" />
     <ClInclude Include="util\ActionTime.h" />
     <ClInclude Include="util\AnimController.h" />

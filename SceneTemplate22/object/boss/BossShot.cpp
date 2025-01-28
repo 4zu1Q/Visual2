@@ -3,6 +3,7 @@
 
 #include "util/AnimController.h"
 #include "util/ActionTime.h"
+#include "util/Pad.h"
 
 #include <cmath>
 #include <cassert>
@@ -165,6 +166,11 @@ void BossShot::Finalize(std::shared_ptr<MyLib::Physics> physics)
 
 void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 {
+	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
+	{
+		m_hp -= 40;
+	}
+
 	//アップデート
 	(this->*m_updateFunc)();
 
@@ -256,6 +262,12 @@ void BossShot::Draw()
 
 
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
+}
+
+const VECTOR& BossShot::GetPosUp() const
+{
+	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 10.0f, 0.0f));
+	return pos;
 }
 
 const VECTOR& BossShot::GetPosDown() const
@@ -583,6 +595,7 @@ void BossShot::DownUpdate()
 void BossShot::DeadUpdate()
 {
 	//ワープアイテムが出現するフラグをおいておく
+	m_isClear = true;
 
 }
 

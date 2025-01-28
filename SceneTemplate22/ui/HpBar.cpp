@@ -26,9 +26,9 @@ HpBar::~HpBar()
 
 }
 
-void HpBar::Update(BossPower& boss)
+void HpBar::Update(int boss)
 {
-	m_bossHp = boss.GetHp();
+	m_bossHp = boss;
 }
 
 void HpBar::Draw()
