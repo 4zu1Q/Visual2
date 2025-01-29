@@ -178,6 +178,7 @@ private:
 	void AnimChange(const char* normal, const char* power, const char* speed, const char* shot);
 
 
+
 private:
 
 	//スマートポインタ
@@ -284,5 +285,8 @@ private:
 
 	//動いたときの音を出すやつ
 	int m_moveCount;
+
+	//無敵時間の時の点滅時間
+	int m_damageFrame;
 
 };

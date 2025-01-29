@@ -71,6 +71,12 @@ namespace Pad
 			}
 		}
 
+		// DirectInput の入力を取得
+		GetJoypadDirectInputState(DX_INPUT_PAD1, &m_dInputState);
+
+		// トリガーの入力を更新
+		m_rightTrigger = m_dInputState.Z / 1000.0f;
+		m_leftTrigger = m_dInputState.Rz / 1000.0f;
 
 	}
 
@@ -79,6 +85,7 @@ namespace Pad
 	{
 		return (padLog[padNo][0] & button);
 	}
+
 	// トリガー判定
 	bool IsTrigger(int button, int padNo)
 	{
@@ -86,11 +93,24 @@ namespace Pad
 		bool isLast = (padLog[padNo][1] & button);	// １フレーム前の状態
 		return (isNow && !isLast);
 	}
+
 	//離した判定
 	bool IsRelase(int button, int padNo) {
 		bool isNow = (padLog[padNo][0] & button);	//現在の状態
 		bool isLast = (padLog[padNo][1] & button);	//1フレーム前の状態
 		return (!isNow && isLast);
+	}
+
+	// 右トリガーの値を取得(失敗)
+	float GetRightTrigger(int padNo)
+	{
+		return m_rightTrigger;
+	}
+
+	// 左トリガーの値を取得(失敗)
+	float GetLeftTrigger(int padNo)
+	{
+		return m_leftTrigger;
 	}
 	//bool GetIsPushedTriggerButton(bool isRight)
 	//{

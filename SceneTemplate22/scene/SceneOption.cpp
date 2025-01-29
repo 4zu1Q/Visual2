@@ -57,6 +57,7 @@ namespace
 		kCheckH,
 		kPointerH,
 		kBackH,
+		kOptionBarH,
 	};
 
 	constexpr float kSelectSpeed = 0.06f;
@@ -88,6 +89,7 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_handles.push_back(LoadGraph("Data/Image/Check.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));
 	m_handles.push_back(LoadGraph("Data/Image/B_Back.png"));
+	m_handles.push_back(LoadGraph("Data/Image/OptionBar.png"));
 
 	m_fontHandle = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", kFontSize);
 
@@ -181,10 +183,12 @@ void SceneOption::Draw()
 {
 	DrawFade(0x000000);
 
-
+	//背景フェード
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	DrawGraph(0, 0, m_handles[kOptionBarH], true);
 
 	DrawGraph(510, 120, m_handles[kBarH], true);
 	DrawGraph(510, 240, m_handles[kBarH], true);
@@ -200,7 +204,7 @@ void SceneOption::Draw()
 		DrawGraph(510, 424, m_handles[kCheckH], true);
 	}
 
-	DrawGraph(0, 660, m_handles[kBackH], true);
+	DrawGraph(0, 685, m_handles[kBackH], true);
 
 	DrawFormatStringToHandle(963, 125, 0xa9a9a9, m_fontHandle, "%d", m_bgmScale);
 	DrawFormatStringToHandle(963, 245, 0xa9a9a9, m_fontHandle, "%d", m_seScale);

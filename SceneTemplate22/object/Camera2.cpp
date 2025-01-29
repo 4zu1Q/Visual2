@@ -70,14 +70,19 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 	VECTOR toPlayer = VSub(m_enemyPos,m_playerPos);
 	float length = VSize(toPlayer);
 
+	float leftTriggerValue = Pad::GetLeftTrigger();
+
 	if (Pad::IsTrigger(PAD_INPUT_10) && !m_isLockOn)
 	{
 		ResetToPlayerView(playerAngle);
 	}
 
+	//レフトトリガーが押された場合
+	//if (leftTriggerValue > 0.5f && isLockOn)
 	if (Pad::IsTrigger(PAD_INPUT_7) && isLockOn)
 	{
 		m_isLockOn = !m_isLockOn;
+		//m_isLockOn = true;
 	}
 
 	if (!m_isLockOn)

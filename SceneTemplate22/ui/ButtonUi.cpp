@@ -10,8 +10,8 @@ namespace
 	const char* const kButtonXFileName = "Data/Image/ButtonX.png";
 	const char* const kButtonYFileName = "Data/Image/ButtonY.png";
 	const char* const kButtonPauseFileName = "Data/Image/ButtonPause.png";
-	const char* const kRBFileName = "Data/Image/RB.png";
-	const char* const kLBFileName = "Data/Image/LB.png";
+	const char* const kRBFileName = "Data/Image/RB1.png";
+	const char* const kLBFileName = "Data/Image/LB1.png";
 
 	//押されているときの画像ファイル名
 	const char* const kPushButtonAFileName = "Data/Image/ButtonA_Push.png";

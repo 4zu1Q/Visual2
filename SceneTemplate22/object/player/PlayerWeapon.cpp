@@ -6,10 +6,10 @@ namespace
 {
 	//武器のファイル名
 	const char* const kSwordModelFileName = "Data/Model/Weapon/Player_Sword.mv1";
-	const char* const kAxeModelFileName = "Data/Model/Weapon/Player_Axe.mv1";
-	const char* const kDaggerModelFileName = "Data/Model/Weapon/Player_Dagger.mv1";
-	const char* const kMagicWandModelFileName = "Data/Model/Weapon/Player_MagicWand.mv1";
-	const char* const kLongSwordModelFileName = "Data/Model/Weapon/Player_LongSword.mv1";
+	const char* const kAxeModelFileName = "Data/Model/Weapon/Player_Ax1e.mv1";
+	const char* const kDaggerModelFileName = "Data/Model/Weapon/Player_Dagge1r.mv1";
+	const char* const kMagicWandModelFileName = "Data/Model/Weapon/Player_MagicWan1d.mv1";
+	const char* const kLongSwordModelFileName = "Data/Model/Weapon/Player_LongSwor1d.mv1";
 
 	//モデルのスケール値
 	constexpr float kModelScale = 1.0f;

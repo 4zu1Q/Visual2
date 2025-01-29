@@ -22,7 +22,6 @@
 
 namespace
 {
-
 	//使う画像の種類
 	enum e_Ui
 	{
@@ -102,15 +101,13 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogoStart.png"));
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
-	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton.png"));
 	m_handles.push_back(LoadGraph("Data/Image/NewGame.png"));				//NewGame
 	m_handles.push_back(LoadGraph("Data/Image/LoadGame.png"));				//LoadGame
 	m_handles.push_back(LoadGraph("Data/Image/Option.png"));				//Option
 	m_handles.push_back(LoadGraph("Data/Image/End.png"));					//End
 	m_handles.push_back(LoadGraph("Data/Image/Select2.png"));				//矢印
-	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));		
-
-
+	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				
 
 }
 
@@ -134,13 +131,11 @@ void SceneTitle::Update()
 	UpdateFadeSelectGraph();
 	UpdateFadeGraphTitleLogo();
 
-
 	m_pCameraProduction->Update(m_PlayerPos, Game::e_PlayerProduction::kTitle);
 	m_pPlayerProduction->Update(m_isActionStart, m_isSkip);
 	m_pSkyDome->Update();
 
 	SoundManager::GetInstance().PlayBgm("titleBgm", true);
-
 
 #ifdef _DEBUG
 

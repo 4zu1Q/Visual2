@@ -19,17 +19,17 @@ namespace
 
 	//const char* const kPauseFilename = "Data/Image/Pause2.png";
 	const Vec2 kPausePos = { 0.0f , 0.0f };
-	const Vec2 kReStartPos = { 160.0f , 120.0f };
-	const Vec2 kOptionPos = { 160.0f , 240.0f };
-	const Vec2 kSelectPos = { 160.0f , 360 };
-	const Vec2 kTitlePos = { 160.0f , 480.0f };
-	const Vec2 kBackPos = { 0.0f , 660.0f };
+	const Vec2 kReStartPos = { 160.0f , 180.0f };
+	const Vec2 kOptionPos = { 160.0f , 300.0f };
+	const Vec2 kSelectPos = { 160.0f , 420.0f };
+	const Vec2 kTitlePos = { 160.0f , 540.0f };
+	const Vec2 kBackPos = { 0.0f , 685.0f };
 
 	//選択UIのポジション
-	const Vec2 kReStartSelectPos = { 110 , 130 };
-	const Vec2 kOptionSelectPos = { 110 , 250 };
-	const Vec2 kSelectSelectPos = { 110 , 370 };
-	const Vec2 kTitleSelectPos = { 110 , 490 };
+	const Vec2 kReStartSelectPos = { 110 , 195 };
+	const Vec2 kOptionSelectPos = { 110 , 315 };
+	const Vec2 kSelectSelectPos = { 110 , 430 };
+	const Vec2 kTitleSelectPos = { 110 , 550 };
 
 	//ポーズの背景アルファ値
 	constexpr int kAlpha = 200;
@@ -46,6 +46,7 @@ namespace
 		kTitleH,
 		kBackH,
 		kPointerH,
+		kPauseBarH,
 	};
 
 	constexpr float kSelectSpeed = 0.06f;
@@ -61,13 +62,14 @@ ScenePause::ScenePause(SceneManager& manager) :
 	m_targetCursorUpPos = kTitleSelectPos;
 
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/Pause4.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Pause.png"));
 	m_handles.push_back(LoadGraph("Data/Image/ReStart.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Select.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Title.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Start_Back.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));
+	m_handles.push_back(LoadGraph("Data/Image/PauseBar.png"));
 
 	m_sceneTrans = e_SceneTrans::kRestart;
 	FadeInSkip();
@@ -75,7 +77,14 @@ ScenePause::ScenePause(SceneManager& manager) :
 
 ScenePause::~ScenePause()
 {
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
 
+
+	m_handles.clear();
 }
 
 void ScenePause::Update()
@@ -220,11 +229,12 @@ void ScenePause::Update()
 
 void ScenePause::Draw()
 {
-	//DrawBlackFade();
-
+	//背景フェード
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00000, true);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	DrawGraph(0, 0, m_handles[kPauseBarH], true);
 
 #ifdef _DEBUG
 

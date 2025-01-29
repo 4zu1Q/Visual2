@@ -67,6 +67,10 @@ namespace
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,12.0f,0.0f };
 
+	//見えない壁を作るための座標
+	constexpr VECTOR kWallRightPos = { 510.0f,0.0f,790.0f };
+	constexpr VECTOR kWallLeftPos = { -685.0f,0.0f,-600.0f };
+
 	/*　プレイヤーのアニメーションの種類　*/
 	const char* const kNormalAnimInfoFilename = "Data/Master/AnimPlayerNormalMaster.csv";
 	const char* const kPowerAnimInfoFilename = "Data/Master/AnimPlayerPowerMaster.csv";
@@ -130,8 +134,8 @@ namespace
 
 	//スタミナの減るスピード
 	constexpr float kStaminaDiminishSpeed = 0.5f;
-	constexpr float kStaminaIncreaseSpeed = 0.4f;
-	constexpr float kStaminaActionIncreaseSpeed = 0.2f;
+	constexpr float kStaminaIncreaseSpeed = 1.0f;
+	constexpr float kStaminaActionIncreaseSpeed = 0.8f;
 
 	//MPの減る値
 	constexpr float kMpDiminishNum = 30.0f;
@@ -178,6 +182,7 @@ Player::Player() :
 	m_playerRotMtx(),
 	m_moveCount(0),
 	m_deadTime(0),
+	m_damageFrame(0),
 	m_shadowH(0)
 {
 
@@ -225,7 +230,6 @@ Player::~Player()
 
 void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon)
 {
-	
 	Collidable::Initialize(physics);
 
 	// 物理挙動の初期化
@@ -297,8 +301,6 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 
 	PlayerSetPosAndRotation(m_pos, m_angle);
 
-
-
 	//HPがゼロより下にいった場合
 	if (m_hp <= 0)
 	{
@@ -339,16 +341,14 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	{
 		m_isStamina = false;
 	}
+
+
 }
 
 void Player::Draw(PlayerWeapon& weapon)
 {
-	//武器の描画
-	WeaponDraw(weapon);
 	
-	////モデルの描画
 	//MV1DrawModel(m_modelH);
-	PlayerDraw();
 
 #ifdef _DEBUG
 
@@ -359,6 +359,20 @@ void Player::Draw(PlayerWeapon& weapon)
 	DrawFormatString(0, 328, 0xffffff, "playerAngle:%d", GetIsJump());
 
 #endif
+
+	// ダメージ演出  2フレーム間隔で表示非表示切り替え
+	// 0: 表示される
+	// 1: 表示される
+	// 2: 非表示
+	// 3: 非表示
+	// 4: 表示される	...
+	// % 4 することで012301230123... に変換する
+	if (m_damageFrame % 8 >= 4) return;
+
+	//武器の描画
+	WeaponDraw(weapon);
+	////モデルの描画
+	PlayerDraw();
 
 }
 
@@ -428,7 +442,8 @@ void Player::IdleUpdate()
 	//攻撃X
 	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
-		OnAttackX();
+		//OnAttackX();
+		OnHit();
 		return;
 	}
 
@@ -1767,9 +1782,10 @@ void Player::AttackYUpdate()
 void Player::HitUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
+	m_damageFrame++;
 
 	//アニメーションが終わったら待機状態に遷移
-	if (m_pAnim->IsLoop())
+	if (m_pAnim->IsLoop() && m_damageFrame == 120)
 	{
 		//ロックオンしていた場合
 		if (m_isLockOn)
@@ -2157,6 +2173,7 @@ void Player::OnHit()
 	m_hp -= 1;
 
 	m_pAnim->ChangeAnim(kAnimHit);
+	//m_pAnim->ChangeAnim(kAnimHit, false, true, true);
 	m_updateFunc = &Player::HitUpdate;
 }
 

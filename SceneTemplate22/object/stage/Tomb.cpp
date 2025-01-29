@@ -19,9 +19,8 @@ namespace
 	//ポジション
 	constexpr VECTOR kTombPowerPos = { -460.0f , 38.0f , 264.0f };
 	constexpr VECTOR kTombSpeedPos = { 327.0f , 138.0f , 602.0f };
-	constexpr VECTOR kTombShotPos = { 0.0f , 68.0f , -50.0f };
-	constexpr VECTOR kTombRastPos = { 0.0f , 38.0f , 50.0f };
-
+	constexpr VECTOR kTombShotPos = { 285.0f , 130.0f , -400.0f };
+	constexpr VECTOR kTombRastPos = { -145.0f , 435.0f , -335.0f };
 	//トライアングルのポジション
 	constexpr VECTOR kTrianglePowerPos = { 0.0f , 38.0f , 50.0f };
 	constexpr VECTOR kTriangleSpeedPos = { 0.0f , 38.0f , 50.0f };
@@ -116,10 +115,10 @@ void Tomb::Update(VECTOR powerPos, VECTOR speedPos, VECTOR shotPos)
 
 void Tomb::Draw()
 {
-	//DrawSphere3D(m_posPower, m_radiusB, 32, 0xffffff, 0xff0000, false);
-	//DrawSphere3D(m_posSpeed, m_radiusB, 32, 0xffffff, 0xff0000, false);
-	//DrawSphere3D(m_posShot, m_radiusB, 32, 0xffffff, 0xff0000, false);
-	//DrawSphere3D(m_posRast, m_radiusRB, 32, 0xffffff, 0xff0000, false);
+	DrawSphere3D(m_posPower, m_radiusB, 32, 0xffffff, 0xff0000, false);
+	DrawSphere3D(m_posSpeed, m_radiusB, 32, 0xffffff, 0xff0000, false);
+	DrawSphere3D(m_posShot, m_radiusB, 32, 0xffffff, 0xff0000, false);
+	DrawSphere3D(m_posRast, m_radiusRB, 32, 0xffffff, 0xff0000, false);
 
 	//DrawFormatString(0, 48, 0xff0fff, "PowerPos:%f,%f,%f", m_posPower.x, m_posPower.y, m_posPower.z);
 	//DrawFormatString(0, 64, 0xff0fff, "SpeedPos:%f,%f,%f", m_posSpeed.x, m_posSpeed.y, m_posSpeed.z);

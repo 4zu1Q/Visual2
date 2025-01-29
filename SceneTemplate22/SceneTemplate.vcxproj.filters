@@ -279,6 +279,9 @@
     <ClCompile Include="ui\LockOnTargetUi.cpp">
       <Filter>ソース ファイル\ui</Filter>
     </ClCompile>
+    <ClCompile Include="myLib\AttackCol.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -484,6 +487,9 @@
     </ClInclude>
     <ClInclude Include="ui\LockOnTargetUi.h">
       <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\AttackCol.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

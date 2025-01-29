@@ -166,6 +166,9 @@ void BossShot::Finalize(std::shared_ptr<MyLib::Physics> physics)
 
 void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 {
+	//アニメーションの更新処理
+	m_pAnim->UpdateAnim();
+
 	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
 	{
 		m_hp -= 40;
@@ -228,9 +231,14 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 		m_isAvoid = false;
 	}
 
+	//HPがゼロより下にいった場合
+	if (m_hp <= 0)
+	{
+		m_hp = 0;
 
-	//アニメーションの更新処理
-	m_pAnim->UpdateAnim();
+		//死亡状態へ遷移
+		OnDead();
+	}
 
 	//auto pos = m_rigidbody.GetPos();
 
@@ -679,6 +687,8 @@ void BossShot::OnAttackCoolTime()
 
 void BossShot::OnDown()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDown);
@@ -687,6 +697,8 @@ void BossShot::OnDown()
 
 void BossShot::OnDead()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);

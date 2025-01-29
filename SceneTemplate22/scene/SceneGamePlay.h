@@ -83,12 +83,14 @@ private:
 	int m_analogZ;
 
 	int m_gameOverTime;
+	int m_gameClearTime;
 	int m_selectTime;
 
 	int m_radius;
 	float m_angle;
 
-//#endif 
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
 
 	bool m_isFadingOut;
 	float m_cameraAngle;
@@ -101,6 +103,8 @@ private:
 	//当たり判定フラグ
 	bool m_isHpHit;
 	bool m_isMpHit;
+
+	bool m_isCameraLockOn;
 
 	Game::e_BossKind m_bossKind;
 

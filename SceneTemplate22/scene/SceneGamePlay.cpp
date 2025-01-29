@@ -39,15 +39,22 @@ namespace
 	constexpr VECTOR kLightUpPos = { -15.0f,15.0f, -27.0f };
 	constexpr VECTOR kLightDownPos = { -15.0f,15.0f, -27.0f };
 
+	const Vec2 kHitPos = { 440.0f , 480.0f };
+
+	//使う画像の種類
+	enum e_Ui
+	{
+		kStageTransH,
+	};
 }
 
-SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind , Game::e_StageKind stageKind) :
+SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, Game::e_StageKind stageKind) :
 	SceneBase(manager),
 	m_isMpHit(false),
 	m_isHpHit(false),
 
 #ifdef _DEBUG
-	
+
 	m_analogX(0),
 	m_analogZ(0),
 	m_radius(5),
@@ -55,9 +62,12 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 
 #endif 
 	m_gameOverTime(0),
+	m_gameClearTime(0),
 	m_selectTime(0),
 	m_cameraAngle(0.0f)
 {
+	m_isCameraLockOn = true;
+
 	m_isPowerTriangl = false;
 	m_isSpeedTriangl = false;
 	m_isShotTriangl = false;
@@ -116,6 +126,9 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager , Game::e_BossKind bosskind ,
 
 	m_pField->Initialize();
 
+	//画像のロード
+	m_handles.push_back(LoadGraph("Data/Image/StageButton.png"));
+
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -128,6 +141,14 @@ SceneGamePlay::~SceneGamePlay()
 
 	DeleteLightHandle(m_lightHandle);
 
+	//画像の削除
+	for (int i = 0; i < m_handles.size(); i++)
+	{
+		DeleteGraph(m_handles[i]);
+	}
+
+
+	m_handles.clear();
 }
 
 
@@ -135,6 +156,7 @@ void SceneGamePlay::Update()
 {
 	Pad::Update();
 	UpdateFade();
+	UpdateFadeSelectGraph();
 
 #ifdef _DEBUG
 	MyLib::DebugDraw::Draw();
@@ -152,17 +174,44 @@ void SceneGamePlay::Update()
 	}
 #endif
 
-	m_pHpBarUi->Update(m_pBossPower->GetHp());
+	//ボスのHPバーのアップデート処理
+	if (m_bossKind == Game::e_BossKind::kPower)
+	{
+		m_pHpBarUi->Update(m_pBossPower->GetHp());
+	}
+	else if (m_bossKind == Game::e_BossKind::kSpeed)
+	{
+		m_pHpBarUi->Update(m_pBossSpeed->GetHp());
+	}
+	else if (m_bossKind == Game::e_BossKind::kShot)
+	{
+		m_pHpBarUi->Update(m_pBossShot->GetHp());
+	}
+	else if (m_bossKind == Game::e_BossKind::kRast)
+	{
+		m_pHpBarUi->Update(m_pBossRast->GetHp());
+	}
 
 	//ゲームステージに移動するための当たり判定
-	m_isPowerTriangl = m_pTomb->TrianglePowerHit(m_pPlayer);
-	m_isSpeedTriangl = m_pTomb->TriangleSpeedHit(m_pPlayer);
-	m_isShotTriangl = m_pTomb->TriangleShotHit(m_pPlayer);
-
+	if(m_pBossPower->GetIsClear()) m_isPowerTriangl = m_pTomb->TrianglePowerHit(m_pPlayer);
+	if(m_pBossSpeed->GetIsClear()) m_isSpeedTriangl = m_pTomb->TriangleSpeedHit(m_pPlayer);
+	if(m_pBossShot->GetIsClear()) m_isShotTriangl = m_pTomb->TriangleShotHit(m_pPlayer);
+	
 	//プレイヤーのゲームオーバーフラグがtrueの場合
 	if (m_pPlayer->GetIsGameOver())
 	{
 		m_gameOverTime++;
+	}
+
+	//if (m_pBossPower->GetIsClear() || m_pBossSpeed->GetIsClear() || m_pBossShot->GetIsClear())
+	//{
+	//	m_gameClearTime++;
+	//}
+
+	if (m_pBossRast->GetIsClear())
+	{
+		m_isCameraLockOn = false;
+		m_gameClearTime++;
 	}
 
 	//ゲームオーバー時間が過ぎたら
@@ -191,6 +240,8 @@ void SceneGamePlay::Update()
 	//パワーボスを倒した場合
 	if (m_pBossPower->GetIsClear())
 	{
+		m_isCameraLockOn = false;
+		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
 		//パワークリアトライアングルの当たり判定に入った場合
 		if (m_isPowerTriangl)
 		{
@@ -207,6 +258,8 @@ void SceneGamePlay::Update()
 	//スピードボスを倒した場合
 	if (m_pBossSpeed->GetIsClear())
 	{
+		m_isCameraLockOn = false;
+		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
 		//スピードクリアトライアングルの当たり判定に入った場合
 		if (m_isSpeedTriangl)
 		{
@@ -223,6 +276,8 @@ void SceneGamePlay::Update()
 	//ショットボスを倒した場合
 	if (m_pBossShot->GetIsClear())
 	{
+		m_isCameraLockOn = false;
+		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
 		//ショットクリアトライアングルの当たり判定に入った場合
 		if (m_isShotTriangl)
 		{
@@ -238,8 +293,11 @@ void SceneGamePlay::Update()
 	}
 
 	//ラスボスを倒した場合
-	if (m_pBossRast->GetIsClear())
+	if (m_gameClearTime > 240)
 	{
+		m_isToNextScene = true;
+		StartFadeOut();
+
 		m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
 		return;
 	}
@@ -272,22 +330,22 @@ void SceneGamePlay::Update()
 	//ボス別々にロックオンするための処理
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossPower->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), true);
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossPower->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
 		m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon,m_pCamera->GetCameraAngleX(),m_pBossPower->GetPosDown(),m_pCamera2->GetIsLockOn());
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossSpeed->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), true);
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossSpeed->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
 		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossSpeed->GetPosDown(), m_pCamera2->GetIsLockOn());
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossShot->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), true);
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossShot->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
 		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossShot->GetPosDown(), m_pCamera2->GetIsLockOn());
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossRast->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), true);
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossRast->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
 		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossRast->GetPosDown(), m_pCamera2->GetIsLockOn());
 	}
 
@@ -355,13 +413,27 @@ void SceneGamePlay::Draw()
 
 	m_pCamera2->Draw();
 
-	m_pHpBarUi->Draw();
+	if (!m_pBossPower->GetIsClear() || !m_pBossSpeed->GetIsClear() || !m_pBossShot->GetIsClear())
+	{
+		m_pHpBarUi->Draw();
+		m_pHpBarUi->DrawBossName(m_bossKind);
+	}
+
 	m_pPlayerBarUi->Draw();
 	m_pButtonUi->Draw(*m_pPlayer);
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);
 
+	if (m_isPowerTriangl || m_isSpeedTriangl || m_isShotTriangl)
+	{
+		DrawFadeSelectGraph(m_handles[kStageTransH], kHitPos);
+	}
 
+	//クリアしたときのみ白いフェードにしておく
+	if (m_pBossPower->GetIsClear() || m_pBossSpeed->GetIsClear() || m_pBossShot->GetIsClear() || m_pBossRast->GetIsClear())
+	{
+		DrawFade(0xffffff);
+	}
 
 	DrawFade(0x000000);
 

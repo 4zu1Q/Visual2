@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="myLib\AttackCol.cpp" />
     <ClCompile Include="myLib\Collidable.cpp" />
     <ClCompile Include="myLib\ColliderDataCapsule.cpp" />
     <ClCompile Include="myLib\ColliderDataLine.cpp" />
@@ -209,6 +210,7 @@
     <ClCompile Include="util\Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="myLib\AttackCol.h" />
     <ClInclude Include="myLib\Collidable.h" />
     <ClInclude Include="myLib\ColliderData.h" />
     <ClInclude Include="myLib\ColliderDataCapsule.h" />

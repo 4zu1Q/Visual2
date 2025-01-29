@@ -13,6 +13,11 @@ namespace Pad
 	//離した判定
 	bool IsRelase(int button, int padNo = 0);
 
+	// 右トリガーの値を取得
+	float GetRightTrigger(int padNo = 0);
+	// 左トリガーの値を取得
+	float GetLeftTrigger(int padNo = 0);
+
 
 	// ログ記録開始、終了
 	void startRecordLog();
@@ -22,4 +27,8 @@ namespace Pad
 	void startPlayLog();
 	void endPlayLog();
 
+
+	static DINPUT_JOYSTATE m_dInputState;
+	static float m_rightTrigger = 0.0f;
+	static float m_leftTrigger = 0.0f;
 }

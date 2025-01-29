@@ -166,6 +166,9 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	//アップデート
 	(this->*m_updateFunc)();
 
+	//アニメーションの更新処理
+	m_pAnim->UpdateAnim();
+
 	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
 	{
 		m_hp -= 40;
@@ -183,9 +186,6 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
 
-	//アニメーションの更新処理
-	m_pAnim->UpdateAnim();
-
 	if (m_attackNum > 2)
 	{
 		m_isAvoid = true;
@@ -193,6 +193,15 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	else
 	{
 		m_isAvoid = false;
+	}
+
+	//HPがゼロより下にいった場合
+	if (m_hp <= 0)
+	{
+		m_hp = 0;
+
+		//死亡状態へ遷移
+		OnDead();
 	}
 
 	//auto pos = m_rigidbody.GetPos();
@@ -569,6 +578,8 @@ void BossSpeed::OnAttack3()
 
 void BossSpeed::OnAvoid()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
 	m_attackNum = 0;
 	m_attackKind = 0;
 	m_actionTime = 0;
@@ -578,6 +589,8 @@ void BossSpeed::OnAvoid()
 
 void BossSpeed::OnAttackCoolTime()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
 	m_attackKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
@@ -586,6 +599,8 @@ void BossSpeed::OnAttackCoolTime()
 
 void BossSpeed::OnDown()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
 	m_attackKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDown);
@@ -594,6 +609,8 @@ void BossSpeed::OnDown()
 
 void BossSpeed::OnDead()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
 	m_attackKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
