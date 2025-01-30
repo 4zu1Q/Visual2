@@ -280,8 +280,7 @@ private:
 	//ゲームオーバー画面に遷移するためのフラグ
 	bool m_isGameOver;
 
-	//ジャンプしているかどうか
-	bool m_isJump;
+
 
 	//動いたときの音を出すやつ
 	int m_moveCount;

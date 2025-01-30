@@ -89,6 +89,7 @@ SceneTitle::SceneTitle(SceneManager& manager):
 
 	m_pPlayerProduction = std::make_shared<PlayerProduction>();
 	m_pCameraProduction = std::make_shared<CameraProduction>();
+
 	m_pSkyDome = std::make_shared<SkyDome>();
 	m_pTitleField = std::make_shared<TitleField>();
 	m_pField = std::make_shared<Field>(Game::e_StageKind::kTitle);

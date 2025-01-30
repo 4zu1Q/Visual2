@@ -189,8 +189,6 @@ Player::Player() :
 	// 影描画用の画像の読み込み
 	m_shadowH = LoadGraph("Data/Image/Shadow.png");
 
-	m_isJump = false;
-
 	//モデルのロード
 	m_modelH = MV1LoadModel(kNormalModelFilename);
 	m_modelPowerH = MV1LoadModel(kPowerModelFilename);
@@ -2085,7 +2083,6 @@ void Player::OnJump()
 	SoundManager::GetInstance().PlaySe("jumpSe");
 
 	//地面と接触しているかどうか
-	//m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
 
 	m_jumpCount = 0;
@@ -2106,7 +2103,6 @@ void Player::OnDashJump()
 	m_stamina -= 20;
 
 	//地面と接触しているかどうか
-	//m_isJump = true;
 	auto vel = m_rigidbody.GetVelocity();
 
 	m_jumpCount = 0;
@@ -2133,7 +2129,6 @@ void Player::OnDashAir()
 
 void Player::OnFall()
 {
-	m_isJump = true;
 
 	m_jumpCount = 0;
 
@@ -2143,7 +2138,6 @@ void Player::OnFall()
 
 void Player::OnDashFall()
 {
-	m_isJump = true;
 
 	m_jumpCount = 0;
 
