@@ -103,7 +103,8 @@ BossRast::BossRast() :
 
 BossRast::~BossRast()
 {
-
+	MV1DeleteModel(m_modelH);
+	m_modelH = -1;
 }
 
 void BossRast::Initialize(std::shared_ptr<MyLib::Physics> physics)
@@ -132,8 +133,7 @@ void BossRast::Initialize(std::shared_ptr<MyLib::Physics> physics)
 
 void BossRast::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
-	MV1DeleteModel(m_modelH);
-	m_modelH = -1;
+
 
 	Collidable::Finalize(physics);
 }

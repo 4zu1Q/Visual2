@@ -3,6 +3,7 @@
 #include <cassert>
 #include "object/player/Player.h"
 
+
 namespace
 {
 	const char* const kSaveDataFilename = "Data/SaveData.csv";

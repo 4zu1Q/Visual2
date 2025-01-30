@@ -26,7 +26,7 @@ public:
 
 	const VECTOR& GetPosUp() const;
 
-	const float& GetHp() const { return m_hp; }
+	//const float& GetHp() const { return m_hp; }
 
 private:
 
@@ -64,7 +64,6 @@ private:
 	using UpdateFunc_t = void(BossPower::*)();
 	UpdateFunc_t m_updateFunc;
 
-	bool m_isAttack;
 
 	//次の行動に移るための変数
 	int m_actionTime;
@@ -77,14 +76,12 @@ private:
 	float m_angle;
 	float m_nextAngle;
 
-	float m_hp;
 
 	VECTOR m_playerPos;
 
 	float m_length;
 
 	//座標
-	VECTOR m_pos;
 	VECTOR m_posUp;
 
 	VECTOR m_direction;

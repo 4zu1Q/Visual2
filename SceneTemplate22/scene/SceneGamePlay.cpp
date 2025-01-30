@@ -106,21 +106,26 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
 		m_pBossPower->Initialize(m_pPhysics);
+		m_pPlayer->BossLook(m_pBossPower->GetPosDown());
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
 		m_pBossSpeed->Initialize(m_pPhysics);
+		m_pPlayer->BossLook(m_pBossSpeed->GetPosDown());
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
 		m_pBossShot->Initialize(m_pPhysics);
+		m_pPlayer->BossLook(m_pBossShot->GetPosDown());
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
 		m_pBossRast->Initialize(m_pPhysics);
+		m_pPlayer->BossLook(m_pBossRast->GetPosDown());
 	}
 
 	m_pCamera2->Initialize(m_pPlayer->GetPos());
+
 
 	m_pTomb->Initialize();
 

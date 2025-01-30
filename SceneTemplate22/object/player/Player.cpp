@@ -143,12 +143,35 @@ namespace
 
 	constexpr float kShadowSize = 5.0f;
 	constexpr float kShadowHeight = 50.0f;
+
+	//プレイヤーの種類によって変わる当たり判定の半径
+	constexpr float kNormalAttackXRadius = 3.0f;
+	constexpr float kNormalAttackYRadius = 8.0f;
+	constexpr float kNormalAttackShockRadius = 8.0f;
+
+	constexpr float kPowerAttackXRadius = 3.0f;
+	constexpr float kPowerAttackYRadius = 3.0f;
+	constexpr float kPowerAttackShockRadius = 3.0f;
+
+	constexpr float kSpeedAttackXRadius = 2.5f;
+	constexpr float kSpeedAttackYRadius = 3.5f;
+	constexpr float kSpeedAttackShockRadius = 3.0f;
+	
+	constexpr float kShotAttackXRadius = 2.0f;
+	constexpr float kShotAttackYRadius = 4.0f;
+	constexpr float kShotAttackShockRadius = 4.0f;
+	
+	constexpr float kRassAttackXRadius = 6.0f;
+	constexpr float kRassAttackYRadius = 12.0f;
+	constexpr float kRassAttackShockRadius = 3.0f;
+
 }
 
 Player::Player() :
 	CharaBase(Collidable::e_Priority::kHigh, Game::e_GameObjectTag::kPlayer, MyLib::ColliderData::e_Kind::kSphere, false),
 	m_isGameOver(false),
 	m_pos(VGet(0,0,0)),
+	m_hitPos(VGet(0,0,0)),
 	m_bossPos(VGet(0, 0, 0)),
 	m_bossToPlayerVec(VGet(0, 0, 0)),
 	m_weaponH(-1),
@@ -219,11 +242,31 @@ Player::Player() :
 	circleColliderData->m_radius = 6.0f;
 
 	m_radius = circleColliderData->m_radius;
+
+	m_hitRadius = 2.5f;
+	m_attackXRadius = 3.0f;
+	m_attackYRadius = 8.5f;
+	m_attackShockRadius = 4.0f;
+
 }
 
 Player::~Player()
 {
 	DeleteGraph(m_shadowH);
+
+
+	//モデルをデリートする
+	MV1DeleteModel(m_modelH);
+	MV1DeleteModel(m_modelPowerH);
+	MV1DeleteModel(m_modelSpeedH);
+	MV1DeleteModel(m_modelShotH);
+	MV1DeleteModel(m_modelRassH);
+
+	m_modelH = -1;
+	m_modelPowerH = -1;
+	m_modelSpeedH = -1;
+	m_modelShotH = -1;
+	m_modelRassH = -1;
 }
 
 void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon)
@@ -249,28 +292,15 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, Pla
 	//アニメーションの初期化
 	m_pAnim->Initialize(kNormalAnimInfoFilename, m_modelH, kAnimIdle);
 
+	m_angle = 48.0f;
 
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &Player::IdleUpdate;
 
 }
 
-void Player::Finalize(std::shared_ptr<MyLib::Physics> physics)
+void Player::Finalize(std::shared_ptr<MyLib::Physics> physics )
 {
-	
-	//モデルをデリートする
-	MV1DeleteModel(m_modelH);
-	MV1DeleteModel(m_modelPowerH);
-	MV1DeleteModel(m_modelSpeedH);
-	MV1DeleteModel(m_modelShotH);
-	MV1DeleteModel(m_modelRassH);
-
-	m_modelH = -1;
-	m_modelPowerH = -1;
-	m_modelSpeedH = -1;
-	m_modelShotH = -1;
-	m_modelRassH = -1;
-
 	Collidable::Finalize(physics);
 }
 
@@ -282,8 +312,43 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
+	//プレイヤーの処理によって攻撃判定のサイズを変える
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_attackXRadius = kPowerAttackXRadius;
+		m_attackYRadius = kPowerAttackYRadius;
+		m_attackShockRadius = kPowerAttackShockRadius;
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_attackXRadius = kSpeedAttackXRadius;
+		m_attackYRadius = kSpeedAttackYRadius;
+		m_attackShockRadius = kSpeedAttackShockRadius;
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_attackXRadius = kShotAttackXRadius;
+		m_attackYRadius = kShotAttackYRadius;
+		m_attackShockRadius = kShotAttackShockRadius;
+	}
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+	{
+		m_attackXRadius = kRassAttackXRadius;
+		m_attackYRadius = kRassAttackYRadius;
+		m_attackShockRadius = kRassAttackShockRadius;
+	}
+
+	if (!m_isFaceUse)
+	{
+		m_attackXRadius = kNormalAttackXRadius;
+		m_attackYRadius = kNormalAttackYRadius;
+		m_attackShockRadius = kNormalAttackShockRadius;
+	}
+
+
 	//プレイヤーの座標を代入
 	m_pos = m_rigidbody.GetPos();
+	m_hitPos = VGet(m_pos.x, m_pos.y + 9.0f, m_pos.z);
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
 	//ボスの座標を代入
@@ -291,10 +356,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	m_bossPos = bossPos;
 	m_bossToPlayerVec = VSub(m_pos, m_bossPos);
 
-
 	//モデルのポジションを合わせるよう
-	//VECTOR modelPos = VGet(m_pos.x, m_pos.y, m_pos.z);
-
 	m_playerRotMtx = MGetRotY(cameraAngleX);
 
 	PlayerSetPosAndRotation(m_pos, m_angle);
@@ -340,7 +402,8 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 		m_isStamina = false;
 	}
 
-
+	VECTOR attackMove = VScale(m_attackDir, 6.0f);
+	m_attackPos = VAdd(VGet(m_hitPos.x,m_hitPos.y - 5.0f,m_hitPos.z), attackMove);
 }
 
 void Player::Draw(PlayerWeapon& weapon)
@@ -355,6 +418,11 @@ void Player::Draw(PlayerWeapon& weapon)
 	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
 	DrawFormatString(0, 348, 0xffffff, "playerAngle:%f", m_angle);
 	DrawFormatString(0, 328, 0xffffff, "playerAngle:%d", GetIsJump());
+
+	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_attackXRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_hitPos, m_attackYRadius, 16, 0xff00ff, 0xffffff, false);
+
 
 #endif
 
@@ -372,6 +440,16 @@ void Player::Draw(PlayerWeapon& weapon)
 	////モデルの描画
 	PlayerDraw();
 
+}
+
+void Player::BossLook(VECTOR bossPos)
+{
+
+	m_pos = m_rigidbody.GetPos();
+	m_bossPos = bossPos;
+	m_bossToPlayerVec = VSub(m_pos, m_bossPos);
+
+	PlayerSetPosAndRotation(m_pos, m_angle);
 }
 
 //この判定処理はまた使えるようになりたい(これでアイテム触った時と敵の攻撃とかを判定したいから)
@@ -440,8 +518,7 @@ void Player::IdleUpdate()
 	//攻撃X
 	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
-		//OnAttackX();
-		OnHit();
+		OnAttackX();
 		return;
 	}
 
@@ -496,11 +573,21 @@ void Player::LockOnIdleUpdate()
 	m_bossToPlayerVec = VNorm(m_bossToPlayerVec);
 	m_angle = atan2f(m_bossToPlayerVec.x, m_bossToPlayerVec.z);
 
+	//m_attackDir = m_bossToPlayerVec;
+
 
 	m_stamina += kStaminaIncreaseSpeed;
 
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
 	VECTOR input = VGet(m_analogX, 0.0f, -m_analogZ);
+
+	if (VSquareSize(input) > 0.0f)
+	{
+		VECTOR playerToBoss = VSub(m_bossPos, m_pos);
+		playerToBoss = VNorm(playerToBoss);
+		m_angle = atan2f(m_bossToPlayerVec.x, m_bossToPlayerVec.z);
+		m_attackDir = VGet(playerToBoss.x, playerToBoss.y, playerToBoss.z);
+	}
 
 	//地面についていなかったら
 	if (!GetIsJump())
@@ -576,7 +663,6 @@ void Player::LockOnIdleUpdate()
 
 void Player::WalkUpdate()
 {
-
 	m_stamina += kStaminaIncreaseSpeed;
 
 	/*プレイヤーの移動*/
@@ -626,8 +712,7 @@ void Player::WalkUpdate()
 	if (len != 0.0f)
 	{
 
-		//速度が決定できるので移動ベクトルに反映する
-		move = VNorm(move);
+
 
 		if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 		{
@@ -717,6 +802,10 @@ void Player::WalkUpdate()
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
 
+		//速度が決定できるので移動ベクトルに反映する
+		move = VNorm(move);
+		m_attackDir = move;
+
 	}
 	//動かなかったらアイドル状態へ
 	else
@@ -790,8 +879,7 @@ void Player::WalkUpdate()
 
 void Player::LockOnWalkUpdate()
 {
-	m_bossToPlayerVec = VNorm(m_bossToPlayerVec);
-	m_angle = atan2f(m_bossToPlayerVec.x, m_bossToPlayerVec.z);
+
 
 	m_stamina += kStaminaIncreaseSpeed;
 
@@ -931,6 +1019,19 @@ void Player::LockOnWalkUpdate()
 
 		m_move = move;
 
+		//速度が決定できるので移動ベクトルに反映する
+		//move = VNorm(move);
+		//m_bossToPlayerVec = VNorm(m_bossToPlayerVec);
+
+		//移動方向からプレイヤーの向く方向を決定する
+		//移動していない場合(ゼロベクトル)の場合は変更しない
+		if (VSquareSize(move) > 0.0f)
+		{
+			VECTOR playerToBoss = VSub(m_bossPos, m_pos);
+			playerToBoss = VNorm(playerToBoss);
+			m_angle = atan2f(m_bossToPlayerVec.x, m_bossToPlayerVec.z);
+			m_attackDir = VGet(playerToBoss.x, playerToBoss.y, playerToBoss.z);
+		}
 		//m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
 
 	}
@@ -1008,6 +1109,8 @@ void Player::LockOnWalkUpdate()
 		OnFaceUse();
 		return;
 	}
+
+
 
 	//顔を選択する関数
 	FaceSelect();
@@ -1113,6 +1216,10 @@ void Player::DashUpdate()
 		m_rigidbody.SetVelocity(move);
 
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+
+		//速度が決定できるので移動ベクトルに反映する
+		move = VNorm(move);
+		m_attackDir = move;
 
 	}
 
@@ -1530,7 +1637,13 @@ void Player::FallUpdate()
 	if (VSquareSize(move) > 0.0f)
 	{
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+
+		//速度が決定できるので移動ベクトルに反映する
+		move = VNorm(move);
+		m_attackDir = move;
 	}
+
+
 
 	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(move);
@@ -1643,6 +1756,10 @@ void Player::DashFallUpdate()
 	if (VSquareSize(move) > 0.0f)
 	{
 		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+
+		//速度が決定できるので移動ベクトルに反映する
+		move = VNorm(move);
+		m_attackDir = move;
 	}
 
 	move.y = m_rigidbody.GetVelocity().y;
@@ -1780,10 +1897,10 @@ void Player::AttackYUpdate()
 void Player::HitUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
-	m_damageFrame++;
+	//m_damageFrame++;
 
 	//アニメーションが終わったら待機状態に遷移
-	if (m_pAnim->IsLoop() && m_damageFrame == 120)
+	if (m_pAnim->IsLoop())
 	{
 		//ロックオンしていた場合
 		if (m_isLockOn)

@@ -127,7 +127,10 @@ BossShot::BossShot() :
 
 BossShot::~BossShot()
 {
-
+	MV1DeleteModel(m_modelH);
+	MV1DeleteModel(m_weaponModelH);
+	m_modelH = -1;
+	m_weaponModelH = -1;
 }
 
 void BossShot::Initialize(std::shared_ptr<MyLib::Physics> physics)
@@ -156,11 +159,6 @@ void BossShot::Initialize(std::shared_ptr<MyLib::Physics> physics)
 
 void BossShot::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
-	MV1DeleteModel(m_modelH);
-	MV1DeleteModel(m_weaponModelH);
-	m_modelH = -1;
-	m_weaponModelH = -1;
-
 	Collidable::Finalize(physics);
 }
 

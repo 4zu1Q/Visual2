@@ -111,9 +111,27 @@ void SceneDebug::Update()
 			return;
 		}
 
-		if (m_sceneTrans == e_SceneTrans::kGamePlay)
+		if (m_sceneTrans == e_SceneTrans::kGamePlayPower)
 		{
 			m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kPower, Game::e_StageKind::kGamePlay));
+			return;
+		}
+
+		if (m_sceneTrans == e_SceneTrans::kGamePlaySpeed)
+		{
+			m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kSpeed, Game::e_StageKind::kGamePlay));
+			return;
+		}
+
+		if (m_sceneTrans == e_SceneTrans::kGamePlayShot)
+		{
+			m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kShot, Game::e_StageKind::kGamePlay));
+			return;
+		}
+
+		if (m_sceneTrans == e_SceneTrans::kGamePlayRast)
+		{
+			m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, Game::e_BossKind::kRast, Game::e_StageKind::kGamePlay));
 			return;
 		}
 
@@ -152,7 +170,10 @@ void SceneDebug::Draw()
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kDebug) * kTextIntervalY, 0xffffff, "Scene Debug");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Scene Title");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Scene Select");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Scene Game Play");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlayPower) * kTextIntervalY, 0xffffff, "Scene Game Play PowerBoss");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlaySpeed) * kTextIntervalY, 0xffffff, "Scene Game Play SpeedBoss");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlayShot) * kTextIntervalY, 0xffffff, "Scene Game Play ShotBoss");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlayRast) * kTextIntervalY, 0xffffff, "Scene Game Play RastBoss");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGameClear) * kTextIntervalY, 0xffffff, "Scene Game Clear");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGameOver) * kTextIntervalY, 0xffffff, "Scene Game Over");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Scene Option");

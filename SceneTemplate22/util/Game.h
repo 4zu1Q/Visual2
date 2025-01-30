@@ -34,6 +34,7 @@ namespace Game
 	//ウィンドウカラーモード
 	constexpr int kColorDepth = 32; //16 or 32
 
+
 	//ボスの種類
 	enum class e_BossKind
 	{

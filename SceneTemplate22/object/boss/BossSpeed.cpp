@@ -126,7 +126,8 @@ BossSpeed::BossSpeed() :
 
 BossSpeed::~BossSpeed()
 {
-
+	MV1DeleteModel(m_modelH);
+	m_modelH = -1;
 }
 
 void BossSpeed::Initialize(std::shared_ptr<MyLib::Physics> physics)
@@ -151,13 +152,11 @@ void BossSpeed::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &BossSpeed::IdleUpdate;
 
+
 }
 
 void BossSpeed::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
-	MV1DeleteModel(m_modelH);
-	m_modelH = -1;
-
 	Collidable::Finalize(physics);
 }
 

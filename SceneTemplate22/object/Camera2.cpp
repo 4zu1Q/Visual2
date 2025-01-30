@@ -34,6 +34,8 @@ Camera2::Camera2():
 {
 	m_pLockOnUi = std::make_shared<LockOnTargetUi>();
 
+
+
 }
 
 Camera2::~Camera2()
@@ -47,7 +49,7 @@ void Camera2::Initialize(VECTOR playerPos)
 	SetCameraNearFar(kCameraNear, kCameraFar);
 
 	// カメラの初期水平角度は１８０度
-	m_angleH = DX_PI_F;
+	m_angleH = 80.0f;
 
 	// 垂直角度は０度
 	m_angleV = 0.0f;
@@ -197,18 +199,6 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 			m_targetPos = VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance));
 			m_targetPos.y += kCameraPlayerTargetHeight;
 		}
-		else if (m_isLockOn)
-		{
-			 //カメラの座標を算出
-			//m_pos = VAdd(VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance)), VScale(forwardVector, -kCameraTargetBackwardDistance -length /*ここにプレイヤーからボスの距離を入れる？*/));
-			//m_pos.y += kCameraPlayerTargetHeight;
-
-			//// カメラの注視点を算出
-			//m_targetPos = VAdd(playerPos, VScale(rightVector, kCameraPlayerRightDistance));
-			//m_targetPos.y += kCameraPlayerTargetHeight;
-
-		}
-
 
 		// カメラの座標からプレイヤーの間にステージのポリゴンがあるか調べる
 		camPosBase = playerPos;
@@ -279,6 +269,7 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 	}
 
 	SetLightDirectionHandle(m_lightHandle, VSub(playerPos, m_pos));
+
 }
 
 void Camera2::Draw()

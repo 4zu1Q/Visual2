@@ -246,10 +246,6 @@ void SceneSelect::Update()
 	/*フレームにアタッチするための更新処理*/
 	//Physicsの後に入れておかないと補正の影響でワンテンポ遅れる
 	m_pPlayerWeapon->SwordUpdate();
-	//m_pPlayerWeapon->AxeUpdate();
-	//m_pPlayerWeapon->DaggerUpdate();
-	//m_pPlayerWeapon->MagicWandUpdate();
-	//m_pPlayerWeapon->LongSwordUpdate();
 
 	m_pFaceUi->Update();
 	m_pPlayerBarUi->Update(*m_pPlayer);
@@ -257,7 +253,7 @@ void SceneSelect::Update()
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
-		if (!IsFadingOut())
+		if (IsFadingOut())
 		{
 			if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)
 			{
@@ -286,7 +282,6 @@ void SceneSelect::Update()
 
 void SceneSelect::Draw()
 {
-	//m_pPlayer->ShadowRender(m_pField->GetModelHandle());
 
 	m_pSkyDome->Draw();
 	m_pField->Draw();
@@ -315,8 +310,8 @@ void SceneSelect::Draw()
 			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kPowerClearItemH], true);
 		}
 
-		DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
-		DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
+		//DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
+		//DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
 	}
 	if (m_isSpeedStage)
 	{
@@ -330,8 +325,8 @@ void SceneSelect::Draw()
 			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kSpeedClearItemH], true);
 		}
 
-		DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
-		DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
+		//DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
+		//DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
 	}
 	if (m_isShotStage)
 	{
@@ -345,8 +340,8 @@ void SceneSelect::Draw()
 			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kShotClearItemH], true);
 		}
 
-		DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
-		DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
+		//DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
+		//DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
 	}
 	if (m_isRastStage)
 	{
@@ -374,8 +369,8 @@ void SceneSelect::Draw()
 		}
 
 
-		DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
-		DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
+		//DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
+		//DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
 	}
 
 

@@ -4,19 +4,22 @@
 #include <memory>
 
 #include "object/CharaBase.h"
+#include "util/Game.h"
 
 class PlayerWeapon;
 class Collidable;
 class AnimController;
 
 class WeaponBase;
+
+
 //プレイヤーの特殊攻撃の種類(顔の種類)
 enum class e_PlayerKind : int
 {
 	kPowerPlayer,		//パワー型
 	kSpeedPlayer,		//スピード型
 	kShotPlayer,		//ショット型
-	kRassPlayer,	//ラスボス型
+	kRassPlayer,		//ラスボス型
 	kNormalPlayer,		//ノーマル型
 	kMax,				// 最大数
 };
@@ -55,6 +58,8 @@ public:
 
 	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX, VECTOR bossPos, bool isLockOn);
 	void Draw(PlayerWeapon& weapon);
+
+	void BossLook(VECTOR bossPos);
 
 	// 衝突したとき
 	//virtual void OnCollide(const Collidable& colider);
@@ -177,8 +182,6 @@ private:
 	//タイプによってアニメーションを分ける関数
 	void AnimChange(const char* normal, const char* power, const char* speed, const char* shot);
 
-
-
 private:
 
 	//スマートポインタ
@@ -222,6 +225,7 @@ private:
 	//	VECTOR m_posDown;
 	VECTOR m_posUp;
 	VECTOR m_pos;
+	VECTOR m_hitPos;
 	VECTOR m_bossPos;
 
 	VECTOR m_attackPos;
@@ -238,6 +242,7 @@ private:
 	MATRIX m_playerRotMtx;
 
 	float m_rate;
+	float m_len;
 
 	//回転
 	float m_angle;
@@ -259,6 +264,8 @@ private:
 	//続けて攻撃するかどうか
 	int m_multiAttack;
 	bool m_isNextAttackFlag;
+
+	bool m_isAttack;
 
 	//強攻撃のチャージ時間
 	int m_chargeTime;
@@ -287,5 +294,14 @@ private:
 
 	//無敵時間の時の点滅時間
 	int m_damageFrame;
+
+	//プレイヤーが敵の攻撃にヒットする当たり判定の半径
+	float m_hitRadius;
+	//プレイヤーの通常攻撃半径
+	float m_attackXRadius;
+	//プレイヤーの特殊攻撃半径
+	float m_attackYRadius;
+	//プレイヤーの衝撃攻撃半径
+	float m_attackShockRadius;
 
 };

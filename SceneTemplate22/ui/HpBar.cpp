@@ -9,9 +9,9 @@ namespace
 	const char* const kHpLostFileName = "Data/Image/HpLost.png";
 
 	const char* const kPowerNameFileName = "Data/Image/BossPowerName.png";
-	const char* const kSpeedNameFileName = "Data/Image/PowerBossName1.png";
-	const char* const kShotNameFileName = "Data/Image/PowerBossName1.png";
-	const char* const kRastNameFileName = "Data/Image/PowerBossName1.png";
+	const char* const kSpeedNameFileName = "Data/Image/SpeedBossName.png";
+	const char* const kShotNameFileName = "Data/Image/ShotBossName.png";
+	const char* const kRastNameFileName = "Data/Image/RastBossName.png";
 
 	//使う画像の種類
 	enum e_Ui
@@ -33,12 +33,10 @@ HpBar::HpBar() :
 	m_bossHpH(-1),
 	m_bossHp(kMaxHp)
 {
-
 	m_handles.push_back(LoadGraph(kPowerNameFileName));
 	m_handles.push_back(LoadGraph(kSpeedNameFileName));
 	m_handles.push_back(LoadGraph(kShotNameFileName));
 	m_handles.push_back(LoadGraph(kRastNameFileName));
-
 }
 
 HpBar::~HpBar()
@@ -74,11 +72,11 @@ void HpBar::DrawBossName(Game::e_BossKind bossKind)
 	{
 		DrawGraph(kNamePos.x, kNamePos.y, m_handles[kSpeedBossNameH], true);
 	}
-	else if (bossKind == Game::e_BossKind::kSpeed)
+	else if (bossKind == Game::e_BossKind::kShot)
 	{
 		DrawGraph(kNamePos.x, kNamePos.y, m_handles[kShotBossNameH], true);
 	}
-	else if (bossKind == Game::e_BossKind::kSpeed)
+	else if (bossKind == Game::e_BossKind::kRast)
 	{
 		DrawGraph(kNamePos.x, kNamePos.y, m_handles[kRastBossNameH], true);
 	}

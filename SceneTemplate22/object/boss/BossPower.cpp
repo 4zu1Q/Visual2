@@ -14,7 +14,7 @@ namespace
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Boss/BossPower.mv1";
 	//モデルのスケール値
-	constexpr float kModelScale = 10.0f;
+	constexpr float kModelScale = 8.0f;
 
 	constexpr float kWalkSpeed = 0.4f;
 	constexpr float kDashSpeed = 0.7f;
@@ -73,7 +73,6 @@ namespace
 
 BossPower::BossPower():
 	BossBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kBoss, MyLib::ColliderData::e_Kind::kSphere, false),
-	m_pos(kInitPos),
 	m_posUp(kInitPos),
 	m_direction(VGet(0,0,0)),
 	m_velocity(VGet(0,0,0)),
@@ -82,43 +81,47 @@ BossPower::BossPower():
 	m_nextAngle(0.0f),
 	m_length(0.0f),
 	m_actionTime(0),
-	m_isAttack(false),
-	m_actionKind(0),
-	m_hp(350.0f)
+	m_actionKind(0)
 {
+	//HPバー
+	m_hp = 400.0f;
+
 	m_isClear = false;
+
+	m_isAttack = false;
+	m_isShock = false;
+
+	m_downCountDown = 0;
+
+	m_hitRadius = 8.0f;
+	m_normalAttackRadius = 3.0f;
+	m_weaponAttackRadius = 6.0f;
+	m_shockRadius = 15.0f;
+
+	m_pos = kInitPos;
+	m_hitPos = VGet(0, 0, 0);
+	m_attackPos = VGet(0, 0, 0);
+	m_shockAttackPos = VGet(0, 0, 0);
+	m_attackDir = VGet(0, 0, 0);
 
 	m_modelH = MV1LoadModel(kModelFilename);
 
 	m_pAnim = std::make_shared<AnimController>();
 
-	//時間のタイマーセット
-	//m_pOnIdleTime = std::make_shared<ActionTime>(120);
-	//m_pOnWlakTime = std::make_shared<ActionTime>(300);
-	//m_pOnDashTime = std::make_shared<ActionTime>(120);
-	//m_pOnDownTime = std::make_shared<ActionTime>(240);
-	//m_pOnAttackTime = std::make_shared<ActionTime>(120);
 
 	m_pPlayer = std::make_shared<Player>();
 
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
-	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 6.5f;
-
-	//m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
-
-	//auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataCapsule>(m_pColliderData);
-	//circleColliderData->m_radius = 5.0f;
-	//circleColliderData->m_posDown = VGet(0.0f, 0.0f, 0.0f);
-	//circleColliderData->m_posUp = VGet(0.0f, 0.0f, 0.0f);
 
 }
 
 BossPower::~BossPower()
 {
-
+	MV1DeleteModel(m_modelH);
+	m_modelH = -1;
 }
 
 void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
@@ -132,7 +135,8 @@ void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	//m_speed = 0.1f;
 
 	//初期位置を代入
-	m_pos = VGet(0, 15, 100);
+	m_pos = m_rigidbody.GetPos();
+
 
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
@@ -147,9 +151,6 @@ void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
 
 void BossPower::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
-	MV1DeleteModel(m_modelH);
-	m_modelH = -1;
-
 	Collidable::Finalize(physics);
 }
 
@@ -174,7 +175,9 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
-
+	m_hitPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+	//m_attackPos = VGet(m_attackPos.x, m_attackPos.y + m_hitPos.y, m_attackPos.z);
+	m_shockAttackPos = m_pos;
 	//auto pos = m_rigidbody.GetPos();
 
 	//モデルのポジションを合わせるよう
@@ -191,7 +194,10 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 		OnDead();
 	}
 
-	//DrawSphere3D(m_pos, 32, 16, 0xffffff, 0xffffff, false);
+	VECTOR attackMove = VScale(m_attackDir, 12.0f);
+	VECTOR shockAttackMove = VScale(m_attackDir, 20.0f);
+	m_attackPos = VAdd(m_hitPos, attackMove);
+	m_shockAttackPos = VAdd(m_hitPos, shockAttackMove);
 
 	//モデルに座標をセットする
 	MV1SetPosition(m_modelH, m_pos);
@@ -207,6 +213,11 @@ void BossPower::Draw()
 
 	DrawFormatString(0, 248, 0xff0fff, "PowerBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(0, 348, 0xff0fff, "PowerBossToPlayer:%f", m_length);
+
+	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
+	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0x0000ff, 0xffffff, false);
 
 #endif // DEBUG
 
@@ -277,6 +288,9 @@ void BossPower::IdleUpdate()
 
 	SmoothAngle(m_angle, m_nextAngle);
 
+	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
+	m_attackDir = VNorm(m_attackDir);
+
 	VECTOR move;
 	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
@@ -314,6 +328,10 @@ void BossPower::WalkUpdate()
 	{
 		OnDash();
 	}
+
+
+	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
+	m_attackDir = VNorm(m_attackDir);
 
 }
 
