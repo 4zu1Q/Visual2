@@ -3,6 +3,8 @@
 
 #include "util/AnimController.h"
 #include "util/ActionTime.h"
+#include "util/EffectManager.h"
+#include "util/SoundManager.h"
 
 #include "util/Pad.h"
 
@@ -86,12 +88,16 @@ BossPower::BossPower():
 	//HPバー
 	m_hp = 400.0f;
 
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+
 	m_isClear = false;
 
 	m_isAttack = false;
 	m_isShock = false;
+	m_isHit = false;
 
 	m_downCountDown = 0;
+	m_damageFrame = 0;
 
 	m_hitRadius = 8.0f;
 	m_normalAttackRadius = 3.0f;
@@ -103,6 +109,17 @@ BossPower::BossPower():
 	m_attackPos = VGet(0, 0, 0);
 	m_shockAttackPos = VGet(0, 0, 0);
 	m_attackDir = VGet(0, 0, 0);
+
+	//プレイヤーの攻撃変数の初期化
+	m_playerAttackXPos = VGet(0, 0, 0);
+	m_playerAttackYPos = VGet(0, 0, 0);
+	m_playerShockPos = VGet(0, 0, 0);
+
+	m_playerAttackXRadius = 0.0f;
+	m_playerAttackYRadius = 0.0f;
+	m_playerShockRadius = 0.0f;
+
+	m_isPlayerAttack = false;
 
 	m_modelH = MV1LoadModel(kModelFilename);
 
@@ -137,7 +154,6 @@ void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	//初期位置を代入
 	m_pos = m_rigidbody.GetPos();
 
-
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
 
@@ -154,7 +170,7 @@ void BossPower::Finalize(std::shared_ptr<MyLib::Physics> physics)
 	Collidable::Finalize(physics);
 }
 
-void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
+void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind)
 {
 	//アップデート
 	(this->*m_updateFunc)();
@@ -162,16 +178,50 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
-	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
-	{
-		m_hp -= 40;
-	}
-
 	//プレイヤーとボスの距離を距離を求める
 	VECTOR toPlayer = VSub(m_playerPos, m_pos);
 	m_length = VSize(toPlayer);
 
 	//m_pos = m_pPlayer->GetPosDown();
+	if (!m_isClear)
+	{
+		if (m_isPlayerAttack)
+		{
+
+			if (!m_isHit)
+			{
+				if (IsAttackXHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
+				{
+					OnHitOneDamage();
+				}
+
+				if (IsAttackYHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
+				{
+					OnHitTwoDamage();
+				}
+
+				if (IsShockAttackHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
+				{
+					OnHitOneDamage();
+				}
+			}
+		}
+	}
+
+	if (m_isHit)
+	{
+		m_damageFrame++;
+	}
+	else
+	{
+		m_damageFrame = 0;
+	}
+
+	if (m_damageFrame >= 60)
+	{
+		m_isHit = false;
+	}
+
 
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
@@ -205,14 +255,89 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 
 }
 
+//void BossPower::HitUpdate(VECTOR attackXPos, VECTOR attackYPos, VECTOR shockPos, float attackXRadius, float attackYRadius, float shockRadius, bool isAttack)
+//{
+//	m_playerAttackXPos = attackXPos;
+//	m_playerAttackYPos = attackYPos;
+//	m_playerShockPos = shockPos;
+//
+//	m_playerAttackXRadius = attackXRadius;
+//	m_playerAttackYRadius = attackYRadius;
+//	m_playerShockRadius = shockRadius;
+//
+//	m_isPlayerAttack = isAttack;
+//}
+
+//bool BossPower::IsAttackXHit()
+//{
+//	//X,Y,Zの距離の成分を取得
+//	float delX = (m_hitPos.x - m_playerAttackXPos.x) * (m_hitPos.x - m_playerAttackXPos.x);
+//	float delY = ((m_hitPos.y) - (m_playerAttackXPos.y)) *
+//		((m_hitPos.y) - (m_playerAttackXPos.y));
+//	float delZ = (m_hitPos.z - m_playerAttackXPos.z) * (m_hitPos.z - m_playerAttackXPos.z);
+//
+//	//球と球の距離
+//	float Distance = sqrt(delX + delY + delZ);
+//
+//	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+//	if (Distance < m_hitRadius + m_playerAttackXRadius)
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}
+//
+//bool BossPower::IsAttackYHit()
+//{
+//	//X,Y,Zの距離の成分を取得
+//	float delX = (m_hitPos.x - m_playerAttackYPos.x) * (m_hitPos.x - m_playerAttackYPos.x);
+//	float delY = ((m_hitPos.y) - (m_playerAttackYPos.y)) *
+//		((m_hitPos.y) - (m_playerAttackYPos.y));
+//	float delZ = (m_hitPos.z - m_playerAttackYPos.z) * (m_hitPos.z - m_playerAttackYPos.z);
+//
+//	//球と球の距離
+//	float Distance = sqrt(delX + delY + delZ);
+//
+//	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+//	if (Distance < m_hitRadius + m_playerAttackYRadius)
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}
+//
+//bool BossPower::IsShockAttackHit()
+//{
+//	//X,Y,Zの距離の成分を取得
+//	float delX = (m_hitPos.x - m_playerShockPos.x) * (m_hitPos.x - m_playerShockPos.x);
+//	float delY = ((m_hitPos.y) - (m_playerShockPos.y)) *
+//		((m_hitPos.y) - (m_playerShockPos.y));
+//	float delZ = (m_hitPos.z - m_playerShockPos.z) * (m_hitPos.z - m_playerShockPos.z);
+//
+//	//球と球の距離
+//	float Distance = sqrt(delX + delY + delZ);
+//
+//	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+//	if (Distance < m_hitRadius + m_playerShockRadius)
+//	{
+//		return true;
+//	}
+//
+//	return false;
+//}
+
+
 void BossPower::Draw()
 {
-	MV1DrawModel(m_modelH);
 
 #ifdef _DEBUG
 
 	DrawFormatString(0, 248, 0xff0fff, "PowerBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(0, 348, 0xff0fff, "PowerBossToPlayer:%f", m_length);
+	DrawFormatString(0, 370, 0xff000f, "PowerBossHp:%f", m_hp);
+
 
 	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
 	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
@@ -221,6 +346,19 @@ void BossPower::Draw()
 
 #endif // DEBUG
 
+	// ダメージ演出  2フレーム間隔で表示非表示切り替え
+	// 0: 表示される
+	// 1: 表示される
+	// 2: 非表示
+	// 3: 非表示
+	// 4: 表示される	...
+	// % 4 することで012301230123... に変換する
+	if (m_damageFrame % 8 >= 4) return;
+
+	if (!m_isClear)
+	{
+		MV1DrawModel(m_modelH);
+	}
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 }
 
@@ -268,16 +406,16 @@ void BossPower::IdleUpdate()
 		switch (m_actionKind)
 		{
 		case 0:
-			OnAttack1();
+			OnPreliminaryAttack1();
 			break;
 		case 1:
-			OnAttack2();
+			OnPreliminaryAttack2();
 			break;
 		case 2:
-			OnAttack3();
+			OnPreliminaryAttack3();
 			break;
 		case 3:
-			OnAttack1();
+			OnPreliminaryAttack1();
 			break;
 		default:
 			break;
@@ -362,11 +500,44 @@ void BossPower::DashUpdate()
 	}
 }
 
+void BossPower::PreliminaryAttack1Update()
+{
+	if (m_pAnim->IsLoop())
+	{
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+
+		OnAttack1();
+	}
+}
+
+void BossPower::PreliminaryAttack2Update()
+{
+	if (m_pAnim->IsLoop())
+	{
+		auto pos = m_rigidbody.GetPos();
+
+		OnAttack2();
+	}
+}
+
+void BossPower::PreliminaryAttack3Update()
+{
+	if (m_pAnim->IsLoop())
+	{
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+
+		OnAttack3();
+	}
+}
+
 void BossPower::Attack1Update()
 {
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
+		m_isAttack = false;
 		OnIdle();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
@@ -377,6 +548,7 @@ void BossPower::Attack2Update()
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
+		m_isAttack = false;
 		OnIdle();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f,0.0f,0.0f));
@@ -387,6 +559,7 @@ void BossPower::Attack3Update()
 	//アニメーションが終わったらクールタイム状態に入る
 	if (m_pAnim->IsLoop())
 	{
+		m_isAttack = false;
 		OnAttackCoolTime();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
@@ -420,7 +593,28 @@ void BossPower::AttackCoolTimeUpdate()
 {
 	m_actionTime++;
 
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
+
+
 	if (m_actionTime > kCoolTimeToAvoidTime)
+	{
+		OnIdle();
+	}
+}
+
+void BossPower::HitOneDamageUpdate()
+{
+	//アニメーションが終わったらアイドル状態に戻る
+	if (m_pAnim->IsLoop())
+	{
+		OnIdle();
+	}
+}
+
+void BossPower::HitTwoDamageUpdate()
+{
+	//アニメーションが終わったらアイドル状態に戻る
+	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
 	}
@@ -438,7 +632,16 @@ void BossPower::DownUpdate()
 void BossPower::DeadUpdate()
 {
 	//ワープアイテムが出現するフラグをおいておく
-	m_isClear = true;
+	if (m_pAnim->IsLoop())
+	{
+		m_isClear = true;
+	}
+
+	if (!m_isClear)
+	{
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	}
 }
 
 
@@ -463,10 +666,38 @@ void BossPower::OnDash()
 	m_updateFunc = &BossPower::DashUpdate;
 }
 
+void BossPower::OnPreliminaryAttack1()
+{
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossPower::PreliminaryAttack1Update;
+}
+
+void BossPower::OnPreliminaryAttack2()
+{
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossPower::PreliminaryAttack2Update;
+}
+
+void BossPower::OnPreliminaryAttack3()
+{
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossPower::PreliminaryAttack3Update;
+}
+
 void BossPower::OnAttack1()
 {
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_isAttack = true;
+
+	m_attackKind = Game::e_BossAttackKind::kBossAttack;
+
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
 	m_updateFunc = &BossPower::Attack1Update;
 }
@@ -475,6 +706,10 @@ void BossPower::OnAttack2()
 {
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_isAttack = true;
+
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
+
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
 	m_updateFunc = &BossPower::Attack2Update;
 }
@@ -483,6 +718,10 @@ void BossPower::OnAttack3()
 {
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_isAttack = true;
+
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
+
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updateFunc = &BossPower::Attack3Update;
 }
@@ -503,6 +742,30 @@ void BossPower::OnAttackCoolTime()
 	m_updateFunc = &BossPower::AttackCoolTimeUpdate;
 }
 
+void BossPower::OnHitOneDamage()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_hp -= 10.0f;
+	m_isHit = true;
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimCoolTime);
+	m_updateFunc = &BossPower::HitOneDamageUpdate;
+}
+
+void BossPower::OnHitTwoDamage()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_hp -= 30.0f;
+	m_isHit = true;
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimCoolTime);
+	m_updateFunc = &BossPower::HitTwoDamageUpdate;
+}
+
 void BossPower::OnDown()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -519,6 +782,7 @@ void BossPower::OnDead()
 
 	m_actionKind = 0;
 	m_actionTime = 0;
+
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updateFunc = &BossPower::DeadUpdate;
 }

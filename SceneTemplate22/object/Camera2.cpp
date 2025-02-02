@@ -4,6 +4,7 @@
 
 #include "util/Setting.h"
 #include "util/Pad.h"
+#include "util/SoundManager.h"
 
 namespace 
 {
@@ -76,6 +77,7 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 
 	if (Pad::IsTrigger(PAD_INPUT_10) && !m_isLockOn)
 	{
+		SoundManager::GetInstance().PlaySe("cameraResetSe");
 		ResetToPlayerView(playerAngle);
 	}
 
@@ -83,8 +85,14 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 	//if (leftTriggerValue > 0.5f && isLockOn)
 	if (Pad::IsTrigger(PAD_INPUT_7) && isLockOn)
 	{
+		SoundManager::GetInstance().PlaySe("lockOnSe");
 		m_isLockOn = !m_isLockOn;
 		//m_isLockOn = true;
+	}
+
+	if (!isLockOn)
+	{
+		m_isLockOn = false;
 	}
 
 	if (!m_isLockOn)

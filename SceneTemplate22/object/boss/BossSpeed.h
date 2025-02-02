@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "BossBase.h"
+#include "util/Game.h"
 
 #include <memory>
 
@@ -18,7 +19,7 @@ public:
 	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
 	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
 
-	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player);
+	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind);
 	void Draw();
 
 	const VECTOR& GetPosUp() const;
@@ -35,11 +36,16 @@ private:
 	void DashUpdate();
 	void PlayerToDashUpdate();
 	void HomePosDashUpdate();
+	void PreliminaryAttack1Update();
+	void PreliminaryAttack2Update();
+	void PreliminaryAttack3Update();
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
 	void AvoidUpdate();
 	void AttackCoolTimeUpdate();
+	void HitOneDamageUpdate();
+	void HitTwoDamageUpdate();
 	void DownUpdate();
 	void DeadUpdate();
 
@@ -48,11 +54,16 @@ private:
 	void OnDash();
 	void OnPlayerToDash();
 	void OnHomePosDash();
+	void OnPreliminaryAttack1();
+	void OnPreliminaryAttack2();
+	void OnPreliminaryAttack3();
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
 	void OnAvoid();
 	void OnAttackCoolTime();
+	void OnHitOneDamage();
+	void OnHitTwoDamage();
 	void OnDown();
 	void OnDead();
 
@@ -70,10 +81,10 @@ private:
 	VECTOR m_anglePos;
 
 	int m_actionTime;
-	bool m_isAttack;
-	bool m_isAvoid;
+	bool m_isAttackAction;
+	bool m_isAvoidAction;
 
-	int m_attackKind;
+	int m_attackType;
 	int m_attackNum;
 
 	float m_moveAngle;

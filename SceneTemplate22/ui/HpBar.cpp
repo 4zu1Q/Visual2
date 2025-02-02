@@ -8,7 +8,7 @@ namespace
 	const char* const kHpFileName = "Data/Image/Hp.png";
 	const char* const kHpLostFileName = "Data/Image/HpLost.png";
 
-	const char* const kPowerNameFileName = "Data/Image/BossPowerName.png";
+	const char* const kPowerNameFileName = "Data/Image/PowerBossName.png";
 	const char* const kSpeedNameFileName = "Data/Image/SpeedBossName.png";
 	const char* const kShotNameFileName = "Data/Image/ShotBossName.png";
 	const char* const kRastNameFileName = "Data/Image/RastBossName.png";

@@ -3,6 +3,8 @@
 
 #include "util/AnimController.h"
 #include "util/ActionTime.h"
+#include "util/EffectManager.h"
+#include "util/SoundManager.h"
 
 #include "util/Pad.h"
 
@@ -87,40 +89,44 @@ BossSpeed::BossSpeed() :
 	m_bossToHomePosLength(0.0f),
 	m_actionTime(0),
 	m_attackNum(0),
-	m_isAttack(false),
-	m_isAvoid(false),
-	m_attackKind(0),
+	m_isAttackAction(false),
+	m_isAvoidAction(false),
+	m_attackType(0),
 	m_moveAngle(0.0f),
 	m_hp(350.0f)
 {
+
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+
 	m_isClear = false;
+
+	m_isAttack = false;
+	m_isShock = false;
+	m_isHit = false;
+
+	m_downCountDown = 0;
+	m_damageFrame = 0;
+
+	m_hitRadius = 8.0f;
+	m_normalAttackRadius = 3.0f;
+	m_weaponAttackRadius = 6.0f;
+	m_shockRadius = 15.0f;
+
+	m_hitPos = VGet(0, 0, 0);
+	m_attackPos = VGet(0, 0, 0);
+	m_shockAttackPos = VGet(0, 0, 0);
+	m_attackDir = VGet(0, 0, 0);
 
 	m_modelH = MV1LoadModel(kModelFilename);
 
 	m_pAnim = std::make_shared<AnimController>();
 
-	//時間のタイマーセット
-	//m_pOnIdleTime = std::make_shared<ActionTime>(120);
-	//m_pOnWlakTime = std::make_shared<ActionTime>(300);
-	//m_pOnDashTime = std::make_shared<ActionTime>(120);
-	//m_pOnDownTime = std::make_shared<ActionTime>(240);
-	//m_pOnAttackTime = std::make_shared<ActionTime>(120);
-
 	m_pPlayer = std::make_shared<Player>();
 
-	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 6.5f;
-
-	//m_pColliderData = std::make_shared<MyLib::ColliderDataCapsule>(false);
-
-	//auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataCapsule>(m_pColliderData);
-	//circleColliderData->m_radius = 5.0f;
-	//circleColliderData->m_posDown = VGet(0.0f, 0.0f, 0.0f);
-	//circleColliderData->m_posUp = VGet(0.0f, 0.0f, 0.0f);
-
 
 }
 
@@ -141,7 +147,7 @@ void BossSpeed::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	//m_speed = 0.1f;
 
 	//初期位置を代入
-	m_pos = VGet(0, 15, 100);
+	m_pos = m_rigidbody.GetPos();
 
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
@@ -151,8 +157,6 @@ void BossSpeed::Initialize(std::shared_ptr<MyLib::Physics> physics)
 
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &BossSpeed::IdleUpdate;
-
-
 }
 
 void BossSpeed::Finalize(std::shared_ptr<MyLib::Physics> physics)
@@ -160,18 +164,13 @@ void BossSpeed::Finalize(std::shared_ptr<MyLib::Physics> physics)
 	Collidable::Finalize(physics);
 }
 
-void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
+void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind)
 {
 	//アップデート
 	(this->*m_updateFunc)();
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
-
-	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
-	{
-		m_hp -= 40;
-	}
 
 	//プレイヤーとボスの距離を距離を求める
 	VECTOR toPlayer = VSub(m_playerPos, m_pos);
@@ -180,18 +179,57 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 	VECTOR toHomePos = VSub(m_homePos, m_pos);
 	m_bossToHomePosLength = VSize(toHomePos);
 
-	//m_pos = m_pPlayer->GetPosDown();
-
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
 
-	if (m_attackNum > 2)
+
+	if (!m_isClear)
 	{
-		m_isAvoid = true;
+		if (m_isPlayerAttack)
+		{
+
+			if (!m_isHit)
+			{
+				if (IsAttackXHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
+				{
+					OnHitOneDamage();
+				}
+
+				if (IsAttackYHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
+				{
+					OnHitTwoDamage();
+				}
+
+				if (IsShockAttackHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
+				{
+					OnHitOneDamage();
+				}
+			}
+		}
+	}
+
+	if (m_isHit)
+	{
+		m_damageFrame++;
 	}
 	else
 	{
-		m_isAvoid = false;
+		m_damageFrame = 0;
+	}
+
+	if (m_damageFrame >= 60)
+	{
+		m_isHit = false;
+	}
+
+
+	if (m_attackNum > 2)
+	{
+		m_isAvoidAction = true;
+	}
+	else
+	{
+		m_isAvoidAction = false;
 	}
 
 	//HPがゼロより下にいった場合
@@ -220,13 +258,26 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 
 void BossSpeed::Draw()
 {
-	MV1DrawModel(m_modelH);
+#ifdef _DEBUG
 
 	DrawFormatString(0, 262, 0xff0fff, "SpeedBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(0, 368, 0xff0fff, "SpeedBossToPlayer:%f", m_bossToPlayerLength);
 	DrawFormatString(0, 408, 0xff0fff, "BossToHomePos:%f", m_bossToHomePosLength);
 
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
+	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
+	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0x0000ff, 0xffffff, false);
+
+#endif // DEBUG
+
+	if (m_damageFrame % 8 >= 4) return;
+
+	if (!m_isClear)
+	{
+		MV1DrawModel(m_modelH);
+	}
 }
 
 const VECTOR& BossSpeed::GetPosUp() const
@@ -267,22 +318,22 @@ void BossSpeed::IdleUpdate()
 	{
 		//ランダム関数かなんか使ってやる
 
-		m_attackKind = GetRand(kAttackKind);
+		m_attackType = GetRand(kAttackKind);
 
 		//ランダムで攻撃を行う
-		switch (m_attackKind)
+		switch (m_attackType)
 		{
 		case 0:
-			OnAttack1();
+			OnPreliminaryAttack1();
 			break;
 		case 1:
-			OnAttack2();
+			OnPreliminaryAttack2();
 			break;
 		case 2:
-			OnAttack3();
+			OnPreliminaryAttack3();
 			break;
 		case 3:
-			OnAttack3();
+			OnPreliminaryAttack3();
 			break;
 		default:
 			break;
@@ -379,22 +430,22 @@ void BossSpeed::PlayerToDashUpdate()
 	{
 		//ランダム関数かなんか使ってやる
 
-		m_attackKind = GetRand(kAttackKind);
+		m_attackType = GetRand(kAttackKind);
 
 		//ランダムで攻撃を行う
-		switch (m_attackKind)
+		switch (m_attackType)
 		{
 		case 0:
-			OnAttack1();
+			OnPreliminaryAttack1();
 			break;
 		case 1:
-			OnAttack2();
+			OnPreliminaryAttack2();
 			break;
 		case 2:
-			OnAttack3();
+			OnPreliminaryAttack3();
 			break;
 		case 3:
-			OnAttack1();
+			OnPreliminaryAttack3();
 			break;
 		default:
 			break;
@@ -425,14 +476,47 @@ void BossSpeed::HomePosDashUpdate()
 
 }
 
+void BossSpeed::PreliminaryAttack1Update()
+{
+	if (m_pAnim->IsLoop())
+	{
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+
+		OnAttack1();
+	}
+}
+
+void BossSpeed::PreliminaryAttack2Update()
+{
+	if (m_pAnim->IsLoop())
+	{
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+
+		OnAttack2();
+	}
+}
+
+void BossSpeed::PreliminaryAttack3Update()
+{
+	if (m_pAnim->IsLoop())
+	{
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+
+		OnAttack3();
+	}
+}
+
 void BossSpeed::Attack1Update()
 {
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop() && m_isAvoid)
+	if (m_pAnim->IsLoop() && m_isAvoidAction)
 	{
 		OnAvoid();
 	}
-	else if (m_pAnim->IsLoop() && !m_isAvoid)
+	else if (m_pAnim->IsLoop() && !m_isAvoidAction)
 	{
 		OnIdle();
 	}
@@ -442,11 +526,11 @@ void BossSpeed::Attack1Update()
 void BossSpeed::Attack2Update()
 {
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop() && m_isAvoid)
+	if (m_pAnim->IsLoop() && m_isAvoidAction)
 	{
 		OnAvoid();
 	}
-	else if (m_pAnim->IsLoop() && !m_isAvoid)
+	else if (m_pAnim->IsLoop() && !m_isAvoidAction)
 	{
 		OnIdle();
 	}
@@ -493,11 +577,29 @@ void BossSpeed::AttackCoolTimeUpdate()
 {
 	m_actionTime++;
 
-	if (m_actionTime > kCoolTimeToAvoidTime && m_isAvoid)
+	if (m_actionTime > kCoolTimeToAvoidTime && m_isAvoidAction)
 	{
 		OnAvoid();
 	}
-	else if (m_actionTime > kCoolTimeToAvoidTime && !m_isAvoid)
+	else if (m_actionTime > kCoolTimeToAvoidTime && !m_isAvoidAction)
+	{
+		OnIdle();
+	}
+}
+
+void BossSpeed::HitOneDamageUpdate()
+{
+	//アニメーションが終わったらアイドル状態に戻る
+	if (m_pAnim->IsLoop())
+	{
+		OnIdle();
+	}
+}
+
+void BossSpeed::HitTwoDamageUpdate()
+{
+	//アニメーションが終わったらアイドル状態に戻る
+	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
 	}
@@ -515,7 +617,16 @@ void BossSpeed::DownUpdate()
 void BossSpeed::DeadUpdate()
 {
 	//ワープアイテムが出現するフラグをおいておく
-	m_isClear = true;
+	if (m_pAnim->IsLoop())
+	{
+		m_isClear = true;
+	}
+
+	if (!m_isClear)
+	{
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	}
 
 }
 
@@ -548,11 +659,36 @@ void BossSpeed::OnHomePosDash()
 	m_updateFunc = &BossSpeed::HomePosDashUpdate;
 }
 
+void BossSpeed::OnPreliminaryAttack1()
+{
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossSpeed::PreliminaryAttack1Update;
+}
+
+void BossSpeed::OnPreliminaryAttack2()
+{
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossSpeed::PreliminaryAttack2Update;
+}
+
+void BossSpeed::OnPreliminaryAttack3()
+{
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossSpeed::PreliminaryAttack3Update;
+}
+
 void BossSpeed::OnAttack1()
 {
 	m_attackNum++;
-	m_attackKind = 0;
+	m_attackType = 0;
 	m_actionTime = 0;
+	m_attackKind = Game::e_BossAttackKind::kBossAttack;
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
 	m_updateFunc = &BossSpeed::Attack1Update;
 }
@@ -560,8 +696,9 @@ void BossSpeed::OnAttack1()
 void BossSpeed::OnAttack2()
 {
 	m_attackNum++;
-	m_attackKind = 0;
+	m_attackType = 0;
 	m_actionTime = 0;
+	m_attackKind = Game::e_BossAttackKind::kBossAttack;
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
 	m_updateFunc = &BossSpeed::Attack2Update;
 }
@@ -569,8 +706,9 @@ void BossSpeed::OnAttack2()
 void BossSpeed::OnAttack3()
 {
 	m_attackNum++;
-	m_attackKind = 0;
+	m_attackType = 0;
 	m_actionTime = 0;
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updateFunc = &BossSpeed::Attack3Update;
 }
@@ -580,7 +718,7 @@ void BossSpeed::OnAvoid()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	m_attackNum = 0;
-	m_attackKind = 0;
+	m_attackType = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAvoid, true, true, false);
 	m_updateFunc = &BossSpeed::AvoidUpdate;
@@ -590,17 +728,41 @@ void BossSpeed::OnAttackCoolTime()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	m_attackKind = 0;
+	m_attackType = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossSpeed::AttackCoolTimeUpdate;
+}
+
+void BossSpeed::OnHitOneDamage()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_hp -= 10.0f;
+	m_isHit = true;
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimCoolTime);
+	m_updateFunc = &BossSpeed::HitOneDamageUpdate;
+}
+
+void BossSpeed::OnHitTwoDamage()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_hp -= 30.0f;
+	m_isHit = true;
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimCoolTime);
+	m_updateFunc = &BossSpeed::HitTwoDamageUpdate;
 }
 
 void BossSpeed::OnDown()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	m_attackKind = 0;
+	m_attackType = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDown);
 	m_updateFunc = &BossSpeed::DownUpdate;
@@ -610,8 +772,9 @@ void BossSpeed::OnDead()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	m_attackKind = 0;
+	m_attackType = 0;
 	m_actionTime = 0;
+
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updateFunc = &BossSpeed::DeadUpdate;
 }

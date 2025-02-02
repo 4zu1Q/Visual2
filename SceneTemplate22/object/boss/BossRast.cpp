@@ -138,7 +138,7 @@ void BossRast::Finalize(std::shared_ptr<MyLib::Physics> physics)
 	Collidable::Finalize(physics);
 }
 
-void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
+void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Game::e_PlayerAttackKind playerAttackKind)
 {
 	//アップデート
 	(this->*m_updateFunc)();
@@ -187,15 +187,25 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player)
 
 void BossRast::Draw()
 {
-	MV1DrawModel(m_modelH);
 
 #ifdef _DEBUG
 
 	DrawFormatString(0, 248, 0xff0fff, "PowerBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
 	DrawFormatString(0, 348, 0xff0fff, "PowerBossToPlayer:%f", m_length);
 
+	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
+	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0x0000ff, 0xffffff, false);
+
 #endif // DEBUG
 
+	if (m_damageFrame % 8 >= 4) return;
+
+	if (!m_isClear)
+	{
+		MV1DrawModel(m_modelH);
+	}
 }
 
 const VECTOR& BossRast::GetPosUp() const

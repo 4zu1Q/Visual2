@@ -64,6 +64,7 @@ void FaceUi::Update()
 void FaceUi::Draw(Player& player)
 {
 	//プレイヤーの仮面UI
+	//セーブデータをやったら使う
 	if (player.GetFaceKind() == e_PlayerKind::kPowerPlayer)
 	{
 		//if(パワーボスフラグがtrueになっていたら)
@@ -72,7 +73,7 @@ void FaceUi::Draw(Player& player)
 		}
 		//else
 		{
-			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerShadowH], true);
+			//DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerShadowH], true);
 		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kSpeedPlayer)
@@ -83,7 +84,7 @@ void FaceUi::Draw(Player& player)
 		}
 		//else
 		{
-			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedShadowH], true);
+			//DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedShadowH], true);
 		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kShotPlayer)
@@ -94,18 +95,18 @@ void FaceUi::Draw(Player& player)
 		}
 		//else
 		{
-			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotShadowH], true);
+			//DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotShadowH], true);
 		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kRassPlayer)
 	{
 		//if(ラスボスフラグがtrueになっていたら)
 		{
-			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassShadowH], true);
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassH], true);
 		}
 		//else
 		{
-			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassH], true);
+			//DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassShadowH], true);
 		}
 	}
 

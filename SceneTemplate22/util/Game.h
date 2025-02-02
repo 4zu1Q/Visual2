@@ -16,7 +16,7 @@ namespace Game
 #endif
 
 	//ウィンドウ名
-	const char* const kTitleText = "マイフェイス";
+	const char* const kTitleText = "TheLegendOfYasuda";
 
 
 	//ウィンドウサイズ
@@ -43,6 +43,26 @@ namespace Game
 		kShot,			//ショット
 		kRast,			//ラスボス
 		kBossNum		//ボスの種類の総数
+	};
+
+	//ボスの攻撃種類
+	enum class e_BossAttackKind
+	{
+		kBossAttackNone,
+		kBossAttack,	//手の攻撃
+		kBossShock,		//衝撃波の攻撃
+		kBossWeapon,	//武器の攻撃
+		kBossShot,		//玉の攻撃
+	};
+
+	//プレイヤーの攻撃種類
+	enum class e_PlayerAttackKind
+	{
+		kPlayerAttackNone,	
+		kPlayerAttackX,		//Xボタンの攻撃
+		kPlayerAttackY,		//Yボタンの攻撃
+		kPlayerShock,		//衝撃波の攻撃
+		kPlayerShot,		//玉の攻撃
 	};
 
 	//ステージの種類

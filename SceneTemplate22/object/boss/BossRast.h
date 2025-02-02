@@ -2,6 +2,7 @@
 #include "BossBase.h"
 
 #include <memory>
+#include "util/Game.h"
 
 class AnimController;
 class ActionTime;
@@ -18,7 +19,7 @@ public:
 	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
 	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
 
-	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player);
+	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player ,Game::e_PlayerAttackKind playerAttackKind);
 	void Draw();
 
 	const VECTOR& GetPosUp() const;

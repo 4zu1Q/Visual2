@@ -120,6 +120,7 @@ SceneTitle::~SceneTitle()
 		DeleteGraph(m_handles[i]);
 	}
 
+	SoundManager::GetInstance().StopBgm("titleBgm");
 
 	m_handles.clear();
 }
@@ -143,7 +144,6 @@ void SceneTitle::Update()
 	//デバッグに遷移する
 	if (Pad::IsTrigger PAD_INPUT_7)
 	{
-		SoundManager::GetInstance().StopBgm("titleBgm");
 		m_pManager.ChangeScene(std::make_shared<SceneDebug>(m_pManager));
 		return;
 	}

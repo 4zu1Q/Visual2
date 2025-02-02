@@ -17,7 +17,7 @@ public:
 	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
 	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
 
-	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player);
+	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind);
 	void Draw();
 
 	const VECTOR& GetPosUp() const;
@@ -39,6 +39,8 @@ private:
 	void DashRightUpdate();
 	void DashLeftUpdate();
 	void AttackCoolTimeUpdate();
+	void HitOneDamageUpdate();
+	void HitTwoDamageUpdate();
 	void DownUpdate();
 	void DeadUpdate();
 
@@ -52,6 +54,8 @@ private:
 	void OnDashRight();
 	void OnDashLeft();
 	void OnAttackCoolTime();
+	void OnHitOneDamage();
+	void OnHitTwoDamage();
 	void OnDown();
 	void OnDead();
 

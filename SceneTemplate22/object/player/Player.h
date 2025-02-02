@@ -56,10 +56,12 @@ public:
 	void Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon);
 	void Finalize(std::shared_ptr<MyLib::Physics> physics);
 
-	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX, VECTOR bossPos, bool isLockOn);
+	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX, VECTOR bossPos, bool isLockOn, Game::e_BossAttackKind bossAttackKind);
 	void Draw(PlayerWeapon& weapon);
 
 	void BossLook(VECTOR bossPos);
+
+	void HitUpdate(VECTOR attackPos, VECTOR weaponPos, VECTOR shockPos, float attackRadius, float weaponRadius, float shockRadius, bool isBossAttack);
 
 	// 衝突したとき
 	//virtual void OnCollide(const Collidable& colider);
@@ -77,8 +79,21 @@ public:
 	void SetPosUp(const VECTOR pos) { m_posUp = pos; }
 
 	//プレイヤーの攻撃座標を取得
-	const VECTOR& GetAttackPos() const { return m_attackPos; }
-	void SetAttackPos(const VECTOR attackPos) { m_attackPos = attackPos; }
+	const VECTOR& GetAttackXPos() const { return m_attackPos; }
+
+	const VECTOR& GetAttackYPos() const { return m_hitPos; }
+
+	const VECTOR& GetShockPos() const { return m_hitPos; }
+
+	const float& GetAttackXRadius() const { return m_attackXRadius; }
+
+	const float& GetAttackYRadius() const { return m_attackYRadius; }
+
+	const float& GetShockRadius() const { return m_attackShockRadius; }
+
+	const bool& GetIsAttack() const { return m_isAttack; }
+
+	const Game::e_PlayerAttackKind& GetAttackKind() const { return m_attackKind; }
 
 	/* ステータスの取得 */
 	//プレイヤーのHPを取得
@@ -122,8 +137,14 @@ public:
 	//これ多分必要ない可能性
 	//void ShadowRender(int stageH);
 
+
 private:
 	void OnCollide(const Collidable& colider);
+
+	//攻撃判定
+	bool IsAttackHit(VECTOR attackPos, float radius);
+	bool IsWeaponHit(VECTOR attackPos, float radius);
+	bool IsShockAttackHit(VECTOR attackPos, float radius);
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
@@ -138,7 +159,8 @@ private:
 	void AttackCharge();
 	void AttackXUpdate();
 	void AttackYUpdate();
-	void HitUpdate();
+	void HitOneDamageUpdate();
+	void HitTwoDamageUpdate();
 	void DeadUpdate();
 	void FaceChangeUpdate();
 	void FaceUseUpdate();
@@ -160,7 +182,8 @@ private:
 	void OnAttackCharge();
 	void OnAttackX();
 	void OnAttackY();
-	void OnHit();
+	void OnHitOneDamage();
+	void OnHitTwoDamage();
 	void OnDead();
 	void OnFaceChange();
 	void OnFaceUse();
@@ -239,6 +262,17 @@ private:
 	VECTOR m_avoid;
 	VECTOR m_move;
 
+	//ボスの攻撃座標
+	VECTOR m_bossAttackPos;
+	VECTOR m_bossWeaponPos;
+	VECTOR m_bossShockPos;
+
+	float m_bossAttackRadius;
+	float m_bossWeaponRadius;
+	float m_bossShockRadius;
+
+	bool m_isBossAttack;
+
 	MATRIX m_playerRotMtx;
 
 	float m_rate;
@@ -266,6 +300,10 @@ private:
 	bool m_isNextAttackFlag;
 
 	bool m_isAttack;
+	bool m_isShock;
+	bool m_isHit;
+	bool m_isAttackY;	//特殊攻撃を使ったどうか
+	int m_shockFrame;
 
 	//強攻撃のチャージ時間
 	int m_chargeTime;
@@ -287,7 +325,8 @@ private:
 	//ゲームオーバー画面に遷移するためのフラグ
 	bool m_isGameOver;
 
-
+	//攻撃の種類
+	Game::e_PlayerAttackKind m_attackKind;
 
 	//動いたときの音を出すやつ
 	int m_moveCount;

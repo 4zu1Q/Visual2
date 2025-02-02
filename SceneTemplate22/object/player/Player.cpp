@@ -147,7 +147,7 @@ namespace
 	//プレイヤーの種類によって変わる当たり判定の半径
 	constexpr float kNormalAttackXRadius = 3.0f;
 	constexpr float kNormalAttackYRadius = 8.0f;
-	constexpr float kNormalAttackShockRadius = 8.0f;
+	constexpr float kNormalAttackShockRadius = 10.0f;
 
 	constexpr float kPowerAttackXRadius = 3.0f;
 	constexpr float kPowerAttackYRadius = 3.0f;
@@ -173,6 +173,9 @@ Player::Player() :
 	m_pos(VGet(0,0,0)),
 	m_hitPos(VGet(0,0,0)),
 	m_bossPos(VGet(0, 0, 0)),
+	m_bossAttackPos(VGet(0, 0, 0)),
+	m_bossWeaponPos(VGet(0, 0, 0)),
+	m_bossShockPos(VGet(0, 0, 0)),
 	m_bossToPlayerVec(VGet(0, 0, 0)),
 	m_weaponH(-1),
 	m_radius(2),
@@ -202,12 +205,18 @@ Player::Player() :
 	m_chargeTime(0),
 	m_jumpCount(0),
 	m_jumpPower(0.0f),
+	m_bossAttackRadius(0.0f),
+	m_bossWeaponRadius(0.0f),
+	m_bossShockRadius(0.0f),
 	m_playerRotMtx(),
 	m_moveCount(0),
 	m_deadTime(0),
 	m_damageFrame(0),
+	m_shockFrame(0),
 	m_shadowH(0)
 {
+	//攻撃の種類を
+	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	// 影描画用の画像の読み込み
 	m_shadowH = LoadGraph("Data/Image/Shadow.png");
@@ -221,6 +230,12 @@ Player::Player() :
 
 	assert(m_modelH > -1);
 
+	m_isAttack = false;
+	m_isAttackY = false;
+	m_isShock = false;
+
+	m_isBossAttack = false;
+	m_isHit = false;
 
 	//マスク関連の初期化
 	m_isFaceUse = false;
@@ -246,7 +261,7 @@ Player::Player() :
 	m_hitRadius = 2.5f;
 	m_attackXRadius = 3.0f;
 	m_attackYRadius = 8.5f;
-	m_attackShockRadius = 4.0f;
+	m_attackShockRadius = 12.0f;
 
 }
 
@@ -304,7 +319,7 @@ void Player::Finalize(std::shared_ptr<MyLib::Physics> physics )
 	Collidable::Finalize(physics);
 }
 
-void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX, VECTOR bossPos, bool isLockOn)
+void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX, VECTOR bossPos, bool isLockOn, Game::e_BossAttackKind bossAttackKind)
 {
 	//アップデート
 	(this->*m_updateFunc)();
@@ -345,6 +360,71 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 		m_attackShockRadius = kNormalAttackShockRadius;
 	}
 
+	/* ボスの攻撃に当たった判定 */
+	//ボスが攻撃アクションをしたかどうかの判定
+	if (!m_isGameOver)
+	{
+		if (m_isBossAttack)
+		{
+			//ヒット判定がfalseだった場合	
+			if (!m_isHit)
+			{
+				//手の攻撃をした場合
+				if (IsAttackHit(m_bossAttackPos, m_bossAttackRadius) && bossAttackKind == Game::e_BossAttackKind::kBossAttack)
+				{
+
+					//武器なし攻撃は1ダメージ
+					OnHitOneDamage();
+				}
+
+				//手の攻撃をした場合
+				if (IsWeaponHit(m_bossWeaponPos, m_bossWeaponRadius) && bossAttackKind == Game::e_BossAttackKind::kBossWeapon)
+				{
+
+					//武器は2ダメージ
+					OnHitTwoDamage();
+				}
+
+				//手の攻撃をした場合 (enumでどこで攻撃したかを教える)
+				if (IsShockAttackHit(m_bossShockPos, m_bossShockRadius) && bossAttackKind == Game::e_BossAttackKind::kBossShock)
+				{
+					//武器なし攻撃は1ダメージ
+					OnHitOneDamage();
+				}
+			}
+		}
+	}
+
+	if (m_isAttackY)
+	{
+		m_shockFrame++;
+	}
+	else
+	{
+		m_shockFrame = 0;
+	}
+
+	if (m_shockFrame >= 120)
+	{
+		m_attackKind = Game::e_PlayerAttackKind::kPlayerShock;
+		m_isAttackY = false;
+	}
+
+	//ヒットした場合の処理
+	if (m_isHit)
+	{
+		m_damageFrame++;
+	}
+	else
+	{
+		m_damageFrame = 0;
+	}
+
+	if (m_damageFrame >= 120)
+	{
+		//ヒット無敵時間を解除
+		m_isHit = false;
+	}
 
 	//プレイヤーの座標を代入
 	m_pos = m_rigidbody.GetPos();
@@ -422,6 +502,7 @@ void Player::Draw(PlayerWeapon& weapon)
 	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
 	DrawSphere3D(m_attackPos, m_attackXRadius, 16, 0xff00ff, 0xffffff, false);
 	DrawSphere3D(m_hitPos, m_attackYRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_hitPos, m_attackShockRadius, 16, 0xff00ff, 0xffffff, false);
 
 
 #endif
@@ -452,6 +533,19 @@ void Player::BossLook(VECTOR bossPos)
 	PlayerSetPosAndRotation(m_pos, m_angle);
 }
 
+void Player::HitUpdate(VECTOR attackPos, VECTOR weaponPos, VECTOR shockPos, float attackRadius, float weaponRadius, float shockRadius, bool isBossAttack)
+{
+	m_isBossAttack = isBossAttack;
+
+	m_bossAttackPos = attackPos;
+	m_bossWeaponPos = weaponPos;
+	m_bossShockPos = shockPos;
+
+	m_bossAttackRadius = attackRadius;
+	m_bossWeaponRadius = weaponRadius;
+	m_bossShockRadius = shockRadius;
+}
+
 //この判定処理はまた使えるようになりたい(これでアイテム触った時と敵の攻撃とかを判定したいから)
 void Player::OnCollide(const Collidable& colider)
 {
@@ -474,6 +568,66 @@ void Player::OnCollide(const Collidable& colider)
 	}
 	message += "と当たった！\n";
 	printfDx(message.c_str());
+}
+
+bool Player::IsAttackHit(VECTOR attackPos, float radius)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_hitPos.x - attackPos.x) * (m_hitPos.x - attackPos.x);
+	float delY = ((m_hitPos.y) - (attackPos.y)) *
+		((m_hitPos.y) - (attackPos.y));
+	float delZ = (m_hitPos.z - attackPos.z) * (m_hitPos.z - attackPos.z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_hitRadius + radius)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Player::IsWeaponHit(VECTOR attackPos, float radius)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_hitPos.x - attackPos.x) * (m_hitPos.x - attackPos.x);
+	float delY = ((m_hitPos.y) - (attackPos.y)) *
+		((m_hitPos.y) - (attackPos.y));
+	float delZ = (m_hitPos.z - attackPos.z) * (m_hitPos.z - attackPos.z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_hitRadius + radius)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Player::IsShockAttackHit(VECTOR attackPos, float radius)
+{
+	//X,Y,Zの距離の成分を取得
+	float delX = (m_hitPos.x - attackPos.x) * (m_hitPos.x - attackPos.x);
+	float delY = ((m_hitPos.y) - (attackPos.y)) *
+		((m_hitPos.y) - (attackPos.y));
+	float delZ = (m_hitPos.z - attackPos.z) * (m_hitPos.z - attackPos.z);
+
+	//球と球の距離
+	float Distance = sqrt(delX + delY + delZ);
+
+	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
+	if (Distance < m_hitRadius + radius)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 const VECTOR& Player::GetPos() const
@@ -712,8 +866,6 @@ void Player::WalkUpdate()
 	if (len != 0.0f)
 	{
 
-
-
 		if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 		{
 			//スティックの押し加減でプレイヤーのスピードを変える
@@ -811,6 +963,13 @@ void Player::WalkUpdate()
 	else
 	{
 		OnIdle();
+		return;
+	}
+
+	//ロックオン機能を入れたら
+	if (m_isLockOn)
+	{
+		OnLockOnWalk();
 		return;
 	}
 
@@ -1051,6 +1210,13 @@ void Player::LockOnWalkUpdate()
 		}
 	}
 
+	//ロックオン機能を外したら
+	if (!m_isLockOn)
+	{
+		OnWalk();
+		return;
+	}
+
 	//地面についていなかったら
 	if (!GetIsJump())
 	{
@@ -1131,6 +1297,8 @@ void Player::DashUpdate()
 		if (m_moveCount % 15 == 0)
 		{
 			SoundManager::GetInstance().PlaySe("footstepsSe");
+			auto pos = m_rigidbody.GetPos();
+			EffectManager::GetInstance().CreateEffect("moveEffect", pos);
 		}
 		m_moveCount++;
 
@@ -1776,6 +1944,8 @@ void Player::AttackCharge()
 	if (m_chargeTime == 60)
 	{
 		SoundManager::GetInstance().PlaySe("healHpSe");
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("attackChargeEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	}
 
 	//if (m_chargeTime > 60)
@@ -1823,7 +1993,7 @@ void Player::AttackXUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("hitEffect", pos);
+	//EffectManager::GetInstance().CreateEffect("hitEffect", pos);
 
 	//攻撃ボタンが押されたとき
 	if (Pad::IsTrigger(PAD_INPUT_3) && !m_isNextAttackFlag)
@@ -1837,6 +2007,9 @@ void Player::AttackXUpdate()
 		m_multiAttack = 0;
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
+
+		m_isAttack = false;
+
 		//アイドル状態に戻る
 		//ロックオンしていた場合
 		if (m_isLockOn)
@@ -1854,6 +2027,7 @@ void Player::AttackXUpdate()
 	//アニメーションが終わった段階で次の攻撃フラグがたっていたら
 	if (m_pAnim->IsLoop() && m_isNextAttackFlag)
 	{
+		m_isAttack = false;
 		m_isNextAttackFlag = false;
 		m_multiAttack++;
 		m_isButtonPush = false;
@@ -1876,6 +2050,8 @@ void Player::AttackYUpdate()
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
+		m_isAttack = false;
+
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 
@@ -1894,11 +2070,30 @@ void Player::AttackYUpdate()
 
 }
 
-void Player::HitUpdate()
+void Player::HitOneDamageUpdate()
 {
 	m_stamina += kStaminaIncreaseSpeed;
 	//m_damageFrame++;
 
+	//アニメーションが終わったら待機状態に遷移
+	if (m_pAnim->IsLoop())
+	{
+		//ロックオンしていた場合
+		if (m_isLockOn)
+		{
+			OnLockOnIdle();
+			return;
+		}
+		else //していない場合
+		{
+			OnIdle();
+			return;
+		}
+	}
+}
+
+void Player::HitTwoDamageUpdate()
+{
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
@@ -2143,7 +2338,7 @@ void Player::OnAttackX()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	auto pos = m_rigidbody.GetPos();
-	//EffectManager::GetInstance().CreateEffect("hitEffect", pos);
+	EffectManager::GetInstance().CreateEffect("hitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 
 	//タイプによって攻撃アニメーションを変える
 	switch (m_multiAttack)
@@ -2173,6 +2368,9 @@ void Player::OnAttackX()
 		break;
 	}
 
+	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackX;
+
+	m_isAttack = true;
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kXbutton;
 
@@ -2183,12 +2381,17 @@ void Player::OnAttackY()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("attackYEffect", m_hitPos);
+
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimAttackY, kAnimAttackY, kAnimAttackY, kAnimAttackY);
 
 	SoundManager::GetInstance().PlaySe("attackYSe");
 
-
+	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackY;
+	m_isAttackY = true;
+	m_isAttack = true;
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
 
@@ -2278,30 +2481,52 @@ void Player::OnAttackCharge()
 
 }
 
-void Player::OnHit()
+void Player::OnHitOneDamage()
 {
+	m_isHit = true;
 	SoundManager::GetInstance().PlaySe("damageSe");
 	m_hp -= 1;
 
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("hitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+
 	m_pAnim->ChangeAnim(kAnimHit);
-	//m_pAnim->ChangeAnim(kAnimHit, false, true, true);
-	m_updateFunc = &Player::HitUpdate;
+	m_updateFunc = &Player::HitOneDamageUpdate;
+}
+
+void Player::OnHitTwoDamage()
+{
+	m_isHit = true;
+	SoundManager::GetInstance().PlaySe("damageSe");
+	m_hp -= 2;
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("hitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+
+	m_pAnim->ChangeAnim(kAnimHit);
+	m_updateFunc = &Player::HitTwoDamageUpdate;
 }
 
 void Player::OnDead()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 	m_updateFunc = &Player::DeadUpdate;
 }
 
 void Player::OnFaceChange()
 {
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("faceUseEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+
 	m_isFaceUse = !m_isFaceUse;
 	m_updateFunc = &Player::FaceChangeUpdate;
 }
 
 void Player::OnFaceUse()
 {
+	SoundManager::GetInstance().PlaySe("faceUseSe");
+
 	m_pAnim->ChangeAnim(kAnimUseFace);
 	m_updateFunc = &Player::FaceUseUpdate;
 }
@@ -2319,10 +2544,12 @@ void Player::FaceSelect()
 	{
 		if (m_playerKind != e_PlayerKind::kRassPlayer)
 		{
+			SoundManager::GetInstance().PlaySe("faceSelectSe");
 			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) + 1);
 		}
 		else if (m_playerKind == e_PlayerKind::kRassPlayer)
 		{
+			SoundManager::GetInstance().PlaySe("faceSelectSe");
 			m_playerKind = e_PlayerKind::kPowerPlayer;
 		}
 	}
@@ -2331,10 +2558,12 @@ void Player::FaceSelect()
 	{
 		if (m_playerKind != e_PlayerKind::kPowerPlayer)
 		{
+			SoundManager::GetInstance().PlaySe("faceSelectSe");
 			m_playerKind = static_cast<e_PlayerKind>(static_cast<int>(m_playerKind) - 1);
 		}
 		else if (m_playerKind == e_PlayerKind::kPowerPlayer)
 		{
+			SoundManager::GetInstance().PlaySe("faceSelectSe");
 			m_playerKind = e_PlayerKind::kRassPlayer;
 		}
 	}
@@ -2370,3 +2599,5 @@ const float& Player::GetRadius() const
 {
 	return m_radius;
 }
+
+

@@ -28,6 +28,7 @@
 
 #include "util/Pad.h"
 #include "util/SoundManager.h"
+#include "util/EffectManager.h"
 #include "util/Font.h"
 #include "util/SaveDataManager.h"
 
@@ -162,6 +163,7 @@ void SceneSelect::Update()
 	Pad::Update();
 	UpdateFade();
 	UpdateFadeSelectGraph();
+	EffectManager::GetInstance().Update();
 
 	SoundManager::GetInstance().PlayBgm("selectBgm", true);
 
@@ -173,38 +175,39 @@ void SceneSelect::Update()
 
 	if (m_isPowerStage)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_2))
+		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
+			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
 		}
 	}
 
-
 	if (m_isSpeedStage)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_2))
+		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
+			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kSpeedTypeBoss;
 		}
 	}
 
-
 	if (m_isShotStage)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_2))
+		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
+			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kShooterTypeBoss;
 		}
 	}
 
-
 	if (m_isRastStage)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_2))
+		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
+			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kRastTypeBoss;
 		}
@@ -239,7 +242,7 @@ void SceneSelect::Update()
 
 	m_pCamera2->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(),m_pField->GetModelHandle(),m_pPlayer->GetAngle(), false);
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
-	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon,m_pCamera2->GetCameraAngleX(), noPos, false);
+	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(), noPos, false, Game::e_BossAttackKind::kBossAttackNone);
 
 	m_pPhysics->Update();
 
@@ -253,7 +256,7 @@ void SceneSelect::Update()
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
-		if (IsFadingOut())
+		//if (IsFadingOut())
 		{
 			if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)
 			{
@@ -381,7 +384,7 @@ void SceneSelect::Draw()
 
 #endif
 
-
+	EffectManager::GetInstance().Draw();
 
 	if (!m_isFadeColor)
 	{

@@ -30,6 +30,7 @@
 
 #include "util/Pad.h"
 #include "util/SoundManager.h"
+#include "util/EffectManager.h"
 
 namespace
 {
@@ -86,7 +87,6 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	m_pBossShot = std::make_shared<BossShot>();
 	m_pBossRast = std::make_shared<BossRast>();
 
-
 	m_pField = std::make_shared<Field>(stageKind);
 	m_pTomb = std::make_shared<Tomb>();
 
@@ -134,6 +134,10 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/StageButton.png"));
 
+
+	//戦闘用BGMを最初に流す
+	SoundManager::GetInstance().PlayBgm("battleBgm", true);
+
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -162,6 +166,8 @@ void SceneGamePlay::Update()
 	Pad::Update();
 	UpdateFade();
 	UpdateFadeSelectGraph();
+	EffectManager::GetInstance().Update();
+
 
 #ifdef _DEBUG
 	MyLib::DebugDraw::Draw();
@@ -183,18 +189,34 @@ void SceneGamePlay::Update()
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
 		m_pHpBarUi->Update(m_pBossPower->GetHp());
+		
+		//ボスの攻撃座標や半径を取得
+		m_pPlayer->HitUpdate(m_pBossPower->GetAttackPos(),m_pBossPower->GetAttackPos(),m_pBossPower->GetShockPos(),m_pBossPower->GetAttackRadius(),m_pBossPower->GetWeaponRadius(),m_pBossPower->GetShockRadius(),m_pBossPower->GetIsAttack());
+		m_pBossPower->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(), m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
 		m_pHpBarUi->Update(m_pBossSpeed->GetHp());
+
+		//ボスの攻撃座標や半径を取得
+		m_pPlayer->HitUpdate(m_pBossSpeed->GetAttackPos(), m_pBossSpeed->GetAttackPos(), m_pBossSpeed->GetShockPos(), m_pBossSpeed->GetAttackRadius(), m_pBossSpeed->GetWeaponRadius(), m_pBossSpeed->GetShockRadius(), m_pBossSpeed->GetIsAttack());
+		m_pBossSpeed->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(), m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
 		m_pHpBarUi->Update(m_pBossShot->GetHp());
+
+		//ボスの攻撃座標や半径を取得
+		m_pPlayer->HitUpdate(m_pBossShot->GetAttackPos(), m_pBossShot->GetAttackPos(), m_pBossShot->GetShockPos(), m_pBossShot->GetAttackRadius(), m_pBossShot->GetWeaponRadius(), m_pBossShot->GetShockRadius(), m_pBossShot->GetIsAttack());
+		m_pBossShot->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(), m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
 		m_pHpBarUi->Update(m_pBossRast->GetHp());
+
+		//ボスの攻撃座標や半径を取得
+		m_pPlayer->HitUpdate(m_pBossRast->GetAttackPos(), m_pBossRast->GetAttackPos(), m_pBossRast->GetShockPos(), m_pBossRast->GetAttackRadius(), m_pBossRast->GetWeaponRadius(), m_pBossRast->GetShockRadius(), m_pBossRast->GetIsAttack());
+		m_pBossRast->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(), m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
 	}
 
 	//ゲームステージに移動するための当たり判定
@@ -245,13 +267,17 @@ void SceneGamePlay::Update()
 	//パワーボスを倒した場合
 	if (m_pBossPower->GetIsClear())
 	{
+		SoundManager::GetInstance().StopBgm("battleBgm");
+		SoundManager::GetInstance().PlayBgm("stageClearBgm", true);
 		m_isCameraLockOn = false;
 		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
 		//パワークリアトライアングルの当たり判定に入った場合
 		if (m_isPowerTriangl)
 		{
-			if (Pad::IsTrigger(PAD_INPUT_2))
+			if (Pad::IsTrigger(PAD_INPUT_1))
 			{
+				SoundManager::GetInstance().PlaySe("selectTransSe");
+				SoundManager::GetInstance().StopBgm("stageClearBgm");
 				m_isToNextScene = true;
 				StartFadeOut();
 
@@ -263,13 +289,17 @@ void SceneGamePlay::Update()
 	//スピードボスを倒した場合
 	if (m_pBossSpeed->GetIsClear())
 	{
+		SoundManager::GetInstance().StopBgm("battleBgm");
+		SoundManager::GetInstance().PlayBgm("stageClearBgm", true);
 		m_isCameraLockOn = false;
 		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
 		//スピードクリアトライアングルの当たり判定に入った場合
 		if (m_isSpeedTriangl)
 		{
-			if (Pad::IsTrigger(PAD_INPUT_2))
+			if (Pad::IsTrigger(PAD_INPUT_1))
 			{
+				SoundManager::GetInstance().PlaySe("selectTransSe");
+				SoundManager::GetInstance().StopBgm("stageClearBgm");
 				m_isToNextScene = true;
 				StartFadeOut();
 
@@ -281,13 +311,17 @@ void SceneGamePlay::Update()
 	//ショットボスを倒した場合
 	if (m_pBossShot->GetIsClear())
 	{
+		SoundManager::GetInstance().StopBgm("battleBgm");
+		SoundManager::GetInstance().PlayBgm("stageClearBgm", true);
 		m_isCameraLockOn = false;
 		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
 		//ショットクリアトライアングルの当たり判定に入った場合
 		if (m_isShotTriangl)
 		{
-			if (Pad::IsTrigger(PAD_INPUT_2))
+			if (Pad::IsTrigger(PAD_INPUT_1))
 			{
+				SoundManager::GetInstance().PlaySe("selectTransSe");
+				SoundManager::GetInstance().StopBgm("stageClearBgm");
 				m_isToNextScene = true;
 				StartFadeOut();
 
@@ -307,27 +341,22 @@ void SceneGamePlay::Update()
 		return;
 	}
 
-
 	//ボスのアップデート処理
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
-		m_pBossPower->Update(m_pPhysics, *m_pPlayer);
-
+		m_pBossPower->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
-		m_pBossSpeed->Update(m_pPhysics, *m_pPlayer);
-
+		m_pBossSpeed->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
-		m_pBossShot->Update(m_pPhysics, *m_pPlayer);
-		
+		m_pBossShot->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
-		m_pBossRast->Update(m_pPhysics, *m_pPlayer);
-
+		m_pBossRast->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
@@ -336,22 +365,22 @@ void SceneGamePlay::Update()
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
 		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossPower->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
-		m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon,m_pCamera->GetCameraAngleX(),m_pBossPower->GetPosDown(),m_pCamera2->GetIsLockOn());
+		m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon,m_pCamera->GetCameraAngleX(),m_pBossPower->GetPosDown(),m_pCamera2->GetIsLockOn(),m_pBossPower->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
 		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossSpeed->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossSpeed->GetPosDown(), m_pCamera2->GetIsLockOn());
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossSpeed->GetPosDown(), m_pCamera2->GetIsLockOn(),m_pBossSpeed->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
 		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossShot->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossShot->GetPosDown(), m_pCamera2->GetIsLockOn());
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossShot->GetPosDown(), m_pCamera2->GetIsLockOn(), m_pBossShot->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
 		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossRast->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossRast->GetPosDown(), m_pCamera2->GetIsLockOn());
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossRast->GetPosDown(), m_pCamera2->GetIsLockOn(), m_pBossRast->GetAttackKind());
 	}
 
 	m_pPhysics->Update();
@@ -395,7 +424,10 @@ void SceneGamePlay::Draw()
 
 	m_pField->Draw();
 
-	m_pTomb->DrawTriangle(m_bossKind);
+	if (m_pBossPower->GetIsClear() || m_pBossSpeed->GetIsClear() || m_pBossShot->GetIsClear())
+	{
+		m_pTomb->DrawTriangle(m_bossKind);
+	}
 
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
@@ -418,7 +450,7 @@ void SceneGamePlay::Draw()
 
 	m_pCamera2->Draw();
 
-	if (!m_pBossPower->GetIsClear() || !m_pBossSpeed->GetIsClear() || !m_pBossShot->GetIsClear())
+	if (!m_pBossPower->GetIsClear() && !m_pBossSpeed->GetIsClear() && !m_pBossShot->GetIsClear())
 	{
 		m_pHpBarUi->Draw();
 		m_pHpBarUi->DrawBossName(m_bossKind);
@@ -434,11 +466,16 @@ void SceneGamePlay::Draw()
 		DrawFadeSelectGraph(m_handles[kStageTransH], kHitPos);
 	}
 
+	EffectManager::GetInstance().Draw();
+
+
 	//クリアしたときのみ白いフェードにしておく
 	if (m_pBossPower->GetIsClear() || m_pBossSpeed->GetIsClear() || m_pBossShot->GetIsClear() || m_pBossRast->GetIsClear())
 	{
 		DrawFade(0xffffff);
 	}
+
+
 
 	DrawFade(0x000000);
 

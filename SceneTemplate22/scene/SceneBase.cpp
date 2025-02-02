@@ -33,15 +33,27 @@ SceneBase::SceneBase(SceneManager& manager):
 
 	/*サウンドのロード*/
 	//BGM
-	SoundManager::GetInstance().Load("titleBgm", "Data/Sound/Bgm/Select.mp3", true);
-	SoundManager::GetInstance().Load("selectBgm", "Data/Sound/Bgm/Select.mp3", true);
-	SoundManager::GetInstance().Load("battleBgm", "Data/Sound/Bgm/Select.mp3", true);
+	SoundManager::GetInstance().Load("titleBgm", "Data/Sound/Bgm/TitleBGM.mp3", true);
+	SoundManager::GetInstance().Load("selectBgm", "Data/Sound/Bgm/SelectBGM.mp3", true);
+	SoundManager::GetInstance().Load("battleBgm", "Data/Sound/Bgm/BattleBGM.mp3", true);
+	SoundManager::GetInstance().Load("stageClearBgm", "Data/Sound/Bgm/StageClearClearBGM.mp3", true);
+	SoundManager::GetInstance().Load("gameOverBgm", "Data/Sound/Bgm/GameOverBGM.mp3", true);
+	SoundManager::GetInstance().Load("gameClearBgm", "Data/Sound/Bgm/GameClearBGM.mp3", true);
 	
 	//カーソル用SE
 	SoundManager::GetInstance().Load("selectSe", "Data/Sound/Se/Select.mp3", false);
 	SoundManager::GetInstance().Load("dectionSe", "Data/Sound/Se/Dection.mp3", false);
 	SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
+	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
+
+	//シーン遷移用SE
+	SoundManager::GetInstance().Load("selectTransSe", "Data/Sound/Se/SelectSceneTrans.mp3", false);
+	SoundManager::GetInstance().Load("gamePlayTransSe", "Data/Sound/Se/GamePlaySceneTrans.mp3", false);
+	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
+	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
+	SoundManager::GetInstance().Load("faceSelectSe", "Data/Sound/Se/FaceSelect.mp3", false);
+
 
 	//プレイヤー用SE
 	SoundManager::GetInstance().Load("healHpSe", "Data/Sound/Se/HealHp.mp3", false);
@@ -55,17 +67,34 @@ SceneBase::SceneBase(SceneManager& manager):
 	SoundManager::GetInstance().Load("attackChargeSe", "Data/Sound/Se/Charge.mp3", false);
 	SoundManager::GetInstance().Load("damageSe", "Data/Sound/Se/Damage.mp3", false);
 	SoundManager::GetInstance().Load("deadSe", "Data/Sound/Se/Dead.mp3", false);
+	SoundManager::GetInstance().Load("faceUseSe", "Data/Sound/Se/FaceUse.mp3", false);
+	SoundManager::GetInstance().Load("lockOnSe", "Data/Sound/Se/LockOn.mp3", false);
+	SoundManager::GetInstance().Load("cameraResetSe", "Data/Sound/Se/CameraReset.mp3", false);
 
 	//ボス用SE
+	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
+	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
+	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
 	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
 	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 
-
-
 	/*エフェクトのロード*/
-	//EffectManager::GetInstance().Load("hitEffect", "Data/Effect/player_hit.efk", 1200.0f , 10.0f);
-
+	EffectManager::GetInstance().Load("playerHitEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("bossHitEffect", "Data/Effect/player_hit.efk", 120, 5.0f);
+	EffectManager::GetInstance().Load("hpHitEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("mpHitEffect", "Data/Effect/player_hit.efk", 120 , 1.0f);
+	EffectManager::GetInstance().Load("shotEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("moveEffect", "Data/Effect/player_hit.efk", 120, 0.1f);
+	EffectManager::GetInstance().Load("gameClearEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("gameOverEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("attackChargeEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("attackYEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("shockEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("backEffect", "Data/Effect/player_hit.efk", 120, 1.0f);
+	EffectManager::GetInstance().Load("faceUseEffect", "Data/Effect/player_hit.efk", 120, 5.0f);
+	EffectManager::GetInstance().Load("preliminaryActionEffect", "Data/Effect/player_hit.efk", 120, 0.5f);
+	EffectManager::GetInstance().Load("shotBossAttackEffect", "Data/Effect/player_hit.efk", 120, 0.5f);
 
 }
 
