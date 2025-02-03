@@ -414,6 +414,7 @@ void BossPower::IdleUpdate()
 	m_actionTime++;
 
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	//auto pos = m_rigidbody.GetPos();
 
@@ -542,6 +543,7 @@ void BossPower::DashUpdate()
 void BossPower::PreliminaryAttack1Update()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 
 	m_preliminaryActionFrame++;
@@ -555,6 +557,7 @@ void BossPower::PreliminaryAttack1Update()
 void BossPower::PreliminaryAttack2Update()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 
 	m_preliminaryActionFrame++;
@@ -568,6 +571,7 @@ void BossPower::PreliminaryAttack2Update()
 void BossPower::PreliminaryAttack3Update()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 
 	m_preliminaryActionFrame++;
@@ -581,6 +585,7 @@ void BossPower::PreliminaryAttack3Update()
 void BossPower::Attack1Update()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 
 	//アニメーションが終わったらアイドル状態に戻る
@@ -595,6 +600,7 @@ void BossPower::Attack1Update()
 void BossPower::Attack2Update()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 
 	//アニメーションが終わったらアイドル状態に戻る
@@ -609,6 +615,7 @@ void BossPower::Attack2Update()
 void BossPower::Attack3Update()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 
 	//アニメーションが終わったらクールタイム状態に入る
@@ -666,6 +673,7 @@ void BossPower::AttackCoolTimeUpdate()
 void BossPower::HitOneDamageUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_damageFrame > 34)
 	{
 		OnIdle();
@@ -675,6 +683,7 @@ void BossPower::HitOneDamageUpdate()
 void BossPower::HitTwoDamageUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_damageFrame > 34)
 	{
 		OnIdle();
@@ -684,6 +693,7 @@ void BossPower::HitTwoDamageUpdate()
 void BossPower::DownUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -693,6 +703,7 @@ void BossPower::DownUpdate()
 void BossPower::DeadUpdate()
 {
 	//ワープアイテムが出現するフラグをおいておく
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_pAnim->IsLoop())
 	{
 		m_isClear = true;
@@ -708,6 +719,9 @@ void BossPower::DeadUpdate()
 
 void BossPower::OnIdle()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossPower::IdleUpdate;
@@ -729,6 +743,9 @@ void BossPower::OnDash()
 
 void BossPower::OnPreliminaryAttack1()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -737,6 +754,9 @@ void BossPower::OnPreliminaryAttack1()
 
 void BossPower::OnPreliminaryAttack2()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -745,6 +765,9 @@ void BossPower::OnPreliminaryAttack2()
 
 void BossPower::OnPreliminaryAttack3()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -753,6 +776,9 @@ void BossPower::OnPreliminaryAttack3()
 
 void BossPower::OnAttack1()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_preliminaryActionFrame = 0;
@@ -766,6 +792,9 @@ void BossPower::OnAttack1()
 
 void BossPower::OnAttack2()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_preliminaryActionFrame = 0;
@@ -779,6 +808,9 @@ void BossPower::OnAttack2()
 
 void BossPower::OnAttack3()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_preliminaryActionFrame = 0;
@@ -800,6 +832,9 @@ void BossPower::OnAvoid()
 
 void BossPower::OnAttackCoolTime()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
@@ -811,6 +846,7 @@ void BossPower::OnHitOneDamage()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_hp -= 10.0f;
 	m_isHit = true;
+	m_isAttack = false;
 
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
@@ -823,6 +859,7 @@ void BossPower::OnHitTwoDamage()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_hp -= 30.0f;
 	m_isHit = true;
+	m_isAttack = false;
 
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));

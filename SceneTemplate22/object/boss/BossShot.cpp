@@ -654,6 +654,7 @@ void BossShot::AttackCoolTimeUpdate()
 
 void BossShot::HitOneDamageUpdate()
 {
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -663,6 +664,7 @@ void BossShot::HitOneDamageUpdate()
 
 void BossShot::HitTwoDamageUpdate()
 {
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -672,6 +674,7 @@ void BossShot::HitTwoDamageUpdate()
 
 void BossShot::DownUpdate()
 {
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -681,6 +684,7 @@ void BossShot::DownUpdate()
 
 void BossShot::DeadUpdate()
 {
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 	//ワープアイテムが出現するフラグをおいておく
 	if (m_pAnim->IsLoop())
 	{
@@ -790,6 +794,7 @@ void BossShot::OnHitOneDamage()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_hp -= 10.0f;
 	m_isHit = true;
+	m_isAttack = false;
 
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
@@ -802,6 +807,7 @@ void BossShot::OnHitTwoDamage()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_hp -= 30.0f;
 	m_isHit = true;
+	m_isAttack = false;
 
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));

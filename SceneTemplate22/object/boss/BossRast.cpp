@@ -5,6 +5,8 @@
 #include "util/ActionTime.h"
 
 #include "util/Pad.h"
+#include "util/EffectManager.h"
+#include "util/SoundManager.h"
 
 #include <cmath>
 #include <cassert>
@@ -86,7 +88,40 @@ BossRast::BossRast() :
 	m_actionKind(0),
 	m_hp(350.0f)
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
+
 	m_isClear = false;
+
+	m_isAttack = false;
+	m_isShock = false;
+	m_isHit = false;
+
+	m_downCountDown = 0;
+	m_damageFrame = 0;
+	m_preliminaryActionFrame = 0;
+
+	m_hitRadius = 8.0f;
+	m_normalAttackRadius = 3.0f;
+	m_weaponAttackRadius = 6.0f;
+	m_shockRadius = 15.0f;
+
+	m_pos = kInitPos;
+	m_hitPos = VGet(0, 0, 0);
+	m_attackPos = VGet(0, 0, 0);
+	m_shockAttackPos = VGet(0, 0, 0);
+	m_attackDir = VGet(0, 0, 0);
+
+	//プレイヤーの攻撃変数の初期化
+	m_playerAttackXPos = VGet(0, 0, 0);
+	m_playerAttackYPos = VGet(0, 0, 0);
+	m_playerShockPos = VGet(0, 0, 0);
+
+	m_playerAttackXRadius = 0.0f;
+	m_playerAttackYRadius = 0.0f;
+	m_playerShockRadius = 0.0f;
+
+	m_isPlayerAttack = false;
 
 	m_modelH = MV1LoadModel(kModelFilename);
 
@@ -166,6 +201,20 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 	//モデルのポジションを合わせるよう
 	//VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
 
+	if (m_isHit)
+	{
+		m_damageFrame++;
+	}
+	else
+	{
+		m_damageFrame = 0;
+	}
+
+	if (m_damageFrame >= 60)
+	{
+		m_isHit = false;
+	}
+
 		//HPがゼロより下にいった場合
 	if (m_hp <= 0)
 	{
@@ -225,10 +274,39 @@ void BossRast::SetPosDown(const VECTOR pos)
 	m_rigidbody.SetPos(pos);
 }
 
+void BossRast::Hit()
+{
+	if (!m_isClear)
+	{
+		if (m_isPlayerAttack)
+		{
+
+			if (!m_isHit)
+			{
+				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
+				{
+					OnHitOneDamage();
+				}
+
+				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
+				{
+					OnHitTwoDamage();
+				}
+
+				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
+				{
+					OnHitOneDamage();
+				}
+			}
+		}
+	}
+}
+
 void BossRast::IdleUpdate()
 {
 	m_actionTime++;
 
+	Hit();
 	//auto pos = m_rigidbody.GetPos();
 
 	//プレイヤーへの向きを取得
@@ -253,16 +331,16 @@ void BossRast::IdleUpdate()
 		switch (m_actionKind)
 		{
 		case 0:
-			OnAttack1();
+			OnPreliminaryAttack1();
 			break;
 		case 1:
-			OnAttack2();
+			OnPreliminaryAttack2();
 			break;
 		case 2:
-			OnAttack3();
+			OnPreliminaryAttack3();
 			break;
 		case 3:
-			OnAttack1();
+			OnPreliminaryAttack1();
 			break;
 		default:
 			break;
@@ -282,6 +360,7 @@ void BossRast::IdleUpdate()
 void BossRast::WalkUpdate()
 {
 	//VECTOR pos = m_rigidbody.GetPos();
+	Hit();
 
 	//プレイヤーへの向きを取得
 	m_direction = VSub(m_playerPos, m_pos);
@@ -315,6 +394,7 @@ void BossRast::WalkUpdate()
 
 void BossRast::DashUpdate()
 {
+	Hit();
 	//プレイヤーへの向きを取得
 	m_direction = VSub(m_playerPos, m_pos);
 
@@ -340,9 +420,89 @@ void BossRast::DashUpdate()
 	}
 }
 
+void BossRast::PreliminaryAttack1Update()
+{
+	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 30)
+	{
+		OnAttack1();
+	}
+}
+
+void BossRast::PreliminaryAttack2Update()
+{
+	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 30)
+	{
+		OnAttack2();
+	}
+}
+
+void BossRast::PreliminaryAttack3Update()
+{
+	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 30)
+	{
+		OnAttack3();
+	}
+}
+
+void BossRast::OnPreliminaryAttack1()
+{
+	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossRast::PreliminaryAttack1Update;
+}
+
+void BossRast::OnPreliminaryAttack2()
+{
+	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossRast::PreliminaryAttack2Update;
+}
+
+void BossRast::OnPreliminaryAttack3()
+{
+	Hit();
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimIdle);
+	m_updateFunc = &BossRast::PreliminaryAttack3Update;
+}
+
 void BossRast::Attack1Update()
 {
+	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -352,7 +512,9 @@ void BossRast::Attack1Update()
 
 void BossRast::Attack2Update()
 {
+	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -362,7 +524,9 @@ void BossRast::Attack2Update()
 
 void BossRast::Attack3Update()
 {
+	Hit();
 	//アニメーションが終わったらクールタイム状態に入る
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_pAnim->IsLoop())
 	{
 		OnAttackCoolTime();
@@ -396,9 +560,30 @@ void BossRast::AvoidUpdate()
 
 void BossRast::AttackCoolTimeUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	if (m_actionTime > kCoolTimeToAvoidTime)
+	{
+		OnIdle();
+	}
+}
+
+void BossRast::HitOneDamageUpdate()
+{
+	//アニメーションが終わったらアイドル状態に戻る
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	if (m_damageFrame > 34)
+	{
+		OnIdle();
+	}
+}
+
+void BossRast::HitTwoDamageUpdate()
+{
+	//アニメーションが終わったらアイドル状態に戻る
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	if (m_damageFrame > 34)
 	{
 		OnIdle();
 	}
@@ -415,12 +600,14 @@ void BossRast::DownUpdate()
 
 void BossRast::DeadUpdate()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_isClear = true;
 }
 
 
 void BossRast::OnIdle()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossRast::IdleUpdate;
@@ -428,44 +615,55 @@ void BossRast::OnIdle()
 
 void BossRast::OnWalk()
 {
-	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimWalk);
 	m_updateFunc = &BossRast::WalkUpdate;
 }
 
 void BossRast::OnDash()
 {
-	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDash);
 	m_updateFunc = &BossRast::DashUpdate;
 }
 
 void BossRast::OnAttack1()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
+
+	m_attackKind = Game::e_BossAttackKind::kBossAttack;
+
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
 	m_updateFunc = &BossRast::Attack1Update;
 }
 
 void BossRast::OnAttack2()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
+
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
+
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
 	m_updateFunc = &BossRast::Attack2Update;
 }
 
 void BossRast::OnAttack3()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
+
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
+
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updateFunc = &BossRast::Attack3Update;
 }
 
 void BossRast::OnAvoid()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAvoid, true, true, false);
@@ -474,10 +672,36 @@ void BossRast::OnAvoid()
 
 void BossRast::OnAttackCoolTime()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
-	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossRast::AttackCoolTimeUpdate;
+}
+
+void BossRast::OnHitOneDamage()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_hp -= 10.0f;
+	m_isHit = true;
+	m_isAttack = false;
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimCoolTime);
+	m_updateFunc = &BossRast::HitOneDamageUpdate;
+}
+
+void BossRast::OnHitTwoDamage()
+{
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_hp -= 30.0f;
+	m_isHit = true;
+	m_isAttack = false;
+
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimCoolTime);
+	m_updateFunc = &BossRast::HitTwoDamageUpdate;
 }
 
 void BossRast::OnDown()

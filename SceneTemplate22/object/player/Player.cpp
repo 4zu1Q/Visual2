@@ -2147,6 +2147,7 @@ void Player::AttackYUpdate()
 
 void Player::HitOneDamageUpdate()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_stamina += kStaminaIncreaseSpeed;
 	//m_damageFrame++;
 
@@ -2169,6 +2170,8 @@ void Player::HitOneDamageUpdate()
 
 void Player::HitTwoDamageUpdate()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
@@ -2566,6 +2569,9 @@ void Player::OnHitOneDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_isHit = true;
+	m_isAttack = false;
+
+
 	SoundManager::GetInstance().PlaySe("damageSe");
 	m_hp -= 1;
 
@@ -2580,6 +2586,7 @@ void Player::OnHitTwoDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_isHit = true;
+	m_isAttack = false;
 	SoundManager::GetInstance().PlaySe("damageSe");
 	m_hp -= 2;
 

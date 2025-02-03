@@ -335,6 +335,8 @@ void SceneGamePlay::Update()
 	//ラスボスを倒した場合
 	if (m_gameClearTime > 240)
 	{
+		SoundManager::GetInstance().StopBgm("battleBgm");
+
 		m_isToNextScene = true;
 		StartFadeOut();
 

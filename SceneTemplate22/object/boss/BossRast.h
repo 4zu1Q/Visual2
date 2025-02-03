@@ -31,15 +31,22 @@ public:
 
 private:
 
+	void Hit();
+
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
 	void WalkUpdate();
 	void DashUpdate();
+	void PreliminaryAttack1Update();
+	void PreliminaryAttack2Update();
+	void PreliminaryAttack3Update();
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
 	void AvoidUpdate();
 	void AttackCoolTimeUpdate();
+	void HitOneDamageUpdate();
+	void HitTwoDamageUpdate();
 	void DownUpdate();
 	void DeadUpdate();
 
@@ -47,11 +54,16 @@ private:
 	void OnIdle();
 	void OnWalk();
 	void OnDash();
+	void OnPreliminaryAttack1();
+	void OnPreliminaryAttack2();
+	void OnPreliminaryAttack3();
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
 	void OnAvoid();
 	void OnAttackCoolTime();
+	void OnHitOneDamage();
+	void OnHitTwoDamage();
 	void OnDown();
 	void OnDead();
 
