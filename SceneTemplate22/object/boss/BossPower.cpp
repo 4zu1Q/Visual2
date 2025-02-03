@@ -89,6 +89,7 @@ BossPower::BossPower():
 	m_hp = 400.0f;
 
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	m_isClear = false;
 
@@ -98,6 +99,7 @@ BossPower::BossPower():
 
 	m_downCountDown = 0;
 	m_damageFrame = 0;
+	m_preliminaryActionFrame = 0;
 
 	m_hitRadius = 8.0f;
 	m_normalAttackRadius = 3.0f;
@@ -182,31 +184,33 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 	VECTOR toPlayer = VSub(m_playerPos, m_pos);
 	m_length = VSize(toPlayer);
 
+	m_playerAttackKind = playerAttackKind;
+
 	//m_pos = m_pPlayer->GetPosDown();
-	if (!m_isClear)
-	{
-		if (m_isPlayerAttack)
-		{
+	//if (!m_isClear)
+	//{
+	//	if (m_isPlayerAttack)
+	//	{
 
-			if (!m_isHit)
-			{
-				if (IsAttackXHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
-				{
-					OnHitOneDamage();
-				}
+	//		if (!m_isHit)
+	//		{
+	//			if (IsAttackXHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
+	//			{
+	//				OnHitOneDamage();
+	//			}
 
-				if (IsAttackYHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
-				{
-					OnHitTwoDamage();
-				}
+	//			if (IsAttackYHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
+	//			{
+	//				OnHitTwoDamage();
+	//			}
 
-				if (IsShockAttackHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
-				{
-					OnHitOneDamage();
-				}
-			}
-		}
-	}
+	//			if (IsShockAttackHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
+	//			{
+	//				OnHitOneDamage();
+	//			}
+	//		}
+	//	}
+	//}
 
 	if (m_isHit)
 	{
@@ -328,7 +332,6 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 //	return false;
 //}
 
-
 void BossPower::Draw()
 {
 
@@ -378,9 +381,39 @@ void BossPower::SetPosDown(const VECTOR pos)
 	m_rigidbody.SetPos(pos);
 }
 
+void BossPower::Hit()
+{
+	if (!m_isClear)
+	{
+		if (m_isPlayerAttack)
+		{
+
+			if (!m_isHit)
+			{
+				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
+				{
+					OnHitOneDamage();
+				}
+
+				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
+				{
+					OnHitTwoDamage();
+				}
+
+				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
+				{
+					OnHitOneDamage();
+				}
+			}
+		}
+	}
+}
+
 void BossPower::IdleUpdate()
 {
 	m_actionTime++;
+
+	Hit();
 
 	//auto pos = m_rigidbody.GetPos();
 
@@ -439,6 +472,8 @@ void BossPower::WalkUpdate()
 {
 	//VECTOR pos = m_rigidbody.GetPos();
 
+	Hit();
+
 	//プレイヤーへの向きを取得
 	m_direction = VSub(m_playerPos, m_pos);
 
@@ -475,6 +510,10 @@ void BossPower::WalkUpdate()
 
 void BossPower::DashUpdate()
 {
+
+	Hit();
+
+
 	//プレイヤーへの向きを取得
 	m_direction = VSub(m_playerPos, m_pos);
 
@@ -502,38 +541,48 @@ void BossPower::DashUpdate()
 
 void BossPower::PreliminaryAttack1Update()
 {
-	if (m_pAnim->IsLoop())
-	{
-		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	Hit();
 
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 30)
+	{
 		OnAttack1();
 	}
 }
 
 void BossPower::PreliminaryAttack2Update()
 {
-	if (m_pAnim->IsLoop())
-	{
-		auto pos = m_rigidbody.GetPos();
+	Hit();
 
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 30)
+	{
 		OnAttack2();
 	}
 }
 
 void BossPower::PreliminaryAttack3Update()
 {
-	if (m_pAnim->IsLoop())
-	{
-		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	Hit();
 
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 30)
+	{
 		OnAttack3();
 	}
 }
 
 void BossPower::Attack1Update()
 {
+	Hit();
+
+
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -545,6 +594,9 @@ void BossPower::Attack1Update()
 
 void BossPower::Attack2Update()
 {
+	Hit();
+
+
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -556,6 +608,9 @@ void BossPower::Attack2Update()
 
 void BossPower::Attack3Update()
 {
+	Hit();
+
+
 	//アニメーションが終わったらクールタイム状態に入る
 	if (m_pAnim->IsLoop())
 	{
@@ -567,6 +622,9 @@ void BossPower::Attack3Update()
 
 void BossPower::AvoidUpdate()
 {
+	Hit();
+
+
 	m_actionTime++;
 
 	//プレイヤーへの向きを取得
@@ -591,6 +649,9 @@ void BossPower::AvoidUpdate()
 
 void BossPower::AttackCoolTimeUpdate()
 {
+	Hit();
+
+
 	m_actionTime++;
 
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
@@ -605,7 +666,7 @@ void BossPower::AttackCoolTimeUpdate()
 void BossPower::HitOneDamageUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
+	if (m_damageFrame > 34)
 	{
 		OnIdle();
 	}
@@ -614,7 +675,7 @@ void BossPower::HitOneDamageUpdate()
 void BossPower::HitTwoDamageUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
+	if (m_damageFrame > 34)
 	{
 		OnIdle();
 	}
@@ -640,7 +701,7 @@ void BossPower::DeadUpdate()
 	if (!m_isClear)
 	{
 		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+		EffectManager::GetInstance().CreateEffect("gameClearEffect", VGet(pos.x, pos.y, pos.z));
 	}
 }
 
@@ -669,7 +730,7 @@ void BossPower::OnDash()
 void BossPower::OnPreliminaryAttack1()
 {
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossPower::PreliminaryAttack1Update;
 }
@@ -677,7 +738,7 @@ void BossPower::OnPreliminaryAttack1()
 void BossPower::OnPreliminaryAttack2()
 {
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossPower::PreliminaryAttack2Update;
 }
@@ -685,7 +746,7 @@ void BossPower::OnPreliminaryAttack2()
 void BossPower::OnPreliminaryAttack3()
 {
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossPower::PreliminaryAttack3Update;
 }
@@ -694,6 +755,7 @@ void BossPower::OnAttack1()
 {
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_preliminaryActionFrame = 0;
 	m_isAttack = true;
 
 	m_attackKind = Game::e_BossAttackKind::kBossAttack;
@@ -706,6 +768,7 @@ void BossPower::OnAttack2()
 {
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_preliminaryActionFrame = 0;
 	m_isAttack = true;
 
 	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
@@ -718,6 +781,7 @@ void BossPower::OnAttack3()
 {
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_preliminaryActionFrame = 0;
 	m_isAttack = true;
 
 	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
@@ -779,10 +843,11 @@ void BossPower::OnDown()
 void BossPower::OnDead()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
 	m_actionKind = 0;
 	m_actionTime = 0;
 
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
+
+
 	m_updateFunc = &BossPower::DeadUpdate;
 }

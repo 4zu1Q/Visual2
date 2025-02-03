@@ -6,6 +6,7 @@
 BossBase::BossBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::ColliderData::e_Kind kind, bool isTrigger):
 	CharaBase(priority, tag, kind, isTrigger),
 	m_hp(0),
+	m_preliminaryActionFrame(0),
 	m_pos(VGet(0,0,0)),
 	m_hitPos(VGet(0,0,0)),
 	m_playerAttackXPos(VGet(0,0,0)),

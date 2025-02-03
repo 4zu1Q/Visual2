@@ -115,10 +115,12 @@ void Tomb::Update(VECTOR powerPos, VECTOR speedPos, VECTOR shotPos)
 
 void Tomb::Draw()
 {
+#ifdef _DEBUG
 	DrawSphere3D(m_posPower, m_radiusB, 32, 0xffffff, 0xff0000, false);
 	DrawSphere3D(m_posSpeed, m_radiusB, 32, 0xffffff, 0xff0000, false);
 	DrawSphere3D(m_posShot, m_radiusB, 32, 0xffffff, 0xff0000, false);
 	DrawSphere3D(m_posRast, m_radiusRB, 32, 0xffffff, 0xff0000, false);
+#endif
 
 	//DrawFormatString(0, 48, 0xff0fff, "PowerPos:%f,%f,%f", m_posPower.x, m_posPower.y, m_posPower.z);
 	//DrawFormatString(0, 64, 0xff0fff, "SpeedPos:%f,%f,%f", m_posSpeed.x, m_posSpeed.y, m_posSpeed.z);

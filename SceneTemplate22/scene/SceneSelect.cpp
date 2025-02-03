@@ -66,7 +66,7 @@ namespace
 	const Vec2 kHitBossPos = { 340.0f , 30.0f };
 	const Vec2 kHitTextPos = { 740.0f , 230.0f };
 	const Vec2 kHitText2Pos = { 743.0f , 230.0f };
-	const Vec2 kHitStarPos = { 790.0f , 110.0f };
+	const Vec2 kHitStarPos = { 790.0f , 160.0f };
 
 }
 

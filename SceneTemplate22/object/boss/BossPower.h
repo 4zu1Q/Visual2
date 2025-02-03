@@ -32,6 +32,8 @@ public:
 
 private:
 
+	void Hit();
+
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
 	void WalkUpdate();

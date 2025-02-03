@@ -17,12 +17,17 @@ public:
 	void Update();
 	void Draw();
 
+
 	void HitUpdate(VECTOR attackXPos,VECTOR attackYPos,VECTOR shockPos, float attackXRadius,float attackYRadius,float shockRadius, bool isAttack);
 
 	//ボスの座標を取得
 	const VECTOR& GetPos() const { return m_pos; }
 	void SetPos(const VECTOR pos) { m_pos = pos; }
 	
+	//ボスのヒット座標
+	const VECTOR& GetHitPos() const { return m_hitPos; }
+	void SetHitPos(const VECTOR hitPos) { m_hitPos = hitPos; }
+
 	//ボスの攻撃座標(武器座標も同じ座標)
 	const VECTOR& GetAttackPos() const { return m_attackPos; }
 	void SetAttackPos(const VECTOR attackPos) { m_attackPos = attackPos; }
@@ -39,8 +44,11 @@ public:
 	void SetHp(const float hp) { m_hp = hp; }
 
 	//ボスの攻撃半径
+	const float& GetHitRadius() const { return m_hitRadius; }
+	void SetHitRadius(const float normalAttackRadius) { m_hitRadius = normalAttackRadius; }
+	//ボスの攻撃半径
 	const float& GetAttackRadius() const { return m_normalAttackRadius; }
-	void SetRadius(const float normalAttackRadius) { m_normalAttackRadius = normalAttackRadius; }
+	void SetAttackRadius(const float normalAttackRadius) { m_normalAttackRadius = normalAttackRadius; }
 	//ボスの武器半径
 	const float& GetWeaponRadius() const { return m_weaponAttackRadius; }
 	void SetWeaponRadius(const float weaponAttackRadius) { m_weaponAttackRadius = weaponAttackRadius; }
@@ -104,6 +112,7 @@ protected:
 	float m_playerShockRadius;
 	bool m_isPlayerAttack;
 
+	int m_preliminaryActionFrame;
 
 	//ボスがプレイヤーの攻撃にヒットする当たり判定の半径
 	float m_hitRadius;
@@ -131,5 +140,6 @@ protected:
 	int m_downCountDown;
 
 	Game::e_BossAttackKind m_attackKind;
+	Game::e_PlayerAttackKind m_playerAttackKind;
 };
 

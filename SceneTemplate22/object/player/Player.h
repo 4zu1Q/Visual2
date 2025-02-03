@@ -61,7 +61,7 @@ public:
 
 	void BossLook(VECTOR bossPos);
 
-	void HitUpdate(VECTOR attackPos, VECTOR weaponPos, VECTOR shockPos, float attackRadius, float weaponRadius, float shockRadius, bool isBossAttack);
+	void HitUpdate(VECTOR hitPos,VECTOR attackPos, VECTOR weaponPos, VECTOR shockPos,float hitRadius ,float attackRadius, float weaponRadius, float shockRadius, bool isBossAttack);
 
 	// 衝突したとき
 	//virtual void OnCollide(const Collidable& colider);
@@ -139,12 +139,18 @@ public:
 
 
 private:
+
+	void Hit();
+
 	void OnCollide(const Collidable& colider);
 
 	//攻撃判定
 	bool IsAttackHit(VECTOR attackPos, float radius);
 	bool IsWeaponHit(VECTOR attackPos, float radius);
 	bool IsShockAttackHit(VECTOR attackPos, float radius);
+
+	//プレイヤーの攻撃が当たっていたら
+	bool IsPlayerAttackHit(VECTOR hitPos, float attackRadius);
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
@@ -263,10 +269,13 @@ private:
 	VECTOR m_move;
 
 	//ボスの攻撃座標
+
+	VECTOR m_bossHitPos;
 	VECTOR m_bossAttackPos;
 	VECTOR m_bossWeaponPos;
 	VECTOR m_bossShockPos;
 
+	float m_bossHitRadius;
 	float m_bossAttackRadius;
 	float m_bossWeaponRadius;
 	float m_bossShockRadius;
@@ -327,6 +336,7 @@ private:
 
 	//攻撃の種類
 	Game::e_PlayerAttackKind m_attackKind;
+	Game::e_BossAttackKind m_bossAttackKind;
 
 	//動いたときの音を出すやつ
 	int m_moveCount;
