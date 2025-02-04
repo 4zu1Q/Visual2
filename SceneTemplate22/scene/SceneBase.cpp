@@ -87,14 +87,14 @@ SceneBase::SceneBase(SceneManager& manager):
 	EffectManager::GetInstance().Load("shotEffect", "Data/Effect/Charge.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("moveEffect", "Data/Effect/Move.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("jumpEffect", "Data/Effect/Jump.efkefc", 120, 2.0f);
-	EffectManager::GetInstance().Load("gameClearEffect", "Data/Effect/StageClear.efkefc", 200, 4.0f);
+	EffectManager::GetInstance().Load("gameClearEffect", "Data/Effect/StageClear01.efkefc", 200, 4.0f);
 	EffectManager::GetInstance().Load("gameOverEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("attackChargeEffect", "Data/Effect/AttackCharge.efkefc", 60, 8.0f);
 	EffectManager::GetInstance().Load("attackChargeFinishEffect", "Data/Effect/ChargeFinish.efkefc", 120, 2.0f);
 	EffectManager::GetInstance().Load("attackYEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("shockEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("backGroundEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
-	EffectManager::GetInstance().Load("faceUseEffect", "Data/Effect/FaceUse.efkefc", 240, 3.0f);
+	EffectManager::GetInstance().Load("faceUseEffect", "Data/Effect/FaceUse01.efkefc", 120, 1.5f);
 	EffectManager::GetInstance().Load("preliminaryActionEffect", "Data/Effect/PreliminaryAction.efkefc", 120, 3.0f);
 	EffectManager::GetInstance().Load("shotBossAttackEffect", "Data/Effect/PlayerHit.efkefc", 120, 0.5f);
 	EffectManager::GetInstance().Load("BossAttackShockEffect", "Data/Effect/BossShockAttack.efkefc", 120, 0.5f);

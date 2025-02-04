@@ -98,6 +98,7 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
 
+	m_isToNextScene = false;
 
 	m_playerPos = VGet(0, 0, -120);
 	m_cameraPos = VGet(0, 0, 0);
@@ -178,6 +179,7 @@ void SceneSelect::Update()
 		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
 			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
+			StartFadeOut();
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kPowerTypeBoss;
 		}
@@ -188,6 +190,7 @@ void SceneSelect::Update()
 		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
 			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
+			StartFadeOut();
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kSpeedTypeBoss;
 		}
@@ -198,6 +201,7 @@ void SceneSelect::Update()
 		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
 			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
+			StartFadeOut();
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kShooterTypeBoss;
 		}
@@ -208,6 +212,7 @@ void SceneSelect::Update()
 		if (Pad::IsTrigger(PAD_INPUT_1))
 		{
 			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
+			StartFadeOut();
 			m_isToNextScene = true;
 			m_sceneTrans = e_SceneTrans::kRastTypeBoss;
 		}
@@ -256,7 +261,7 @@ void SceneSelect::Update()
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
-		//if (IsFadingOut())
+		if (!IsFadingOut())
 		{
 			if (m_sceneTrans == e_SceneTrans::kPowerTypeBoss)
 			{

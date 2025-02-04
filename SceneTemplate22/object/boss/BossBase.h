@@ -84,6 +84,7 @@ public:
 	bool IsAttackYHit();
 	bool IsShockAttackHit();
 
+
 protected:
 
 	//HP
@@ -130,6 +131,7 @@ protected:
 	bool m_isShock;
 
 	bool m_isHit;
+	bool m_isPlayerFace;
 
 	int m_damageFrame;
 
@@ -141,5 +143,6 @@ protected:
 
 	Game::e_BossAttackKind m_attackKind;
 	Game::e_PlayerAttackKind m_playerAttackKind;
+	e_PlayerKind m_playerKind;
 };
 

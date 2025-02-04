@@ -90,6 +90,7 @@ BossPower::BossPower():
 
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
+	m_playerKind = e_PlayerKind::kNormalPlayer;
 
 	m_isClear = false;
 
@@ -185,32 +186,7 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 	m_length = VSize(toPlayer);
 
 	m_playerAttackKind = playerAttackKind;
-
-	//m_pos = m_pPlayer->GetPosDown();
-	//if (!m_isClear)
-	//{
-	//	if (m_isPlayerAttack)
-	//	{
-
-	//		if (!m_isHit)
-	//		{
-	//			if (IsAttackXHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
-	//			{
-	//				OnHitOneDamage();
-	//			}
-
-	//			if (IsAttackYHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
-	//			{
-	//				OnHitTwoDamage();
-	//			}
-
-	//			if (IsShockAttackHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
-	//			{
-	//				OnHitOneDamage();
-	//			}
-	//		}
-	//	}
-	//}
+	m_playerKind = player.GetFaceKind();
 
 	if (m_isHit)
 	{
@@ -258,79 +234,6 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));
 
 }
-
-//void BossPower::HitUpdate(VECTOR attackXPos, VECTOR attackYPos, VECTOR shockPos, float attackXRadius, float attackYRadius, float shockRadius, bool isAttack)
-//{
-//	m_playerAttackXPos = attackXPos;
-//	m_playerAttackYPos = attackYPos;
-//	m_playerShockPos = shockPos;
-//
-//	m_playerAttackXRadius = attackXRadius;
-//	m_playerAttackYRadius = attackYRadius;
-//	m_playerShockRadius = shockRadius;
-//
-//	m_isPlayerAttack = isAttack;
-//}
-
-//bool BossPower::IsAttackXHit()
-//{
-//	//X,Y,Zの距離の成分を取得
-//	float delX = (m_hitPos.x - m_playerAttackXPos.x) * (m_hitPos.x - m_playerAttackXPos.x);
-//	float delY = ((m_hitPos.y) - (m_playerAttackXPos.y)) *
-//		((m_hitPos.y) - (m_playerAttackXPos.y));
-//	float delZ = (m_hitPos.z - m_playerAttackXPos.z) * (m_hitPos.z - m_playerAttackXPos.z);
-//
-//	//球と球の距離
-//	float Distance = sqrt(delX + delY + delZ);
-//
-//	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
-//	if (Distance < m_hitRadius + m_playerAttackXRadius)
-//	{
-//		return true;
-//	}
-//
-//	return false;
-//}
-//
-//bool BossPower::IsAttackYHit()
-//{
-//	//X,Y,Zの距離の成分を取得
-//	float delX = (m_hitPos.x - m_playerAttackYPos.x) * (m_hitPos.x - m_playerAttackYPos.x);
-//	float delY = ((m_hitPos.y) - (m_playerAttackYPos.y)) *
-//		((m_hitPos.y) - (m_playerAttackYPos.y));
-//	float delZ = (m_hitPos.z - m_playerAttackYPos.z) * (m_hitPos.z - m_playerAttackYPos.z);
-//
-//	//球と球の距離
-//	float Distance = sqrt(delX + delY + delZ);
-//
-//	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
-//	if (Distance < m_hitRadius + m_playerAttackYRadius)
-//	{
-//		return true;
-//	}
-//
-//	return false;
-//}
-//
-//bool BossPower::IsShockAttackHit()
-//{
-//	//X,Y,Zの距離の成分を取得
-//	float delX = (m_hitPos.x - m_playerShockPos.x) * (m_hitPos.x - m_playerShockPos.x);
-//	float delY = ((m_hitPos.y) - (m_playerShockPos.y)) *
-//		((m_hitPos.y) - (m_playerShockPos.y));
-//	float delZ = (m_hitPos.z - m_playerShockPos.z) * (m_hitPos.z - m_playerShockPos.z);
-//
-//	//球と球の距離
-//	float Distance = sqrt(delX + delY + delZ);
-//
-//	//球と球の距離がプレイヤとエネミーの半径よりも小さい場合
-//	if (Distance < m_hitRadius + m_playerShockRadius)
-//	{
-//		return true;
-//	}
-//
-//	return false;
-//}
 
 void BossPower::Draw()
 {
@@ -390,17 +293,18 @@ void BossPower::Hit()
 
 			if (!m_isHit)
 			{
-				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
+
+				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX)
 				{
 					OnHitOneDamage();
 				}
 
-				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
+				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
 				{
 					OnHitTwoDamage();
 				}
 
-				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
+				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
 				{
 					OnHitOneDamage();
 				}
@@ -834,7 +738,6 @@ void BossPower::OnAttackCoolTime()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
@@ -844,7 +747,30 @@ void BossPower::OnAttackCoolTime()
 void BossPower::OnHitOneDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_hp -= 10.0f;
+
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
+	{
+		m_hp -= 15.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
+	{
+		m_hp -= 20.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+
+	if (!m_isPlayerFace)
+	{
+		m_hp -= 25.0f;
+	}
+
+	
 	m_isHit = true;
 	m_isAttack = false;
 
@@ -857,7 +783,29 @@ void BossPower::OnHitOneDamage()
 void BossPower::OnHitTwoDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_hp -= 30.0f;
+
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
+	{
+		m_hp -= 80.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
+	{
+		m_hp -= 40.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
+	{
+		m_hp -= 40.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
+	{
+		m_hp -= 100.0f;
+	}
+
+	if (!m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+
 	m_isHit = true;
 	m_isAttack = false;
 

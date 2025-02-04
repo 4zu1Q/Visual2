@@ -28,6 +28,7 @@ public:
 	const float& GetHp() const { return m_hp; }
 
 private:
+	void Hit();
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();

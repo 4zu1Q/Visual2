@@ -181,7 +181,8 @@ Player::Player() :
 	m_radius(2),
 	m_posUp(kInitPos),
 	m_move(VGet(0, 0, 0)),
-	m_attackPos(VGet(0, 0, 0)),
+	m_attackXPos(VGet(0, 0, 0)),
+	m_attackYPos(VGet(0, 0, 0)),
 	m_attackDir(VGet(0, 0, 0)),
 	m_cameraToPlayerVec(VGet(0, 0, 0)),
 	m_cameraDirection(VGet(0, 0, 0)),
@@ -363,7 +364,18 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 		m_attackShockRadius = kNormalAttackShockRadius;
 	}
 
+	//if (IsAttackHit() && m_attackKind == e_PlayerAttackKind::kPlayerAttackX)
+	//{
 
+	//}
+	//if (IsAttackHit() && m_attackKind == e_PlayerAttackKind::kPlayerAttackX)
+	//{
+
+	//}
+	//if (IsAttackHit() && m_attackKind == e_PlayerAttackKind::kPlayerAttackX)
+	//{
+
+	//}
 
 	if (!m_isAttack)
 	{
@@ -459,7 +471,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	}
 
 	VECTOR attackMove = VScale(m_attackDir, 6.0f);
-	m_attackPos = VAdd(VGet(m_hitPos.x,m_hitPos.y - 5.0f,m_hitPos.z), attackMove);
+	m_attackXPos = VAdd(VGet(m_hitPos.x,m_hitPos.y - 5.0f,m_hitPos.z), attackMove);
 }
 
 void Player::Draw(PlayerWeapon& weapon)
@@ -470,15 +482,15 @@ void Player::Draw(PlayerWeapon& weapon)
 #ifdef _DEBUG
 
 	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_rigidbody.GetPos().x, m_rigidbody.GetPos().y, m_rigidbody.GetPos().z);
-	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackPos.x, m_attackPos.y, m_attackPos.z);
+	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackXPos.x, m_attackXPos.y, m_attackXPos.z);
 	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
 	DrawFormatString(0, 348, 0xffffff, "playerAngle:%f", m_angle);
 	DrawFormatString(0, 328, 0xffffff, "playerAngle:%d", GetIsJump());
 
 	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
-	DrawSphere3D(m_attackPos, m_attackXRadius, 16, 0xff00ff, 0xffffff, false);
-	DrawSphere3D(m_hitPos, m_attackYRadius, 16, 0xff00ff, 0xffffff, false);
-	DrawSphere3D(m_hitPos, m_attackShockRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_attackXPos, m_attackXRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_attackYPos, m_attackYRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_attackYPos, m_attackShockRadius, 16, 0xff00ff, 0xffffff, false);
 
 
 #endif
@@ -527,7 +539,7 @@ void Player::HitUpdate(VECTOR hitPos,VECTOR attackPos, VECTOR weaponPos, VECTOR 
 void Player::Hit()
 {
 	/* ボスの攻撃に当たった判定 */
-//ボスが攻撃アクションをしたかどうかの判定
+	//ボスが攻撃アクションをしたかどうかの判定
 	if (!m_isGameOver)
 	{
 		if (m_isBossAttack)
@@ -711,6 +723,7 @@ void Player::IdleUpdate()
 	//攻撃X
 	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
+
 		OnAttackX();
 		return;
 	}
@@ -2062,7 +2075,6 @@ void Player::AttackXUpdate()
 {
 	Hit();
 
-
 	m_stamina += kStaminaIncreaseSpeed;
 	auto pos = m_rigidbody.GetPos();
 	//EffectManager::GetInstance().CreateEffect("hitEffect", pos);
@@ -2562,7 +2574,6 @@ void Player::OnAttackCharge()
 	m_buttonKind = e_ButtonKind::kYbutton;
 
 	m_updateFunc = &Player::AttackCharge;
-
 }
 
 void Player::OnHitOneDamage()
@@ -2617,7 +2628,7 @@ void Player::OnFaceUse()
 	SoundManager::GetInstance().PlaySe("faceUseSe");
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("faceUseEffect", VGet(pos.x, pos.y, pos.z));
+	EffectManager::GetInstance().CreateEffect("faceUseEffect", VGet(pos.x, pos.y + 8.0f, pos.z));
 
 	m_pAnim->ChangeAnim(kAnimUseFace);
 	m_updateFunc = &Player::FaceUseUpdate;

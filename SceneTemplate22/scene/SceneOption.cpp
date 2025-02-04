@@ -28,21 +28,44 @@ namespace
 	constexpr int kPushWaitCount = 30;
 
 	//グラフの座標
-	const Vec2 kBgmPos = { 210.0f , 120.0f };
-	const Vec2 kSePos = { 210.0f , 240.0f };
-	const Vec2 kSensitivityPos = { 210.0f , 360.0f };
-	const Vec2 kFullScreenPos = { 210.0f , 480.0f };
+	const Vec2 kBgmPos = { 160.0f , 180.0f };
+	const Vec2 kSePos = { 160.0f , 300.0f };
+	const Vec2 kSensitivityPos = { 160.0f , 420.0f };
+	const Vec2 kFullScreenPos = { 160.0f , 540.0f };
 
 	//選択UIのポジション
-	const Vec2 kBgmSelectPos = { 130 , 130 };
-	const Vec2 kSeSelectPos = { 130 , 250 };
-	const Vec2 kSensitivitySelectPos = { 130 , 370 };
-	const Vec2 kFullScreenSelectPos = { 130 , 490 };
+	const Vec2 kBgmSelectPos = { 110 , 195 };
+	const Vec2 kSeSelectPos = { 110 , 315 };
+	const Vec2 kSensitivitySelectPos = { 110 , 430 };
+	const Vec2 kFullScreenSelectPos = { 110 , 550 };
 	
+	const Vec2 kTextBgmPosFront = { 1030 , 170 };
+	const Vec2 kTextBgmPosBack = { 1033 , 170 };
+
+	const Vec2 kTextSePosFront = { 1030 , 290 };
+	const Vec2 kTextSePosBack = { 1033 , 290 };
+
+	const Vec2 kTextSensitivityPosFront = { 1030 , 410 };
+	const Vec2 kTextSensitivityPosBack = { 1033 , 410 };
+
+	const Vec2 kBBackPos = { 1160 , 680 };
+	
+	const Vec2 kBgmBarPos = { 550 , 170 };
+	const Vec2 kSeBarPos = { 550 , 290 };
+	const Vec2 kSensitivityBarPos = { 550 , 410 };
+	const Vec2 kMathPos = { 550 , 530 };
+	
+	const Vec2 kPointBgmPos = { 550 , 174 };
+	const Vec2 kPointSePos = { 550 , 294 };
+	const Vec2 kPointSensitivityPos = { 550 , 414 };
+
+	const Vec2 kCheckPos = { 550 , 530 };
+
+
 	constexpr float kCursorSpeed = 0.05f;
 
 	//オプションの背景アルファ値
-	constexpr int kAlpha = 200;
+	constexpr int kAlpha = 220;
 
 	//使う画像の種類
 	enum e_Ui
@@ -72,6 +95,8 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_sensitivityScale(50),
 	m_isFullScreen(false)
 {
+	m_isToNextScene = false;
+
 	m_cursorPos = kBgmSelectPos;
 	m_targetCursorDownPos = kSeSelectPos;
 	m_targetCursorUpPos = kFullScreenSelectPos;
@@ -190,29 +215,29 @@ void SceneOption::Draw()
 
 	DrawGraph(0, 0, m_handles[kOptionBarH], true);
 
-	DrawGraph(510, 120, m_handles[kBarH], true);
-	DrawGraph(510, 240, m_handles[kBarH], true);
-	DrawGraph(510, 360, m_handles[kBarH], true);
-	DrawGraph(510, 480, m_handles[kMathH], true);
+	DrawGraph(kBgmBarPos.x, kBgmBarPos.y, m_handles[kBarH], true);
+	DrawGraph(kSeBarPos.x, kSeBarPos.y, m_handles[kBarH], true);
+	DrawGraph(kSensitivityBarPos.x, kSensitivityBarPos.y, m_handles[kBarH], true);
+	DrawGraph(kMathPos.x, kMathPos.y, m_handles[kMathH], true);
 
-	DrawGraph(510 + m_bgmScale * 3.68, 124, m_handles[kPointH], true);
-	DrawGraph(510 + m_seScale * 3.68, 244, m_handles[kPointH], true);
-	DrawGraph(510 + m_sensitivityScale * 3.68, 364, m_handles[kPointH], true);
+	DrawGraph(kPointBgmPos.x + m_bgmScale * 3.68, kPointBgmPos.y, m_handles[kPointH], true);
+	DrawGraph(kPointSePos.x + m_seScale * 3.68, kPointSePos.y, m_handles[kPointH], true);
+	DrawGraph(kPointSensitivityPos.x + m_sensitivityScale * 3.68, kPointSensitivityPos.y, m_handles[kPointH], true);
 
 	if (m_isFullScreen)
 	{
-		DrawGraph(510, 424, m_handles[kCheckH], true);
+		DrawGraph(kCheckPos.x, kCheckPos.y, m_handles[kCheckH], true);
 	}
 
-	DrawGraph(0, 685, m_handles[kBackH], true);
+	DrawGraph(kBBackPos.x, kBBackPos.y, m_handles[kBackH], true);
 
-	DrawFormatStringToHandle(963, 125, 0xa9a9a9, m_fontHandle, "%d", m_bgmScale);
-	DrawFormatStringToHandle(963, 245, 0xa9a9a9, m_fontHandle, "%d", m_seScale);
-	DrawFormatStringToHandle(963, 365, 0xa9a9a9, m_fontHandle, "%d", m_sensitivityScale);
+	DrawFormatStringToHandle(kTextBgmPosBack.x, kTextBgmPosBack.y, 0xa9a9a9, m_fontHandle, "%d", m_bgmScale);
+	DrawFormatStringToHandle(kTextSePosBack.x, kTextSePosBack.y, 0xa9a9a9, m_fontHandle, "%d", m_seScale);
+	DrawFormatStringToHandle(kTextSensitivityPosBack.x, kTextSensitivityPosBack.y, 0xa9a9a9, m_fontHandle, "%d", m_sensitivityScale);
 
-	DrawFormatStringToHandle(960, 125, 0xffffff, m_fontHandle, "%d", m_bgmScale);
-	DrawFormatStringToHandle(960, 245, 0xffffff, m_fontHandle, "%d", m_seScale);
-	DrawFormatStringToHandle(960, 365, 0xffffff, m_fontHandle, "%d", m_sensitivityScale);
+	DrawFormatStringToHandle(kTextBgmPosFront.x, kTextBgmPosFront.y, 0xffffff, m_fontHandle, "%d", m_bgmScale);
+	DrawFormatStringToHandle(kTextSePosFront.x, kTextSePosFront.y, 0xffffff, m_fontHandle, "%d", m_seScale);
+	DrawFormatStringToHandle(kTextSensitivityPosFront.x, kTextSensitivityPosFront.y, 0xffffff, m_fontHandle, "%d", m_sensitivityScale);
 
 	//カーソルの描画
 	DrawCursor();

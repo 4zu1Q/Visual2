@@ -117,11 +117,15 @@ BossRast::BossRast() :
 	m_playerAttackYPos = VGet(0, 0, 0);
 	m_playerShockPos = VGet(0, 0, 0);
 
-	m_playerAttackXRadius = 0.0f;
-	m_playerAttackYRadius = 0.0f;
-	m_playerShockRadius = 0.0f;
+	m_hitRadius = 8.0f;
+	m_normalAttackRadius = 3.0f;
+	m_weaponAttackRadius = 6.0f;
+	m_shockRadius = 15.0f;
 
 	m_isPlayerAttack = false;
+	m_isPlayerFace = false;
+
+	m_playerKind = e_PlayerKind::kNormalPlayer;
 
 	m_modelH = MV1LoadModel(kModelFilename);
 
@@ -181,11 +185,6 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
-	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
-	{
-		m_hp -= 40;
-	}
-
 	//プレイヤーとボスの距離を距離を求める
 	VECTOR toPlayer = VSub(m_playerPos, m_pos);
 	m_length = VSize(toPlayer);
@@ -195,6 +194,9 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
 
+	m_playerAttackKind = playerAttackKind;
+	m_playerKind = player.GetFaceKind();
+	m_isPlayerFace = player.GetIsFaceUse();
 
 	//auto pos = m_rigidbody.GetPos();
 
@@ -283,17 +285,17 @@ void BossRast::Hit()
 
 			if (!m_isHit)
 			{
-				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
+				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX)
 				{
 					OnHitOneDamage();
 				}
 
-				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
+				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
 				{
 					OnHitTwoDamage();
 				}
 
-				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
+				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
 				{
 					OnHitOneDamage();
 				}
@@ -536,6 +538,7 @@ void BossRast::Attack3Update()
 
 void BossRast::AvoidUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//プレイヤーへの向きを取得
@@ -591,6 +594,7 @@ void BossRast::HitTwoDamageUpdate()
 
 void BossRast::DownUpdate()
 {
+	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -681,7 +685,29 @@ void BossRast::OnAttackCoolTime()
 void BossRast::OnHitOneDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_hp -= 10.0f;
+
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
+	{
+		m_hp -= 15.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
+	{
+		m_hp -= 20.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+
+	if (!m_isPlayerFace)
+	{
+		m_hp -= 25.0f;
+	}
+
 	m_isHit = true;
 	m_isAttack = false;
 
@@ -694,7 +720,29 @@ void BossRast::OnHitOneDamage()
 void BossRast::OnHitTwoDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_hp -= 30.0f;
+
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
+	{
+		m_hp -= 80.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
+	{
+		m_hp -= 40.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
+	{
+		m_hp -= 40.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
+	{
+		m_hp -= 100.0f;
+	}
+
+	if (!m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+
 	m_isHit = true;
 	m_isAttack = false;
 

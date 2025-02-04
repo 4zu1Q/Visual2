@@ -97,6 +97,8 @@ BossSpeed::BossSpeed() :
 {
 
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
+	m_playerKind = e_PlayerKind::kNormalPlayer;
 
 	m_isClear = false;
 
@@ -116,6 +118,10 @@ BossSpeed::BossSpeed() :
 	m_attackPos = VGet(0, 0, 0);
 	m_shockAttackPos = VGet(0, 0, 0);
 	m_attackDir = VGet(0, 0, 0);
+
+	m_isPlayerAttack = false;
+	m_isPlayerFace = false;
+
 
 	m_modelH = MV1LoadModel(kModelFilename);
 
@@ -182,31 +188,9 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
 
+	m_playerAttackKind = playerAttackKind;
+	m_playerKind = player.GetFaceKind();
 
-	if (!m_isClear)
-	{
-		if (m_isPlayerAttack)
-		{
-
-			if (!m_isHit)
-			{
-				if (IsAttackXHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
-				{
-					OnHitOneDamage();
-				}
-
-				if (IsAttackYHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
-				{
-					OnHitTwoDamage();
-				}
-
-				if (IsShockAttackHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
-				{
-					OnHitOneDamage();
-				}
-			}
-		}
-	}
 
 	if (m_isHit)
 	{
@@ -296,8 +280,38 @@ void BossSpeed::SetPosDown(const VECTOR pos)
 	m_rigidbody.SetPos(pos);
 }
 
+void BossSpeed::Hit()
+{
+	if (!m_isClear)
+	{
+		if (m_isPlayerAttack)
+		{
+
+			if (!m_isHit)
+			{
+				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX)
+				{
+					OnHitOneDamage();
+				}
+
+				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
+				{
+					OnHitTwoDamage();
+				}
+
+				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
+				{
+					OnHitOneDamage();
+				}
+			}
+		}
+	}
+}
+
 void BossSpeed::IdleUpdate()
 {
+	Hit();
+
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionTime++;
 
@@ -353,6 +367,7 @@ void BossSpeed::IdleUpdate()
 
 void BossSpeed::DashUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//プレイヤーへの向きを取得
@@ -378,36 +393,11 @@ void BossSpeed::DashUpdate()
 		OnIdle();
 	}
 
-	//m_direction = VSub(m_playerPos, m_pos);
-
-	//m_direction = VNorm(m_direction);
-
-	//m_angle = atan2f(m_direction.x, m_direction.z);
-
-	////注視点の座標
-	//VECTOR playerAimPos = VGet(0.0f, 0.0f, 0.0f);
-	////ベクトルの方向(注視点-カメラのポジション)
-	//VECTOR posToAim = VSub(playerAimPos, m_pos);
-
-	//m_moveAngle += 0.05f;
-
-	//m_anglePos.x += cosf(m_moveAngle) * 24;
-	//m_anglePos.y += 0.0f;
-	//m_anglePos.z += sinf(m_moveAngle) * 24;
-
-	//m_anglePos = VNorm(m_anglePos);
-
-
-	//if (m_bossToPlayerLength < 160)
-	//{
-	//	OnPlayerToDash();
-	//}
-
-	//m_rigidbody.SetVelocity(m_anglePos);
 }
 
 void BossSpeed::PlayerToDashUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//プレイヤーへの向きを取得
@@ -457,6 +447,7 @@ void BossSpeed::PlayerToDashUpdate()
 
 void BossSpeed::HomePosDashUpdate()
 {
+	Hit();
 	//定位置の向きを取得
 	m_direction = VSub(m_homePos, m_pos);
 
@@ -479,6 +470,7 @@ void BossSpeed::HomePosDashUpdate()
 
 void BossSpeed::PreliminaryAttack1Update()
 {
+	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_pAnim->IsLoop())
 	{
@@ -491,6 +483,7 @@ void BossSpeed::PreliminaryAttack1Update()
 
 void BossSpeed::PreliminaryAttack2Update()
 {
+	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_pAnim->IsLoop())
 	{
@@ -503,6 +496,7 @@ void BossSpeed::PreliminaryAttack2Update()
 
 void BossSpeed::PreliminaryAttack3Update()
 {
+	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	if (m_pAnim->IsLoop())
 	{
@@ -515,6 +509,7 @@ void BossSpeed::PreliminaryAttack3Update()
 
 void BossSpeed::Attack1Update()
 {
+	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop() && m_isAvoidAction)
 	{
@@ -529,6 +524,7 @@ void BossSpeed::Attack1Update()
 
 void BossSpeed::Attack2Update()
 {
+	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop() && m_isAvoidAction)
 	{
@@ -543,6 +539,7 @@ void BossSpeed::Attack2Update()
 
 void BossSpeed::Attack3Update()
 {
+	Hit();
 	//アニメーションが終わったらクールタイム状態に入る
 	if (m_pAnim->IsLoop())
 	{
@@ -554,6 +551,7 @@ void BossSpeed::Attack3Update()
 
 void BossSpeed::AvoidUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//プレイヤーへの向きを取得
@@ -579,6 +577,7 @@ void BossSpeed::AvoidUpdate()
 
 void BossSpeed::AttackCoolTimeUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	if (m_actionTime > kCoolTimeToAvoidTime && m_isAvoidAction)
@@ -611,6 +610,7 @@ void BossSpeed::HitTwoDamageUpdate()
 
 void BossSpeed::DownUpdate()
 {
+	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -749,7 +749,29 @@ void BossSpeed::OnAttackCoolTime()
 void BossSpeed::OnHitOneDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_hp -= 10.0f;
+
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
+	{
+		m_hp -= 15.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
+	{
+		m_hp -= 20.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+
+	if (!m_isPlayerFace)
+	{
+		m_hp -= 25.0f;
+	}
+
 	m_isHit = true;
 	m_isAttack = false;
 
@@ -762,7 +784,29 @@ void BossSpeed::OnHitOneDamage()
 void BossSpeed::OnHitTwoDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_hp -= 30.0f;
+
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
+	{
+		m_hp -= 80.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
+	{
+		m_hp -= 40.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
+	{
+		m_hp -= 40.0f;
+	}
+	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
+	{
+		m_hp -= 100.0f;
+	}
+
+	if (!m_isPlayerFace)
+	{
+		m_hp -= 50.0f;
+	}
+
 	m_isHit = true;
 	m_isAttack = false;
 

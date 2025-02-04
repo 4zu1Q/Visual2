@@ -13,16 +13,6 @@ class AnimController;
 class WeaponBase;
 
 
-//プレイヤーの特殊攻撃の種類(顔の種類)
-enum class e_PlayerKind : int
-{
-	kPowerPlayer,		//パワー型
-	kSpeedPlayer,		//スピード型
-	kShotPlayer,		//ショット型
-	kRassPlayer,		//ラスボス型
-	kNormalPlayer,		//ノーマル型
-	kMax,				// 最大数
-};
 
 class Player : public CharaBase
 {
@@ -79,11 +69,11 @@ public:
 	void SetPosUp(const VECTOR pos) { m_posUp = pos; }
 
 	//プレイヤーの攻撃座標を取得
-	const VECTOR& GetAttackXPos() const { return m_attackPos; }
+	const VECTOR& GetAttackXPos() const { return m_attackXPos; }
 
-	const VECTOR& GetAttackYPos() const { return m_hitPos; }
+	const VECTOR& GetAttackYPos() const { return m_attackYPos; }
 
-	const VECTOR& GetShockPos() const { return m_hitPos; }
+	const VECTOR& GetShockPos() const { return m_attackYPos; }
 
 	const float& GetAttackXRadius() const { return m_attackXRadius; }
 
@@ -107,8 +97,8 @@ public:
 	const bool& GetIsStamina() const { return m_isStamina; }
 
 	//プレイヤーの顔の種類を取得
-	const e_PlayerKind& GetFaceKind() const { return m_playerKind; }
-	void SetFaceKind(const e_PlayerKind playerKind) { m_playerKind = playerKind; }
+	const Game::e_PlayerKind& GetFaceKind() const { return m_playerKind; }
+	void SetFaceKind(const Game::e_PlayerKind playerKind) { m_playerKind = playerKind; }
 
 	//カメラの方向を取得
 	void SetCameraDirection(VECTOR dir) { m_cameraDirection = dir; }
@@ -123,7 +113,7 @@ public:
 	//押しているボタンの種類
 	const e_ButtonKind& GetButtonKind() const { return m_buttonKind; }
 	//顔を使用しているかどうかを取得
-	const bool& GetIsFrame() const { return m_isFaceUse; }
+	const bool& GetIsFaceUse() const { return m_isFaceUse; }
 
 	//ゲームオーバーのフラグを取得
 	const bool& GetIsGameOver() const { return m_isGameOver; }
@@ -150,7 +140,7 @@ private:
 	bool IsShockAttackHit(VECTOR attackPos, float radius);
 
 	//プレイヤーの攻撃が当たっていたら
-	bool IsPlayerAttackHit(VECTOR hitPos, float attackRadius);
+	bool IsPlayerAttackHit(VECTOR attackPos, float attackRadius);
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
@@ -219,7 +209,7 @@ private:
 
 
 	//プレイヤーの顔の種類
-	e_PlayerKind m_playerKind;
+	Game::e_PlayerKind m_playerKind;
 	e_ButtonKind m_buttonKind;
 
 	//メンバ関数ポインタ
@@ -257,7 +247,8 @@ private:
 	VECTOR m_hitPos;
 	VECTOR m_bossPos;
 
-	VECTOR m_attackPos;
+	VECTOR m_attackXPos;
+	VECTOR m_attackYPos;
 	VECTOR m_attackDir;
 
 	VECTOR m_cameraToPlayerVec;

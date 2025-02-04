@@ -48,6 +48,8 @@ SceneGameOver::SceneGameOver(SceneManager& manager, Game::e_BossKind bossKind) :
 	m_cursorPos = kGamePlaySelectPos;
 	m_targetCursorPos = kSelectSelectPos;
 
+	m_isToNextScene = false;
+
 	m_isActionStart = false;
 	m_isActionBack = false;
 

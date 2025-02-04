@@ -18,8 +18,8 @@ namespace
 	const char* const kPushButtonBFileName = "Data/Image/ButtonB_Push.png";
 	const char* const kPushButtonXFileName = "Data/Image/ButtonX_Push.png";
 	const char* const kPushButtonYFileName = "Data/Image/ButtonY_Push.png";
-	const char* const kPushRBFileName = "Data/Image/RB_Push.png";
-	const char* const kPushLBFileName = "Data/Image/LB_Push.png";
+	const char* const kPushRBFileName = "Data/Image/RB2.png";
+	const char* const kPushLBFileName = "Data/Image/LB2.png";
 
 	//ボタンUIの配置座標
 	const Vec2 kButtonAPos = { 1145.0f , 222.0f };
@@ -114,6 +114,11 @@ void ButtonUi::Draw(Player& player)
 
 	}
 
+	if (player.GetIsFaceUse())
+	{
+		DrawGraph(kRBPos.x, kRBPos.y, m_pushButtonRBHandle, true);
+		DrawGraph(kLBPos.x, kLBPos.y, m_pushButtonLBHandle, true);
+	}
 
 
 	DrawGraph(kButtonPausePos.x, kButtonPausePos.y, m_buttonPauseHandle, true);

@@ -46,6 +46,8 @@ namespace
 SceneGameClear::SceneGameClear(SceneManager& manager) :
 	SceneBase(manager)
 {
+	m_isToNextScene = false;
+
 	m_isActionStart = false;
 	m_isActionBack = false;
 

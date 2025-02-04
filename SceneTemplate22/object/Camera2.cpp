@@ -30,12 +30,11 @@ Camera2::Camera2():
 	m_angleV(0.0f),
 	m_lightHandle(0),
 	m_angleMoveScale(0.0f),
-	m_cameraDistance(25.0f),
+	m_cameraDistance(35.0f),
 	m_isLockOn(false)
 {
+
 	m_pLockOnUi = std::make_shared<LockOnTargetUi>();
-
-
 
 }
 
@@ -115,7 +114,7 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 		// カメラの位置を更新
 		m_pos = VGet(
 			m_playerPos.x - m_cameraDistance * cosf(m_angleV) * sinf(m_angleH),
-			m_playerPos.y * 0.5f + 10.0f,
+			m_playerPos.y * 0.5f + 20.0f,
 			m_playerPos.z - m_cameraDistance * cosf(m_angleV) * cosf(m_angleH)
 		);
 

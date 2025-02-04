@@ -35,6 +35,17 @@ namespace Game
 	constexpr int kColorDepth = 32; //16 or 32
 
 
+	//プレイヤーの特殊攻撃の種類(顔の種類)
+	enum class e_PlayerKind : int
+	{
+		kPowerPlayer,		//パワー型
+		kSpeedPlayer,		//スピード型
+		kShotPlayer,		//ショット型
+		kRassPlayer,		//ラスボス型
+		kNormalPlayer,		//ノーマル型
+		kMax,				// 最大数
+	};
+
 	//ボスの種類
 	enum class e_BossKind
 	{

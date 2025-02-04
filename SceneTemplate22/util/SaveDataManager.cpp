@@ -39,9 +39,9 @@ void SaveDataManager::Load()
 	// クリアタイムを読み込む
 	FileRead_read(&m_info.clearTime, sizeof(int), fileHandle);
 	// 解放情報を読み込む
-	for (int i = 0; i < static_cast<int>(e_PlayerKind::kMax); i++)
+	for (int i = 0; i < static_cast<int>(Game::e_PlayerKind::kMax); i++)
 	{
-		e_PlayerKind kind = static_cast<e_PlayerKind>(i);
+		Game::e_PlayerKind kind = static_cast<Game::e_PlayerKind>(i);
 		bool isRelease;
 		FileRead_read(&isRelease, sizeof(bool), fileHandle);
 		m_info.isRelease[kind] = isRelease;
@@ -66,9 +66,9 @@ void SaveDataManager::Save() const
 	// クリアタイムを書き込む
 	fwrite(&m_info.clearTime, sizeof(int), 1, fp);
 	// 解放情報を書き込む
-	for (int i = 0; i < static_cast<int>(e_PlayerKind::kMax); i++)
+	for (int i = 0; i < static_cast<int>(Game::e_PlayerKind::kMax); i++)
 	{
-		e_PlayerKind kind = static_cast<e_PlayerKind>(i);
+		Game::e_PlayerKind kind = static_cast<Game::e_PlayerKind>(i);
 		bool isRelease = m_info.isRelease.at(kind);
 		fwrite(&isRelease, sizeof(bool), 1, fp);
 	}
@@ -83,9 +83,9 @@ void SaveDataManager::Init()
 	// クリアタイムを初期化
 	m_info.clearTime = 0;
 	// 解放情報を初期化
-	for (int i = 0; i < static_cast<int>(e_PlayerKind::kMax); i++)
+	for (int i = 0; i < static_cast<int>(Game::e_PlayerKind::kMax); i++)
 	{
-		e_PlayerKind kind = static_cast<e_PlayerKind>(i);
+		Game::e_PlayerKind kind = static_cast<Game::e_PlayerKind>(i);
 		m_info.isRelease[kind] = false;
 	}
 }

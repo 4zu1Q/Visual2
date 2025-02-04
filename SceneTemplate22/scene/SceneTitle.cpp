@@ -86,6 +86,7 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_isActionStart = false;
 	m_isActionBack = false;
 
+	m_isToNextScene = false;
 
 	m_pPlayerProduction = std::make_shared<PlayerProduction>();
 	m_pCameraProduction = std::make_shared<CameraProduction>();

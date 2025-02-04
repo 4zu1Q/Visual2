@@ -67,6 +67,8 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	m_selectTime(0),
 	m_cameraAngle(0.0f)
 {
+	m_isToNextScene = false;
+
 	m_isCameraLockOn = true;
 
 	m_isPowerTriangl = false;
@@ -168,21 +170,12 @@ void SceneGamePlay::Update()
 	UpdateFadeSelectGraph();
 	EffectManager::GetInstance().Update();
 
-
 #ifdef _DEBUG
 	MyLib::DebugDraw::Draw();
 #endif
 
 #ifdef _DEBUG
 	MyLib::DebugDraw::Clear();
-#endif
-
-#ifdef _DEBUG
-	//デバッグに遷移する
-	if (Pad::IsPress PAD_INPUT_1 && Pad::IsPress PAD_INPUT_2)
-	{
-
-	}
 #endif
 
 	//ボスのHPバーのアップデート処理
@@ -230,11 +223,6 @@ void SceneGamePlay::Update()
 		m_gameOverTime++;
 	}
 
-	//if (m_pBossPower->GetIsClear() || m_pBossSpeed->GetIsClear() || m_pBossShot->GetIsClear())
-	//{
-	//	m_gameClearTime++;
-	//}
-
 	if (m_pBossRast->GetIsClear())
 	{
 		m_isCameraLockOn = false;
@@ -244,16 +232,9 @@ void SceneGamePlay::Update()
 	//ゲームオーバー時間が過ぎたら
 	if (m_gameOverTime > 240)
 	{
-		m_isToNextScene = true;
 		StartFadeOut();
+		m_isToNextScene = true;
 		SoundManager::GetInstance().StopBgm("battleBgm");
-
-		//なんか入らん後でやる
-		//if (!IsFadingOut())
-		{
-			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
-			return;
-		}
 	}
 
 	if (!IsFading())
@@ -279,11 +260,9 @@ void SceneGamePlay::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectTransSe");
 				SoundManager::GetInstance().StopBgm("stageClearBgm");
-				m_isToNextScene = true;
 				StartFadeOut();
+				m_isToNextScene = true;
 
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
-				return;
 			}
 		}
 	}
@@ -301,8 +280,8 @@ void SceneGamePlay::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectTransSe");
 				SoundManager::GetInstance().StopBgm("stageClearBgm");
-				m_isToNextScene = true;
 				StartFadeOut();
+				m_isToNextScene = true;
 
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
 				return;
@@ -323,8 +302,8 @@ void SceneGamePlay::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectTransSe");
 				SoundManager::GetInstance().StopBgm("stageClearBgm");
-				m_isToNextScene = true;
 				StartFadeOut();
+				m_isToNextScene = true;
 
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
 				return;
@@ -337,11 +316,8 @@ void SceneGamePlay::Update()
 	{
 		SoundManager::GetInstance().StopBgm("battleBgm");
 
-		m_isToNextScene = true;
 		StartFadeOut();
-
-		m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
-		return;
+		m_isToNextScene = true;
 	}
 
 	//ボスのアップデート処理
@@ -398,7 +374,7 @@ void SceneGamePlay::Update()
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
-		//if (!IsFadingOut())
+		if (!IsFadingOut())
 		{
 			//フェードさせるやつ
 			if (m_pPlayer->GetIsGameOver())
@@ -407,16 +383,29 @@ void SceneGamePlay::Update()
 				return;
 			}
 
-			//else if (m_pBossSpeed->GetIsClear())
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
-			//	return;
-			//}
-			//else if (m_pBossShot->GetIsClear())
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
-			//	return;
-			//}
+			if (m_pBossPower->GetIsClear())
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				return;
+			}
+
+			if (m_pBossSpeed->GetIsClear())
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				return;
+			}
+
+			if (m_pBossShot->GetIsClear())
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				return;
+			}
+
+			if (m_pBossRast->GetIsClear())
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
+				return;
+			}
 		}
 	}
 
@@ -471,16 +460,17 @@ void SceneGamePlay::Draw()
 
 	EffectManager::GetInstance().Draw();
 
-
 	//クリアしたときのみ白いフェードにしておく
 	if (m_pBossPower->GetIsClear() || m_pBossSpeed->GetIsClear() || m_pBossShot->GetIsClear() || m_pBossRast->GetIsClear())
 	{
 		DrawFade(0xffffff);
 	}
+	else
+	{
+		DrawFade(0x000000);
+	}
 
 
-
-	DrawFade(0x000000);
 
 #ifdef _DEBUG
 

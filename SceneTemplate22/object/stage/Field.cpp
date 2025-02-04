@@ -10,8 +10,8 @@ namespace
 	const char* const kShadowFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
 	{
 		"Data/Model/Stage/TitleStage.mv1",
-		"Data/Model/Stage/Stage.mv1",
-		"Data/Model/Stage/Field07.mv1",
+		"Data/Model/Stage/SelectStage.mv1",
+		"Data/Model/Stage/BattleStage.mv1",
 	};
 
 	//ステージのスケール値

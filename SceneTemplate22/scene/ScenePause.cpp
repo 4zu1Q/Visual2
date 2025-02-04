@@ -23,7 +23,7 @@ namespace
 	const Vec2 kOptionPos = { 160.0f , 300.0f };
 	const Vec2 kSelectPos = { 160.0f , 420.0f };
 	const Vec2 kTitlePos = { 160.0f , 540.0f };
-	const Vec2 kBackPos = { 0.0f , 685.0f };
+	const Vec2 kBackPos = { 1160.0f , 680.0f };
 
 	//選択UIのポジション
 	const Vec2 kReStartSelectPos = { 110 , 195 };
@@ -60,6 +60,8 @@ ScenePause::ScenePause(SceneManager& manager) :
 	m_cursorPos = kReStartSelectPos;
 	m_targetCursorDownPos = kOptionSelectPos;
 	m_targetCursorUpPos = kTitleSelectPos;
+
+	m_isToNextScene = false;
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/Pause.png"));
@@ -181,14 +183,14 @@ void ScenePause::Update()
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
-				m_isToNextScene = true;
 				StartFadeOut();	//フェードアウト開始
+				m_isToNextScene = true;
 			}
 			if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
-				m_isToNextScene = true;
 				StartFadeOut();	//フェードアウト開始
+				m_isToNextScene = true;
 				SaveDataManager::GetInstance().Save(); //セーブデータの保存
 			}
 		}

@@ -15,15 +15,14 @@ namespace
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Boss/BossShot.mv1";
 	const char* const kWeaponModelFilename = "Data/Model/Weapon/Player_MagicWand.mv1";
+
 	//モデルのスケール値
 	constexpr float kModelScale = 10.0f;
 
 	constexpr float kWalkSpeed = 0.4f;
 	constexpr float kDashSpeed = 0.7f;
 
-
 	constexpr float kAvoidSpeed = 3.0f;
-
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,20.0f,200.0f };
@@ -97,7 +96,10 @@ BossShot::BossShot() :
 	m_isClear = false;
 
 	m_avoidKind = e_AvoidKind::kFront;
+
+	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_playerKind = e_PlayerKind::kNormalPlayer;
 
 	m_isAttack = false;
 	m_isShock = false;
@@ -131,7 +133,6 @@ BossShot::BossShot() :
 
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
-	//auto circleColliderData = dynamic_cast<MyLib::ColliderDataSphere*>();
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = 6.5f;
 
@@ -205,6 +206,9 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
 
+	m_playerAttackKind = playerAttackKind;
+	m_playerKind = player.GetFaceKind();
+
 	m_dashFrontPos.y = m_pos.y;
 	m_dashBackPos.y = m_pos.y;
 	m_dashRightPos.y = m_pos.y;
@@ -226,31 +230,6 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 
 	VECTOR toAvoidLeft = VSub(m_dashLeftPos, m_pos);
 	m_avoidLeftLength = VSize(toAvoidLeft);
-
-	if (!m_isClear)
-	{
-		if (m_isPlayerAttack)
-		{
-
-			if (!m_isHit)
-			{
-				if (IsAttackXHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX);
-				{
-					OnHitOneDamage();
-				}
-
-				if (IsAttackYHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY);
-				{
-					OnHitTwoDamage();
-				}
-
-				if (IsShockAttackHit() == true && playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock);
-				{
-					OnHitOneDamage();
-				}
-			}
-		}
-	}
 
 	if (m_isHit)
 	{
@@ -304,8 +283,6 @@ void BossShot::Draw()
 	MV1DrawModel(m_modelH);
 	MV1DrawModel(m_weaponModelH);
 
-
-
 #ifdef _DEBUG
 
 	DrawFormatString(0, 280, 0xff0fff, "ShotBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
@@ -349,8 +326,37 @@ void BossShot::SetPosDown(const VECTOR pos)
 	m_rigidbody.SetPos(pos);
 }
 
+void BossShot::Hit()
+{
+	if (!m_isClear)
+	{
+		if (m_isPlayerAttack)
+		{
+
+			if (!m_isHit)
+			{
+				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX)
+				{
+					OnHitOneDamage();
+				}
+
+				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
+				{
+					OnHitTwoDamage();
+				}
+
+				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
+				{
+					OnHitOneDamage();
+				}
+			}
+		}
+	}
+}
+
 void BossShot::IdleUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//auto pos = m_rigidbody.GetPos();
@@ -486,6 +492,7 @@ void BossShot::IdleUpdate()
 
 void BossShot::Attack1Update()
 {
+	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -497,6 +504,7 @@ void BossShot::Attack1Update()
 
 void BossShot::Attack2Update()
 {
+	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
@@ -507,6 +515,7 @@ void BossShot::Attack2Update()
 
 void BossShot::Attack3Update()
 {
+	Hit();
 	//アニメーションが終わったらクールタイム状態に入る
 	if (m_pAnim->IsLoop())
 	{
@@ -517,6 +526,7 @@ void BossShot::Attack3Update()
 
 void BossShot::DashFrontUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//プレイヤーへの向きを取得
@@ -548,6 +558,7 @@ void BossShot::DashFrontUpdate()
 
 void BossShot::DashBackUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//プレイヤーへの向きを取得
@@ -570,15 +581,12 @@ void BossShot::DashBackUpdate()
 	{
 		OnIdle();
 	}
-	//else if (m_dashBackLength > 40 && m_actionTime > kAvoidToIdleTime)
-	//{
-	//	//OnAvoidCoolTime();
-	//	OnDashBack();
-	//}
+
 }
 
 void BossShot::DashRightUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//移動先の向きを取得
@@ -601,16 +609,12 @@ void BossShot::DashRightUpdate()
 	{
 		OnIdle();
 	}
-	//else if (m_dashRightLength > 40 && m_actionTime > kAvoidToIdleTime)
-	//{
-	//	//OnAvoidCoolTime();
-	//	OnDashRight();
-	//}
 
 }
 
 void BossShot::DashLeftUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	//プレイヤーへの向きを取得
@@ -633,15 +637,12 @@ void BossShot::DashLeftUpdate()
 	{
 		OnIdle();
 	}
-	//else if(m_avoidLeftLength > 40 && m_actionTime > kAvoidToIdleTime)
-	//{
-	//	//OnAvoidCoolTime();
-	//	OnDashLeft();
-	//}
+
 }
 
 void BossShot::AttackCoolTimeUpdate()
 {
+	Hit();
 	m_actionTime++;
 
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
@@ -674,6 +675,7 @@ void BossShot::HitTwoDamageUpdate()
 
 void BossShot::DownUpdate()
 {
+	Hit();
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())

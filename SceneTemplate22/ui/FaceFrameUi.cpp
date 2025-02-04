@@ -31,7 +31,7 @@ void FaceFrameUi::Update()
 
 void FaceFrameUi::Draw(Player& player)
 {
-	if (!player.GetIsFrame())
+	if (!player.GetIsFaceUse())
 	{
 		DrawGraph(kFaceFramePos.x, kFaceFramePos.y, m_faceFrameHandle, true);
 	}
