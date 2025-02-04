@@ -194,6 +194,14 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
 
+	m_hitPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
+
+	VECTOR attackMove = VScale(m_attackDir, 12.0f);
+	VECTOR shockAttackMove = VScale(m_attackDir, 20.0f);
+	m_attackPos = VAdd(m_hitPos, attackMove);
+	m_shockAttackPos = VAdd(m_hitPos, shockAttackMove);
+
 	m_playerAttackKind = playerAttackKind;
 	m_playerKind = player.GetFaceKind();
 	m_isPlayerFace = player.GetIsFaceUse();
@@ -212,7 +220,7 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 60)
+	if (m_damageFrame >= 180)
 	{
 		m_isHit = false;
 	}
@@ -248,6 +256,17 @@ void BossRast::Draw()
 	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
 	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
 	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0x0000ff, 0xffffff, false);
+
+	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0xff00ff, 0xffffff, false);
+
+	if (m_isAttack)
+	{
+		if (m_attackKind == Game::e_BossAttackKind::kBossAttack) DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_BossAttackKind::kBossWeapon) DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_BossAttackKind::kBossShock) DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0xffff00, 0xffffff, false);
+	}
 
 #endif // DEBUG
 

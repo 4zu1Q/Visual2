@@ -364,39 +364,21 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 		m_attackShockRadius = kNormalAttackShockRadius;
 	}
 
-	//if (IsAttackHit() && m_attackKind == e_PlayerAttackKind::kPlayerAttackX)
-	//{
 
+	//if (m_isAttackY)
+	//{
+	//	m_shockFrame++;
 	//}
-	//if (IsAttackHit() && m_attackKind == e_PlayerAttackKind::kPlayerAttackX)
+	//else
 	//{
-
-	//}
-	//if (IsAttackHit() && m_attackKind == e_PlayerAttackKind::kPlayerAttackX)
-	//{
-
+	//	m_shockFrame = 0;
 	//}
 
-	if (!m_isAttack)
-	{
-
-	}
-
-
-	if (m_isAttackY)
-	{
-		m_shockFrame++;
-	}
-	else
-	{
-		m_shockFrame = 0;
-	}
-
-	if (m_shockFrame == 120)
-	{
-		m_attackKind = Game::e_PlayerAttackKind::kPlayerShock;
-		m_isAttackY = false;
-	}
+	//if (m_shockFrame == 120)
+	//{
+	//	m_attackKind = Game::e_PlayerAttackKind::kPlayerShock;
+	//	m_isAttackY = false;
+	//}
 
 	//ヒットした場合の処理
 	if (m_isHit)
@@ -416,8 +398,30 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 
 	//プレイヤーの座標を代入
 	m_pos = m_rigidbody.GetPos();
+
+	//ヒット座標
 	m_hitPos = VGet(m_pos.x, m_pos.y + 9.0f, m_pos.z);
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
+
+	//攻撃X座標
+	VECTOR attackMove = VScale(m_attackDir, 7.0f);
+	m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), attackMove);
+
+	//通常状態の攻撃Y座標(スピードタイプ以外はチャージあり)
+	if (!m_isFaceUse)
+	{
+		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+	}
+	//攻撃Y座標(スピードタイプ以外はチャージあり)
+	else if (m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+	}
+	//攻撃Y(スピードタイプのみショートカット)
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), attackMove);
+	}
 
 	//ボスの座標を代入
 	m_isLockOn = isLockOn;
@@ -470,8 +474,6 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 		m_isStamina = false;
 	}
 
-	VECTOR attackMove = VScale(m_attackDir, 6.0f);
-	m_attackXPos = VAdd(VGet(m_hitPos.x,m_hitPos.y - 5.0f,m_hitPos.z), attackMove);
 }
 
 void Player::Draw(PlayerWeapon& weapon)
@@ -488,9 +490,18 @@ void Player::Draw(PlayerWeapon& weapon)
 	DrawFormatString(0, 328, 0xffffff, "playerAngle:%d", GetIsJump());
 
 	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+
 	DrawSphere3D(m_attackXPos, m_attackXRadius, 16, 0xff00ff, 0xffffff, false);
 	DrawSphere3D(m_attackYPos, m_attackYRadius, 16, 0xff00ff, 0xffffff, false);
 	DrawSphere3D(m_attackYPos, m_attackShockRadius, 16, 0xff00ff, 0xffffff, false);
+
+	if (m_isAttack)
+	{
+		if (m_attackKind == Game::e_PlayerAttackKind::kPlayerAttackX) DrawSphere3D(m_attackXPos, m_attackXRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_PlayerAttackKind::kPlayerAttackY) DrawSphere3D(m_attackYPos, m_attackYRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_PlayerAttackKind::kPlayerShock) DrawSphere3D(m_attackYPos, m_attackShockRadius, 16, 0xffff00, 0xffffff, false);
+	}
+
 
 
 #endif
@@ -2376,6 +2387,7 @@ void Player::OnIdle()
 	m_frame = 0;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimIdle, kAnimIdle, kAnimIdle, kAnimIdle);
@@ -2389,6 +2401,7 @@ void Player::OnLockOnIdle()
 	m_frame = 0;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimIdle, kAnimIdle, kAnimIdle, kAnimIdle);
@@ -2400,6 +2413,7 @@ void Player::OnWalk()
 {
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimWalk, kAnimWalk, kAnimWalk, kAnimWalk);
+	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	m_updateFunc = &Player::WalkUpdate;
 }
@@ -2408,6 +2422,7 @@ void Player::OnLockOnWalk()
 {
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimLockOnWalk, kAnimLockOnWalk, kAnimLockOnWalk, kAnimLockOnWalk);
+	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	m_updateFunc = &Player::LockOnWalkUpdate;
 }
@@ -2416,6 +2431,7 @@ void Player::OnDash()
 {
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimDash, kAnimDash, kAnimDash, kAnimDash);
+	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kAbutton;

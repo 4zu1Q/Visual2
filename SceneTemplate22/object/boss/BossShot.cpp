@@ -54,9 +54,9 @@ namespace
 	constexpr float kMaxHp = 400.0f;
 
 	//次の状態に遷移するまでの時間
-	constexpr float kIdleToAttackTime = 60.0f;
+	constexpr float kIdleToAttackTime = 30.0f;
 	constexpr float kIdleToDashTime = 70.0f;
-	constexpr float kCoolTimeToIdleTime = 120.0f;
+	constexpr float kCoolTimeToIdleTime = 60.0f;
 	constexpr float kAvoidToIdleTime = 29.0f;
 
 	//次の状態に遷移するまでのプレイヤーとの長さ
@@ -240,7 +240,7 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 60)
+	if (m_damageFrame >= 90)
 	{
 		m_isHit = false;
 	}
@@ -294,9 +294,17 @@ void BossShot::Draw()
 	DrawFormatString(0, 468, 0xff0fff, "L:%f", m_avoidLeftLength);
 
 	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+
 	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
-	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
-	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0x0000ff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0xff00ff, 0xffffff, false);
+
+	if (m_isAttack)
+	{
+		if (m_attackKind == Game::e_BossAttackKind::kBossAttack) DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_BossAttackKind::kBossWeapon) DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_BossAttackKind::kBossShock) DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0xffff00, 0xffffff, false);
+	}
 
 #endif // DEBUG
 

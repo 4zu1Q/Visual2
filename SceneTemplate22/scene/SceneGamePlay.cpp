@@ -220,7 +220,12 @@ void SceneGamePlay::Update()
 	//プレイヤーのゲームオーバーフラグがtrueの場合
 	if (m_pPlayer->GetIsGameOver())
 	{
+		m_isCameraLockOn = false;
 		m_gameOverTime++;
+
+		SoundManager::GetInstance().StopBgm("battleBgm");
+		StartFadeOut();
+		m_isToNextScene = true;
 	}
 
 	if (m_pBossRast->GetIsClear())
@@ -230,11 +235,11 @@ void SceneGamePlay::Update()
 	}
 
 	//ゲームオーバー時間が過ぎたら
-	if (m_gameOverTime > 240)
+	if (m_gameOverTime > 180)
 	{
-		StartFadeOut();
-		m_isToNextScene = true;
-		SoundManager::GetInstance().StopBgm("battleBgm");
+		//SoundManager::GetInstance().StopBgm("battleBgm");
+		//StartFadeOut();
+		//m_isToNextScene = true;
 	}
 
 	if (!IsFading())
@@ -283,8 +288,8 @@ void SceneGamePlay::Update()
 				StartFadeOut();
 				m_isToNextScene = true;
 
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
-				return;
+				//m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				//return;
 			}
 		}
 	}
@@ -305,8 +310,8 @@ void SceneGamePlay::Update()
 				StartFadeOut();
 				m_isToNextScene = true;
 
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
-				return;
+				//m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				//return;
 			}
 		}
 	}

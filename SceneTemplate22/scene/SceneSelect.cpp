@@ -356,24 +356,24 @@ void SceneSelect::Draw()
 		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kRastH], true);
 
-		DrawGraph(kHitStarPos.x - 25, kHitStarPos.y + 10, m_handles[kNoClearItemH], true);
-		DrawGraph(kHitStarPos.x, kHitStarPos.y - 30, m_handles[kNoClearItemH], true);
-		DrawGraph(kHitStarPos.x + 25, kHitStarPos.y + 10, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitStarPos.x - 25, kHitStarPos.y - 40, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitStarPos.x, kHitStarPos.y - 80, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitStarPos.x + 25, kHitStarPos.y - 40, m_handles[kNoClearItemH], true);
 
 		//条件を満たしていた場合していた場合
 		//if ()
 		{
-			DrawGraph(kHitStarPos.x - 25, kHitStarPos.y + 10, m_handles[kPowerClearItemH], true);
+			DrawGraph(kHitStarPos.x - 25, kHitStarPos.y - 40, m_handles[kPowerClearItemH], true);
 		}
 
 		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kShotPlayer))
 		{
-			DrawGraph(kHitStarPos.x, kHitStarPos.y - 30, m_handles[kShotClearItemH], true);
+			DrawGraph(kHitStarPos.x, kHitStarPos.y - 80, m_handles[kShotClearItemH], true);
 		}
 
 		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kSpeedPlayer))
 		{
-			DrawGraph(kHitStarPos.x + 25, kHitStarPos.y + 10, m_handles[kSpeedClearItemH], true);
+			DrawGraph(kHitStarPos.x + 25, kHitStarPos.y - 40 , m_handles[kSpeedClearItemH], true);
 		}
 
 

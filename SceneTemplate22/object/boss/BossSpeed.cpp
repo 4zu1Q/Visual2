@@ -250,9 +250,17 @@ void BossSpeed::Draw()
 
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+
 	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
-	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
-	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0x0000ff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0xff00ff, 0xffffff, false);
+
+	if (m_isAttack)
+	{
+		if (m_attackKind == Game::e_BossAttackKind::kBossAttack) DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_BossAttackKind::kBossWeapon) DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_BossAttackKind::kBossShock) DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0xffff00, 0xffffff, false);
+	}
 
 #endif // DEBUG
 
@@ -760,7 +768,7 @@ void BossSpeed::OnHitOneDamage()
 	}
 	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
 	{
-		m_hp -= 20.0f;
+		m_hp -= 10.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
 	{
@@ -769,7 +777,7 @@ void BossSpeed::OnHitOneDamage()
 
 	if (!m_isPlayerFace)
 	{
-		m_hp -= 25.0f;
+		m_hp -= 20.0f;
 	}
 
 	m_isHit = true;

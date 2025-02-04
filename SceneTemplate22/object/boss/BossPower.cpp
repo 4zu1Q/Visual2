@@ -26,7 +26,7 @@ namespace
 
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 0.0f,15.0f,200.0f };
+	constexpr VECTOR kInitPos = { 0.0f,13.0f,200.0f };
 
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
@@ -55,9 +55,9 @@ namespace
 	constexpr float kMaxHp = 400.0f;
 
 	//次の状態に遷移するまでの時間
-	constexpr float kIdleToAttackTime = 40.0f;
-	constexpr float kIdleToAvoidTime = 90.0f;
-	constexpr float kCoolTimeToAvoidTime = 120.0f;
+	constexpr float kIdleToAttackTime = 20.0f;
+	constexpr float kIdleToAvoidTime = 35.0f;
+	constexpr float kCoolTimeToAvoidTime = 60.0f;
 	constexpr float kAvoidToIdleTime = 29.0f;
 
 	//次の状態に遷移するまでのプレイヤーとの長さ
@@ -197,7 +197,7 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 60)
+	if (m_damageFrame >= 120)
 	{
 		m_isHit = false;
 	}
@@ -246,9 +246,17 @@ void BossPower::Draw()
 
 
 	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+
 	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
-	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
-	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0x0000ff, 0xffffff, false);
+	DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xff00ff, 0xffffff, false);
+	DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0xff00ff, 0xffffff, false);
+
+	if (m_isAttack)
+	{
+		if (m_attackKind == Game::e_BossAttackKind::kBossAttack) DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_BossAttackKind::kBossWeapon) DrawSphere3D(m_attackPos, m_weaponAttackRadius, 16, 0xffff00, 0xffffff, false);
+		if (m_attackKind == Game::e_BossAttackKind::kBossShock) DrawSphere3D(m_shockAttackPos, m_shockRadius, 16, 0xffff00, 0xffffff, false);
+	}
 
 #endif // DEBUG
 
@@ -452,7 +460,7 @@ void BossPower::PreliminaryAttack1Update()
 
 	m_preliminaryActionFrame++;
 
-	if (m_preliminaryActionFrame > 30)
+	if (m_preliminaryActionFrame > 15)
 	{
 		OnAttack1();
 	}
@@ -466,7 +474,7 @@ void BossPower::PreliminaryAttack2Update()
 
 	m_preliminaryActionFrame++;
 
-	if (m_preliminaryActionFrame > 30)
+	if (m_preliminaryActionFrame > 15)
 	{
 		OnAttack2();
 	}
@@ -480,7 +488,7 @@ void BossPower::PreliminaryAttack3Update()
 
 	m_preliminaryActionFrame++;
 
-	if (m_preliminaryActionFrame > 30)
+	if (m_preliminaryActionFrame > 15)
 	{
 		OnAttack3();
 	}
@@ -495,7 +503,6 @@ void BossPower::Attack1Update()
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
-		m_isAttack = false;
 		OnIdle();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
@@ -510,7 +517,6 @@ void BossPower::Attack2Update()
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
-		m_isAttack = false;
 		OnIdle();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f,0.0f,0.0f));
@@ -525,7 +531,7 @@ void BossPower::Attack3Update()
 	//アニメーションが終わったらクールタイム状態に入る
 	if (m_pAnim->IsLoop())
 	{
-		m_isAttack = false;
+		m_isAttack = true;
 		OnAttackCoolTime();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
@@ -620,11 +626,12 @@ void BossPower::DeadUpdate()
 	}
 }
 
-
 void BossPower::OnIdle()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_isAttack = false;
 
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -633,6 +640,10 @@ void BossPower::OnIdle()
 
 void BossPower::OnWalk()
 {
+
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_isAttack = false;
+
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimWalk);
 	m_updateFunc = &BossPower::WalkUpdate;
@@ -640,6 +651,10 @@ void BossPower::OnWalk()
 
 void BossPower::OnDash()
 {
+	m_isAttack = false;
+
+
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDash);
 	m_updateFunc = &BossPower::DashUpdate;
@@ -648,8 +663,10 @@ void BossPower::OnDash()
 void BossPower::OnPreliminaryAttack1()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_isAttack = false;
 
 
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -659,8 +676,10 @@ void BossPower::OnPreliminaryAttack1()
 void BossPower::OnPreliminaryAttack2()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_isAttack = false;
 
 
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -670,8 +689,10 @@ void BossPower::OnPreliminaryAttack2()
 void BossPower::OnPreliminaryAttack3()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_isAttack = false;
 
 
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -688,7 +709,7 @@ void BossPower::OnAttack1()
 	m_preliminaryActionFrame = 0;
 	m_isAttack = true;
 
-	m_attackKind = Game::e_BossAttackKind::kBossAttack;
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
 	m_updateFunc = &BossPower::Attack1Update;
@@ -704,7 +725,7 @@ void BossPower::OnAttack2()
 	m_preliminaryActionFrame = 0;
 	m_isAttack = true;
 
-	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
+	m_attackKind = Game::e_BossAttackKind::kBossAttack;
 
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
 	m_updateFunc = &BossPower::Attack2Update;
@@ -718,9 +739,8 @@ void BossPower::OnAttack3()
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_preliminaryActionFrame = 0;
-	m_isAttack = true;
 
-	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
+	m_attackKind = Game::e_BossAttackKind::kBossShock;
 
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updateFunc = &BossPower::Attack3Update;
@@ -728,6 +748,8 @@ void BossPower::OnAttack3()
 
 void BossPower::OnAvoid()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_isAttack = false;
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimAvoid, true, true, false);
@@ -738,6 +760,8 @@ void BossPower::OnAttackCoolTime()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_isAttack = false;
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
@@ -750,7 +774,7 @@ void BossPower::OnHitOneDamage()
 
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
 	{
-		m_hp -= 50.0f;
+		m_hp -= 30.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
 	{
@@ -758,7 +782,7 @@ void BossPower::OnHitOneDamage()
 	}
 	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
 	{
-		m_hp -= 20.0f;
+		m_hp -= 10.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
 	{
@@ -767,15 +791,16 @@ void BossPower::OnHitOneDamage()
 
 	if (!m_isPlayerFace)
 	{
-		m_hp -= 25.0f;
+		m_hp -= 20.0f;
 	}
 
 	
 	m_isHit = true;
 	m_isAttack = false;
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossPower::HitOneDamageUpdate;
 }
@@ -808,9 +833,10 @@ void BossPower::OnHitTwoDamage()
 
 	m_isHit = true;
 	m_isAttack = false;
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossPower::HitTwoDamageUpdate;
 }
@@ -818,6 +844,8 @@ void BossPower::OnHitTwoDamage()
 void BossPower::OnDown()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_isAttack = false;
 
 	m_actionKind = 0;
 	m_actionTime = 0;
@@ -827,6 +855,8 @@ void BossPower::OnDown()
 
 void BossPower::OnDead()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_isAttack = false;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
