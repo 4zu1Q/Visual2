@@ -84,12 +84,12 @@ BossRast::BossRast() :
 	m_nextAngle(0.0f),
 	m_length(0.0f),
 	m_actionTime(0),
-	m_isAttack(false),
 	m_actionKind(0),
-	m_hp(350.0f)
+	m_hp(400.0f)
 {
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
+	m_playerKind = e_PlayerKind::kNormalPlayer;
 
 	m_isClear = false;
 
@@ -100,6 +100,7 @@ BossRast::BossRast() :
 	m_downCountDown = 0;
 	m_damageFrame = 0;
 	m_preliminaryActionFrame = 0;
+	m_attackFrame = 0;
 
 	m_hitRadius = 8.0f;
 	m_normalAttackRadius = 3.0f;
@@ -125,7 +126,6 @@ BossRast::BossRast() :
 	m_isPlayerAttack = false;
 	m_isPlayerFace = false;
 
-	m_playerKind = e_PlayerKind::kNormalPlayer;
 
 	m_modelH = MV1LoadModel(kModelFilename);
 
@@ -193,7 +193,6 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
-
 	m_hitPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
@@ -374,6 +373,9 @@ void BossRast::IdleUpdate()
 
 	SmoothAngle(m_angle, m_nextAngle);
 
+	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
+	m_attackDir = VNorm(m_attackDir);
+
 	VECTOR move;
 	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
@@ -413,6 +415,9 @@ void BossRast::WalkUpdate()
 		OnDash();
 	}
 
+
+	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
+	m_attackDir = VNorm(m_attackDir);
 }
 
 void BossRast::DashUpdate()
@@ -451,7 +456,7 @@ void BossRast::PreliminaryAttack1Update()
 
 	m_preliminaryActionFrame++;
 
-	if (m_preliminaryActionFrame > 30)
+	if (m_preliminaryActionFrame > 10)
 	{
 		OnAttack1();
 	}
@@ -465,7 +470,7 @@ void BossRast::PreliminaryAttack2Update()
 
 	m_preliminaryActionFrame++;
 
-	if (m_preliminaryActionFrame > 30)
+	if (m_preliminaryActionFrame > 10)
 	{
 		OnAttack2();
 	}
@@ -479,7 +484,7 @@ void BossRast::PreliminaryAttack3Update()
 
 	m_preliminaryActionFrame++;
 
-	if (m_preliminaryActionFrame > 30)
+	if (m_preliminaryActionFrame > 10)
 	{
 		OnAttack3();
 	}
@@ -492,7 +497,7 @@ void BossRast::OnPreliminaryAttack1()
 
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("rassPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossRast::PreliminaryAttack1Update;
 }
@@ -504,7 +509,7 @@ void BossRast::OnPreliminaryAttack2()
 
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("rassPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossRast::PreliminaryAttack2Update;
 }
@@ -516,7 +521,7 @@ void BossRast::OnPreliminaryAttack3()
 
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("rassPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossRast::PreliminaryAttack3Update;
 }
@@ -526,6 +531,14 @@ void BossRast::Attack1Update()
 	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	m_attackFrame++;
+
+	if (m_attackFrame > 15)
+	{
+		m_isAttack = true;
+	}
+
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -538,6 +551,14 @@ void BossRast::Attack2Update()
 	Hit();
 	//アニメーションが終わったらアイドル状態に戻る
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	m_attackFrame++;
+
+	if (m_attackFrame > 15)
+	{
+		m_isAttack = true;
+	}
+
 	if (m_pAnim->IsLoop())
 	{
 		OnIdle();
@@ -550,6 +571,14 @@ void BossRast::Attack3Update()
 	Hit();
 	//アニメーションが終わったらクールタイム状態に入る
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	m_attackFrame++;
+
+	if (m_attackFrame > 30)
+	{
+		m_isAttack = true;
+	}
+
 	if (m_pAnim->IsLoop())
 	{
 		OnAttackCoolTime();
@@ -632,7 +661,10 @@ void BossRast::DeadUpdate()
 
 void BossRast::OnIdle()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_isAttack = false;
+	m_attackFrame = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossRast::IdleUpdate;
@@ -640,23 +672,31 @@ void BossRast::OnIdle()
 
 void BossRast::OnWalk()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_isAttack = false;
+	m_attackFrame = 0;
 	m_pAnim->ChangeAnim(kAnimWalk);
 	m_updateFunc = &BossRast::WalkUpdate;
 }
 
 void BossRast::OnDash()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_isAttack = false;
+	m_attackFrame = 0;
 	m_pAnim->ChangeAnim(kAnimDash);
 	m_updateFunc = &BossRast::DashUpdate;
 }
 
 void BossRast::OnAttack1()
 {
+	m_isAttack = false;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_attackFrame = 0;
 
-	m_attackKind = Game::e_BossAttackKind::kBossAttack;
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
 	m_updateFunc = &BossRast::Attack1Update;
@@ -664,23 +704,27 @@ void BossRast::OnAttack1()
 
 void BossRast::OnAttack2()
 {
+	m_isAttack = false;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_attackFrame = 0;
 
-	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 
+	m_attackKind = Game::e_BossAttackKind::kBossAttack;
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
 	m_updateFunc = &BossRast::Attack2Update;
 }
 
 void BossRast::OnAttack3()
 {
+	m_isAttack = false;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
+	m_attackFrame = 0;
 
-	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
+	m_attackKind = Game::e_BossAttackKind::kBossShock;
 
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updateFunc = &BossRast::Attack3Update;
@@ -688,6 +732,8 @@ void BossRast::OnAttack3()
 
 void BossRast::OnAvoid()
 {
+	m_isAttack = false;
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
@@ -697,6 +743,8 @@ void BossRast::OnAvoid()
 
 void BossRast::OnAttackCoolTime()
 {
+	m_isAttack = false;
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_pAnim->ChangeAnim(kAnimCoolTime);
@@ -706,10 +754,11 @@ void BossRast::OnAttackCoolTime()
 void BossRast::OnHitOneDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
 	{
-		m_hp -= 50.0f;
+		m_hp -= 40.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
 	{
@@ -717,7 +766,7 @@ void BossRast::OnHitOneDamage()
 	}
 	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
 	{
-		m_hp -= 20.0f;
+		m_hp -= 10.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
 	{
@@ -726,9 +775,10 @@ void BossRast::OnHitOneDamage()
 
 	if (!m_isPlayerFace)
 	{
-		m_hp -= 25.0f;
+		m_hp -= 20.0f;
 	}
 
+	m_attackFrame = 0;
 	m_isHit = true;
 	m_isAttack = false;
 
@@ -741,6 +791,7 @@ void BossRast::OnHitOneDamage()
 void BossRast::OnHitTwoDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
 	{
@@ -764,6 +815,7 @@ void BossRast::OnHitTwoDamage()
 		m_hp -= 50.0f;
 	}
 
+	m_attackFrame = 0;
 	m_isHit = true;
 	m_isAttack = false;
 
@@ -775,7 +827,9 @@ void BossRast::OnHitTwoDamage()
 
 void BossRast::OnDown()
 {
+	m_isAttack = false;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	m_actionKind = 0;
 	m_actionTime = 0;
@@ -785,7 +839,9 @@ void BossRast::OnDown()
 
 void BossRast::OnDead()
 {
+	m_isAttack = false;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	m_actionKind = 0;
 	m_actionTime = 0;

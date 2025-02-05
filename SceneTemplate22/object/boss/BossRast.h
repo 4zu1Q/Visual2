@@ -77,8 +77,6 @@ private:
 	using UpdateFunc_t = void(BossRast::*)();
 	UpdateFunc_t m_updateFunc;
 
-	bool m_isAttack;
-
 	//次の行動に移るための変数
 	int m_actionTime;
 	int m_actionKind;

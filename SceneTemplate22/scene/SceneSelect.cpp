@@ -376,9 +376,6 @@ void SceneSelect::Draw()
 			DrawGraph(kHitStarPos.x + 25, kHitStarPos.y - 40 , m_handles[kSpeedClearItemH], true);
 		}
 
-
-		//DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
-		//DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
 	}
 
 

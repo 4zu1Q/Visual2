@@ -9,7 +9,7 @@
 #include "object/player/PlayerProduction.h"
 #include "object/CameraProduction.h"
 #include "object/stage/SkyDome.h"
-#include "object/stage/TitleField.h"
+#include "object/stage/Field.h"
 
 #include "util/SoundManager.h"
 #include "util/Pad.h"
@@ -60,7 +60,7 @@ SceneGameClear::SceneGameClear(SceneManager& manager) :
 	m_pPlayerProduction = std::make_shared<PlayerProduction>();
 	m_pCameraProduction = std::make_shared<CameraProduction>();
 	m_pSkyDome = std::make_shared<SkyDome>();
-	m_pTitleField = std::make_shared<TitleField>();
+	m_pField = std::make_shared<Field>(Game::e_StageKind::kTitle);
 
 	m_pPlayerProduction->Initialize(Game::e_PlayerProduction::kGameClear);
 	m_pCameraProduction->Initialize(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kGameClear);
@@ -70,6 +70,9 @@ SceneGameClear::SceneGameClear(SceneManager& manager) :
 	m_handles.push_back(LoadGraph("Data/Image/Select.png"));				//Select
 	m_handles.push_back(LoadGraph("Data/Image/Title.png"));					//Title
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				//矢印
+
+	SoundManager::GetInstance().PlayBgm("gameClearBgm", true);
+
 }
 
 SceneGameClear::~SceneGameClear()
@@ -80,8 +83,10 @@ SceneGameClear::~SceneGameClear()
 		DeleteGraph(m_handles[i]);
 	}
 
-
 	m_handles.clear();
+
+	SoundManager::GetInstance().StopBgm("gameClearBgm");
+
 }
 
 void SceneGameClear::Update()
@@ -93,6 +98,7 @@ void SceneGameClear::Update()
 	m_pCameraProduction->Update(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kGameClear);
 	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
 	m_pSkyDome->Update();
+
 
 	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
@@ -203,11 +209,12 @@ void SceneGameClear::Update()
 void SceneGameClear::Draw()
 {
 	//DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
-	m_pTitleField->Draw();
+	m_pField->Draw();
 
 	//背景座標
 	m_pCameraProduction->Draw();
 	m_pPlayerProduction->Draw();
+	
 	m_pSkyDome->Draw();
 
 #ifdef _DEBUG

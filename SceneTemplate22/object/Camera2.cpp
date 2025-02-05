@@ -17,6 +17,8 @@ namespace
 
 	constexpr float kCameraNear = 5.0f;
 	constexpr float kCameraFar = 5000.0f;
+
+	constexpr int kTriggerDeadZone = 60;
 }
 
 Camera2::Camera2():
@@ -31,7 +33,8 @@ Camera2::Camera2():
 	m_lightHandle(0),
 	m_angleMoveScale(0.0f),
 	m_cameraDistance(35.0f),
-	m_isLockOn(false)
+	m_isLockOn(false),
+	m_isReset(false)
 {
 
 	m_pLockOnUi = std::make_shared<LockOnTargetUi>();
@@ -63,6 +66,9 @@ void Camera2::Finalize()
 
 void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float playerAngle, bool isLockOn)
 {
+
+	GetJoypadDirectInputState(DX_INPUT_PAD1, &m_input);
+
 	m_playerPos = playerPos;
 	m_enemyPos = enemyPos;
 
@@ -81,13 +87,25 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 	}
 
 	//レフトトリガーが押された場合
-	//if (leftTriggerValue > 0.5f && isLockOn)
-	if (Pad::IsTrigger(PAD_INPUT_7) && isLockOn)
+	//if (Pad::IsTrigger(PAD_INPUT_7) && isLockOn)
+	if(m_input.Z > 500 && isLockOn)
 	{
-		SoundManager::GetInstance().PlaySe("lockOnSe");
-		m_isLockOn = !m_isLockOn;
-		//m_isLockOn = true;
+
+		m_isReset = true;
+		m_isLockOn = true;
 	}
+	else if (m_input.Z < 500 && isLockOn)
+	{
+
+		if (m_input.Z < 450 && m_isReset)
+		{
+			ResetToPlayerView(playerAngle);
+			m_isReset = false;
+		}
+
+		m_isLockOn = false;
+	}
+
 
 	if (!isLockOn)
 	{
@@ -345,3 +363,4 @@ void Camera2::UpdateCameraAngle()
 	// カメラの注視点を更新
 	m_targetPos = midPoint;
 }
+

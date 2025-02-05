@@ -133,6 +133,7 @@ protected:
 	bool m_isHit;
 	bool m_isPlayerFace;
 
+	int m_attackFrame;
 	int m_damageFrame;
 
 	//ダウン判定

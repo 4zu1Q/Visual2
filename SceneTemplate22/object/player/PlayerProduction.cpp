@@ -243,8 +243,6 @@ void PlayerProduction::TitleIdleUpdate()
 		OnPlayStart();
 	}
 
-
-
 	if (!m_isStart && Pad::IsTrigger(PAD_INPUT_2))
 	{
 		OnSitDown();
@@ -288,6 +286,7 @@ void PlayerProduction::PlayStartUpdate()
 
 void PlayerProduction::GameOverUpdate()
 {
+
 	if (m_isStart)
 	{
 		OnRetry();

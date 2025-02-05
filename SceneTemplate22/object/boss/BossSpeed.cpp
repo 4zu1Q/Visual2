@@ -93,7 +93,7 @@ BossSpeed::BossSpeed() :
 	m_isAvoidAction(false),
 	m_attackType(0),
 	m_moveAngle(0.0f),
-	m_hp(350.0f)
+	m_hp(400.0f)
 {
 
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
@@ -105,9 +105,13 @@ BossSpeed::BossSpeed() :
 	m_isAttack = false;
 	m_isShock = false;
 	m_isHit = false;
+	m_isPlayerFace = false;
+
 
 	m_downCountDown = 0;
 	m_damageFrame = 0;
+	m_preliminaryActionFrame = 0;
+	m_attackFrame = 0;
 
 	m_hitRadius = 8.0f;
 	m_normalAttackRadius = 3.0f;
@@ -196,6 +200,7 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 
 	m_playerAttackKind = playerAttackKind;
 	m_playerKind = player.GetFaceKind();
+	m_isPlayerFace = player.GetIsFaceUse();
 
 
 
@@ -374,6 +379,9 @@ void BossSpeed::IdleUpdate()
 
 	SmoothAngle(m_angle, m_nextAngle);
 
+	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
+	m_attackDir = VNorm(m_attackDir);
+
 	VECTOR move;
 	move.y = m_rigidbody.GetVelocity().y;
 	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
@@ -401,6 +409,9 @@ void BossSpeed::DashUpdate()
 
 	//敵の移動
 	m_rigidbody.SetVelocity(m_velocity);
+
+	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
+	m_attackDir = VNorm(m_attackDir);
 
 	if (m_actionTime > kIdleToAvoidTime && m_bossToPlayerLength < kIdleToAttackLength)
 	{
@@ -487,11 +498,12 @@ void BossSpeed::PreliminaryAttack1Update()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	if (m_pAnim->IsLoop())
-	{
-		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 10)
+	{
 		OnAttack1();
 	}
 }
@@ -500,11 +512,12 @@ void BossSpeed::PreliminaryAttack2Update()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	if (m_pAnim->IsLoop())
-	{
-		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 10)
+	{
 		OnAttack2();
 	}
 }
@@ -513,11 +526,12 @@ void BossSpeed::PreliminaryAttack3Update()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	if (m_pAnim->IsLoop())
-	{
-		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 
+
+	m_preliminaryActionFrame++;
+
+	if (m_preliminaryActionFrame > 10)
+	{
 		OnAttack3();
 	}
 }
@@ -525,6 +539,14 @@ void BossSpeed::PreliminaryAttack3Update()
 void BossSpeed::Attack1Update()
 {
 	Hit();
+
+	m_attackFrame++;
+
+	if (m_attackFrame > 15)
+	{
+		m_isAttack = true;
+	}
+
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop() && m_isAvoidAction)
 	{
@@ -540,6 +562,14 @@ void BossSpeed::Attack1Update()
 void BossSpeed::Attack2Update()
 {
 	Hit();
+
+	m_attackFrame++;
+
+	if (m_attackFrame > 15)
+	{
+		m_isAttack = true;
+	}
+
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop() && m_isAvoidAction)
 	{
@@ -555,6 +585,14 @@ void BossSpeed::Attack2Update()
 void BossSpeed::Attack3Update()
 {
 	Hit();
+
+	m_attackFrame++;
+
+	if (m_attackFrame > 30)
+	{
+		m_isAttack = true;
+	}
+
 	//アニメーションが終わったらクールタイム状態に入る
 	if (m_pAnim->IsLoop())
 	{
@@ -646,7 +684,7 @@ void BossSpeed::DeadUpdate()
 	if (!m_isClear)
 	{
 		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+		EffectManager::GetInstance().CreateEffect("gameClearEffect", VGet(pos.x, pos.y, pos.z));
 	}
 
 }
@@ -654,6 +692,8 @@ void BossSpeed::DeadUpdate()
 
 void BossSpeed::OnIdle()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
+	m_attackFrame = 0;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -662,6 +702,7 @@ void BossSpeed::OnIdle()
 
 void BossSpeed::OnDash()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDash);
 	m_updateFunc = &BossSpeed::DashUpdate;
@@ -669,6 +710,7 @@ void BossSpeed::OnDash()
 
 void BossSpeed::OnPlayerToDash()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDash);
 	m_updateFunc = &BossSpeed::PlayerToDashUpdate;
@@ -676,6 +718,7 @@ void BossSpeed::OnPlayerToDash()
 
 void BossSpeed::OnHomePosDash()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDash);
 	m_updateFunc = &BossSpeed::HomePosDashUpdate;
@@ -683,27 +726,30 @@ void BossSpeed::OnHomePosDash()
 
 void BossSpeed::OnPreliminaryAttack1()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossSpeed::PreliminaryAttack1Update;
 }
 
 void BossSpeed::OnPreliminaryAttack2()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossSpeed::PreliminaryAttack2Update;
 }
 
 void BossSpeed::OnPreliminaryAttack3()
 {
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("preliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossSpeed::PreliminaryAttack3Update;
 }
@@ -745,6 +791,7 @@ void BossSpeed::OnAttack3()
 void BossSpeed::OnAvoid()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	m_attackNum = 0;
 	m_attackType = 0;
@@ -756,6 +803,7 @@ void BossSpeed::OnAvoid()
 void BossSpeed::OnAttackCoolTime()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	m_attackType = 0;
 	m_actionTime = 0;
@@ -766,10 +814,11 @@ void BossSpeed::OnAttackCoolTime()
 void BossSpeed::OnHitOneDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
 	{
-		m_hp -= 50.0f;
+		m_hp -= 40.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
 	{
@@ -789,6 +838,7 @@ void BossSpeed::OnHitOneDamage()
 		m_hp -= 20.0f;
 	}
 
+	m_attackFrame = 0;
 	m_isHit = true;
 	m_isAttack = false;
 
@@ -801,6 +851,7 @@ void BossSpeed::OnHitOneDamage()
 void BossSpeed::OnHitTwoDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
 	{
@@ -824,6 +875,7 @@ void BossSpeed::OnHitTwoDamage()
 		m_hp -= 50.0f;
 	}
 
+	m_attackFrame = 0;
 	m_isHit = true;
 	m_isAttack = false;
 
@@ -836,6 +888,7 @@ void BossSpeed::OnHitTwoDamage()
 void BossSpeed::OnDown()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	m_attackType = 0;
 	m_actionTime = 0;
@@ -846,6 +899,7 @@ void BossSpeed::OnDown()
 void BossSpeed::OnDead()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	m_attackType = 0;
 	m_actionTime = 0;

@@ -68,6 +68,9 @@ SceneGameOver::SceneGameOver(SceneManager& manager, Game::e_BossKind bossKind) :
 	m_handles.push_back(LoadGraph("Data/Image/Retry.png"));					//Title
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				//矢印
 	m_handles.push_back(LoadGraph("Data/Image/GameOverBg.png"));				//
+
+	SoundManager::GetInstance().PlayBgm("gameOverBgm", true);
+
 }
 
 SceneGameOver::~SceneGameOver()
@@ -78,8 +81,10 @@ SceneGameOver::~SceneGameOver()
 		DeleteGraph(m_handles[i]);
 	}
 
-
 	m_handles.clear();
+
+	SoundManager::GetInstance().StopBgm("gameOverBgm");
+
 }
 
 void SceneGameOver::Update()
@@ -90,6 +95,7 @@ void SceneGameOver::Update()
 
 	m_pCameraProduction->Update(m_pPlayerProduction->GetPos(), Game::e_PlayerProduction::kGameOver);
 	m_pPlayerProduction->Update(m_isActionStart, m_isActionBack);
+
 
 #ifdef _DEBUG
 	//デバッグに遷移する
@@ -113,7 +119,6 @@ void SceneGameOver::Update()
 		m_targetCursorPos = kGamePlaySelectPos;
 	}
 
-	//
 	if (!m_isToNextScene)
 	{
 		//左を押した場合
@@ -173,15 +178,6 @@ void SceneGameOver::Update()
 			}
 		}
 	}
-
-	//if (m_isToNextScene)
-	//{
-	//	m_fadeTime++;
-
-	//	if (m_fadeTime > 60)
-	//	{
-	//	}
-	//}
 
 
 	//シーンフラグがたった場合

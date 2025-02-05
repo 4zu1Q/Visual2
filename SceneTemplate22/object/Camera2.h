@@ -1,6 +1,9 @@
 ﻿#pragma once
 #include "DxLib.h"
 #include <memory>
+#include<map>
+#include<string>
+#include<unordered_map>
 
 class LockOnTargetUi;
 
@@ -33,6 +36,8 @@ private:
 	void UpdateLockOnCamera();
 	void UpdateCameraAngle();
 
+	bool GetIsPushedTriggerButton(bool isRight) const;
+
 private:
 
 	std::shared_ptr<LockOnTargetUi> m_pLockOnUi;
@@ -56,6 +61,9 @@ private:
 
 	bool m_isLockOn;
 
+	bool m_isReset;
+
+	DINPUT_JOYSTATE m_input;
 
 };
 

@@ -183,12 +183,16 @@ void ScenePause::Update()
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
+				SoundManager::GetInstance().StopBgm("battleBgm");
+				SoundManager::GetInstance().StopBgm("selectBgm");
 				StartFadeOut();	//フェードアウト開始
 				m_isToNextScene = true;
 			}
 			if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
+				SoundManager::GetInstance().StopBgm("battleBgm");
+				SoundManager::GetInstance().StopBgm("selectBgm");
 				StartFadeOut();	//フェードアウト開始
 				m_isToNextScene = true;
 				SaveDataManager::GetInstance().Save(); //セーブデータの保存

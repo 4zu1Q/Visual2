@@ -146,23 +146,23 @@ namespace
 
 	//プレイヤーの種類によって変わる当たり判定の半径
 	constexpr float kNormalAttackXRadius = 4.0f;
-	constexpr float kNormalAttackYRadius = 8.0f;
+	constexpr float kNormalAttackYRadius = 15.0f;
 	constexpr float kNormalAttackShockRadius = 10.0f;
 
 	constexpr float kPowerAttackXRadius = 4.0f;
-	constexpr float kPowerAttackYRadius = 8.0f;
+	constexpr float kPowerAttackYRadius = 15.0f;
 	constexpr float kPowerAttackShockRadius = 10.0f;
 
 	constexpr float kSpeedAttackXRadius = 2.5f;
 	constexpr float kSpeedAttackYRadius = 5.5f;
 	constexpr float kSpeedAttackShockRadius = 3.0f;
 	
-	constexpr float kShotAttackXRadius = 4.0f;
-	constexpr float kShotAttackYRadius = 6.0f;
+	constexpr float kShotAttackXRadius = 8.0f;
+	constexpr float kShotAttackYRadius = 15.0f;
 	constexpr float kShotAttackShockRadius = 10.0f;
 	
 	constexpr float kRassAttackXRadius = 6.0f;
-	constexpr float kRassAttackYRadius = 12.0f;
+	constexpr float kRassAttackYRadius = 15.0f;
 	constexpr float kRassAttackShockRadius = 3.0f;
 
 }
@@ -215,6 +215,7 @@ Player::Player() :
 	m_deadTime(0),
 	m_damageFrame(0),
 	m_shockFrame(0),
+	m_attackFrame(0),
 	m_shadowH(0)
 {
 	//攻撃の種類を
@@ -327,6 +328,8 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	//アップデート
 	(this->*m_updateFunc)();
 
+	GetJoypadDirectInputState(DX_INPUT_PAD1, &m_input);
+
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
 
@@ -364,22 +367,6 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 		m_attackYRadius = kNormalAttackYRadius;
 		m_attackShockRadius = kNormalAttackShockRadius;
 	}
-
-
-	//if (m_isAttackY)
-	//{
-	//	m_shockFrame++;
-	//}
-	//else
-	//{
-	//	m_shockFrame = 0;
-	//}
-
-	//if (m_shockFrame == 120)
-	//{
-	//	m_attackKind = Game::e_PlayerAttackKind::kPlayerShock;
-	//	m_isAttackY = false;
-	//}
 
 	//ヒットした場合の処理
 	if (m_isHit)
@@ -419,7 +406,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
 	{
 		//攻撃X座標
-		 m_attackMove = VScale(m_attackDir, 7.0f);
+		 m_attackMove = VScale(m_attackDir, 20.0f);
 		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
 	}
 	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
@@ -436,22 +423,30 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
 	}
 
-
-
-	//通常状態の攻撃Y座標(スピードタイプ以外はチャージあり)
+	//通常状態の攻撃Y座標(スピードタイプ以外)
 	if (!m_isFaceUse)
 	{
 		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
 	}
-	//攻撃Y座標(スピードタイプ以外はチャージあり)
-	else if (m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	//攻撃Y座標(スピードタイプ以外)
+	else if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 	{
 		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
 	}
 	//攻撃Y(スピードタイプのみショートカット)
 	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
+		m_attackMove = VScale(m_attackDir, 9.0f);
 		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_attackMove = VScale(m_attackDir, 50.0f);
+		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+	{
+		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
 	}
 
 	//ボスの座標を代入
@@ -609,7 +604,8 @@ void Player::Hit()
 				if (IsShockAttackHit(m_bossShockPos, m_bossShockRadius) && m_bossAttackKind == Game::e_BossAttackKind::kBossShock)
 				{
 					//武器なし攻撃は1ダメージ
-					OnHitOneDamage();
+					//OnHitOneDamage();
+					OnHitTwoDamage();
 				}
 
 			}
@@ -794,7 +790,8 @@ void Player::IdleUpdate()
 	}
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(kPadButtonLStick))
+	//if (Pad::IsTrigger(kPadButtonLStick))
+	if (m_input.Z <= -1000)
 	{
 		OnFaceUse();
 		return;
@@ -891,7 +888,9 @@ void Player::LockOnIdleUpdate()
 	}
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(kPadButtonLStick))
+	//if (Pad::IsTrigger(kPadButtonLStick))
+	//if (m_input.Z != 0)
+	if (m_input.Z <= -1000)
 	{
 		OnFaceUse();
 		return;
@@ -1125,7 +1124,9 @@ void Player::WalkUpdate()
 	}
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(kPadButtonLStick))
+	//if (Pad::IsTrigger(kPadButtonLStick))
+	//if (m_input.Z != 0)
+	if (m_input.Z <= -1000)
 	{
 		OnFaceUse();
 		return;
@@ -1370,7 +1371,9 @@ void Player::LockOnWalkUpdate()
 	}
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(kPadButtonLStick))
+	//if (Pad::IsTrigger(kPadButtonLStick))
+	//if(m_input.Z != 0)
+	if (m_input.Z <= -1000)
 	{
 		OnFaceUse();
 		return;
@@ -1558,7 +1561,9 @@ void Player::DashUpdate()
 	}
 
 	//顔を決定する	ここはZRで決定にする
-	if (Pad::IsTrigger(kPadButtonLStick))
+	//if (Pad::IsTrigger(kPadButtonLStick))
+	//if (m_input.Z != 0)
+	if (m_input.Z <= -1000)
 	{
 		OnFaceUse();
 		return;
@@ -2171,7 +2176,7 @@ void Player::AttackYUpdate()
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 
-
+	m_attackFrame++;
 	m_stamina += kStaminaIncreaseSpeed;
 
 	if (m_isUseMp)
@@ -2180,10 +2185,15 @@ void Player::AttackYUpdate()
 		m_isUseMp = false;
 	}
 
+	if (m_attackFrame > 50)
+	{
+		m_isAttack = true;
+	}
+
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
-		m_isAttack = false;
+		//m_isAttack = false;
 
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
@@ -2481,6 +2491,11 @@ void Player::OnAttackX()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("hitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 
+	if (m_playerKind == Game::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		EffectManager::GetInstance().CreateEffect("shotPlayerAttackXEffect", VGet(m_attackXPos.x, m_attackXPos.y - 4.0f, m_attackXPos.z));
+	}
+
 	//タイプによって攻撃アニメーションを変える
 	switch (m_multiAttack)
 	{
@@ -2522,8 +2537,21 @@ void Player::OnAttackY()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("attackYEffect", m_hitPos);
+
+
+	if (m_playerKind == Game::e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		EffectManager::GetInstance().CreateEffect("shotPlayerAttackYEffect", VGet(m_attackYPos.x, m_attackYPos.y - 4.0f, m_attackYPos.z));
+		m_isAttack = false;
+
+	}
+	else
+	{
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("attackYEffect", m_hitPos);
+		m_isAttack = true;
+
+	}
 
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimAttackY, kAnimAttackY, kAnimAttackY, kAnimAttackY);
@@ -2532,7 +2560,6 @@ void Player::OnAttackY()
 
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackY;
 	m_isAttackY = true;
-	m_isAttack = true;
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
 
@@ -2617,6 +2644,7 @@ void Player::OnAttackCharge()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	
 	SoundManager::GetInstance().PlaySe("attackChargeSe");
+	m_attackFrame = 0;
 
 	//タイプによってアニメーションを変える
 	AnimChange(kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge);
@@ -2632,6 +2660,7 @@ void Player::OnHitOneDamage()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_isHit = true;
 	m_isAttack = false;
+	m_attackFrame = 0;
 
 
 	SoundManager::GetInstance().PlaySe("damageSe");
@@ -2651,7 +2680,7 @@ void Player::OnHitTwoDamage()
 	m_isAttack = false;
 	SoundManager::GetInstance().PlaySe("damageSe");
 	m_hp -= 2;
-
+	m_attackFrame = 0;
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("hitEffect", VGet(pos.x, pos.y + 4.0f, pos.z));
 

@@ -345,4 +345,9 @@ private:
 	//プレイヤーの衝撃攻撃半径
 	float m_attackShockRadius;
 
+	int m_attackFrame;
+
+	//RTのインプット
+	DINPUT_JOYSTATE m_input;
+
 };

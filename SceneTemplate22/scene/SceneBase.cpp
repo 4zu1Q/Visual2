@@ -37,7 +37,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	SoundManager::GetInstance().Load("selectBgm", "Data/Sound/Bgm/SelectBGM.mp3", true);
 	SoundManager::GetInstance().Load("battleBgm", "Data/Sound/Bgm/BattleBGM.mp3", true);
 	SoundManager::GetInstance().Load("stageClearBgm", "Data/Sound/Bgm/StageClearClearBGM.mp3", true);
-	SoundManager::GetInstance().Load("gameOverBgm", "Data/Sound/Bgm/GameOverBGM.mp3", true);
+	SoundManager::GetInstance().Load("gameOverBgm", "Data/Sound/Bgm/GameOver.mp3", true);
 	SoundManager::GetInstance().Load("gameClearBgm", "Data/Sound/Bgm/GameClearBGM.mp3", true);
 	
 	//カーソル用SE
@@ -95,8 +95,13 @@ SceneBase::SceneBase(SceneManager& manager):
 	EffectManager::GetInstance().Load("shockEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("backGroundEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("faceUseEffect", "Data/Effect/FaceUse01.efkefc", 120, 1.5f);
-	EffectManager::GetInstance().Load("preliminaryActionEffect", "Data/Effect/PreliminaryAction.efkefc", 120, 3.0f);
-	EffectManager::GetInstance().Load("shotBossAttackEffect", "Data/Effect/PlayerHit.efkefc", 120, 0.5f);
+	EffectManager::GetInstance().Load("powerPreliminaryActionEffect", "Data/Effect/PowerPreliminaryAction.efkefc", 120, 3.0f);
+	EffectManager::GetInstance().Load("speedPreliminaryActionEffect", "Data/Effect/SpeedPreliminaryAction.efkefc", 120, 3.0f);
+	EffectManager::GetInstance().Load("shotPreliminaryActionEffect", "Data/Effect/ShotPreliminaryAction.efkefc", 120, 3.0f);
+	EffectManager::GetInstance().Load("rassPreliminaryActionEffect", "Data/Effect/RassPreliminaryAction.efkefc", 120, 3.0f);
+	EffectManager::GetInstance().Load("shotBossAttackEffect", "Data/Effect/ShotBossAttack.efkefc", 120, 5.5f);
+	EffectManager::GetInstance().Load("shotPlayerAttackXEffect", "Data/Effect/ShotPlayerAttackX.efkefc", 120, 4.5f);
+	EffectManager::GetInstance().Load("shotPlayerAttackYEffect", "Data/Effect/ShotPlayerAttackY2.efkefc", 120, 4.0f);
 	EffectManager::GetInstance().Load("BossAttackShockEffect", "Data/Effect/BossShockAttack.efkefc", 120, 0.5f);
 
 }

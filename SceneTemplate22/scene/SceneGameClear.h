@@ -6,7 +6,8 @@
 class PlayerProduction;
 class CameraProduction;
 class SkyDome;
-class TitleField;
+//class TitleField;
+class Field;
 
 class SceneGameClear :
 	public SceneBase
@@ -36,7 +37,8 @@ private:
 	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
 	std::shared_ptr<CameraProduction> m_pCameraProduction;
 	std::shared_ptr<SkyDome> m_pSkyDome;
-	std::shared_ptr<TitleField> m_pTitleField;
+	//std::shared_ptr<TitleField> m_pTitleField;
+	std::shared_ptr<Field> m_pField;
 
 	//遷移先
 	enum class e_SceneTrans : int

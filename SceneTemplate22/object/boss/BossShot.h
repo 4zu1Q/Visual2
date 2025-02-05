@@ -32,6 +32,9 @@ private:
 
 	/*各々の状態のアップデート処理*/
 	void IdleUpdate();
+	void PreliminaryAttack1Update();
+	void PreliminaryAttack2Update();
+	void PreliminaryAttack3Update();
 	void Attack1Update();
 	void Attack2Update();
 	void Attack3Update();
@@ -47,6 +50,9 @@ private:
 
 	/*アップデート処理に移動させるための関数*/
 	void OnIdle();
+	void OnPreliminaryAttack1();
+	void OnPreliminaryAttack2();
+	void OnPreliminaryAttack3();
 	void OnAttack1();
 	void OnAttack2();
 	void OnAttack3();
