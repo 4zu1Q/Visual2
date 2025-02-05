@@ -205,6 +205,12 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 	/*座標の取得*/
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
+	m_hitPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+	
+	VECTOR attackMove = VScale(m_attackDir, 12.0f);
+	VECTOR shockAttackMove = VScale(m_attackDir, 20.0f);
+	m_attackPos = VAdd(m_hitPos, attackMove);
+	m_shockAttackPos = VAdd(m_hitPos, shockAttackMove);
 
 	m_playerAttackKind = playerAttackKind;
 	m_playerKind = player.GetFaceKind();
@@ -240,7 +246,7 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 90)
+	if (m_damageFrame >= 120)
 	{
 		m_isHit = false;
 	}
@@ -267,6 +273,8 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 
 	//モデルのポジションを合わせるよう
 	//VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
+
+
 
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
@@ -665,7 +673,8 @@ void BossShot::HitOneDamageUpdate()
 {
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	if (m_damageFrame > 34)
 	{
 		OnIdle();
 	}
@@ -675,7 +684,8 @@ void BossShot::HitTwoDamageUpdate()
 {
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	if (m_damageFrame > 34)
 	{
 		OnIdle();
 	}

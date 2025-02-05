@@ -145,21 +145,21 @@ namespace
 	constexpr float kShadowHeight = 50.0f;
 
 	//プレイヤーの種類によって変わる当たり判定の半径
-	constexpr float kNormalAttackXRadius = 3.0f;
+	constexpr float kNormalAttackXRadius = 4.0f;
 	constexpr float kNormalAttackYRadius = 8.0f;
 	constexpr float kNormalAttackShockRadius = 10.0f;
 
-	constexpr float kPowerAttackXRadius = 3.0f;
-	constexpr float kPowerAttackYRadius = 3.0f;
-	constexpr float kPowerAttackShockRadius = 3.0f;
+	constexpr float kPowerAttackXRadius = 4.0f;
+	constexpr float kPowerAttackYRadius = 8.0f;
+	constexpr float kPowerAttackShockRadius = 10.0f;
 
 	constexpr float kSpeedAttackXRadius = 2.5f;
-	constexpr float kSpeedAttackYRadius = 3.5f;
+	constexpr float kSpeedAttackYRadius = 5.5f;
 	constexpr float kSpeedAttackShockRadius = 3.0f;
 	
-	constexpr float kShotAttackXRadius = 2.0f;
-	constexpr float kShotAttackYRadius = 4.0f;
-	constexpr float kShotAttackShockRadius = 4.0f;
+	constexpr float kShotAttackXRadius = 4.0f;
+	constexpr float kShotAttackYRadius = 6.0f;
+	constexpr float kShotAttackShockRadius = 10.0f;
 	
 	constexpr float kRassAttackXRadius = 6.0f;
 	constexpr float kRassAttackYRadius = 12.0f;
@@ -181,6 +181,7 @@ Player::Player() :
 	m_radius(2),
 	m_posUp(kInitPos),
 	m_move(VGet(0, 0, 0)),
+	m_attackMove(VGet(0, 0, 0)),
 	m_attackXPos(VGet(0, 0, 0)),
 	m_attackYPos(VGet(0, 0, 0)),
 	m_attackDir(VGet(0, 0, 0)),
@@ -403,9 +404,39 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	m_hitPos = VGet(m_pos.x, m_pos.y + 9.0f, m_pos.z);
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
-	//攻撃X座標
-	VECTOR attackMove = VScale(m_attackDir, 7.0f);
-	m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), attackMove);
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		//攻撃X座標
+		m_attackMove = VScale(m_attackDir, 8.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		//攻撃X座標
+		m_attackMove = VScale(m_attackDir, 7.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		//攻撃X座標
+		 m_attackMove = VScale(m_attackDir, 7.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+	{
+		//攻撃X座標
+		 m_attackMove = VScale(m_attackDir, 9.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+
+	if (!m_isFaceUse)
+	{
+		//攻撃X座標
+		m_attackMove = VScale(m_attackDir, 7.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+
+
 
 	//通常状態の攻撃Y座標(スピードタイプ以外はチャージあり)
 	if (!m_isFaceUse)
@@ -420,7 +451,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	//攻撃Y(スピードタイプのみショートカット)
 	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
-		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), attackMove);
+		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
 	}
 
 	//ボスの座標を代入
@@ -2021,6 +2052,7 @@ void Player::DashFallUpdate()
 void Player::AttackCharge()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 
 
 	m_stamina += kStaminaIncreaseSpeed;
@@ -2085,6 +2117,8 @@ void Player::AttackCharge()
 void Player::AttackXUpdate()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
+
 
 	m_stamina += kStaminaIncreaseSpeed;
 	auto pos = m_rigidbody.GetPos();
@@ -2135,6 +2169,7 @@ void Player::AttackXUpdate()
 void Player::AttackYUpdate()
 {
 	Hit();
+	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 
 
 	m_stamina += kStaminaIncreaseSpeed;

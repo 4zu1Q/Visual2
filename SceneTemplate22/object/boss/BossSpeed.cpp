@@ -187,9 +187,16 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 
 	m_playerPos = player.GetPos();
 	m_pos = m_rigidbody.GetPos();
+	m_hitPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+
+	VECTOR attackMove = VScale(m_attackDir, 12.0f);
+	VECTOR shockAttackMove = VScale(m_attackDir, 20.0f);
+	m_attackPos = VAdd(m_hitPos, attackMove);
+	m_shockAttackPos = VAdd(m_hitPos, shockAttackMove);
 
 	m_playerAttackKind = playerAttackKind;
 	m_playerKind = player.GetFaceKind();
+
 
 
 	if (m_isHit)
@@ -201,7 +208,7 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 60)
+	if (m_damageFrame >= 120)
 	{
 		m_isHit = false;
 	}
@@ -601,7 +608,8 @@ void BossSpeed::AttackCoolTimeUpdate()
 void BossSpeed::HitOneDamageUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	if (m_damageFrame > 34)
 	{
 		OnIdle();
 	}
@@ -610,7 +618,8 @@ void BossSpeed::HitOneDamageUpdate()
 void BossSpeed::HitTwoDamageUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+	if (m_damageFrame > 34)
 	{
 		OnIdle();
 	}

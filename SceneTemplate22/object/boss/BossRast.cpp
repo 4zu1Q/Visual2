@@ -220,7 +220,7 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 180)
+	if (m_damageFrame >= 120)
 	{
 		m_isHit = false;
 	}
@@ -233,6 +233,8 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 		//死亡状態へ遷移
 		OnDead();
 	}
+
+
 
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
@@ -272,7 +274,7 @@ void BossRast::Draw()
 
 	if (m_damageFrame % 8 >= 4) return;
 
-	if (!m_isClear)
+	//if (!m_isClear)
 	{
 		MV1DrawModel(m_modelH);
 	}

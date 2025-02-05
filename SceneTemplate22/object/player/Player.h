@@ -250,6 +250,7 @@ private:
 	VECTOR m_attackXPos;
 	VECTOR m_attackYPos;
 	VECTOR m_attackDir;
+	VECTOR m_attackMove;
 
 	VECTOR m_cameraToPlayerVec;
 	VECTOR m_bossToPlayerVec;

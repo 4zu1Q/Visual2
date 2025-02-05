@@ -207,7 +207,7 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 	m_pos = m_rigidbody.GetPos();
 	m_hitPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
 	//m_attackPos = VGet(m_attackPos.x, m_attackPos.y + m_hitPos.y, m_attackPos.z);
-	m_shockAttackPos = m_pos;
+	//m_shockAttackPos = m_pos;
 	//auto pos = m_rigidbody.GetPos();
 
 	//モデルのポジションを合わせるよう

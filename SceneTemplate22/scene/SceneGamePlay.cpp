@@ -158,6 +158,7 @@ SceneGamePlay::~SceneGamePlay()
 		DeleteGraph(m_handles[i]);
 	}
 
+	SoundManager::GetInstance().StopBgm("stageClearBgm");
 
 	m_handles.clear();
 }
@@ -240,6 +241,14 @@ void SceneGamePlay::Update()
 		//SoundManager::GetInstance().StopBgm("battleBgm");
 		//StartFadeOut();
 		//m_isToNextScene = true;
+
+					//フェードさせるやつ
+		//if (m_pPlayer->GetIsGameOver())
+		//{
+			m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
+			//return;
+		//}
+
 	}
 
 	if (!IsFading())
@@ -321,8 +330,14 @@ void SceneGamePlay::Update()
 	{
 		SoundManager::GetInstance().StopBgm("battleBgm");
 
-		StartFadeOut();
-		m_isToNextScene = true;
+		//if (m_pBossRast->GetIsClear())
+		//{
+			m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
+		//	return;
+		//}
+
+		//StartFadeOut();
+		//m_isToNextScene = true;
 	}
 
 	//ボスのアップデート処理
@@ -381,12 +396,12 @@ void SceneGamePlay::Update()
 	{
 		if (!IsFadingOut())
 		{
-			//フェードさせるやつ
-			if (m_pPlayer->GetIsGameOver())
-			{
-				m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
-				return;
-			}
+			////フェードさせるやつ
+			//if (m_pPlayer->GetIsGameOver())
+			//{
+			//	m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
+			//	return;
+			//}
 
 			if (m_pBossPower->GetIsClear())
 			{
@@ -406,11 +421,11 @@ void SceneGamePlay::Update()
 				return;
 			}
 
-			if (m_pBossRast->GetIsClear())
-			{
-				m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
-				return;
-			}
+			//if (m_pBossRast->GetIsClear())
+			//{
+			//	m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
+			//	return;
+			//}
 		}
 	}
 

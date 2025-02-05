@@ -6,9 +6,9 @@ namespace
 {
 
 	//トライアングルのモデルファイル名
-	const char* const kTrianglePowerModelFileName = "Data/Model/Obj/PowerClearItem.mv1";
-	const char* const kTriangleSpeedModelFileName = "Data/Model/Obj/SpeedClearItem.mv1";
-	const char* const kTriangleShotModelFileName = "Data/Model/Obj/ShotClearItem.mv1";
+	const char* const kTrianglePowerModelFileName = "Data/Model/Item/PowerClearItem.mv1";
+	const char* const kTriangleSpeedModelFileName = "Data/Model/Item/SpeedClearItem.mv1";
+	const char* const kTriangleShotModelFileName = "Data/Model/Item/ShotClearItem.mv1";
 
 
 	constexpr float kAddPosY = 8.0f;
