@@ -250,7 +250,7 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 120)
+	if (m_damageFrame >= 140)
 	{
 		m_isHit = false;
 	}
@@ -359,13 +359,11 @@ void BossShot::Hit()
 				{
 					OnHitOneDamage();
 				}
-
-				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
+				else if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
 				{
 					OnHitTwoDamage();
 				}
-
-				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
+				else if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
 				{
 					OnHitOneDamage();
 				}
@@ -518,7 +516,7 @@ void BossShot::PreliminaryAttack1Update()
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	m_attackPos = VScale(VGet(m_playerPos.x, m_playerPos.y + 6.0f, m_playerPos.z), 0.87f);
+	m_attackPos = VScale(VGet(m_playerPos.x, m_playerPos.y + 6.0f, m_playerPos.z),0.89f);
 
 	m_preliminaryActionFrame++;
 
@@ -533,7 +531,7 @@ void BossShot::PreliminaryAttack2Update()
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	m_attackPos = VScale(VGet(m_playerPos.x, m_playerPos.y + 6.0f, m_playerPos.z), 0.87f);
+	m_attackPos = VScale(VGet(m_playerPos.x, m_playerPos.y + 6.0f, m_playerPos.z), 0.89f);
 
 	m_preliminaryActionFrame++;
 
@@ -548,7 +546,7 @@ void BossShot::PreliminaryAttack3Update()
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
-	m_shockAttackPos = VScale(VGet(m_playerPos.x, m_playerPos.y + 6.0f, m_playerPos.z),0.87f);
+	m_shockAttackPos = VScale(VGet(m_playerPos.x, m_playerPos.y + 6.0f, m_playerPos.z), 0.89f);
 
 	m_preliminaryActionFrame++;
 
@@ -564,7 +562,7 @@ void BossShot::Attack1Update()
 
 	m_attackFrame++;
 
-	if (m_attackFrame > 60)
+	if (m_attackFrame > 20)
 	{
 		m_isAttack = true;
 	}
@@ -584,7 +582,7 @@ void BossShot::Attack2Update()
 
 	m_attackFrame++;
 
-	if (m_attackFrame > 60)
+	if (m_attackFrame > 30)
 	{
 		m_isAttack = true;
 	}
@@ -603,7 +601,7 @@ void BossShot::Attack3Update()
 
 	m_attackFrame++;
 
-	if (m_attackFrame > 90)
+	if (m_attackFrame > 40)
 	{
 		m_isAttack = true;
 	}
@@ -881,7 +879,7 @@ void BossShot::OnAttack3()
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("shotBossAttackEffect", VGet(m_shockAttackPos.x, m_shockAttackPos.y, m_shockAttackPos.z));
+	EffectManager::GetInstance().CreateEffect("bossShockEffect", VGet(m_shockAttackPos.x, m_shockAttackPos.y, m_shockAttackPos.z));
 
 	m_attackKind = Game::e_BossAttackKind::kBossShock;
 	m_attackFrame = 0;
@@ -978,6 +976,9 @@ void BossShot::OnHitOneDamage()
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossShot::HitOneDamageUpdate;
+
+	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
+	//m_updateFunc = &BossShot::IdleUpdate;
 }
 
 void BossShot::OnHitTwoDamage()
@@ -1016,6 +1017,10 @@ void BossShot::OnHitTwoDamage()
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossShot::HitTwoDamageUpdate;
+
+	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
+	//m_updateFunc = &BossShot::IdleUpdate;
+
 }
 
 void BossShot::OnDown()
@@ -1034,7 +1039,6 @@ void BossShot::OnDead()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
-
 	m_attackFrame = 0;
 	m_actionKind = 0;
 	m_actionTime = 0;

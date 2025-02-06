@@ -61,6 +61,7 @@ namespace
 
 	//初期位置
 	constexpr VECTOR kInitPos = { -85.0f,35.0f,740.0f };
+	constexpr VECTOR kLookPos = { -100.0f,30.0f,500.0f };
 
 	const Vec2 kHitPos = { 440.0f , 480.0f };
 	const Vec2 kHitBossPos = { 340.0f , 30.0f };
@@ -104,15 +105,18 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
-	m_pCamera2->Initialize(m_pPlayer->GetPos());
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
+
+	m_pPlayer->BossLook(kLookPos);
+	m_pCamera2->Initialize(m_pPlayer->GetPos());
 
 	m_isPowerStage = false;
 	m_isSpeedStage = false;
 	m_isShotStage = false;
 	m_isRastStage = false;
+
 
 	//タイトルのBgmが流れていたら止める用
 	SoundManager::GetInstance().StopBgm("selectBgm");

@@ -92,7 +92,8 @@ SceneBase::SceneBase(SceneManager& manager):
 	EffectManager::GetInstance().Load("attackChargeEffect", "Data/Effect/AttackCharge.efkefc", 60, 8.0f);
 	EffectManager::GetInstance().Load("attackChargeFinishEffect", "Data/Effect/ChargeFinish.efkefc", 120, 2.0f);
 	EffectManager::GetInstance().Load("attackYEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
-	EffectManager::GetInstance().Load("shockEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
+	EffectManager::GetInstance().Load("playerShockEffect", "Data/Effect/PlayerShockAttack.efkefc", 120, 1.0f);
+	EffectManager::GetInstance().Load("bossShockEffect", "Data/Effect/BossShockAttack.efkefc", 160, 4.0f);
 	EffectManager::GetInstance().Load("backGroundEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("faceUseEffect", "Data/Effect/FaceUse01.efkefc", 120, 1.5f);
 	EffectManager::GetInstance().Load("powerPreliminaryActionEffect", "Data/Effect/PowerPreliminaryAction.efkefc", 120, 3.0f);

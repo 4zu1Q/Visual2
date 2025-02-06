@@ -55,10 +55,10 @@ namespace
 	constexpr float kMaxHp = 400.0f;
 
 	//次の状態に遷移するまでの時間
-	constexpr float kIdleToAttackTime = 40.0f;
-	constexpr float kIdleToAvoidTime = 90.0f;
-	constexpr float kCoolTimeToAvoidTime = 120.0f;
-	constexpr float kAvoidToIdleTime = 29.0f;
+	constexpr float kIdleToAttackTime = 20.0f;
+	constexpr float kIdleToAvoidTime = 30.0f;
+	constexpr float kCoolTimeToAvoidTime = 30.0f;
+	constexpr float kAvoidToIdleTime = 19.0f;
 
 	//次の状態に遷移するまでのプレイヤーとの長さ
 	constexpr float kIdleToAttackLength = 20.0f;
@@ -219,7 +219,7 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 120)
+	if (m_damageFrame >= 140)
 	{
 		m_isHit = false;
 	}
@@ -309,13 +309,11 @@ void BossRast::Hit()
 				{
 					OnHitOneDamage();
 				}
-
-				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
+				else if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
 				{
 					OnHitTwoDamage();
 				}
-
-				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
+				else if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
 				{
 					OnHitOneDamage();
 				}
@@ -725,6 +723,8 @@ void BossRast::OnAttack3()
 	m_attackFrame = 0;
 
 	m_attackKind = Game::e_BossAttackKind::kBossShock;
+	EffectManager::GetInstance().CreateEffect("bossShockEffect", m_shockAttackPos);
+
 
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updateFunc = &BossRast::Attack3Update;
@@ -786,6 +786,10 @@ void BossRast::OnHitOneDamage()
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossRast::HitOneDamageUpdate;
+
+	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
+	//m_updateFunc = &BossRast::IdleUpdate;
+
 }
 
 void BossRast::OnHitTwoDamage()
@@ -823,6 +827,7 @@ void BossRast::OnHitTwoDamage()
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossRast::HitTwoDamageUpdate;
+	m_updateFunc = &BossRast::IdleUpdate;
 }
 
 void BossRast::OnDown()

@@ -218,6 +218,14 @@ void SceneGameOver::Draw()
 
 #ifdef _DEBUG
 
+
+	DrawString(0, 0, "Scene Game Over", 0xffffff, false);
+
+	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
+
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Retry");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
+
 #endif
 
 	DrawCursor();
@@ -243,14 +251,6 @@ void SceneGameOver::Draw()
 
 	DrawGraph(0, -10 + m_selectAnimation, m_handles[kGameOverBgH], true);
 	DrawGraph(380, 100, m_handles[kGameOverH], true);
-
-
-	DrawString(0, 0, "Scene Game Over", 0xffffff, false);
-
-	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
-
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Retry");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 
 	DrawFade(0x000000);
 }

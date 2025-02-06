@@ -2185,7 +2185,7 @@ void Player::AttackYUpdate()
 		m_isUseMp = false;
 	}
 
-	if (m_attackFrame > 50)
+	if (m_attackFrame > 30)
 	{
 		m_isAttack = true;
 	}
@@ -2661,7 +2661,7 @@ void Player::OnHitOneDamage()
 	m_isHit = true;
 	m_isAttack = false;
 	m_attackFrame = 0;
-
+	m_multiAttack = 0;
 
 	SoundManager::GetInstance().PlaySe("damageSe");
 	m_hp -= 1;
@@ -2678,6 +2678,7 @@ void Player::OnHitTwoDamage()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_isHit = true;
 	m_isAttack = false;
+	m_multiAttack = 0;
 	SoundManager::GetInstance().PlaySe("damageSe");
 	m_hp -= 2;
 	m_attackFrame = 0;

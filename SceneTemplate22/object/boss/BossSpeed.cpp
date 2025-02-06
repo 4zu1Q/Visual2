@@ -213,7 +213,7 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 120)
+	if (m_damageFrame >= 140)
 	{
 		m_isHit = false;
 	}
@@ -313,13 +313,11 @@ void BossSpeed::Hit()
 				{
 					OnHitOneDamage();
 				}
-
-				if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
+				else if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
 				{
 					OnHitTwoDamage();
 				}
-
-				if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
+				else if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
 				{
 					OnHitOneDamage();
 				}
@@ -785,6 +783,7 @@ void BossSpeed::OnAttack3()
 	m_actionTime = 0;
 	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
+	EffectManager::GetInstance().CreateEffect("bossShockEffect", m_shockAttackPos);
 	m_updateFunc = &BossSpeed::Attack3Update;
 }
 
@@ -846,6 +845,9 @@ void BossSpeed::OnHitOneDamage()
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossSpeed::HitOneDamageUpdate;
+	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
+	//m_updateFunc = &BossSpeed::IdleUpdate;
+
 }
 
 void BossSpeed::OnHitTwoDamage()
@@ -883,6 +885,9 @@ void BossSpeed::OnHitTwoDamage()
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossSpeed::HitTwoDamageUpdate;
+
+	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
+	//m_updateFunc = &BossSpeed::IdleUpdate;
 }
 
 void BossSpeed::OnDown()
