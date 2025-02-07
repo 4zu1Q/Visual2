@@ -245,7 +245,7 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 	{
 		m_damageFrame++;
 	}
-	else
+	else if(!m_isHit)
 	{
 		m_damageFrame = 0;
 	}

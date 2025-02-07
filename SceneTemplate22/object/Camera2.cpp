@@ -94,7 +94,7 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 		m_isReset = true;
 		m_isLockOn = true;
 	}
-	else if (m_input.Z < 500 && isLockOn)
+	else if (m_input.Z > 500 && !isLockOn)
 	{
 
 		if (m_input.Z < 450 && m_isReset)

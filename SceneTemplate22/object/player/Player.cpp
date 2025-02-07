@@ -595,7 +595,6 @@ void Player::Hit()
 				//手の攻撃をした場合
 				if (IsWeaponHit(m_bossWeaponPos, m_bossWeaponRadius) && m_bossAttackKind == Game::e_BossAttackKind::kBossWeapon)
 				{
-
 					//武器は2ダメージ
 					OnHitTwoDamage();
 				}
@@ -1438,7 +1437,7 @@ void Player::DashUpdate()
 	move = VNorm(move);
 
 	//動いている間
-	if (VSquareSize(move) > 0.0f)
+	if (VSquareSize(move) > 0.01f)
 	{
 		m_stamina -= 0.5f;
 
@@ -1496,6 +1495,14 @@ void Player::DashUpdate()
 		m_attackDir = move;
 
 	}
+	else
+	{
+		//if (VSquareSize(move) == 0.0f || m_isStamina)
+		//{
+			OnIdle();
+			return;
+		//}
+	}
 
 	//地面についていなかったら
 	if (!GetIsJump())
@@ -1504,8 +1511,10 @@ void Player::DashUpdate()
 		return;
 	}
 
+
+
 	//歩き
-	if (Pad::IsRelase(kPadButtonA) || VSquareSize(move) == 0.0f || m_isStamina)
+	if (Pad::IsRelase(kPadButtonA) || m_isStamina)
 	{
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
@@ -1513,10 +1522,12 @@ void Player::DashUpdate()
 		if (m_isLockOn)
 		{
 			OnLockOnWalk();
+			return;
 		}
 		else
 		{
 			OnWalk();
+			return;
 		}
 	}
 
@@ -1526,6 +1537,7 @@ void Player::DashUpdate()
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackX();
+		return;
 	}
 
 	//攻撃Y
@@ -1535,6 +1547,7 @@ void Player::DashUpdate()
 		m_buttonKind = e_ButtonKind::kNone;
 		//OnAttackY();
 		OnAttackCharge();
+		return;
 	}
 	//攻撃Y(スピードタイプ以外はチャージあり)
 	else if (Pad::IsPress(kPadButtonY) && m_playerKind != e_PlayerKind::kSpeedPlayer && m_isFaceUse && !m_isStamina && !m_isMp)
@@ -1542,6 +1555,7 @@ void Player::DashUpdate()
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackCharge();
+		return;
 	}
 	//攻撃Y(スピードタイプのみショートカット)
 	else if (Pad::IsPress(kPadButtonY) && m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse && !m_isStamina && !m_isMp)
@@ -1550,6 +1564,7 @@ void Player::DashUpdate()
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackY();
+		return;
 	}
 
 	//ジャンプ
@@ -1558,6 +1573,7 @@ void Player::DashUpdate()
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 		OnDashJump();
+		return;
 	}
 
 	//顔を決定する	ここはZRで決定にする

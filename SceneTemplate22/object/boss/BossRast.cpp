@@ -214,7 +214,7 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 	{
 		m_damageFrame++;
 	}
-	else
+	else if (!m_isHit)
 	{
 		m_damageFrame = 0;
 	}
