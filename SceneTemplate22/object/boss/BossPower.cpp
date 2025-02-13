@@ -504,7 +504,7 @@ void BossPower::Attack1Update()
 
 	if (m_attackFrame > 15)
 	{
-		m_isAttack = true;
+		m_isAttack = false;
 	}
 
 	//アニメーションが終わったらアイドル状態に戻る
@@ -524,8 +524,9 @@ void BossPower::Attack2Update()
 
 	if (m_attackFrame > 15)
 	{
-		m_isAttack = true;
+		m_isAttack = false;
 	}
+
 
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
@@ -732,7 +733,7 @@ void BossPower::OnAttack1()
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_preliminaryActionFrame = 0;
-	//m_isAttack = true;
+	m_isAttack = true;
 
 	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 
@@ -749,7 +750,7 @@ void BossPower::OnAttack2()
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_preliminaryActionFrame = 0;
-	//m_isAttack = true;
+	m_isAttack = true;
 
 	m_attackKind = Game::e_BossAttackKind::kBossAttack;
 

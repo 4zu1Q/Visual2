@@ -19,6 +19,9 @@ namespace
 	constexpr float kCameraFar = 5000.0f;
 
 	constexpr int kTriggerDeadZone = 60;
+
+	constexpr int kPadButtonLStick = 0x00001000;
+
 }
 
 Camera2::Camera2():
@@ -86,25 +89,30 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 		ResetToPlayerView(playerAngle);
 	}
 
-	//レフトトリガーが押された場合
-	//if (Pad::IsTrigger(PAD_INPUT_7) && isLockOn)
-	if(m_input.Z > 500 && isLockOn)
+	//Lスティック押し込み
+	if (Pad::IsTrigger(kPadButtonLStick) && isLockOn)
 	{
 
-		m_isReset = true;
-		m_isLockOn = true;
+		//m_isReset = true;
+		m_isLockOn = !m_isLockOn;
 	}
-	else if (m_input.Z > 500 && !isLockOn)
+
+	if (Pad::IsTrigger(kPadButtonLStick) && !m_isLockOn)
 	{
-
-		if (m_input.Z < 450 && m_isReset)
-		{
-			ResetToPlayerView(playerAngle);
-			m_isReset = false;
-		}
-
-		m_isLockOn = false;
+		ResetToPlayerView(playerAngle);
 	}
+
+	//else if (Pad::IsTrigger(kPadButtonLStick) && !isLockOn)
+	//{
+
+	//	if (m_isReset)
+	//	{
+	//		ResetToPlayerView(playerAngle);
+	//		m_isReset = false;
+	//	}
+
+	//	m_isLockOn = false;
+	//}
 
 
 	if (!isLockOn)
@@ -154,14 +162,23 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 		m_angleH += dInputState.Rx / 10000.0f * Setting::GetInstance().GetSensitivity();
 		if (m_angleH < -DX_PI_F)
 		{
-			m_angleH += DX_TWO_PI_F;
+			m_angleH -= DX_TWO_PI_F;
 		}
 		if (m_angleH > DX_PI_F)
 		{
-			m_angleH -= DX_TWO_PI_F;
+			m_angleH += DX_TWO_PI_F;
 		}
 
-		m_angleV += dInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
+		//設定で上下反転変えられるようにする
+		if (Setting::GetInstance().GetIsFlipSideUp())
+		{
+			m_angleV -= dInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
+		}
+		else if (!Setting::GetInstance().GetIsFlipSideUp())
+		{
+			m_angleV += dInputState.Ry / 10000.0f * Setting::GetInstance().GetSensitivity() * 0.5f;
+		}
+
 		if (m_angleV < -DX_PI_F / 2.0f + 0.6f)
 		{
 			m_angleV = -DX_PI_F / 2.0f - 0.6f;
@@ -170,6 +187,7 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 		{
 			m_angleV = DX_PI_F / 2.0f + 0.6f;
 		}
+
 
 		// カメラの水平角度を制限
 		if (m_angleV < -0.9f)

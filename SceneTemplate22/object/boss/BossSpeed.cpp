@@ -542,7 +542,7 @@ void BossSpeed::Attack1Update()
 
 	if (m_attackFrame > 15)
 	{
-		m_isAttack = true;
+		m_isAttack = false;
 	}
 
 	//アニメーションが終わったらアイドル状態に戻る
@@ -565,7 +565,7 @@ void BossSpeed::Attack2Update()
 
 	if (m_attackFrame > 15)
 	{
-		m_isAttack = true;
+		m_isAttack = false;
 	}
 
 	//アニメーションが終わったらアイドル状態に戻る
@@ -754,6 +754,9 @@ void BossSpeed::OnPreliminaryAttack3()
 
 void BossSpeed::OnAttack1()
 {
+	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+
+	m_isAttack = true;
 	m_attackNum++;
 	m_attackType = 0;
 	m_actionTime = 0;
@@ -766,6 +769,7 @@ void BossSpeed::OnAttack2()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	m_isAttack = true;
 	m_attackNum++;
 	m_attackType = 0;
 	m_actionTime = 0;
@@ -778,6 +782,7 @@ void BossSpeed::OnAttack3()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	m_isAttack = false;
 	m_attackNum++;
 	m_attackType = 0;
 	m_actionTime = 0;

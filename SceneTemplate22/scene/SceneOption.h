@@ -28,6 +28,8 @@ private:
 	void SeUpdate();
 	//Sensitivity
 	void SensitivityUpdate();
+	//FlipSideUp
+	void FlipSideUpUpdate();
 	//FullScreen
 	void FullScreenUpdate();
 
@@ -42,6 +44,7 @@ private:
 		kBgm,
 		kSe,
 		kSensitivity,
+		kFlipSideUp,
 		kFullScreen
 	};
 
@@ -51,6 +54,7 @@ private:
 	int m_seScale;
 	int m_sensitivityScale;
 	bool m_isFullScreen;
+	bool m_isFlipSideUp;
 
 	int m_fontHandle;
 

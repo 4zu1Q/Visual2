@@ -534,7 +534,7 @@ void BossRast::Attack1Update()
 
 	if (m_attackFrame > 15)
 	{
-		m_isAttack = true;
+		m_isAttack = false;
 	}
 
 	if (m_pAnim->IsLoop())
@@ -554,7 +554,7 @@ void BossRast::Attack2Update()
 
 	if (m_attackFrame > 15)
 	{
-		m_isAttack = true;
+		m_isAttack = false;
 	}
 
 	if (m_pAnim->IsLoop())
@@ -688,7 +688,7 @@ void BossRast::OnDash()
 
 void BossRast::OnAttack1()
 {
-	m_isAttack = false;
+	m_isAttack = true;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;
@@ -702,7 +702,7 @@ void BossRast::OnAttack1()
 
 void BossRast::OnAttack2()
 {
-	m_isAttack = false;
+	m_isAttack = true;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_actionKind = 0;
 	m_actionTime = 0;

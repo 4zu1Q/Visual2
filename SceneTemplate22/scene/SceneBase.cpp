@@ -91,7 +91,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	EffectManager::GetInstance().Load("gameOverEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("attackChargeEffect", "Data/Effect/AttackCharge.efkefc", 60, 8.0f);
 	EffectManager::GetInstance().Load("attackChargeFinishEffect", "Data/Effect/ChargeFinish.efkefc", 120, 2.0f);
-	EffectManager::GetInstance().Load("attackYEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
+	EffectManager::GetInstance().Load("attackYEffect", "Data/Effect/PlayerShockAttack.efkefc", 40, 5.0f);
 	EffectManager::GetInstance().Load("playerShockEffect", "Data/Effect/PlayerShockAttack.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("bossShockEffect", "Data/Effect/BossShockAttack.efkefc", 160, 4.0f);
 	EffectManager::GetInstance().Load("backGroundEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
@@ -103,6 +103,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	EffectManager::GetInstance().Load("shotBossAttackEffect", "Data/Effect/ShotBossAttack.efkefc", 120, 5.5f);
 	EffectManager::GetInstance().Load("shotPlayerAttackXEffect", "Data/Effect/ShotPlayerAttackX.efkefc", 120, 4.5f);
 	EffectManager::GetInstance().Load("shotPlayerAttackYEffect", "Data/Effect/ShotPlayerAttackY2.efkefc", 120, 4.0f);
+	EffectManager::GetInstance().Load("speedPlayerAttackYEffect", "Data/Effect/AttackY.efkefc", 120, 4.0f);
 	EffectManager::GetInstance().Load("BossAttackShockEffect", "Data/Effect/BossShockAttack.efkefc", 120, 0.5f);
 
 }

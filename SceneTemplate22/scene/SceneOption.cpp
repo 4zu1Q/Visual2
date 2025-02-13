@@ -31,13 +31,15 @@ namespace
 	const Vec2 kBgmPos = { 160.0f , 180.0f };
 	const Vec2 kSePos = { 160.0f , 300.0f };
 	const Vec2 kSensitivityPos = { 160.0f , 420.0f };
-	const Vec2 kFullScreenPos = { 160.0f , 540.0f };
+	const Vec2 kFlipSideUpPos = { 160.0f , 540.0f };
+	const Vec2 kFullScreenPos = { 160.0f , 660.0f };
 
 	//選択UIのポジション
 	const Vec2 kBgmSelectPos = { 110 , 195 };
 	const Vec2 kSeSelectPos = { 110 , 315 };
 	const Vec2 kSensitivitySelectPos = { 110 , 430 };
-	const Vec2 kFullScreenSelectPos = { 110 , 550 };
+	const Vec2 kFlipSideUpSelectPos = { 110 , 550 };
+	const Vec2 kFullScreenSelectPos = { 110 , 670 };
 	
 	const Vec2 kTextBgmPosFront = { 1030 , 170 };
 	const Vec2 kTextBgmPosBack = { 1033 , 170 };
@@ -53,13 +55,15 @@ namespace
 	const Vec2 kBgmBarPos = { 550 , 170 };
 	const Vec2 kSeBarPos = { 550 , 290 };
 	const Vec2 kSensitivityBarPos = { 550 , 410 };
-	const Vec2 kMathPos = { 550 , 530 };
+	const Vec2 kFlipSideUpMathPos = { 550 , 530 };
+	const Vec2 kFullScreenMathPos = { 550 , 650 };
 	
 	const Vec2 kPointBgmPos = { 550 , 174 };
 	const Vec2 kPointSePos = { 550 , 294 };
 	const Vec2 kPointSensitivityPos = { 550 , 414 };
 
-	const Vec2 kCheckPos = { 550 , 530 };
+	const Vec2 kFlipSideUpCheckPos = { 550 , 530 };
+	const Vec2 kFullScreenCheckPos = { 550 , 650 };
 
 
 	constexpr float kCursorSpeed = 0.05f;
@@ -93,7 +97,8 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_bgmScale(50),
 	m_seScale(50),
 	m_sensitivityScale(50),
-	m_isFullScreen(false)
+	m_isFullScreen(false),
+	m_isFlipSideUp(false)
 {
 	m_isToNextScene = false;
 
@@ -124,6 +129,7 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_bgmScale = static_cast<int>(Setting::GetInstance().GetBGMVolume() * 100);
 	m_seScale = static_cast<int>(Setting::GetInstance().GetSEVolume() * 100);
 	m_sensitivityScale = static_cast<int>(Setting::GetInstance().GetSensitivity() * 100);
+	m_isFlipSideUp = !Setting::GetInstance().GetIsFlipSideUp();
 	m_isFullScreen = !Setting::GetInstance().GetIsFullScreen();
 
 	// メンバ関数ポインタの初期化
@@ -170,13 +176,20 @@ void SceneOption::Update()
 		m_cursorPos = kSensitivitySelectPos;
 
 		m_targetCursorUpPos = kSeSelectPos;
+		m_targetCursorDownPos = kFlipSideUpSelectPos;
+	}
+	else if (m_nowItem == e_Item::kFlipSideUp)
+	{
+		m_cursorPos = kFlipSideUpSelectPos;
+
+		m_targetCursorUpPos = kSensitivitySelectPos;
 		m_targetCursorDownPos = kFullScreenSelectPos;
 	}
 	else if (m_nowItem == e_Item::kFullScreen)
 	{
 		m_cursorPos = kFullScreenSelectPos;
 
-		m_targetCursorUpPos = kSensitivitySelectPos;
+		m_targetCursorUpPos = kFlipSideUpSelectPos;
 		m_targetCursorDownPos = kBgmSelectPos;
 	}
 
@@ -192,6 +205,7 @@ void SceneOption::Update()
 		Setting::GetInstance().SetBGMVolume(static_cast<float>(m_bgmScale) / 100);
 		Setting::GetInstance().SetSEVolume(static_cast<float>(m_seScale) / 100);
 		Setting::GetInstance().SetSensitivity(static_cast<float>(m_sensitivityScale) / 100);
+		Setting::GetInstance().SetIsFlipSideUp(m_isFlipSideUp);
 		Setting::GetInstance().SetIsFullScreen(m_isFullScreen);
 
 		Setting::GetInstance().Save();
@@ -218,15 +232,21 @@ void SceneOption::Draw()
 	DrawGraph(kBgmBarPos.x, kBgmBarPos.y, m_handles[kBarH], true);
 	DrawGraph(kSeBarPos.x, kSeBarPos.y, m_handles[kBarH], true);
 	DrawGraph(kSensitivityBarPos.x, kSensitivityBarPos.y, m_handles[kBarH], true);
-	DrawGraph(kMathPos.x, kMathPos.y, m_handles[kMathH], true);
+	DrawGraph(kFlipSideUpCheckPos.x, kFlipSideUpCheckPos.y, m_handles[kMathH], true);
+	DrawGraph(kFullScreenMathPos.x, kFullScreenMathPos.y, m_handles[kMathH], true);
 
 	DrawGraph(kPointBgmPos.x + m_bgmScale * 3.68, kPointBgmPos.y, m_handles[kPointH], true);
 	DrawGraph(kPointSePos.x + m_seScale * 3.68, kPointSePos.y, m_handles[kPointH], true);
 	DrawGraph(kPointSensitivityPos.x + m_sensitivityScale * 3.68, kPointSensitivityPos.y, m_handles[kPointH], true);
 
+	if (m_isFlipSideUp)
+	{
+		DrawGraph(kFlipSideUpCheckPos.x, kFlipSideUpCheckPos.y, m_handles[kCheckH], true);
+	}
+
 	if (m_isFullScreen)
 	{
-		DrawGraph(kCheckPos.x, kCheckPos.y, m_handles[kCheckH], true);
+		DrawGraph(kFullScreenCheckPos.x, kFullScreenCheckPos.y, m_handles[kCheckH], true);
 	}
 
 	DrawGraph(kBBackPos.x, kBBackPos.y, m_handles[kBackH], true);
@@ -251,6 +271,8 @@ void SceneOption::Draw()
 		DrawGraph(kSePos.x, kSePos.y, m_handles[kSeH], true);
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
+		//FlipSideUp
+		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFullScreenH], true);
 		//FullScreen
 		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
 	}
@@ -262,6 +284,8 @@ void SceneOption::Draw()
 		DrawFadeSelectGraph(m_handles[kSeH], kSePos);
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
+		//FlipSideUp
+		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFullScreenH], true);
 		//FullScreen
 		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
 	}
@@ -273,6 +297,21 @@ void SceneOption::Draw()
 		DrawGraph(kSePos.x, kSePos.y, m_handles[kSeH], true);
 		//Sensitivity
 		DrawFadeSelectGraph(m_handles[kSensitivityH], kSensitivityPos);
+		//FlipSideUp
+		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFullScreenH], true);
+		//FullScreen
+		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
+	}
+	else if (m_nowItem == e_Item::kFlipSideUp)
+	{
+		//BGM
+		DrawGraph(kBgmPos.x, kBgmPos.y, m_handles[kBgmH], true);
+		//SE
+		DrawGraph(kSePos.x, kSePos.y, m_handles[kSeH], true);
+		//Sensitivity
+		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
+		//FlipSideUp
+		DrawFadeSelectGraph(m_handles[kFullScreenH], kFlipSideUpPos);
 		//FullScreen
 		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
 	}
@@ -284,6 +323,8 @@ void SceneOption::Draw()
 		DrawGraph(kSePos.x, kSePos.y, m_handles[kSeH], true);
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
+		//FlipSideUp
+		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFullScreenH], true);
 		//FullScreen
 		DrawFadeSelectGraph(m_handles[kFullScreenH], kFullScreenPos);
 	}
@@ -292,7 +333,7 @@ void SceneOption::Draw()
 
 	DrawFormatString(0, 0, 0xffffff, "Scene Option");
 
-	DrawFormatString(0, 16, 0xffffff, "Item : %d", m_nowItem);
+	DrawFormatString(0, 160, 0xffffff, "Item : %d", m_nowItem);
 
 	DrawFormatString(32, 32, 0xffffff, "BGM");
 	DrawFormatString(32, 48, 0xffffff, "SE");
@@ -430,8 +471,8 @@ void SceneOption::SensitivityUpdate()
 	if (Pad::IsTrigger(PAD_INPUT_DOWN))
 	{
 		SoundManager::GetInstance().PlaySe("selectSe");
-		m_nowItem = e_Item::kFullScreen;
-		m_updateFunc = &SceneOption::FullScreenUpdate;
+		m_nowItem = e_Item::kFlipSideUp;
+		m_updateFunc = &SceneOption::FlipSideUpUpdate;
 		FadeGraphSelectReset();
 		UpdateCursorDown();
 	}
@@ -464,14 +505,41 @@ void SceneOption::SensitivityUpdate()
 	}
 }
 
+void SceneOption::FlipSideUpUpdate()
+{
+	if (Pad::IsTrigger(PAD_INPUT_UP))
+	{
+		SoundManager::GetInstance().PlaySe("selectSe");
+		m_nowItem = e_Item::kSensitivity;
+		m_updateFunc = &SceneOption::SensitivityUpdate;
+		FadeGraphSelectReset();
+		UpdateCursorUp();
+	}
+
+	if (Pad::IsTrigger(PAD_INPUT_DOWN))
+	{
+		SoundManager::GetInstance().PlaySe("selectSe");
+		m_nowItem = e_Item::kFullScreen;
+		m_updateFunc = &SceneOption::FullScreenUpdate;
+		FadeGraphSelectReset();
+		UpdateCursorDown();
+	}
+
+	if (Pad::IsTrigger(PAD_INPUT_1))
+	{
+		SoundManager::GetInstance().PlaySe("dectionSe");
+		m_isFlipSideUp = !m_isFlipSideUp;
+	}
+}
+
 void SceneOption::FullScreenUpdate()
 {
 
 	if (Pad::IsTrigger(PAD_INPUT_UP))
 	{
 		SoundManager::GetInstance().PlaySe("selectSe");
-		m_nowItem = e_Item::kSensitivity;
-		m_updateFunc = &SceneOption::SensitivityUpdate;
+		m_nowItem = e_Item::kFlipSideUp;
+		m_updateFunc = &SceneOption::FlipSideUpUpdate;
 		FadeGraphSelectReset();
 		UpdateCursorUp();
 	}

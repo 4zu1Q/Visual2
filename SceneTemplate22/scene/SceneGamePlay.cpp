@@ -30,6 +30,7 @@
 
 #include "util/Pad.h"
 #include "util/SoundManager.h"
+#include "util/SaveDataManager.h"
 #include "util/EffectManager.h"
 
 namespace
@@ -266,6 +267,8 @@ void SceneGamePlay::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectTransSe");
 				SoundManager::GetInstance().StopBgm("stageClearBgm");
+				//パワータイプの顔が使用できるようになる
+				SaveDataManager::GetInstance().OnRelease(Game::e_PlayerKind::kPowerPlayer);
 				StartFadeOut();
 				m_isToNextScene = true;
 
@@ -286,6 +289,8 @@ void SceneGamePlay::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectTransSe");
 				SoundManager::GetInstance().StopBgm("stageClearBgm");
+				//スピードタイプの顔が使用できるようになる
+				SaveDataManager::GetInstance().OnRelease(Game::e_PlayerKind::kPowerPlayer);
 				StartFadeOut();
 				m_isToNextScene = true;
 
@@ -306,6 +311,8 @@ void SceneGamePlay::Update()
 			{
 				SoundManager::GetInstance().PlaySe("selectTransSe");
 				SoundManager::GetInstance().StopBgm("stageClearBgm");
+				//ショットタイプの顔が使用できるようになる
+				SaveDataManager::GetInstance().OnRelease(Game::e_PlayerKind::kShotPlayer);
 				StartFadeOut();
 				m_isToNextScene = true;
 
@@ -317,6 +324,8 @@ void SceneGamePlay::Update()
 	if (m_gameClearTime > 240)
 	{
 		SoundManager::GetInstance().StopBgm("battleBgm");
+		//ラスボスタイプの顔が使用できるようになる
+		SaveDataManager::GetInstance().OnRelease(Game::e_PlayerKind::kRassPlayer);
 
 		m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
 		return;

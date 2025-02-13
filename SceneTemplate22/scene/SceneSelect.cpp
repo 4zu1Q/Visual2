@@ -317,7 +317,7 @@ void SceneSelect::Draw()
 
 		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
 		//クリアしていた場合
-		//if(SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kPowerPlayer))
+		//if(SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
 		{
 			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kPowerClearItemH], true);
 		}
@@ -332,7 +332,7 @@ void SceneSelect::Draw()
 
 		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
 		//クリアしていた場合
-		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kSpeedPlayer))
+		//if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
 		{
 			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kSpeedClearItemH], true);
 		}
@@ -347,7 +347,7 @@ void SceneSelect::Draw()
 
 		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
 		//クリアしていた場合
-		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kShotPlayer))
+		//if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 		{
 			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kShotClearItemH], true);
 		}
@@ -365,17 +365,17 @@ void SceneSelect::Draw()
 		DrawGraph(kHitStarPos.x + 25, kHitStarPos.y - 40, m_handles[kNoClearItemH], true);
 
 		//条件を満たしていた場合していた場合
-		//if ()
+		//if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
 		{
 			DrawGraph(kHitStarPos.x - 25, kHitStarPos.y - 40, m_handles[kPowerClearItemH], true);
 		}
 
-		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kShotPlayer))
+		//if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 		{
 			DrawGraph(kHitStarPos.x, kHitStarPos.y - 80, m_handles[kShotClearItemH], true);
 		}
 
-		//if (SaveDataManager::GetInstance().IsRelease(e_PlayerKind::kSpeedPlayer))
+		//if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
 		{
 			DrawGraph(kHitStarPos.x + 25, kHitStarPos.y - 40 , m_handles[kSpeedClearItemH], true);
 		}

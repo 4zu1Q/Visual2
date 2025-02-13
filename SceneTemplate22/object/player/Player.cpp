@@ -2559,14 +2559,16 @@ void Player::OnAttackY()
 	{
 		EffectManager::GetInstance().CreateEffect("shotPlayerAttackYEffect", VGet(m_attackYPos.x, m_attackYPos.y - 4.0f, m_attackYPos.z));
 		m_isAttack = false;
-
+	}
+	else if (m_playerKind == Game::e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		EffectManager::GetInstance().CreateEffect("speedPlayerAttackYEffect", m_attackYPos);
+		m_isAttack = true;
 	}
 	else
 	{
-		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("attackYEffect", m_hitPos);
+		EffectManager::GetInstance().CreateEffect("attackYEffect", m_pos);
 		m_isAttack = true;
-
 	}
 
 	//タイプによってアニメーションを変える

@@ -8,6 +8,7 @@ private:
 		float seVolume = 0.5f;
 		float sensitivity = 0.5f;
 		bool isFullScreen = false;
+		bool isFlipSideUp = false;
 	};
 private:
 	// シングルトンパターンなのでコンストラクタはprivateに置く
@@ -49,11 +50,13 @@ public:
 	void SetSEVolume(float volume) { m_data.seVolume = volume; }
 	void SetSensitivity(float sensitivity) { m_data.sensitivity = sensitivity; }
 	void SetIsFullScreen(bool isFullScreen) { m_data.isFullScreen = isFullScreen; }
+	void SetIsFlipSideUp(bool isFlipSideUp) { m_data.isFlipSideUp = isFlipSideUp; }
 
 	const float GetBGMVolume()const { return m_data.bgmVolume; }
 	const float GetSEVolume()const { return m_data.seVolume; }
 	const float GetSensitivity()const { return m_data.sensitivity; }
 	const bool GetIsFullScreen()const { return !m_data.isFullScreen; }
+	const bool GetIsFlipSideUp()const { return !m_data.isFlipSideUp; }
 
 	void Load();
 	void Save();
