@@ -77,6 +77,7 @@ namespace
 		kBgmH,
 		kSeH,
 		kSensitivityH,
+		kFlipSideUpH,
 		kFullScreenH,
 		kBarH,
 		kMathH,
@@ -112,6 +113,7 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_handles.push_back(LoadGraph("Data/Image/Bgm2.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Se2.png"));				
 	m_handles.push_back(LoadGraph("Data/Image/Sensitivity.png"));		
+	m_handles.push_back(LoadGraph("Data/Image/FlipSideUp.png"));
 	m_handles.push_back(LoadGraph("Data/Image/FullScreen.png"));		
 	m_handles.push_back(LoadGraph("Data/Image/Bar.png"));
 	m_handles.push_back(LoadGraph("Data/Image/FullScreenMath.png"));
@@ -272,7 +274,7 @@ void SceneOption::Draw()
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
 		//FlipSideUp
-		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFullScreenH], true);
+		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFlipSideUpH], true);
 		//FullScreen
 		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
 	}
@@ -285,7 +287,7 @@ void SceneOption::Draw()
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
 		//FlipSideUp
-		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFullScreenH], true);
+		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFlipSideUpH], true);
 		//FullScreen
 		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
 	}
@@ -298,7 +300,7 @@ void SceneOption::Draw()
 		//Sensitivity
 		DrawFadeSelectGraph(m_handles[kSensitivityH], kSensitivityPos);
 		//FlipSideUp
-		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFullScreenH], true);
+		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFlipSideUpH], true);
 		//FullScreen
 		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
 	}
@@ -311,7 +313,7 @@ void SceneOption::Draw()
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
 		//FlipSideUp
-		DrawFadeSelectGraph(m_handles[kFullScreenH], kFlipSideUpPos);
+		DrawFadeSelectGraph(m_handles[kFlipSideUpH], kFlipSideUpPos);
 		//FullScreen
 		DrawGraph(kFullScreenPos.x, kFullScreenPos.y, m_handles[kFullScreenH], true);
 	}
@@ -324,7 +326,7 @@ void SceneOption::Draw()
 		//Sensitivity
 		DrawGraph(kSensitivityPos.x, kSensitivityPos.y, m_handles[kSensitivityH], true);
 		//FlipSideUp
-		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFullScreenH], true);
+		DrawGraph(kFlipSideUpPos.x, kFlipSideUpPos.y, m_handles[kFlipSideUpH], true);
 		//FullScreen
 		DrawFadeSelectGraph(m_handles[kFullScreenH], kFullScreenPos);
 	}
