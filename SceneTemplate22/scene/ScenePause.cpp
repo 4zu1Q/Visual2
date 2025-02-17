@@ -195,7 +195,7 @@ void ScenePause::Update()
 				SoundManager::GetInstance().StopBgm("selectBgm");
 				StartFadeOut();	//フェードアウト開始
 				m_isToNextScene = true;
-				SaveDataManager::GetInstance().Save(); //セーブデータの保存
+				//SaveDataManager::GetInstance().Save(); //セーブデータの保存
 			}
 		}
 

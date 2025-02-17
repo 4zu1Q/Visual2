@@ -3,7 +3,10 @@
 #include "util/Game.h"
 
 // プレイヤーの種類を表す列挙型
-enum class e_PlayerKind;
+namespace Game
+{
+	enum class e_PlayerKind;
+}
 
 // セーブデータを管理するクラス
 class SaveDataManager

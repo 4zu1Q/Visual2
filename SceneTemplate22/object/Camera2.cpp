@@ -99,7 +99,7 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 
 	if (Pad::IsTrigger(kPadButtonLStick) && !m_isLockOn)
 	{
-		ResetToPlayerView(playerAngle);
+		//ResetToPlayerView(playerAngle);
 	}
 
 	//else if (Pad::IsTrigger(kPadButtonLStick) && !isLockOn)

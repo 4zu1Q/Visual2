@@ -246,6 +246,7 @@ void SceneGameClear::Draw()
 
 	DrawGraph(380, 100, m_handles[kGameClearH], true);
 
+#ifdef _DEBUG
 
 	DrawString(0, 0, "Scene Game Clear", 0xffffff, false);
 
@@ -254,6 +255,7 @@ void SceneGameClear::Draw()
 
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
+#endif
 
 	DrawFade(0xffffff);
 }

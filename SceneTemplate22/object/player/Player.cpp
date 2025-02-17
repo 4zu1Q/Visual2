@@ -1292,7 +1292,6 @@ void Player::LockOnWalkUpdate()
 			m_attackDir = VGet(playerToBoss.x, playerToBoss.y, playerToBoss.z);
 		}
 		//m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-
 	}
 	//動かなかったらアイドル状態へ
 	else
@@ -1423,24 +1422,25 @@ void Player::DashUpdate()
 
 	float speed = 0;
 
-	//カメラの正面方向ベクトル
-	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
-	//カメラの右方向ベクトル
-	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
 
-	//向きベクトル*移動量
-	front = VScale(front, -move.x);
-	//向きベクトル*移動量
-	right = VScale(right, -move.z);
-
-	move = VAdd(front, right);
-	move = VNorm(move);
 
 	//動いている間
 	if (VSquareSize(move) > 0.01f)
 	{
 		m_stamina -= 0.5f;
 
+		//カメラの正面方向ベクトル
+		VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+		//カメラの右方向ベクトル
+		VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+		//向きベクトル*移動量
+		front = VScale(front, -move.x);
+		//向きベクトル*移動量
+		right = VScale(right, -move.z);
+
+		move = VAdd(front, right);
+		move = VNorm(move);
 
 		//速度が決定できるので移動ベクトルに反映する
 		move = VNorm(move);
@@ -1584,6 +1584,8 @@ void Player::DashUpdate()
 		OnFaceUse();
 		return;
 	}
+
+
 
 	//顔を選択する関数
 	FaceSelect();

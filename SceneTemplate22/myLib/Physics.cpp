@@ -612,6 +612,7 @@ void MyLib::Physics::FixPositionWithWallInternal(std::shared_ptr<Collidable>& co
 	// 壁からの押し出し処理を試みる最大数だけ繰り返し
 	for (int i = 0; i < ColInfo::kMaxColHitTryNum; i++)
 	{
+
 		// 当たる可能性のある壁ポリゴンを全て見る
 		bool isHitWall = false;
 		// 壁ポリゴンの数だけ繰り返し

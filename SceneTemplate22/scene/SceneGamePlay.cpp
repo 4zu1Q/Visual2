@@ -290,7 +290,7 @@ void SceneGamePlay::Update()
 				SoundManager::GetInstance().PlaySe("selectTransSe");
 				SoundManager::GetInstance().StopBgm("stageClearBgm");
 				//スピードタイプの顔が使用できるようになる
-				SaveDataManager::GetInstance().OnRelease(Game::e_PlayerKind::kPowerPlayer);
+				SaveDataManager::GetInstance().OnRelease(Game::e_PlayerKind::kSpeedPlayer);
 				StartFadeOut();
 				m_isToNextScene = true;
 

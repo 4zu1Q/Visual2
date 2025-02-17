@@ -6,7 +6,7 @@
 
 namespace
 {
-	const char* const kSaveDataFilename = "Data/SaveData.csv";
+	const char* const kSaveDataFilename = "Data/SaveData/SaveData.csv";
 }
 
 SaveDataManager::SaveDataManager()
@@ -29,22 +29,26 @@ void SaveDataManager::Load()
 {
 	// ファイルを開く
 	int fileHandle = FileRead_open(kSaveDataFilename);
+
+	// データが存在する場合
 	if (fileHandle == 0)
 	{
-		assert(false && "読み込み失敗");
+		// 初期化処理
 		Init();
-		return;
 	}
-
-	// クリアタイムを読み込む
-	FileRead_read(&m_info.clearTime, sizeof(int), fileHandle);
-	// 解放情報を読み込む
-	for (int i = 0; i < static_cast<int>(Game::e_PlayerKind::kMax); i++)
+	// 存在しない場合
+	else
 	{
-		Game::e_PlayerKind kind = static_cast<Game::e_PlayerKind>(i);
-		bool isRelease;
-		FileRead_read(&isRelease, sizeof(bool), fileHandle);
-		m_info.isRelease[kind] = isRelease;
+		// クリアタイムを読み込む
+		FileRead_read(&m_info.clearTime, sizeof(int), fileHandle);
+		// 解放情報を読み込む
+		for (int i = 0; i < static_cast<int>(Game::e_PlayerKind::kMax); i++)
+		{
+			Game::e_PlayerKind kind = static_cast<Game::e_PlayerKind>(i);
+			bool isRelease;
+			FileRead_read(&isRelease, sizeof(bool), fileHandle);
+			m_info.isRelease[kind] = isRelease;
+		}
 	}
 
 	// ファイルを閉じる
