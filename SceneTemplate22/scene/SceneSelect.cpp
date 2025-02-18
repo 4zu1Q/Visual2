@@ -51,6 +51,8 @@ namespace
 		kPowerClearItemH,
 		kSpeedClearItemH,
 		kShotClearItemH,
+		kRastNoClearItemH,
+		kRastClearItemH,
 	};
 
 	//フォントのパス
@@ -63,11 +65,13 @@ namespace
 	constexpr VECTOR kInitPos = { -85.0f,35.0f,740.0f };
 	constexpr VECTOR kLookPos = { -100.0f,30.0f,500.0f };
 
+	//ボスに行く部屋に表示される画像の座標
 	const Vec2 kHitPos = { 440.0f , 480.0f };
 	const Vec2 kHitBossPos = { 340.0f , 30.0f };
 	const Vec2 kHitTextPos = { 740.0f , 230.0f };
 	const Vec2 kHitText2Pos = { 743.0f , 230.0f };
-	const Vec2 kHitStarPos = { 790.0f , 160.0f };
+	const Vec2 kHitItemPos = { 790.0f , 160.0f };
+	const Vec2 kHitStarPos = { 790.0f , 220.0f };
 
 }
 
@@ -109,14 +113,12 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
-	m_pPlayer->BossLook(kLookPos);
 	m_pCamera2->Initialize(m_pPlayer->GetPos());
 
 	m_isPowerStage = false;
 	m_isSpeedStage = false;
 	m_isShotStage = false;
 	m_isRastStage = false;
-
 
 	//タイトルのBgmが流れていたら止める用
 	SoundManager::GetInstance().StopBgm("selectBgm");
@@ -130,6 +132,8 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_handles.push_back(LoadGraph("Data/Image/PowerClearItem.png"));
 	m_handles.push_back(LoadGraph("Data/Image/SpeedClearItem.png"));
 	m_handles.push_back(LoadGraph("Data/Image/ShotClearItem.png"));
+	m_handles.push_back(LoadGraph("Data/Image/NoClearStar.png"));
+	m_handles.push_back(LoadGraph("Data/Image/ClearStar.png"));
 
 	m_fontHandle = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", kFontSize);
 
@@ -213,7 +217,7 @@ void SceneSelect::Update()
 
 	if (m_isRastStage)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_1))
+		if (Pad::IsTrigger(PAD_INPUT_1) && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer) && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer) && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 		{
 			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
 			StartFadeOut();
@@ -315,78 +319,68 @@ void SceneSelect::Draw()
 		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kPowerH], true);
 
-		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x, kHitItemPos.y, m_handles[kNoClearItemH], true);
 		//クリアしていた場合
 		if(SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
 		{
-			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kPowerClearItemH], true);
+			DrawGraph(kHitItemPos.x, kHitItemPos.y, m_handles[kPowerClearItemH], true);
 		}
-
-		//DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
-		//DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
 	}
 	if (m_isSpeedStage)
 	{
 		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kSpeedH], true);
 
-		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x, kHitItemPos.y, m_handles[kNoClearItemH], true);
 		//クリアしていた場合
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
 		{
-			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kSpeedClearItemH], true);
+			DrawGraph(kHitItemPos.x, kHitItemPos.y, m_handles[kSpeedClearItemH], true);
 		}
-
-		//DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
-		//DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
 	}
 	if (m_isShotStage)
 	{
 		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kShotH], true);
 
-		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x, kHitItemPos.y, m_handles[kNoClearItemH], true);
 		//クリアしていた場合
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 		{
-			DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kShotClearItemH], true);
+			DrawGraph(kHitItemPos.x, kHitItemPos.y, m_handles[kShotClearItemH], true);
 		}
-
-		//DrawFormatStringToHandle(kHitText2Pos.x, kHitText2Pos.y, 0x000000, m_fontHandle, "%d", m_test);
-		//DrawFormatStringToHandle(kHitTextPos.x, kHitTextPos.y, 0x696969, m_fontHandle, "%d", m_test);
 	}
 	if (m_isRastStage)
 	{
 		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kRastH], true);
 
-		DrawGraph(kHitStarPos.x - 25, kHitStarPos.y - 40, m_handles[kNoClearItemH], true);
-		DrawGraph(kHitStarPos.x, kHitStarPos.y - 80, m_handles[kNoClearItemH], true);
-		DrawGraph(kHitStarPos.x + 25, kHitStarPos.y - 40, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x - 25, kHitItemPos.y - 40, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x, kHitItemPos.y - 80, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x + 25, kHitItemPos.y - 40, m_handles[kNoClearItemH], true);
 
-		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kRastNoClearItemH], true);
 
 		//条件を満たしていた場合していた場合
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
 		{
-			DrawGraph(kHitStarPos.x - 25, kHitStarPos.y - 40, m_handles[kPowerClearItemH], true);
+			DrawGraph(kHitItemPos.x - 25, kHitItemPos.y - 40, m_handles[kPowerClearItemH], true);
 		}
 
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 		{
-			DrawGraph(kHitStarPos.x, kHitStarPos.y - 80, m_handles[kShotClearItemH], true);
+			DrawGraph(kHitItemPos.x, kHitItemPos.y - 80, m_handles[kShotClearItemH], true);
 		}
 
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
 		{
-			DrawGraph(kHitStarPos.x + 25, kHitStarPos.y - 40 , m_handles[kSpeedClearItemH], true);
+			DrawGraph(kHitItemPos.x + 25, kHitItemPos.y - 40 , m_handles[kSpeedClearItemH], true);
 		}
 
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kRassPlayer))
 		{
-			DrawGraph(kHitStarPos.x, kHitStarPos.y , m_handles[kSpeedClearItemH], true);
+			DrawGraph(kHitStarPos.x, kHitStarPos.y , m_handles[kRastClearItemH], true);
 		}
-
 	}
 
 

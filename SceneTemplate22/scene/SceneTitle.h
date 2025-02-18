@@ -57,7 +57,7 @@ private:
 
 	bool m_isPlayer;	//プレイヤーのタイトルバージョンのアニメーションを行う
 
-	bool m_isSkip;
+	bool m_isPreesAnyButton;
 	bool m_isStart;
 	
 

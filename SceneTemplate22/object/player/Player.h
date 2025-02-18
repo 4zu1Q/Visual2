@@ -10,10 +10,6 @@ class PlayerWeapon;
 class Collidable;
 class AnimController;
 
-class WeaponBase;
-
-
-
 class Player : public CharaBase
 {
 
@@ -198,17 +194,13 @@ private:
 	/// </summary>
 	void FaceSelect();
 
+	//プレイヤーがアイテムを使うときの関数
 	void FaceUse();
-
-	//タイプによってアニメーションを分ける関数
-	void AnimChange(const char* normal, const char* power, const char* speed, const char* shot);
 
 private:
 
 	//スマートポインタ
-	std::shared_ptr<WeaponBase> m_pWeaponBase;
 	std::shared_ptr<AnimController> m_pAnim;
-
 
 	//プレイヤーの顔の種類
 	Game::e_PlayerKind m_playerKind;
@@ -351,5 +343,4 @@ private:
 
 	//RTのインプット
 	DINPUT_JOYSTATE m_input;
-
 };

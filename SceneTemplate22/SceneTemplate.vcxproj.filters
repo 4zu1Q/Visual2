@@ -61,12 +61,6 @@
     <Filter Include="ソース ファイル\myLib">
       <UniqueIdentifier>{f4bf15a2-b8e1-4f06-b113-494134f39c37}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\object\weapon">
-      <UniqueIdentifier>{be7be85c-40c5-4fe5-8a69-2b70400e813a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\object\weapon">
-      <UniqueIdentifier>{4a628768-4d92-47ba-9de2-3ddc749b701d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\object\stage">
       <UniqueIdentifier>{774fc939-23d0-4125-ad5e-aff0564864a5}</UniqueIdentifier>
     </Filter>
@@ -221,18 +215,6 @@
     </ClCompile>
     <ClCompile Include="object\item\ItemBase.cpp">
       <Filter>ソース ファイル\object\item</Filter>
-    </ClCompile>
-    <ClCompile Include="object\weapon\WeaponBase.cpp">
-      <Filter>ソース ファイル\object\weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="object\weapon\Sword.cpp">
-      <Filter>ソース ファイル\object\weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="object\weapon\Axe.cpp">
-      <Filter>ソース ファイル\object\weapon</Filter>
-    </ClCompile>
-    <ClCompile Include="object\weapon\Dagger.cpp">
-      <Filter>ソース ファイル\object\weapon</Filter>
     </ClCompile>
     <ClCompile Include="object\item\ItemWarp.cpp">
       <Filter>ソース ファイル\object\item</Filter>
@@ -430,18 +412,6 @@
     </ClInclude>
     <ClInclude Include="object\item\ItemBase.h">
       <Filter>ヘッダー ファイル\object\item</Filter>
-    </ClInclude>
-    <ClInclude Include="object\weapon\WeaponBase.h">
-      <Filter>ヘッダー ファイル\object\weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="object\weapon\Sword.h">
-      <Filter>ヘッダー ファイル\object\weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="object\weapon\Axe.h">
-      <Filter>ヘッダー ファイル\object\weapon</Filter>
-    </ClInclude>
-    <ClInclude Include="object\weapon\Dagger.h">
-      <Filter>ヘッダー ファイル\object\weapon</Filter>
     </ClInclude>
     <ClInclude Include="object\item\ItemWarp.h">
       <Filter>ヘッダー ファイル\object\item</Filter>

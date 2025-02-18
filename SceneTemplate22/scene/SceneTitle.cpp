@@ -41,8 +41,7 @@ namespace
 	constexpr int kTextIntervalY = 24;
 
 	//タイトルロゴのポジション　※この型で画像などの移動を行っていく
-	const Vec2 kTitleLogoStartPos = { 240 , 0 };
-	const Vec2 kTitleLogoPos = { 300 , 100 };
+	const Vec2 kTitleLogoPos = { 240 , 0 };
 	
 	//UIのポジション定数
 	const Vec2 kNewGamePos = { 540.0f , 410.0f };
@@ -51,6 +50,8 @@ namespace
 	const Vec2 kEndPos = { 540.0f , 620.0f };
 
 	const Vec2 kAnyPreesButtonPos = { 240.0f , 550.0f };
+	const Vec2 kAnyPreesButtonSelectLeftPos = { 360 , 585 };
+	const Vec2 kAnyPreesButtonSelectRightPos = { 880 , 585 };
 
 	//選択UIのポジション
 	const Vec2 kNewGameSelectPos = { 520 , 425 };
@@ -71,12 +72,12 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_targetCursorDownPos = kNewGameSelectPos;
 	m_targetCursorUpPos = kNewGameSelectPos;
 
-	m_titleLogoPos = kTitleLogoStartPos;
+	m_titleLogoPos = kTitleLogoPos;
 
 
 	m_sceneTrans = e_SceneTrans::kNewGame;
 	m_isStart = false;
-	m_isSkip = false;
+	m_isPreesAnyButton = false;
 	m_isPlayer = true;
 	m_startTime = 0;
 	m_titleLogoTime = 0;
@@ -135,7 +136,7 @@ void SceneTitle::Update()
 	UpdateFadeGraphTitleLogo();
 
 	m_pCameraProduction->Update(m_PlayerPos, Game::e_PlayerProduction::kTitle);
-	m_pPlayerProduction->Update(m_isActionStart, m_isSkip);
+	m_pPlayerProduction->Update(m_isActionStart, m_isPreesAnyButton);
 	m_pSkyDome->Update();
 
 	SoundManager::GetInstance().PlayBgm("titleBgm", true);
@@ -150,14 +151,14 @@ void SceneTitle::Update()
 	}
 
 #endif
-	if(!m_isSkip) m_titleLogoTime++;
+	if(!m_isPreesAnyButton) m_titleLogoTime++;
 
 	if (m_titleLogoTime >= 140)
 	{
-		m_isSkip = true;
+		m_isPreesAnyButton = true;
 	}
 
-	if (Pad::IsTrigger(PAD_INPUT_1) && !m_isStart && m_isSkip)
+	if (Pad::IsTrigger(PAD_INPUT_1) && !m_isStart && m_isPreesAnyButton)
 	{
 		m_isStart = true;
 		SoundManager::GetInstance().PlaySe("dectionSe");
@@ -285,7 +286,7 @@ void SceneTitle::Update()
 			SoundManager::GetInstance().PlaySe("backSe");
 			m_isActionStart = false;
 			m_isStart = false;
-			m_isSkip = false;
+			m_isPreesAnyButton = false;
 			m_titleLogoTime = 0;
 			m_startTime = 0;
 			FadeGraphTitleLogoReset();
@@ -316,7 +317,8 @@ void SceneTitle::Update()
 		}
 	}
 
-	if (m_isSkip && m_isStart)
+
+	if (m_isPreesAnyButton && m_isStart)
 	{
 		// スタート指示を点滅させる
 		if (m_fadeGraphTime == 120)
@@ -342,7 +344,6 @@ void SceneTitle::Draw()
 	m_pCameraProduction->Draw();
 	m_pPlayerProduction->Draw();
 	m_pSkyDome->Draw();
-	//m_pTitleField->Draw();
 	m_pField->Draw();
 
 	// フェードしながら描画
@@ -352,17 +353,14 @@ void SceneTitle::Draw()
 	if (!m_isStart)
 	{
 		//ロゴ
-		//DrawGraph(m_titleLogoPos.x, m_titleLogoPos.y, m_handles[kLogoStartH], true);
 		DrawFadeGraphTitleLogo(m_handles[kLogoStartH], m_titleLogoPos);
 
-		if (m_isSkip)
+		if (m_isPreesAnyButton)
 		{
 			// 画像の描画
-
 			DrawFadeSelectGraph(m_handles[kPleasePressH], kAnyPreesButtonPos);
-			DrawGraph(360 + m_selectAnimation, 585, m_handles[kPointerH], true);
-			DrawTurnGraph(880 - m_selectAnimation, 585, m_handles[kPointerH], true);
-			
+			DrawGraph(kAnyPreesButtonSelectLeftPos.x + m_selectAnimation, kAnyPreesButtonSelectLeftPos.y, m_handles[kPointerH], true);
+			DrawTurnGraph(kAnyPreesButtonSelectRightPos.x - m_selectAnimation, kAnyPreesButtonSelectRightPos.y, m_handles[kPointerH], true);
 		}
 
 	}
@@ -430,7 +428,7 @@ void SceneTitle::Draw()
 	DrawString(0, 0, "Scene Title", 0xffffff, false);
 
 
-	DrawFormatString(0,16,0xffffff,"SkipFlag:%d",m_isSkip);
+	DrawFormatString(0,16,0xffffff,"SkipFlag:%d",m_isPreesAnyButton);
 
 	//DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
 
@@ -440,8 +438,6 @@ void SceneTitle::Draw()
 	//DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kQuit) * kTextIntervalY, 0xffffff, "Quit");
 
 #endif
-
-
 
 	DrawFade(0x000000);
 }

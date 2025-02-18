@@ -1,6 +1,5 @@
 ﻿#include "Player.h"
 #include "PlayerWeapon.h"
-#include "object/weapon/WeaponBase.h"
 
 #include "util/Pad.h"
 #include "util/AnimController.h"
@@ -128,6 +127,9 @@ namespace
 	constexpr int kPadButtonRStick = 0x00002000;
 	constexpr int kPadButtonLStick = 0x00001000;
 
+	//ライトトリガーが反応する値
+	constexpr int kRTButtonNum = -1000;
+
 	//最大値
 	constexpr float kMaxHp = 10.0f;
 	constexpr float kMaxMp = 300.0f;
@@ -223,9 +225,6 @@ Player::Player() :
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 	m_bossAttackKind = Game::e_BossAttackKind::kBossAttackNone;
 
-	// 影描画用の画像の読み込み
-	m_shadowH = LoadGraph("Data/Image/Shadow.png");
-
 	//モデルのロード
 	m_modelH = MV1LoadModel(kNormalModelFilename);
 	m_modelPowerH = MV1LoadModel(kPowerModelFilename);
@@ -251,10 +250,6 @@ Player::Player() :
 	m_buttonKind = e_ButtonKind::kNone;
 
 	m_pAnim = std::make_shared<AnimController>();
-
-	m_pWeaponBase = std::make_shared<WeaponBase>();
-	m_pWeaponBase->Initialize(m_weaponH, m_modelH, "handslot.r", "handslot.l", kWeaponScale);
-
 
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
@@ -514,7 +509,8 @@ void Player::Draw(PlayerWeapon& weapon)
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackXPos.x, m_attackXPos.y, m_attackXPos.z);
 	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
 	DrawFormatString(0, 348, 0xffffff, "playerAngle:%f", m_angle);
-	DrawFormatString(0, 328, 0xffffff, "playerAngle:%d", GetIsJump());
+
+	DrawFormatString(0, 500, 0xfff00f, "playerIsJump:%d", GetIsJump());
 
 	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
 
@@ -529,6 +525,10 @@ void Player::Draw(PlayerWeapon& weapon)
 		if (m_attackKind == Game::e_PlayerAttackKind::kPlayerShock) DrawSphere3D(m_attackYPos, m_attackShockRadius, 16, 0xffff00, 0xffffff, false);
 	}
 
+	if (m_isHit)
+	{
+		DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xff00ff, 0xffffff, false);
+	}
 
 
 #endif
@@ -2065,19 +2065,6 @@ void Player::AttackCharge()
 		EffectManager::GetInstance().CreateEffect("attackChargeFinishEffect", pos);
 	}
 
-	//if (m_chargeTime > 60)
-	//{
-	//	//エフェクトを入れてチャージされたかを確認できるようにする
-	//	//後音も入れる
-	//}
-	//else
-	//{
-	//	if (m_chargeTime % 30 == 0)
-	//	{
-	//		SoundManager::GetInstance().PlaySe("attackChargeSe");
-	//	}
-	//}
-
 	//Yボタンを離した場合
 	if (Pad::IsRelase(kPadButtonY) && m_chargeTime > 60)
 	{
@@ -2421,8 +2408,8 @@ void Player::OnIdle()
 
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimIdle, kAnimIdle, kAnimIdle, kAnimIdle);
+	//アイドルアニメーションにチェンジ
+	m_pAnim->ChangeAnim(kAnimIdle);
 
 	m_updateFunc = &Player::IdleUpdate;
 }
@@ -2435,16 +2422,16 @@ void Player::OnLockOnIdle()
 
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimIdle, kAnimIdle, kAnimIdle, kAnimIdle);
+	//アイドルアニメーションにチェンジ
+	m_pAnim->ChangeAnim(kAnimIdle);
 
 	m_updateFunc = &Player::LockOnIdleUpdate;
 }
 
 void Player::OnWalk()
 {
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimWalk, kAnimWalk, kAnimWalk, kAnimWalk);
+	//歩きアニメーションにチェンジ
+	m_pAnim->ChangeAnim(kAnimWalk);
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	m_updateFunc = &Player::WalkUpdate;
@@ -2452,8 +2439,8 @@ void Player::OnWalk()
 
 void Player::OnLockOnWalk()
 {
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimLockOnWalk, kAnimLockOnWalk, kAnimLockOnWalk, kAnimLockOnWalk);
+	//ロックオン歩きアニメーションにチェンジ
+	m_pAnim->ChangeAnim(kAnimLockOnWalk);
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 
 	m_updateFunc = &Player::LockOnWalkUpdate;
@@ -2461,9 +2448,9 @@ void Player::OnLockOnWalk()
 
 void Player::OnDash()
 {
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimDash, kAnimDash, kAnimDash, kAnimDash);
+	//走りアニメーションにチェンジ
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
+	m_pAnim->ChangeAnim(kAnimDash);
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kAbutton;
@@ -2488,23 +2475,23 @@ void Player::OnAttackX()
 	{
 	case 0:
 		//一番目の攻撃アニメーション
-		AnimChange(kAnimAttackX_First, kAnimAttackX_First, kAnimAttackX_First, kAnimAttackX_First);
+		m_pAnim->ChangeAnim(kAnimAttackX_First);
 		SoundManager::GetInstance().PlaySe("attackFirstSe");
 
 		break;
 	case 1:
 		//二番目の攻撃アニメーション
-		AnimChange(kAnimAttackX_Second, kAnimAttackX_Second, kAnimAttackX_Second, kAnimAttackX_Second);
+		m_pAnim->ChangeAnim(kAnimAttackX_Second);
 		SoundManager::GetInstance().PlaySe("attackSecondSe");
 		break;
 	case 2:
 		//三番目の攻撃アニメーション
-		AnimChange(kAnimAttackX_Third, kAnimAttackX_Third, kAnimAttackX_Third, kAnimAttackX_Third);
+		m_pAnim->ChangeAnim(kAnimAttackX_Third);
 		SoundManager::GetInstance().PlaySe("attackFirstSe");
 		break;
 	case 3:
 		//四番目の攻撃アニメーション
-		AnimChange(kAnimAttackX_Fourth, kAnimAttackX_Fourth, kAnimAttackX_Fourth, kAnimAttackX_Fourth);
+		m_pAnim->ChangeAnim(kAnimAttackX_Fourth);
 		SoundManager::GetInstance().PlaySe("attackThirdSe");
 		break;
 	default:
@@ -2542,8 +2529,8 @@ void Player::OnAttackY()
 		m_isAttack = true;
 	}
 
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimAttackY, kAnimAttackY, kAnimAttackY, kAnimAttackY);
+	//Y攻撃アニメーションにチェンジ
+	m_pAnim->ChangeAnim(kAnimAttackY);
 
 	SoundManager::GetInstance().PlaySe("attackYSe");
 
@@ -2561,9 +2548,6 @@ void Player::OnJump()
 
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("jumpEffect", pos);
-
-	//地面と接触しているかどうか
-	auto vel = m_rigidbody.GetVelocity();
 
 	m_jumpCount = 0;
 	m_jumpPower = 0;
@@ -2584,9 +2568,6 @@ void Player::OnDashJump()
 	EffectManager::GetInstance().CreateEffect("jumpEffect", pos);
 
 	m_stamina -= 20;
-
-	//地面と接触しているかどうか
-	auto vel = m_rigidbody.GetVelocity();
 
 	m_jumpCount = 0;
 	m_jumpPower = 0;
@@ -2623,7 +2604,6 @@ void Player::OnDashFall()
 {
 
 	m_jumpCount = 0;
-
 	m_pAnim->ChangeAnim(kAnimFall);
 	m_updateFunc = &Player::DashFallUpdate;
 }
@@ -2635,8 +2615,8 @@ void Player::OnAttackCharge()
 	SoundManager::GetInstance().PlaySe("attackChargeSe");
 	m_attackFrame = 0;
 
-	//タイプによってアニメーションを変える
-	AnimChange(kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge, kAnimAttackCharge);
+	//攻撃チャージアニメーションにチェンジ
+	m_pAnim->ChangeAnim(kAnimAttackCharge);
 
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
@@ -2742,53 +2722,27 @@ void Player::FaceSelect()
 
 void Player::FaceUse()
 {
-	if (m_input.Z <= -1000 && m_playerKind == e_PlayerKind::kPowerPlayer&& SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
+	if (m_input.Z <= kRTButtonNum && m_playerKind == e_PlayerKind::kPowerPlayer&& SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
 	{
 		OnFaceUse();
 		return;
 	}
-	else if (m_input.Z <= -1000 && m_playerKind == e_PlayerKind::kSpeedPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
+	else if (m_input.Z <= kRTButtonNum && m_playerKind == e_PlayerKind::kSpeedPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
 	{
 		OnFaceUse();
 		return;
 	}
-	else if (m_input.Z <= -1000 && m_playerKind == e_PlayerKind::kShotPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
+	else if (m_input.Z <= kRTButtonNum && m_playerKind == e_PlayerKind::kShotPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 	{
 		OnFaceUse();
 		return;
 	}
-	else if (m_input.Z <= -1000 && m_playerKind == e_PlayerKind::kRassPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kRassPlayer))
+	else if (m_input.Z <= kRTButtonNum && m_playerKind == e_PlayerKind::kRassPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kRassPlayer))
 	{
 		OnFaceUse();
 		return;
 	}
 
-}
-
-void Player::AnimChange(const char* normal, const char* power, const char* speed, const char* shot)
-{
-	//プレイヤーのタイプでアニメーションを変える
-	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(power);
-	}
-	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(speed);
-	}
-	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(shot);
-	}
-	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(normal);
-	}
-
-	if (!m_isFaceUse)
-	{
-		m_pAnim->ChangeAnim(normal);
-	}
 }
 
 const float& Player::GetRadius() const
