@@ -247,7 +247,7 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kNewGame)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
-				//SaveDataManager::GetInstance().Init();	//セーブデータの初期化
+				SaveDataManager::GetInstance().Init();	//セーブデータの初期化
 				m_isActionStart = true;
 				m_isActionBack = false;
 				StartFadeOut();
@@ -257,7 +257,6 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kLoadGame)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
-				//SaveDataManager::GetInstance().Load();	//セーブデータの読み込み
 				m_isActionStart = true;
 				m_isActionBack = false;
 				StartFadeOut();
@@ -274,7 +273,6 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kQuit)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
-				//SaveDataManager::GetInstance().Save(); //セーブデータの保存
 
 				DxLib_End();
 			}

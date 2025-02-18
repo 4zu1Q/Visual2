@@ -198,6 +198,8 @@ private:
 	/// </summary>
 	void FaceSelect();
 
+	void FaceUse();
+
 	//タイプによってアニメーションを分ける関数
 	void AnimChange(const char* normal, const char* power, const char* speed, const char* shot);
 

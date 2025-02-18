@@ -6,6 +6,7 @@
 #include "util/AnimController.h"
 #include "util/EffectManager.h"
 #include "util/SoundManager.h"
+#include "util/SaveDataManager.h"
 
 #include "myLib/MyLib.h"
 
@@ -788,13 +789,8 @@ void Player::IdleUpdate()
 		OnAttackY();
 	}
 
-	//顔を決定する	ここはZRで決定にする
-	//if (Pad::IsTrigger(kPadButtonLStick))
-	if (m_input.Z <= -1000)
-	{
-		OnFaceUse();
-		return;
-	}
+	//プレイヤーを変える関数
+	FaceUse();
 
 	//ロックオンした場合
 	if (m_isLockOn)
@@ -886,14 +882,8 @@ void Player::LockOnIdleUpdate()
 		OnAttackY();
 	}
 
-	//顔を決定する	ここはZRで決定にする
-	//if (Pad::IsTrigger(kPadButtonLStick))
-	//if (m_input.Z != 0)
-	if (m_input.Z <= -1000)
-	{
-		OnFaceUse();
-		return;
-	}
+
+	FaceUse();
 
 	//ロックオンしていなかったら
 	if (!m_isLockOn)
@@ -946,22 +936,22 @@ void Player::WalkUpdate()
 
 	float speed = 0;
 
-	//カメラの正面方向ベクトル
-	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
-	//カメラの右方向ベクトル
-	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
-
-	//向きベクトル*移動量
-	front = VScale(front, -move.x);
-	//向きベクトル*移動量
-	right = VScale(right, -move.z);
-
-	move = VAdd(front, right);
-	move = VNorm(move);
-
 	//動いている間
 	if (len != 0.0f)
 	{
+
+		//カメラの正面方向ベクトル
+		VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+		//カメラの右方向ベクトル
+		VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+		//向きベクトル*移動量
+		front = VScale(front, -move.x);
+		//向きベクトル*移動量
+		right = VScale(right, -move.z);
+
+		move = VAdd(front, right);
+		move = VNorm(move);
 
 		if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 		{
@@ -1122,14 +1112,8 @@ void Player::WalkUpdate()
 		return;
 	}
 
-	//顔を決定する	ここはZRで決定にする
-	//if (Pad::IsTrigger(kPadButtonLStick))
-	//if (m_input.Z != 0)
-	if (m_input.Z <= -1000)
-	{
-		OnFaceUse();
-		return;
-	}
+	FaceUse();
+
 
 	//顔を選択する関数
 	FaceSelect();
@@ -1172,22 +1156,21 @@ void Player::LockOnWalkUpdate()
 
 	float speed = 0;
 
-	//カメラの正面方向ベクトル
-	VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
-	//カメラの右方向ベクトル
-	VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
-
-	//向きベクトル*移動量
-	front = VScale(front, -move.x);
-	//向きベクトル*移動量
-	right = VScale(right, -move.z);
-
-	move = VAdd(front, right);
-	move = VNorm(move);
-
 	//動いている間
 	if (len != 0.0f)
 	{
+		//カメラの正面方向ベクトル
+		VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+		//カメラの右方向ベクトル
+		VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+		//向きベクトル*移動量
+		front = VScale(front, -move.x);
+		//向きベクトル*移動量
+		right = VScale(right, -move.z);
+
+		move = VAdd(front, right);
+		move = VNorm(move);
 
 		//速度が決定できるので移動ベクトルに反映する
 		move = VNorm(move);
@@ -1368,14 +1351,7 @@ void Player::LockOnWalkUpdate()
 		return;
 	}
 
-	//顔を決定する	ここはZRで決定にする
-	//if (Pad::IsTrigger(kPadButtonLStick))
-	//if(m_input.Z != 0)
-	if (m_input.Z <= -1000)
-	{
-		OnFaceUse();
-		return;
-	}
+	FaceUse();
 
 
 
@@ -1576,14 +1552,7 @@ void Player::DashUpdate()
 		return;
 	}
 
-	//顔を決定する	ここはZRで決定にする
-	//if (Pad::IsTrigger(kPadButtonLStick))
-	//if (m_input.Z != 0)
-	if (m_input.Z <= -1000)
-	{
-		OnFaceUse();
-		return;
-	}
+	FaceUse();
 
 
 
@@ -2397,22 +2366,22 @@ void Player::WeaponDraw(PlayerWeapon& weapon)
 void Player::PlayerDraw()
 {
 	//顔を付けている場合
-	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
 	{
 		//モデルの描画
 		MV1DrawModel(m_modelPowerH);
 	}
-	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
 	{
 		//モデルの描画
 		MV1DrawModel(m_modelSpeedH);
 	}
-	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 	{
 		//モデルの描画
 		MV1DrawModel(m_modelShotH);
 	}
-	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kRassPlayer))
 	{
 		//モデルの描画
 		MV1DrawModel(m_modelRassH);
@@ -2718,8 +2687,6 @@ void Player::OnDead()
 
 void Player::OnFaceChange()
 {
-
-
 	m_isFaceUse = !m_isFaceUse;
 	m_updateFunc = &Player::FaceChangeUpdate;
 }
@@ -2771,6 +2738,31 @@ void Player::FaceSelect()
 			m_playerKind = e_PlayerKind::kRassPlayer;
 		}
 	}
+}
+
+void Player::FaceUse()
+{
+	if (m_input.Z <= -1000 && m_playerKind == e_PlayerKind::kPowerPlayer&& SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
+	{
+		OnFaceUse();
+		return;
+	}
+	else if (m_input.Z <= -1000 && m_playerKind == e_PlayerKind::kSpeedPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
+	{
+		OnFaceUse();
+		return;
+	}
+	else if (m_input.Z <= -1000 && m_playerKind == e_PlayerKind::kShotPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
+	{
+		OnFaceUse();
+		return;
+	}
+	else if (m_input.Z <= -1000 && m_playerKind == e_PlayerKind::kRassPlayer && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kRassPlayer))
+	{
+		OnFaceUse();
+		return;
+	}
+
 }
 
 void Player::AnimChange(const char* normal, const char* power, const char* speed, const char* shot)

@@ -1,6 +1,7 @@
 ﻿#include "FaceUi.h"
 
 #include "object/player/Player.h"
+#include "util/SaveDataManager.h"
 
 namespace
 {
@@ -30,7 +31,6 @@ namespace
 
 FaceUi::FaceUi()
 {
-
 	m_handles.push_back(LoadGraph("Data/Image/PowerFace.png"));
 	m_handles.push_back(LoadGraph("Data/Image/PowerFace01.png"));		
 
@@ -67,46 +67,46 @@ void FaceUi::Draw(Player& player)
 	//セーブデータをやったら使う
 	if (player.GetFaceKind() == e_PlayerKind::kPowerPlayer)
 	{
-		//if(パワーボスフラグがtrueになっていたら)
+		if(SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
 		{
 			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerH], true);
 		}
-		//else
+		else
 		{
-			//DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerShadowH], true);
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kPowerShadowH], true);
 		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kSpeedPlayer)
 	{
-		//if(スピードボスフラグがtrueになっていたら)
+		if(SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
 		{
 			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedH], true);
 		}
-		//else
+		else
 		{
-			//DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedShadowH], true);
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kSpeedShadowH], true);
 		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kShotPlayer)
 	{
-		//if(ショットボスフラグがtrueになっていたら)
+		if(SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 		{
 			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotH], true);
 		}
-		//else
+		else
 		{
-			//DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotShadowH], true);
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kShotShadowH], true);
 		}
 	}
 	else if (player.GetFaceKind() == e_PlayerKind::kRassPlayer)
 	{
-		//if(ラスボスフラグがtrueになっていたら)
+		if(SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kRassPlayer))
 		{
 			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassH], true);
 		}
-		//else
+		else
 		{
-			//DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassShadowH], true);
+			DrawGraph(kFacePos.x, kFacePos.y, m_handles[kRassShadowH], true);
 		}
 	}
 
