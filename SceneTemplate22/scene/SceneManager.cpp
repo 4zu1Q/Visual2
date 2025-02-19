@@ -29,6 +29,9 @@ namespace
 	//処理バーの座標
 	constexpr int kBarPosX = 0;
 	constexpr int kBarPosY = Game::kScreenHeight - 16;
+
+	constexpr float kDebugNum = 16666.6f;
+
 }
 
 SceneManager::SceneManager()
@@ -114,20 +117,18 @@ void SceneManager::DrawDebug()
 	//処理バーの表示　
 	//説明
 #ifdef _DEBUG
-
 	DrawString(kUpdateBarStringPosX, kUpdateBarStringPosY, "処理", 0xffffff, 0x000000);
 	DrawBox(kExplainUpdateBarPosX1, kExplainUpdateBarPosY1, kExplainUpdateBarPosX2, kExplainUpdateBarPosY2, kUpdateBarColor, true);
 	DrawString(kDrawBarPosStringPosX, kDrawBarPosStringPosY, "描画", 0xffffff, 0x000000);
 	DrawBox(kExplainDrawBarPosX1, kExplainDrawBarPosY1, kExplainDrawBarPosX2, kExplainDrawBarPosY2, kDrawBarColor, true);
 
-	float rate = static_cast<float>(m_updateTime + m_drawTime) / 16666.6f;
+	float rate = static_cast<float>(m_updateTime + m_drawTime) / kDebugNum;
 	float width = static_cast<float>(Game::kScreenWidth * rate);
 	DrawBox(kBarPosX, kBarPosY, static_cast<int>(width), Game::kScreenHeight, kDrawBarColor, true);
 
-	rate = static_cast<float>(m_updateTime) / 16666.6f;
+	rate = static_cast<float>(m_updateTime) / kDebugNum;
 	width = static_cast<float>(Game::kScreenWidth * rate);
 	DrawBox(kBarPosX, kBarPosY, static_cast<int>(width), Game::kScreenHeight, kUpdateBarColor, true);
-
 #endif
 
 }

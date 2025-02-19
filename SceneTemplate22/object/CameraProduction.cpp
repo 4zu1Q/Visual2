@@ -26,8 +26,12 @@ namespace
 	constexpr float kSelectSpeed = 0.01f;
 	constexpr float kSelectAnimationSize = 1.0f;
 
-	constexpr float kCameraNear = 5.0f;
+	constexpr float kCameraNear = 0.1f;
 	constexpr float kCameraFar = 5000.0f;
+
+	constexpr float kSmashNum = 2.0f;
+
+	constexpr float kFovNum = 60.0f;
 }
 
 CameraProduction::CameraProduction():
@@ -42,7 +46,7 @@ CameraProduction::CameraProduction():
 	m_cameraAnimation(0.0f)
 {
 	//カメラ
-	SetCameraNearFar(0.1f, 1000.0f);
+	SetCameraNearFar(kCameraNear, kCameraFar);
 
 	// カメラの初期水平角度は１８０度
 	m_angleH = DX_PI_F;
@@ -51,7 +55,7 @@ CameraProduction::CameraProduction():
 	m_angleV = 0.0f;
 
 	// FOV(視野角)を60度に
-	SetupCamera_Perspective(60.0f * (static_cast<float>(M_PI) / 180.0f));
+	SetupCamera_Perspective(kFovNum * (static_cast<float>(M_PI) / 180.0f));
 }
 
 CameraProduction::~CameraProduction()
@@ -68,14 +72,10 @@ void CameraProduction::Initialize(VECTOR playerPos, Game::e_PlayerProduction pla
 
 void CameraProduction::Finalize()
 {
-
-
 }
 
 void CameraProduction::Update(VECTOR playerPos, Game::e_PlayerProduction playerPro)
 {
-
-
 	// カメラの初期水平角度は１８０度
 	m_angleH = DX_PI_F;
 
@@ -95,9 +95,9 @@ void CameraProduction::Update(VECTOR playerPos, Game::e_PlayerProduction playerP
 	forwardVector.z = cos(m_angleV) * sin(-m_angleH);
 
 	// カメラの水平方向を算出
-	rightVector.x = cos(-m_angleH - DX_PI_F / 2.0f);
+	rightVector.x = cos(-m_angleH - DX_PI_F / kSmashNum);
 	rightVector.y = 0.0f;
-	rightVector.z = sin(-m_angleH - DX_PI_F / 2.0f);
+	rightVector.z = sin(-m_angleH - DX_PI_F / kSmashNum);
 
 	// カメラの座標を算出
 	if (playerPro == Game::e_PlayerProduction::kTitle)

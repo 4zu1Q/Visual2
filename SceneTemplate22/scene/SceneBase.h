@@ -120,8 +120,8 @@ protected:
 protected:
 
 	SceneManager& m_pManager;	//シーン管理クラスの参照
-	bool m_isToNextScene;
-	bool m_isFadeColor;		
+	bool m_isToNextScene;		//次のシーンに行く場合のフラグ
+	bool m_isFadeColor;			//フェードカラーの場合
 
 private:
 

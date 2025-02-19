@@ -30,12 +30,13 @@ namespace
 		kPointerH,
 	};
 
-	const Vec2 kSelectSelectPos = { 360 , 615 };
-	const Vec2 kTitleSelectPos = { 760 , 615 };
-
+	//画像の座標
 	const Vec2 kSelectPos = { 400.0f , 600.0f };
 	const Vec2 kTitlePos = { 800.0f , 600.0f };
+	const Vec2 kClearPos = { 380.0f , 100.0f };
 
+	const Vec2 kSelectSelectPos = { 360 , 615 };
+	const Vec2 kTitleSelectPos = { 760 , 615 };
 
 	constexpr float kCursorSpeed = 0.05f;
 
@@ -208,7 +209,6 @@ void SceneGameClear::Update()
 
 void SceneGameClear::Draw()
 {
-	//DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x2e8b57, true);
 	m_pField->Draw();
 
 	//背景座標
@@ -217,19 +217,12 @@ void SceneGameClear::Draw()
 	
 	m_pSkyDome->Draw();
 
-#ifdef _DEBUG
-
-
-
-
-#endif
-	//
+	//カーソル描画
 	DrawCursor();
 
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-
 		//Select
 		DrawFadeSelectGraph(m_handles[kSelectH], kSelectPos);
 		//Title
@@ -237,27 +230,24 @@ void SceneGameClear::Draw()
 	}
 	if (m_sceneTrans == e_SceneTrans::kTitle)
 	{
-
 		//Select
 		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 		//Title
 		DrawFadeSelectGraph(m_handles[kTitleH], kTitlePos);
 	}
 
-	DrawGraph(380, 100, m_handles[kGameClearH], true);
+	DrawGraph(kClearPos.x, kClearPos.y, m_handles[kGameClearH], true);
+
+	DrawFade(0xffffff);
 
 #ifdef _DEBUG
 
 	DrawString(0, 0, "Scene Game Clear", 0xffffff, false);
-
-
 	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
-
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
-#endif
 
-	DrawFade(0xffffff);
+#endif
 }
 
 void SceneGameClear::DrawCursor()

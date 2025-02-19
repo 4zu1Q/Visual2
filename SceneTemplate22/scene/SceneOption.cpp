@@ -90,14 +90,17 @@ namespace
 
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
+
+	constexpr int kScaleNum = 100;
+
 }
 
 SceneOption::SceneOption(SceneManager& manager) :
 	SceneBase(manager),
 	m_pushCount(0),
-	m_bgmScale(50),
-	m_seScale(50),
-	m_sensitivityScale(50),
+	m_bgmScale(0),
+	m_seScale(0),
+	m_sensitivityScale(0),
 	m_isFullScreen(false),
 	m_isFlipSideUp(false)
 {
@@ -125,7 +128,6 @@ SceneOption::SceneOption(SceneManager& manager) :
 
 	m_fontHandle = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", kFontSize);
 
-
 	FadeInSkip();
 
 	m_bgmScale = static_cast<int>(Setting::GetInstance().GetBGMVolume() * 100);
@@ -140,13 +142,11 @@ SceneOption::SceneOption(SceneManager& manager) :
 
 SceneOption::~SceneOption()
 {
-
 	//画像の削除
 	for (int i = 0; i < m_handles.size(); i++)
 	{
 		DeleteGraph(m_handles[i]);
 	}
-
 
 	m_handles.clear();
 }
@@ -204,9 +204,9 @@ void SceneOption::Update()
 	if (Pad::IsTrigger(PAD_INPUT_2))
 	{
 		SoundManager::GetInstance().PlaySe("backSe");
-		Setting::GetInstance().SetBGMVolume(static_cast<float>(m_bgmScale) / 100);
-		Setting::GetInstance().SetSEVolume(static_cast<float>(m_seScale) / 100);
-		Setting::GetInstance().SetSensitivity(static_cast<float>(m_sensitivityScale) / 100);
+		Setting::GetInstance().SetBGMVolume(static_cast<float>(m_bgmScale) / kScaleNum);
+		Setting::GetInstance().SetSEVolume(static_cast<float>(m_seScale) / kScaleNum);
+		Setting::GetInstance().SetSensitivity(static_cast<float>(m_sensitivityScale) / kScaleNum);
 		Setting::GetInstance().SetIsFlipSideUp(m_isFlipSideUp);
 		Setting::GetInstance().SetIsFullScreen(m_isFullScreen);
 
@@ -332,9 +332,7 @@ void SceneOption::Draw()
 	}
 
 #ifdef _DEBUG
-
 	DrawFormatString(0, 0, 0xffffff, "Scene Option");
-
 	DrawFormatString(0, 160, 0xffffff, "Item : %d", m_nowItem);
 
 	DrawFormatString(32, 32, 0xffffff, "BGM");
@@ -380,11 +378,11 @@ void SceneOption::BgmUpdate()
 		{
 			m_bgmScale++;
 
-			if (m_bgmScale > 100)
+			if (m_bgmScale > kScaleNum)
 			{
-				m_bgmScale = 100;
+				m_bgmScale = kScaleNum;
 			}
-			SoundManager::GetInstance().ChangeBGMVolume(static_cast<float>(m_bgmScale) / 100);
+			SoundManager::GetInstance().ChangeBGMVolume(static_cast<float>(m_bgmScale) / kScaleNum);
 		}
 		m_pushCount++;
 	}
@@ -399,7 +397,7 @@ void SceneOption::BgmUpdate()
 			{
 				m_bgmScale = 0;
 			}
-			SoundManager::GetInstance().ChangeBGMVolume(static_cast<float>(m_bgmScale) / 100);
+			SoundManager::GetInstance().ChangeBGMVolume(static_cast<float>(m_bgmScale) / kScaleNum);
 		}
 		m_pushCount++;
 	}
@@ -433,11 +431,11 @@ void SceneOption::SeUpdate()
 		{
 			m_seScale++;
 
-			if (m_seScale > 100)
+			if (m_seScale > kScaleNum)
 			{
-				m_seScale = 100;
+				m_seScale = kScaleNum;
 			}
-			SoundManager::GetInstance().ChangeSEVolume(static_cast<float>(m_seScale) / 100);
+			SoundManager::GetInstance().ChangeSEVolume(static_cast<float>(m_seScale) / kScaleNum);
 		}
 		m_pushCount++;
 	}
@@ -452,7 +450,7 @@ void SceneOption::SeUpdate()
 			{
 				m_seScale = 0;
 			}
-			SoundManager::GetInstance().ChangeSEVolume(static_cast<float>(m_seScale) / 100);
+			SoundManager::GetInstance().ChangeSEVolume(static_cast<float>(m_seScale) / kScaleNum);
 		}
 		m_pushCount++;
 	}
@@ -484,9 +482,9 @@ void SceneOption::SensitivityUpdate()
 		if (m_pushCount == 0 || m_pushCount > kPushWaitCount)
 		{
 			m_sensitivityScale++;
-			if (m_sensitivityScale > 100)
+			if (m_sensitivityScale > kScaleNum)
 			{
-				m_sensitivityScale = 100;
+				m_sensitivityScale = kScaleNum;
 			}
 		}
 		m_pushCount++;

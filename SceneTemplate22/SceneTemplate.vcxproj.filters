@@ -67,12 +67,6 @@
     <Filter Include="ヘッダー ファイル\object\stage">
       <UniqueIdentifier>{17b196ff-7941-457f-8c7f-af5325170c22}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\object\face">
-      <UniqueIdentifier>{07fca25c-9af8-4004-9faf-479ca2130ffd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\object\face">
-      <UniqueIdentifier>{90156e82-432e-4f8b-8427-578805bf931b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\object\shot">
       <UniqueIdentifier>{e1666975-3d42-46b0-bc23-01c264b4c9f1}</UniqueIdentifier>
     </Filter>
@@ -137,9 +131,6 @@
     </ClCompile>
     <ClCompile Include="ui\FaceUi.cpp">
       <Filter>ソース ファイル\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="object\Camera.cpp">
-      <Filter>ソース ファイル\object</Filter>
     </ClCompile>
     <ClCompile Include="object\player\PlayerWeapon.cpp">
       <Filter>ソース ファイル\object\player</Filter>
@@ -237,7 +228,7 @@
     <ClCompile Include="util\Setting.cpp">
       <Filter>ソース ファイル\util</Filter>
     </ClCompile>
-    <ClCompile Include="object\Camera2.cpp">
+    <ClCompile Include="object\Camera.cpp">
       <Filter>ソース ファイル\object</Filter>
     </ClCompile>
     <ClCompile Include="util\MoveDirectionVec.cpp">
@@ -260,9 +251,6 @@
     </ClCompile>
     <ClCompile Include="ui\LockOnTargetUi.cpp">
       <Filter>ソース ファイル\ui</Filter>
-    </ClCompile>
-    <ClCompile Include="myLib\AttackCol.cpp">
-      <Filter>ソース ファイル\myLib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -322,9 +310,6 @@
     </ClInclude>
     <ClInclude Include="ui\FaceUi.h">
       <Filter>ヘッダー ファイル\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="object\Camera.h">
-      <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
     <ClInclude Include="object\player\PlayerWeapon.h">
       <Filter>ヘッダー ファイル\object\player</Filter>
@@ -434,7 +419,7 @@
     <ClInclude Include="util\Setting.h">
       <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
-    <ClInclude Include="object\Camera2.h">
+    <ClInclude Include="object\Camera.h">
       <Filter>ヘッダー ファイル\object</Filter>
     </ClInclude>
     <ClInclude Include="util\MoveDirectionVec.h">
@@ -457,9 +442,6 @@
     </ClInclude>
     <ClInclude Include="ui\LockOnTargetUi.h">
       <Filter>ヘッダー ファイル\ui</Filter>
-    </ClInclude>
-    <ClInclude Include="myLib\AttackCol.h">
-      <Filter>ヘッダー ファイル\myLib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

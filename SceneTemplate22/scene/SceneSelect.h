@@ -15,7 +15,6 @@ class FaceUi;
 class FaceFrameUi;
 class ButtonUi;
 class PlayerBarUi;
-class BossShot;
 class ItemMp;
 class ItemHp;
 class Tomb;
@@ -52,13 +51,10 @@ private:
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
 	std::shared_ptr<ButtonUi> m_pButtonUi;
 
-	std::shared_ptr<BossShot> m_pBossShot;
-
 	std::shared_ptr<ItemMp> m_pItemMp;
 	std::shared_ptr<ItemHp> m_pItemHp;
 	std::shared_ptr<Tomb> m_pTomb;
 	std::shared_ptr<Field> m_pField;
-
 
 	std::shared_ptr<MyLib::Physics> m_pPhysics;
 
@@ -68,36 +64,23 @@ private:
 		kPowerTypeBoss,		//パワータイプのボス
 		kSpeedTypeBoss,		//スピードタイプのボス
 		kShooterTypeBoss,	//遠距離タイプのボス
-		kRastTypeBoss,			//ラスボス
+		kRastTypeBoss,		//ラスボス
 	};
 
+	//enum変数
 	e_SceneTrans m_sceneTrans;
-
-	int m_frameCount;
-
-	VECTOR m_playerPos;
-	VECTOR m_cameraPos;
-
-	int m_analogX;
-	int m_analogZ;
-
-	int m_radius;
-	float m_angle;
-
-
-	bool m_isFadingOut;
-	float m_cameraAngle;
 
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
+
+	//フォントハンドル
 	int m_fontHandle;
 
+	//ステージに移動する当たり判定フラグ
 	bool m_isPowerStage;
 	bool m_isSpeedStage;
 	bool m_isShotStage;
 	bool m_isRastStage;
 
-
-	int m_test = 0;
 };
 

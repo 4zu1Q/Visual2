@@ -38,6 +38,9 @@ private:
 		kTitle,					//タイトル
 	};
 
+	//enum変数
+	e_SceneTrans m_sceneTrans;
+
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
 
@@ -45,10 +48,9 @@ private:
 	int m_pauseHandle;
 	float m_selectAnimation;
 
+	//カーソル座標
 	Vec2 m_cursorPos;
 	Vec2 m_targetCursorUpPos;
 	Vec2 m_targetCursorDownPos;
-
-	e_SceneTrans m_sceneTrans;
 };
 

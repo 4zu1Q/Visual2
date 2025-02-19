@@ -10,7 +10,6 @@
 #include "object/player/Player.h"
 #include "object/player/PlayerWeapon.h"
 #include "object/Camera.h"
-#include "object/Camera2.h"
 #include "object/boss/BossShot.h"
 
 #include "object/item/ItemHp.h"
@@ -73,6 +72,10 @@ namespace
 	const Vec2 kHitItemPos = { 790.0f , 160.0f };
 	const Vec2 kHitStarPos = { 790.0f , 220.0f };
 
+	//調整する座標
+	const Vec2 kHitAdjustmentPos = { 25.0f , 40.0f };
+	const Vec2 kHitAdjustmentUpPos = { 25.0f , 80.0f };
+
 }
 
 
@@ -91,8 +94,6 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
 	m_pButtonUi = std::make_shared<ButtonUi>();
 
-	m_pBossShot = std::make_shared<BossShot>();
-
 	m_pField = std::make_shared<Field>(stageKind);
 	m_pSkyDome = std::make_shared<SkyDome>();
 
@@ -105,8 +106,6 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 
 	m_isToNextScene = false;
 
-	m_playerPos = VGet(0, 0, -120);
-	m_cameraPos = VGet(0, 0, 0);
 
 	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
 	m_pItemHp->Initialize(m_pPhysics);
@@ -217,7 +216,10 @@ void SceneSelect::Update()
 
 	if (m_isRastStage)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_1) && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer) && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer) && SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
+		if (Pad::IsTrigger(PAD_INPUT_1) &&
+			SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer) &&
+			SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer) && 
+			SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 		{
 			SoundManager::GetInstance().PlaySe("gamePlayTransSe");
 			StartFadeOut();
@@ -298,7 +300,6 @@ void SceneSelect::Update()
 
 void SceneSelect::Draw()
 {
-
 	m_pSkyDome->Draw();
 	m_pField->Draw();
 
@@ -355,26 +356,26 @@ void SceneSelect::Draw()
 		DrawFadeSelectGraph(m_handles[kHitH], kHitPos);
 		DrawGraph(kHitBossPos.x, kHitBossPos.y, m_handles[kRastH], true);
 
-		DrawGraph(kHitItemPos.x - 25, kHitItemPos.y - 40, m_handles[kNoClearItemH], true);
-		DrawGraph(kHitItemPos.x, kHitItemPos.y - 80, m_handles[kNoClearItemH], true);
-		DrawGraph(kHitItemPos.x + 25, kHitItemPos.y - 40, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x - kHitAdjustmentPos.x, kHitItemPos.y - kHitAdjustmentPos.y, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x, kHitItemPos.y - kHitAdjustmentUpPos.y, m_handles[kNoClearItemH], true);
+		DrawGraph(kHitItemPos.x + kHitAdjustmentPos.x, kHitItemPos.y - kHitAdjustmentPos.y, m_handles[kNoClearItemH], true);
 
 		DrawGraph(kHitStarPos.x, kHitStarPos.y, m_handles[kRastNoClearItemH], true);
 
 		//条件を満たしていた場合していた場合
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kPowerPlayer))
 		{
-			DrawGraph(kHitItemPos.x - 25, kHitItemPos.y - 40, m_handles[kPowerClearItemH], true);
+			DrawGraph(kHitItemPos.x - kHitAdjustmentPos.x, kHitItemPos.y - kHitAdjustmentPos.y, m_handles[kPowerClearItemH], true);
 		}
 
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kShotPlayer))
 		{
-			DrawGraph(kHitItemPos.x, kHitItemPos.y - 80, m_handles[kShotClearItemH], true);
+			DrawGraph(kHitItemPos.x, kHitItemPos.y - kHitAdjustmentUpPos.y, m_handles[kShotClearItemH], true);
 		}
 
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kSpeedPlayer))
 		{
-			DrawGraph(kHitItemPos.x + 25, kHitItemPos.y - 40 , m_handles[kSpeedClearItemH], true);
+			DrawGraph(kHitItemPos.x + kHitAdjustmentPos.x, kHitItemPos.y - kHitAdjustmentPos.y, m_handles[kSpeedClearItemH], true);
 		}
 
 		if (SaveDataManager::GetInstance().IsRelease(Game::e_PlayerKind::kRassPlayer))
@@ -382,14 +383,6 @@ void SceneSelect::Draw()
 			DrawGraph(kHitStarPos.x, kHitStarPos.y , m_handles[kRastClearItemH], true);
 		}
 	}
-
-
-#ifdef _DEBUG
-
-	DrawString(0, 0, "Scene Select", 0xffffff, false);
-	m_pCamera2->Draw();
-
-#endif
 
 	EffectManager::GetInstance().Draw();
 
@@ -401,5 +394,10 @@ void SceneSelect::Draw()
 	{
 		DrawFade(0xffffff);
 	}
+
+#ifdef _DEBUG
+	DrawString(0, 0, "Scene Select", 0xffffff, false);
+	m_pCamera2->Draw();
+#endif
 
 }

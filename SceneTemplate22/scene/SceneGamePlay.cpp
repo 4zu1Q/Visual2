@@ -17,7 +17,6 @@
 #include "object/boss/BossShot.h"
 #include "object/boss/BossRast.h"
 #include "object/Camera.h"
-#include "object/Camera2.h"
 #include "object/stage/Tomb.h"
 
 #include "ui/HpBar.h"
@@ -41,6 +40,9 @@ namespace
 	constexpr VECTOR kLightUpPos = { -15.0f,15.0f, -27.0f };
 	constexpr VECTOR kLightDownPos = { -15.0f,15.0f, -27.0f };
 
+	constexpr int kGameOverTimeMax = 180;
+	constexpr int kGameClearTimeMax = 240;
+
 	const Vec2 kHitPos = { 440.0f , 480.0f };
 
 	//使う画像の種類
@@ -52,56 +54,38 @@ namespace
 
 SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, Game::e_StageKind stageKind) :
 	SceneBase(manager),
-	m_isMpHit(false),
-	m_isHpHit(false),
-
-#ifdef _DEBUG
-
-	m_analogX(0),
-	m_analogZ(0),
-	m_radius(5),
-	m_angle(0.0f),
-
-#endif 
 	m_gameOverTime(0),
 	m_gameClearTime(0),
-	m_selectTime(0),
-	m_cameraAngle(0.0f)
+	m_selectTime(0)
 {
 	m_isToNextScene = false;
-
 	m_isCameraLockOn = true;
-
 	m_isPowerTriangl = false;
 	m_isSpeedTriangl = false;
 	m_isShotTriangl = false;
 
+	m_bossKind = bosskind;
+
 	m_pPlayer = std::make_shared<Player>();
 	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
 
-	m_pHpBarUi = std::make_shared<HpBar>();
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
 	m_pFaceUi = std::make_shared<FaceUi>();
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
 	m_pButtonUi = std::make_shared<ButtonUi>();
+	m_pHpBarUi = std::make_shared<HpBar>();
 
 	m_pBossPower = std::make_shared<BossPower>();
 	m_pBossSpeed = std::make_shared<BossSpeed>();
 	m_pBossShot = std::make_shared<BossShot>();
 	m_pBossRast = std::make_shared<BossRast>();
 
+	m_pCamera2 = std::make_shared<Camera2>();
+
 	m_pField = std::make_shared<Field>(stageKind);
 	m_pTomb = std::make_shared<Tomb>();
 
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
-
-	m_pCamera = std::make_shared<Camera>();
-	m_pCamera2 = std::make_shared<Camera2>();
-
-	m_playerPos = VGet(30, 0, 20);
-	m_cameraPos = VGet(0, 0, 0);
-
-	m_bossKind = bosskind;
 
 	//初期位置をセット
 	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
@@ -128,19 +112,14 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	}
 
 	m_pCamera2->Initialize(m_pPlayer->GetPos());
-
-
 	m_pTomb->Initialize();
-
 	m_pField->Initialize();
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/StageButton.png"));
 
-
 	//戦闘用BGMを最初に流す
 	SoundManager::GetInstance().PlayBgm("battleBgm", true);
-
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -238,7 +217,7 @@ void SceneGamePlay::Update()
 	}
 
 	//ゲームオーバー時間が過ぎたら
-	if (m_gameOverTime > 180)
+	if (m_gameOverTime > kGameOverTimeMax)
 	{
 		m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
 		return;
@@ -321,7 +300,7 @@ void SceneGamePlay::Update()
 	}
 
 	//ラスボスを倒した場合
-	if (m_gameClearTime > 240)
+	if (m_gameClearTime > kGameClearTimeMax)
 	{
 		SoundManager::GetInstance().StopBgm("battleBgm");
 		//ラスボスタイプの顔が使用できるようになる
@@ -329,25 +308,6 @@ void SceneGamePlay::Update()
 
 		m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
 		return;
-
-	}
-
-	//ボスのアップデート処理
-	if (m_bossKind == Game::e_BossKind::kPower)
-	{
-		m_pBossPower->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
-	}
-	else if (m_bossKind == Game::e_BossKind::kSpeed)
-	{
-		m_pBossSpeed->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
-	}
-	else if (m_bossKind == Game::e_BossKind::kShot)
-	{
-		m_pBossShot->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
-	}
-	else if (m_bossKind == Game::e_BossKind::kRast)
-	{
-		m_pBossRast->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 
 	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
@@ -355,23 +315,55 @@ void SceneGamePlay::Update()
 	//ボス別々にロックオンするための処理
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossPower->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
-		m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon,m_pCamera->GetCameraAngleX(),m_pBossPower->GetPosDown(),m_pCamera2->GetIsLockOn(),m_pBossPower->GetAttackKind());
+		//カメラのアップデート処理
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossPower->GetPosUp(),
+			m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
+
+		//プレイヤーのアップデート処理
+		m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(),
+			m_pBossPower->GetPosDown(),m_pCamera2->GetIsLockOn(),m_pBossPower->GetAttackKind());
+
+		//パワーボスのアップデート処理
+		m_pBossPower->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossSpeed->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossSpeed->GetPosDown(), m_pCamera2->GetIsLockOn(),m_pBossSpeed->GetAttackKind());
+		//カメラのアップデート処理
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossSpeed->GetPosUp(),
+			m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
+
+		//プレイヤーのアップデート処理
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(),
+			m_pBossSpeed->GetPosDown(), m_pCamera2->GetIsLockOn(),m_pBossSpeed->GetAttackKind());
+
+		//スピードボスのアップデート処理
+		m_pBossSpeed->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossShot->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossShot->GetPosDown(), m_pCamera2->GetIsLockOn(), m_pBossShot->GetAttackKind());
+		//カメラのアップデート処理
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossShot->GetPosUp(),
+			m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
+
+		//プレイヤーのアップデート処理
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(),
+			m_pBossShot->GetPosDown(), m_pCamera2->GetIsLockOn(), m_pBossShot->GetAttackKind());
+
+		//ショットボスのアップデート処理
+		m_pBossShot->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossRast->GetPosUp(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), m_pBossRast->GetPosDown(), m_pCamera2->GetIsLockOn(), m_pBossRast->GetAttackKind());
+		//カメラのアップデート処理
+		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossRast->GetPosUp(),
+			m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
+
+		//プレイヤーのアップデート処理
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(),
+			m_pBossRast->GetPosDown(), m_pCamera2->GetIsLockOn(), m_pBossRast->GetAttackKind());
+
+		//ラストボスのアップデート処理
+		m_pBossRast->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 	}
 
 	m_pPhysics->Update();
@@ -388,13 +380,6 @@ void SceneGamePlay::Update()
 	{
 		if (!IsFadingOut())
 		{
-			//フェードさせるやつ
-			//if (m_pPlayer->GetIsGameOver())
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneGameOver>(m_pManager, m_bossKind));
-			//	return;
-			//}
-
 			if (m_pBossPower->GetIsClear())
 			{
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
@@ -412,15 +397,8 @@ void SceneGamePlay::Update()
 				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
 				return;
 			}
-
-			//if (m_pBossRast->GetIsClear())
-			//{
-			//	m_pManager.ChangeScene(std::make_shared<SceneGameClear>(m_pManager));
-			//	return;
-			//}
 		}
 	}
-
 }
 
 void SceneGamePlay::Draw()
@@ -473,7 +451,10 @@ void SceneGamePlay::Draw()
 	EffectManager::GetInstance().Draw();
 
 	//クリアしたときのみ白いフェードにしておく
-	if (m_pBossPower->GetIsClear() || m_pBossSpeed->GetIsClear() || m_pBossShot->GetIsClear() || m_pBossRast->GetIsClear())
+	if (m_pBossPower->GetIsClear() ||
+		m_pBossSpeed->GetIsClear() ||
+		m_pBossShot->GetIsClear()  ||
+		m_pBossRast->GetIsClear())
 	{
 		DrawFade(0xffffff);
 	}
@@ -482,24 +463,8 @@ void SceneGamePlay::Draw()
 		DrawFade(0x000000);
 	}
 
-
-
 #ifdef _DEBUG
-
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
-
-
-	//if (m_isTriangl)
-	//{
-	//	DrawString(0, 600, "Hit", 0xffffff, false);
-	//}
-
 #endif // DEBUG
 
 }
-
-//void SceneGamePlay::StartFadeOut()
-//{
-//	SceneBase::StartFadeOut();
-//	m_isFadingOut = true;
-//}

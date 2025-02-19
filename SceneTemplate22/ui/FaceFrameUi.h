@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "DxLib.h"
 #include "util/Vec2.h"
+#include <vector>
 
 class Player;
 class FaceFrameUi
@@ -15,10 +16,8 @@ public:
 
 private:
 
-	//顔の枠のハンドル
-	int m_faceFrameHandle;
-	int m_faceFrameLockHandle;
-
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
 
 };
 

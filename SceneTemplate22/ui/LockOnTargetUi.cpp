@@ -17,6 +17,9 @@ namespace
 	constexpr float kUpMax = 3.0f;
 	//高さ
 	constexpr float kHeight = 25.0f;
+
+	//
+	constexpr float kHalf = 0.5f;
 }
 
 LockOnTargetUi::LockOnTargetUi() :
@@ -61,8 +64,8 @@ void LockOnTargetUi::Draw()
 	/// 第十引数			画像ハンドル
 	/// 第十一引数			反転するかどうか
 	/// </summary>
-	DrawModiBillboard3D(pos, -m_graphSizeX * 0.5f, m_graphSizeY * 0.5f, m_graphSizeX * 0.5f, m_graphSizeY * 0.5f,
-		m_graphSizeX * 0.5f, -m_graphSizeY * 0.5f, -m_graphSizeX * 0.5f, -m_graphSizeY * 0.5f, m_handle, true);
+	DrawModiBillboard3D(pos, -m_graphSizeX * kHalf, m_graphSizeY * kHalf, m_graphSizeX * kHalf, m_graphSizeY * kHalf,
+		m_graphSizeX * kHalf, -m_graphSizeY * kHalf, -m_graphSizeX * kHalf, -m_graphSizeY * kHalf, m_handle, true);
 }
 
 void LockOnTargetUi::CancelLockOn()

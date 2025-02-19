@@ -32,11 +32,12 @@ private:
 
 private:
 
+	//スマートポインタ
 	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
 	std::shared_ptr<CameraProduction> m_pCameraProduction;
 
-	int m_fadeTime;	//フェード時間の引き延ばし
-	float m_selectAnimation;
+	int m_fadeTime;				//フェード時間の引き延ばし
+	float m_selectAnimation;	//選択しているカーソルのアニメーション
 
 	//遷移先
 	enum class e_SceneTrans : int
@@ -48,10 +49,14 @@ private:
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
 
+	//行動するかしないかの場合
 	bool m_isActionStart;
 	bool m_isActionBack;
 
+	//シーンの種類
 	e_SceneTrans m_sceneTrans;
+
+	//戦っていたボスの種類
 	Game::e_BossKind m_bossKind;
 
 	// カーソルの現在位置と目標位置

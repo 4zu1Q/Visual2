@@ -15,6 +15,9 @@ namespace
 
 	constexpr float kCursorSpeed = 0.2f;
 
+	constexpr int kFadeMax = 255;
+	constexpr int kFadeTime = 120;
+	constexpr int kFadeNum = 2;
 
 }
 
@@ -76,8 +79,6 @@ SceneBase::SceneBase(SceneManager& manager):
 	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
 	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
 	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
-	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
-	//SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 
 	/*エフェクトのロード*/
 	EffectManager::GetInstance().Load("playerHitEffect", "Data/Effect/PlayerHit.efkefc", 120, 6.0f);
@@ -101,7 +102,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	EffectManager::GetInstance().Load("shotPreliminaryActionEffect", "Data/Effect/ShotPreliminaryAction.efkefc", 120, 3.0f);
 	EffectManager::GetInstance().Load("rassPreliminaryActionEffect", "Data/Effect/RassPreliminaryAction.efkefc", 120, 3.0f);
 	EffectManager::GetInstance().Load("shotBossAttackEffect", "Data/Effect/ShotBossAttack.efkefc", 120, 5.5f);
-	EffectManager::GetInstance().Load("shotPlayerAttackXEffect", "Data/Effect/ShotPlayerAttackX.efkefc", 120, 4.5f);
+	EffectManager::GetInstance().Load("shotPlayerAttackXEffect", "Data/Effect/ShotPlayerAttackX.efkefc", 60, 2.5f);
 	EffectManager::GetInstance().Load("shotPlayerAttackYEffect", "Data/Effect/ShotPlayerAttackY2.efkefc", 120, 4.0f);
 	EffectManager::GetInstance().Load("speedPlayerAttackYEffect", "Data/Effect/AttackY.efkefc", 120, 4.0f);
 	EffectManager::GetInstance().Load("BossAttackShockEffect", "Data/Effect/BossShockAttack.efkefc", 120, 0.5f);
@@ -113,9 +114,9 @@ void SceneBase::UpdateFade()
 
 	m_fadeBright += m_fadeSpeed;
 
-	if (m_fadeBright >= 255)
+	if (m_fadeBright >= kFadeMax)
 	{
-		m_fadeBright = 255;
+		m_fadeBright = kFadeMax;
 		if (m_fadeSpeed > 0)
 		{
 			m_fadeSpeed = 0;
@@ -164,7 +165,7 @@ bool SceneBase::IsFadingOut() const
 
 bool SceneBase::IsFinishFadeOut() const
 {
-	if (m_fadeBright == 255 && m_fadeSpeed == 0)
+	if (m_fadeBright == kFadeMax && m_fadeSpeed == 0)
 	{
 		return true;
 	}
@@ -180,14 +181,14 @@ void SceneBase::FadeInSkip()
 
 void SceneBase::FadeOutSkip()
 {
-	m_fadeBright = 255;
+	m_fadeBright = kFadeMax;
 	m_fadeSpeed = kFadeSpeed;
 }
 
 void SceneBase::UpdateFadeSelectGraph()
 {
 	// スタート指示を点滅させる
-	if (m_fadeGraphSelectTime == 120) 
+	if (m_fadeGraphSelectTime == kFadeTime)
 	{
 		m_fadeGraphSelectTime++;
 	}
@@ -195,20 +196,20 @@ void SceneBase::UpdateFadeSelectGraph()
 	{
 		m_fadeGraphSelectTime--;
 	}
-	else if (m_fadeGraphSelectTime % 2 == 0) 
+	else if (m_fadeGraphSelectTime % kFadeNum == 0)
 	{
-		m_fadeGraphSelectTime += 2;
+		m_fadeGraphSelectTime += kFadeNum;
 	}
 	else 
 	{
-		m_fadeGraphSelectTime -= 2;
+		m_fadeGraphSelectTime -= kFadeNum;
 	}
 }
 
 void SceneBase::DrawFadeSelectGraph(int graphHandle, Vec2 graphPos)
 {
 	// フェードしながら描画
-	int alpha = static_cast<int>(255 * ((float)m_fadeGraphSelectTime / 120));
+	int alpha = static_cast<int>(kFadeMax * ((float)m_fadeGraphSelectTime / kFadeTime));
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 	// 画像の描画
 	DrawGraph(graphPos.x, graphPos.y, graphHandle, true);
@@ -217,19 +218,19 @@ void SceneBase::DrawFadeSelectGraph(int graphHandle, Vec2 graphPos)
 
 void SceneBase::FadeGraphSelectReset()
 {
-	m_fadeGraphSelectTime = 120;
+	m_fadeGraphSelectTime = kFadeTime;
 }
 
 void SceneBase::UpdateFadeGraphTitleLogo()
 {
 	// スタート指示を点滅させる
-	if (m_fadeGraphTitleTime == 120)
+	if (m_fadeGraphTitleTime == kFadeTime)
 	{
 		m_fadeGraphTitleTime++;
 	}
-	else if (m_fadeGraphTitleTime % 2 == 0)
+	else if (m_fadeGraphTitleTime % kFadeNum == 0)
 	{
-		m_fadeGraphTitleTime += 2;
+		m_fadeGraphTitleTime += kFadeNum;
 	}
 
 }
@@ -237,7 +238,7 @@ void SceneBase::UpdateFadeGraphTitleLogo()
 void SceneBase::DrawFadeGraphTitleLogo(int graphHandle, Vec2 graphPos)
 {
 	// フェードしながら描画
-	int alpha = static_cast<int>(255 * ((float)m_fadeGraphTitleTime / 120));
+	int alpha = static_cast<int>(kFadeMax * ((float)m_fadeGraphTitleTime / kFadeTime));
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 	// 画像の描画
 	DrawGraph(graphPos.x, graphPos.y, graphHandle, true);

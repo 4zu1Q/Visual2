@@ -37,6 +37,10 @@ namespace
 	const Vec2 kSelectPos = { 800.0f , 600.0f };
 	const Vec2 kGamePlayPos = { 400.0f , 600.0f };
 
+	const Vec2 kGameOverPos = { 380.0f , 100.0f };
+	const Vec2 kGameOverBgPos = { 0.0f , -10.0f };
+
+
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
 }
@@ -183,21 +187,18 @@ void SceneGameOver::Update()
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
-		//if (m_fadeTime > 60)
+		if (!IsFadingOut())
 		{
-			if (!IsFadingOut())
+			if (m_sceneTrans == e_SceneTrans::kGamePlay)
 			{
-				if (m_sceneTrans == e_SceneTrans::kGamePlay)
-				{
-					m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, m_bossKind, Game::e_StageKind::kGamePlay));
-					return;
-				}
+				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, m_bossKind, Game::e_StageKind::kGamePlay));
+				return;
+			}
 
-				if (m_sceneTrans == e_SceneTrans::kSelect)
-				{
-					m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
-					return;
-				}
+			if (m_sceneTrans == e_SceneTrans::kSelect)
+			{
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				return;
 			}
 		}
 	}
@@ -210,30 +211,17 @@ void SceneGameOver::Update()
 
 void SceneGameOver::Draw()
 {
+	//背景
 	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
-
 
 	m_pCameraProduction->Draw();
 	m_pPlayerProduction->Draw();
-
-#ifdef _DEBUG
-
-
-	DrawString(0, 0, "Scene Game Over", 0xffffff, false);
-
-	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
-
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Retry");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
-
-#endif
 
 	DrawCursor();
 
 	//選択
 	if (m_sceneTrans == e_SceneTrans::kGamePlay)
 	{
-
 		//GamePlay
 		DrawFadeSelectGraph(m_handles[kGamePlayH], kGamePlayPos);
 		//Select
@@ -241,18 +229,23 @@ void SceneGameOver::Draw()
 	}
 	if (m_sceneTrans == e_SceneTrans::kSelect)
 	{
-
 		//GamePlay
 		DrawGraph(kGamePlayPos.x, kGamePlayPos.y, m_handles[kGamePlayH], true);
 		//Select
 		DrawFadeSelectGraph(m_handles[kSelectH], kSelectPos);
 	}
 
-
-	DrawGraph(0, -10 + m_selectAnimation, m_handles[kGameOverBgH], true);
-	DrawGraph(380, 100, m_handles[kGameOverH], true);
+	DrawGraph(kGameOverBgPos.x, kGameOverBgPos.y + m_selectAnimation, m_handles[kGameOverBgH], true);
+	DrawGraph(kGameOverPos.x, kGameOverPos.y, m_handles[kGameOverH], true);
 
 	DrawFade(0x000000);
+
+#ifdef _DEBUG
+	DrawString(0, 0, "Scene Game Over", 0xffffff, false);
+	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kGamePlay) * kTextIntervalY, 0xffffff, "Retry");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
+#endif
 }
 
 void SceneGameOver::DrawCursor()

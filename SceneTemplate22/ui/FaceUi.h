@@ -19,12 +19,5 @@ private:
 	
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
-
-	//顔のハンドル
-	int m_PowerFaceHandle;
-	int m_SpeedFaceHandle;
-	int m_ShotFaceHandle;
-	int m_RastFaceHandle;
-
 };
 

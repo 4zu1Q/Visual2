@@ -43,7 +43,7 @@ private:
 	//押したかどうか
 	bool m_isPush;
 
+	//シーン遷移種類
 	e_SceneTrans m_sceneTrans;
-
 };
 

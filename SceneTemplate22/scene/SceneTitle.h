@@ -35,12 +35,12 @@ private:
 
 private:
 
+	//スマートポインタ
 	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
 	std::shared_ptr<CameraProduction> m_pCameraProduction;
 	std::shared_ptr<SkyDome> m_pSkyDome;
 	std::shared_ptr<TitleField> m_pTitleField;
 	std::shared_ptr<Field> m_pField;
-
 
 	//遷移先
 	enum class e_SceneTrans : int
@@ -51,37 +51,40 @@ private:
 		kQuit,		//ゲーム終了
 	};
 
+	//enum変数
+	e_SceneTrans m_sceneTrans;
+
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
 
-
 	bool m_isPlayer;	//プレイヤーのタイトルバージョンのアニメーションを行う
 
+	//イベントのフラグ
 	bool m_isPreesAnyButton;
 	bool m_isStart;
 	
-
+	//タイム変数
 	int m_startTime;
 	int m_titleLogoTime;
 	int m_fadeGraphTime;
 
+	//カーソルアニメーション
 	float m_selectAnimation;
 
+	//プレイヤーの座標
 	VECTOR m_PlayerPos;
 
-
-	Vec2 m_titleLogoPos;
-
+	//行動するかしないかの場合
 	bool m_isActionStart;
 	bool m_isActionBack;
+
+	//タイトルロゴの座標
+	Vec2 m_titleLogoPos;
 
 	// カーソルの現在位置と目標位置
 	Vec2 m_cursorPos;
 	Vec2 m_targetCursorUpPos;
 	Vec2 m_targetCursorDownPos;
-
-	e_SceneTrans m_sceneTrans;
-
 
 };
 

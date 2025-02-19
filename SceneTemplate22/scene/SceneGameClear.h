@@ -34,10 +34,10 @@ private:
 
 private:
 
+	//スマートポインタ
 	std::shared_ptr<PlayerProduction> m_pPlayerProduction;
 	std::shared_ptr<CameraProduction> m_pCameraProduction;
 	std::shared_ptr<SkyDome> m_pSkyDome;
-	//std::shared_ptr<TitleField> m_pTitleField;
 	std::shared_ptr<Field> m_pField;
 
 	//遷移先
@@ -51,9 +51,11 @@ private:
 	std::vector<int> m_handles;
 	float m_selectAnimation;
 
+	//行動するかしないかの場合
 	bool m_isActionStart;
 	bool m_isActionBack;
 
+	//遷移の種類
 	e_SceneTrans m_sceneTrans;
 
 	// カーソルの現在位置と目標位置

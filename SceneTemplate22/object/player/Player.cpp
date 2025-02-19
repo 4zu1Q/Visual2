@@ -188,22 +188,17 @@ Player::Player() :
 	m_attackXPos(VGet(0, 0, 0)),
 	m_attackYPos(VGet(0, 0, 0)),
 	m_attackDir(VGet(0, 0, 0)),
-	m_cameraToPlayerVec(VGet(0, 0, 0)),
 	m_cameraDirection(VGet(0, 0, 0)),
-	m_avoid(VGet(0, 0, 0)),
 	m_analogX(0),
 	m_analogZ(0),
 	m_hp(kMaxHp),
 	m_mp(kMaxMp),
 	m_stamina(kMaxStamina),
 	m_cameraAngle(0.0f),
-	m_rate(0.0f),
 	m_isDead(false),
 	m_isStamina(false),
 	m_isMp(false),
 	m_isUseMp(false),
-	m_frame(0),
-	m_isMove(false),
 	m_multiAttack(0),
 	m_isNextAttackFlag(false),
 	m_isLockOn(false),
@@ -213,13 +208,10 @@ Player::Player() :
 	m_bossAttackRadius(0.0f),
 	m_bossWeaponRadius(0.0f),
 	m_bossShockRadius(0.0f),
-	m_playerRotMtx(),
 	m_moveCount(0),
 	m_deadTime(0),
 	m_damageFrame(0),
-	m_shockFrame(0),
-	m_attackFrame(0),
-	m_shadowH(0)
+	m_attackFrame(0)
 {
 	//攻撃の種類を
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
@@ -235,11 +227,10 @@ Player::Player() :
 	assert(m_modelH > -1);
 
 	m_isAttack = false;
-	m_isAttackY = false;
-	m_isShock = false;
+	m_isShock = false;		//結局使っていない
 
 	m_isBossAttack = false;
-	m_isHit = false;
+	m_isHitDamage = false;
 
 	//マスク関連の初期化
 	m_isFaceUse = false;
@@ -267,8 +258,6 @@ Player::Player() :
 
 Player::~Player()
 {
-	DeleteGraph(m_shadowH);
-
 
 	//モデルをデリートする
 	MV1DeleteModel(m_modelH);
@@ -291,7 +280,6 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, Pla
 	// 物理挙動の初期化
 	m_rigidbody.Initialize(true);
 	m_rigidbody.SetPos(pos);
-	m_speed = 0.1f;
 
 	//モデルのスケールを決める
 	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
@@ -365,7 +353,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	}
 
 	//ヒットした場合の処理
-	if (m_isHit)
+	if (m_isHitDamage)
 	{
 		m_damageFrame++;
 	}
@@ -377,7 +365,7 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	if (m_damageFrame >= 120)
 	{
 		//ヒット無敵時間を解除
-		m_isHit = false;
+		m_isHitDamage = false;
 	}
 
 	//プレイヤーの座標を代入
@@ -451,7 +439,8 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	m_bossToPlayerVec = VSub(m_pos, m_bossPos);
 
 	//モデルのポジションを合わせるよう
-	m_playerRotMtx = MGetRotY(cameraAngleX);
+	// 多分いらないやつ
+	//m_playerRotMtx = MGetRotY(cameraAngleX);
 
 	PlayerSetPosAndRotation(m_pos, m_angle);
 
@@ -500,8 +489,6 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 
 void Player::Draw(PlayerWeapon& weapon)
 {
-	
-	//MV1DrawModel(m_modelH);
 
 #ifdef _DEBUG
 
@@ -525,11 +512,10 @@ void Player::Draw(PlayerWeapon& weapon)
 		if (m_attackKind == Game::e_PlayerAttackKind::kPlayerShock) DrawSphere3D(m_attackYPos, m_attackShockRadius, 16, 0xffff00, 0xffffff, false);
 	}
 
-	if (m_isHit)
+	if (m_isHitDamage)
 	{
 		DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xff00ff, 0xffffff, false);
 	}
-
 
 #endif
 
@@ -551,7 +537,6 @@ void Player::Draw(PlayerWeapon& weapon)
 
 void Player::BossLook(VECTOR bossPos)
 {
-
 	m_pos = m_rigidbody.GetPos();
 	m_bossPos = bossPos;
 	m_bossToPlayerVec = VSub(m_pos, m_bossPos);
@@ -583,7 +568,7 @@ void Player::Hit()
 		if (m_isBossAttack)
 		{
 			//ヒット判定がfalseだった場合	
-			if (!m_isHit)
+			if (!m_isHitDamage)
 			{
 				//手の攻撃をした場合
 				if (IsAttackHit(m_bossAttackPos, m_bossAttackRadius) && m_bossAttackKind == Game::e_BossAttackKind::kBossAttack)
@@ -611,30 +596,6 @@ void Player::Hit()
 			}
 		}
 	}
-}
-
-//この判定処理はまた使えるようになりたい(これでアイテム触った時と敵の攻撃とかを判定したいから)
-void Player::OnCollide(const Collidable& colider)
-{
-	std::string message = "プレイヤーが";
-	auto tag = colider.GetTag();
-	switch (tag)
-	{
-	case Game::e_GameObjectTag::kItemHp:
-		message += "アイテムHp";
-		m_hp += 1;
-		break;
-	case Game::e_GameObjectTag::kBoss:
-		message += "ボス";
-		break;
-	//case Game::e_GameObjectTag:::
-	//	message += "足場";
-	//	break;
-	default:
-		break;
-	}
-	message += "と当たった！\n";
-	printfDx(message.c_str());
 }
 
 bool Player::IsAttackHit(VECTOR attackPos, float radius)
@@ -729,7 +690,6 @@ void Player::SetPosDown(const VECTOR pos)
 
 void Player::IdleUpdate()
 {	
-
 	Hit();
 
 	m_stamina += kStaminaIncreaseSpeed;
@@ -815,9 +775,6 @@ void Player::LockOnIdleUpdate()
 	m_bossToPlayerVec = VNorm(m_bossToPlayerVec);
 	m_angle = atan2f(m_bossToPlayerVec.x, m_bossToPlayerVec.z);
 
-	//m_attackDir = m_bossToPlayerVec;
-
-
 	m_stamina += kStaminaIncreaseSpeed;
 
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
@@ -882,7 +839,6 @@ void Player::LockOnIdleUpdate()
 		OnAttackY();
 	}
 
-
 	FaceUse();
 
 	//ロックオンしていなかったら
@@ -904,154 +860,10 @@ void Player::WalkUpdate()
 
 	Hit();
 
+	//プレイヤーの移動
+	Move();
+
 	m_stamina += kStaminaIncreaseSpeed;
-
-	/*プレイヤーの移動*/
-	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
-	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
-	float len = VSize(move);
-
-	//移動中に足音のSEを鳴らす
-	//キャラクターの種類によって変える
-	if (len != 0.0f)
-	{
-		if (m_moveCount % 25 == 0)
-		{
-			SoundManager::GetInstance().PlaySe("footstepsSe");
-		}
-		m_moveCount++;
-
-	}
-	else
-	{
-		m_moveCount = 0;
-	}
-
-	float rate = len / kAnalogInputMax;
-
-	//アナログスティック無効な範囲を除外する
-	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	rate = min(rate, 1.0f);
-	rate = max(rate, 0.0f);
-
-	float speed = 0;
-
-	//動いている間
-	if (len != 0.0f)
-	{
-
-		//カメラの正面方向ベクトル
-		VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
-		//カメラの右方向ベクトル
-		VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
-
-		//向きベクトル*移動量
-		front = VScale(front, -move.x);
-		//向きベクトル*移動量
-		right = VScale(right, -move.z);
-
-		move = VAdd(front, right);
-		move = VNorm(move);
-
-		if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kPowerMinSpeed * rate;
-				move = VScale(move, speed);
-				//move = VTransform(move, m_playerRotMtx);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kPowerMaxSpeed * rate;
-				move = VScale(move, speed);
-				//move = VTransform(move, m_playerRotMtx);
-			}
-		}
-		if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kSpeedMinSpeed * rate;
-				move = VScale(move, speed);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kSpeedMaxSpeed * rate;
-				move = VScale(move, speed);
-			}
-		}
-		if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kShotMinSpeed * rate;
-				move = VScale(move, speed);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kShotMaxSpeed * rate;
-				move = VScale(move, speed);
-			}
-		}
-		if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kNormalMinSpeed * rate;
-				move = VScale(move, speed);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kNormalMaxSpeed * rate;
-				move = VScale(move, speed);
-			}
-		}
-
-		if (!m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kNormalMinSpeed * rate;
-				move = VScale(move, speed);
-				//move = VTransform(move, m_playerRotMtx);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kNormalMaxSpeed * rate;
-				move = VScale(move, speed);
-				//move = VTransform(move, m_playerRotMtx);
-			}
-		}
-
-		//カメラのいる場所(角度)から
-		//コントローラーによる移動方向を決定する
-		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
-		move = VTransform(move, mtx);
-
-		move.y = m_rigidbody.GetVelocity().y;
-		m_rigidbody.SetVelocity(move);
-
-		m_move = move;
-
-		m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-
-		//速度が決定できるので移動ベクトルに反映する
-		move = VNorm(move);
-		m_attackDir = move;
-
-	}
-	//動かなかったらアイドル状態へ
-	else
-	{
-		OnIdle();
-		return;
-	}
 
 	//ロックオン機能を入れたら
 	if (m_isLockOn)
@@ -1121,176 +933,12 @@ void Player::WalkUpdate()
 
 void Player::LockOnWalkUpdate()
 {
-	Hit();
 
+	Hit();
+	//プレイヤーの移動
+	Move();
 
 	m_stamina += kStaminaIncreaseSpeed;
-
-	/*プレイヤーの移動*/
-	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
-	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
-	float len = VSize(move);
-
-	//移動中に足音のSEを鳴らす
-	//キャラクターの種類によって変える
-	if (len != 0.0f)
-	{
-		if (m_moveCount % 25 == 0)
-		{
-			SoundManager::GetInstance().PlaySe("footstepsSe");
-		}
-		m_moveCount++;
-
-	}
-	else
-	{
-		m_moveCount = 0;
-	}
-
-	float rate = len / kAnalogInputMax;
-
-	//アナログスティック無効な範囲を除外する
-	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	rate = min(rate, 1.0f);
-	rate = max(rate, 0.0f);
-
-	float speed = 0;
-
-	//動いている間
-	if (len != 0.0f)
-	{
-		//カメラの正面方向ベクトル
-		VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
-		//カメラの右方向ベクトル
-		VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
-
-		//向きベクトル*移動量
-		front = VScale(front, -move.x);
-		//向きベクトル*移動量
-		right = VScale(right, -move.z);
-
-		move = VAdd(front, right);
-		move = VNorm(move);
-
-		//速度が決定できるので移動ベクトルに反映する
-		move = VNorm(move);
-
-		if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kPowerMinSpeed * rate;
-				move = VScale(move, speed);
-				//move = VTransform(move, m_playerRotMtx);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kPowerMaxSpeed * rate;
-				move = VScale(move, speed);
-				//move = VTransform(move, m_playerRotMtx);
-			}
-		}
-		if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kSpeedMinSpeed * rate;
-				move = VScale(move, speed);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kSpeedMaxSpeed * rate;
-				move = VScale(move, speed);
-			}
-		}
-		if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kShotMinSpeed * rate;
-				move = VScale(move, speed);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kShotMaxSpeed * rate;
-				move = VScale(move, speed);
-			}
-		}
-		if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kNormalMinSpeed * rate;
-				move = VScale(move, speed);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kNormalMaxSpeed * rate;
-				move = VScale(move, speed);
-			}
-		}
-
-		if (!m_isFaceUse)
-		{
-			//スティックの押し加減でプレイヤーのスピードを変える
-			if (rate <= 0.6f && rate > 0.0f);
-			{
-				speed = kNormalMinSpeed * rate;
-				move = VScale(move, speed);
-				//move = VTransform(move, m_playerRotMtx);
-			}
-			if (rate >= 0.6f)
-			{
-				speed = kNormalMaxSpeed * rate;
-				move = VScale(move, speed);
-				//move = VTransform(move, m_playerRotMtx);
-			}
-		}
-
-		//カメラのいる場所(角度)から
-		//コントローラーによる移動方向を決定する
-		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
-		move = VTransform(move, mtx);
-
-		move.y = m_rigidbody.GetVelocity().y;
-		m_rigidbody.SetVelocity(move);
-
-		m_move = move;
-
-		//速度が決定できるので移動ベクトルに反映する
-		//move = VNorm(move);
-		//m_bossToPlayerVec = VNorm(m_bossToPlayerVec);
-
-		//移動方向からプレイヤーの向く方向を決定する
-		//移動していない場合(ゼロベクトル)の場合は変更しない
-		if (VSquareSize(move) > 0.0f)
-		{
-			VECTOR playerToBoss = VSub(m_bossPos, m_pos);
-			playerToBoss = VNorm(playerToBoss);
-			m_angle = atan2f(m_bossToPlayerVec.x, m_bossToPlayerVec.z);
-			m_attackDir = VGet(playerToBoss.x, playerToBoss.y, playerToBoss.z);
-		}
-		//m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
-	}
-	//動かなかったらアイドル状態へ
-	else
-	{
-		//ロックオンしていた場合
-		if (m_isLockOn)
-		{
-			OnLockOnIdle();
-			return;
-		}
-		else //していない場合
-		{
-			OnIdle();
-			return;
-		}
-	}
 
 	//ロックオン機能を外したら
 	if (!m_isLockOn)
@@ -1352,8 +1000,6 @@ void Player::LockOnWalkUpdate()
 	}
 
 	FaceUse();
-
-
 
 	//顔を選択する関数
 	FaceSelect();
@@ -1456,11 +1102,6 @@ void Player::DashUpdate()
 		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
 		move = VTransform(move, mtx);
 
-		////カメラの角度によって進む方向を変える
-		//MATRIX playerRotMtx = MGetRotY(m_pCamera->GetCameraAngleX());
-		////移動ベクトルとカメラ角度行列を乗算
-		//move = VTransform(move, playerRotMtx);
-
 		move.y = m_rigidbody.GetVelocity().y;
 		m_rigidbody.SetVelocity(move);
 
@@ -1473,11 +1114,8 @@ void Player::DashUpdate()
 	}
 	else
 	{
-		//if (VSquareSize(move) == 0.0f || m_isStamina)
-		//{
-			OnIdle();
-			return;
-		//}
+		OnIdle();
+		return;
 	}
 
 	//地面についていなかったら
@@ -1569,34 +1207,32 @@ void Player::JumpUpdate()
 	
 	m_jumpCount++;
 
-	//if (!m_isFaceUse)
+	auto vel = m_rigidbody.GetVelocity();
+
+	if (m_jumpCount < 6)
 	{
-		auto vel = m_rigidbody.GetVelocity();
-		//vel.y += kMinJumpPower;
-
-		if (m_jumpCount < 6)
-		{
-			vel.y += kMaxJumpPower;
-			m_jumpPower += kMaxJumpPower;
-		}
-		else
-		{
-			vel.y += kMinJumpPower;
-			m_jumpPower += kMinJumpPower;
-		}
-
-		if (m_jumpPower > 4)
-		{
-			OnAir();
-		}
-
-		m_rigidbody.SetVelocity(vel);
+		vel.y += kMaxJumpPower;
+		m_jumpPower += kMaxJumpPower;
 	}
+	else
+	{
+		vel.y += kMinJumpPower;
+		m_jumpPower += kMinJumpPower;
+	}
+
+	if (m_jumpPower > 4)
+	{
+		OnAir();
+	}
+
+	m_rigidbody.SetVelocity(vel);
 
 	if (m_jumpCount > 30)
 	{
 		OnFall();
 	}
+
+	//Move();
 
 	//アナログスティックを取得
 	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
@@ -2400,10 +2036,175 @@ void Player::PlayerSetPosAndRotation(VECTOR pos, float angle)
 
 }
 
+void Player::Move()
+{
+	/*プレイヤーの移動*/
+	GetJoypadAnalogInput(&m_analogX, &m_analogZ, DX_INPUT_PAD1);
+	VECTOR move = VGet(m_analogX, 0.0f, -m_analogZ);
+	float len = VSize(move);
+
+	//移動中に足音のSEを鳴らす
+	//キャラクターの種類によって変える
+	if (len != 0.0f)
+	{
+		if (m_moveCount % 25 == 0)
+		{
+			SoundManager::GetInstance().PlaySe("footstepsSe");
+		}
+		m_moveCount++;
+
+	}
+	else
+	{
+		m_moveCount = 0;
+	}
+
+	float rate = len / kAnalogInputMax;
+
+	//アナログスティック無効な範囲を除外する
+	rate = (rate - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	rate = min(rate, 1.0f);
+	rate = max(rate, 0.0f);
+
+	float speed = 0;
+
+	//動いている間
+	if (len != 0.0f)
+	{
+
+		//カメラの正面方向ベクトル
+		VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
+		//カメラの右方向ベクトル
+		VECTOR right = VGet(-m_cameraDirection.z, 0.0f, m_cameraDirection.x);
+
+		//向きベクトル*移動量
+		front = VScale(front, -move.x);
+		//向きベクトル*移動量
+		right = VScale(right, -move.z);
+
+		//移動量に加算
+		move = VAdd(front, right);
+		move = VNorm(move);
+
+		if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+		{
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				speed = kPowerMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				speed = kPowerMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
+		}
+		if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+		{
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				speed = kSpeedMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				speed = kSpeedMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
+		}
+		if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+		{
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				speed = kShotMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				speed = kShotMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
+		}
+		if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+		{
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				speed = kNormalMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				speed = kNormalMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
+		}
+
+		if (!m_isFaceUse)
+		{
+			//スティックの押し加減でプレイヤーのスピードを変える
+			if (rate <= 0.6f && rate > 0.0f);
+			{
+				speed = kNormalMinSpeed * rate;
+				move = VScale(move, speed);
+			}
+			if (rate >= 0.6f)
+			{
+				speed = kNormalMaxSpeed * rate;
+				move = VScale(move, speed);
+			}
+		}
+
+		//カメラのいる場所(角度)から
+		//コントローラーによる移動方向を決定する
+		MATRIX mtx = MGetRotY(-m_cameraAngle - DX_PI_F / 2);
+		move = VTransform(move, mtx);
+
+		move.y = m_rigidbody.GetVelocity().y;
+		m_rigidbody.SetVelocity(move);
+
+		m_move = move;
+
+		if (!m_isLockOn)
+		{
+			m_angle = -atan2f(move.z, move.x) - DX_PI_F / 2;
+
+			//速度が決定できるので移動ベクトルに反映する
+			move = VNorm(move);
+			m_attackDir = move;
+
+		}
+		else
+		{
+			//速度が決定できるので移動ベクトルに反映する
+			move = VNorm(move);
+			m_bossToPlayerVec = VNorm(m_bossToPlayerVec);
+
+			//移動方向からプレイヤーの向く方向を決定する
+			//移動していない場合(ゼロベクトル)の場合は変更しない
+			if (VSquareSize(move) > 0.0f)
+			{
+				VECTOR playerToBoss = VSub(m_bossPos, m_pos);
+				playerToBoss = VNorm(playerToBoss);
+				m_angle = atan2f(m_bossToPlayerVec.x, m_bossToPlayerVec.z);
+				m_attackDir = VGet(playerToBoss.x, playerToBoss.y, playerToBoss.z);
+			}
+		}
+	}
+	//動かなかったらアイドル状態へ
+	else
+	{
+		OnIdle();
+		return;
+	}
+}
+
 void Player::OnIdle()
 {
 	m_jumpCount = 0;
-	m_frame = 0;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
@@ -2417,7 +2218,6 @@ void Player::OnIdle()
 void Player::OnLockOnIdle()
 {
 	m_jumpCount = 0;
-	m_frame = 0;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
@@ -2535,7 +2335,6 @@ void Player::OnAttackY()
 	SoundManager::GetInstance().PlaySe("attackYSe");
 
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackY;
-	m_isAttackY = true;
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
 
@@ -2627,7 +2426,7 @@ void Player::OnAttackCharge()
 void Player::OnHitOneDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_isHit = true;
+	m_isHitDamage = true;
 	m_isAttack = false;
 	m_attackFrame = 0;
 	m_multiAttack = 0;
@@ -2645,7 +2444,7 @@ void Player::OnHitOneDamage()
 void Player::OnHitTwoDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_isHit = true;
+	m_isHitDamage = true;
 	m_isAttack = false;
 	m_multiAttack = 0;
 	SoundManager::GetInstance().PlaySe("damageSe");

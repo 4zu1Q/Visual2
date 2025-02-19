@@ -76,12 +76,6 @@ PlayerBarUi::PlayerBarUi():
 	m_handles.push_back(LoadGraph("Data/Image/StaminaGaugeRed.png"));
 	m_handles.push_back(LoadGraph("Data/Image/StaminaGaugeBlack.png"));
 
-	//画像ロード
-	//for (int i = 0; i < m_staminaGaugeHandle.size(); i++)
-	//{
-	//	m_staminaGaugeHandle[i] = LoadGraph(kFileName[i]);
-	//}
-
 }
 
 PlayerBarUi::~PlayerBarUi()
@@ -92,14 +86,7 @@ PlayerBarUi::~PlayerBarUi()
 		DeleteGraph(m_handles[i]);
 	}
 
-	//画像削除
-	//for (int i = 0; i < m_staminaGaugeHandle.size(); i++)
-	//{
-	//	DeleteGraph(m_staminaGaugeHandle[i]);
-	//}
-
 	m_handles.clear();
-
 }
 
 void PlayerBarUi::Update(Player& player)

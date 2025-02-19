@@ -9,7 +9,6 @@
 #include "util/Game.h"
 #include "util/Pad.h"
 #include "util/SoundManager.h"
-#include "util/SaveDataManager.h"
 
 namespace
 {
@@ -195,7 +194,6 @@ void ScenePause::Update()
 				SoundManager::GetInstance().StopBgm("selectBgm");
 				StartFadeOut();	//フェードアウト開始
 				m_isToNextScene = true;
-				//SaveDataManager::GetInstance().Save(); //セーブデータの保存
 			}
 		}
 
@@ -242,19 +240,6 @@ void ScenePause::Draw()
 
 	DrawGraph(0, 0, m_handles[kPauseBarH], true);
 
-#ifdef _DEBUG
-
-	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
-
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRestart) * kTextIntervalY, 0xffffff, "Restart");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
-
-	DrawString(0, 0, "Scene Pause", 0xffffff, false);
-
-#endif
-
 	DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);
 	DrawGraph(kBackPos.x, kBackPos.y, m_handles[kBackH], true);
 
@@ -300,6 +285,19 @@ void ScenePause::Draw()
 	}
 
 	DrawFade(0x000000);
+
+#ifdef _DEBUG
+
+	DrawFormatString(kTextX / 2, kTextBlankSpaceY + static_cast<int>(m_sceneTrans) * kTextIntervalY, 0xff0000, "→");
+
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRestart) * kTextIntervalY, 0xffffff, "Restart");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
+	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
+
+	DrawString(0, 0, "Scene Pause", 0xffffff, false);
+
+#endif
 
 }
 
