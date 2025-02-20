@@ -46,7 +46,7 @@ namespace
 
 }
 
-Camera2::Camera2():
+Camera::Camera():
 	m_pos(VGet(0, 0, 0)),
 	m_playerPos(VGet(0, 0, 0)),
 	m_enemyPos(VGet(0, 0, 0)),
@@ -63,12 +63,12 @@ Camera2::Camera2():
 	m_pLockOnUi = std::make_shared<LockOnTargetUi>();
 }
 
-Camera2::~Camera2()
+Camera::~Camera()
 {
 	DeleteLightHandle(m_lightHandle);
 }
 
-void Camera2::Initialize(VECTOR playerPos)
+void Camera::Initialize(VECTOR playerPos)
 {
 	m_lightHandle = CreateDirLightHandle(VSub(m_targetPos, m_pos));
 	SetCameraNearFar(kCameraNear, kCameraFar);
@@ -80,11 +80,11 @@ void Camera2::Initialize(VECTOR playerPos)
 	m_angleV = 0.0f;
 }
 
-void Camera2::Finalize()
+void Camera::Finalize()
 {
 }
 
-void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float playerAngle, bool isLockOn)
+void Camera::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float playerAngle, bool isLockOn)
 {
 	m_playerPos = playerPos;
 	m_enemyPos = enemyPos;
@@ -298,7 +298,7 @@ void Camera2::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float p
 
 }
 
-void Camera2::Draw()
+void Camera::Draw()
 {
 	if (m_isLockOn)
 	{
@@ -312,12 +312,12 @@ void Camera2::Draw()
 #endif
 }
 
-const VECTOR Camera2::GetDirection() const
+const VECTOR Camera::GetDirection() const
 {
 	return VNorm(VSub(m_targetPos, m_pos));
 }
 
-void Camera2::ResetToPlayerView(float playerAngle)
+void Camera::ResetToPlayerView(float playerAngle)
 {
 	// プレイヤーの角度をカメラの水平角度に合わせる
 	m_angleH = playerAngle + kAddAngle;
@@ -325,20 +325,20 @@ void Camera2::ResetToPlayerView(float playerAngle)
 
 }
 
-void Camera2::LockOn(VECTOR playerPos, VECTOR enemyPos)
+void Camera::LockOn(VECTOR playerPos, VECTOR enemyPos)
 {
 	// カメラの位置と角度を更新
 	UpdateCameraAngle();
 }
 
-void Camera2::UpdateLockOnCamera()
+void Camera::UpdateLockOnCamera()
 {
 	VECTOR direction = VSub(m_enemyPos, m_playerPos);
 	m_angleV = atan2f(direction.x, direction.z);
 	m_angleH = atan2f(direction.y, VSize(VGet(direction.x, 0.0f, direction.z)));
 }
 
-void Camera2::UpdateCameraAngle()
+void Camera::UpdateCameraAngle()
 {
 	// プレイヤーと敵の中間点を計算
 	VECTOR midPoint = VGet(

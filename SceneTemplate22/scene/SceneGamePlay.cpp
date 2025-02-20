@@ -25,7 +25,6 @@
 #include "ui/FaceFrameUi.h"
 #include "ui/ButtonUi.h"
 
-//#include "ui/GamePlayUi.h"
 
 #include "util/Pad.h"
 #include "util/SoundManager.h"
@@ -80,7 +79,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	m_pBossShot = std::make_shared<BossShot>();
 	m_pBossRast = std::make_shared<BossRast>();
 
-	m_pCamera2 = std::make_shared<Camera2>();
+	m_pCamera = std::make_shared<Camera>();
 
 	m_pField = std::make_shared<Field>(stageKind);
 	m_pTomb = std::make_shared<Tomb>();
@@ -111,7 +110,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 		m_pPlayer->BossLook(m_pBossRast->GetPosDown());
 	}
 
-	m_pCamera2->Initialize(m_pPlayer->GetPos());
+	m_pCamera->Initialize(m_pPlayer->GetPos());
 	m_pTomb->Initialize();
 	m_pField->Initialize();
 
@@ -310,18 +309,18 @@ void SceneGamePlay::Update()
 		return;
 	}
 
-	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
+	m_pPlayer->SetCameraDirection(m_pCamera->GetDirection());
 
 	//ボス別々にロックオンするための処理
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
 		//カメラのアップデート処理
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossPower->GetPosUp(),
+		m_pCamera->Update(m_pPlayer->GetPos(), m_pBossPower->GetPosUp(),
 			m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
 
 		//プレイヤーのアップデート処理
-		m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(),
-			m_pBossPower->GetPosDown(),m_pCamera2->GetIsLockOn(),m_pBossPower->GetAttackKind());
+		m_pPlayer->Update(m_pPhysics,*m_pPlayerWeapon, m_pCamera->GetCameraAngleX(),
+			m_pBossPower->GetPosDown(), m_pCamera->GetIsLockOn(),m_pBossPower->GetAttackKind());
 
 		//パワーボスのアップデート処理
 		m_pBossPower->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
@@ -329,12 +328,12 @@ void SceneGamePlay::Update()
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
 		//カメラのアップデート処理
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossSpeed->GetPosUp(),
+		m_pCamera->Update(m_pPlayer->GetPos(), m_pBossSpeed->GetPosUp(),
 			m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
 
 		//プレイヤーのアップデート処理
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(),
-			m_pBossSpeed->GetPosDown(), m_pCamera2->GetIsLockOn(),m_pBossSpeed->GetAttackKind());
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(),
+			m_pBossSpeed->GetPosDown(), m_pCamera->GetIsLockOn(),m_pBossSpeed->GetAttackKind());
 
 		//スピードボスのアップデート処理
 		m_pBossSpeed->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
@@ -342,12 +341,12 @@ void SceneGamePlay::Update()
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
 		//カメラのアップデート処理
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossShot->GetPosUp(),
+		m_pCamera->Update(m_pPlayer->GetPos(), m_pBossShot->GetPosUp(),
 			m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
 
 		//プレイヤーのアップデート処理
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(),
-			m_pBossShot->GetPosDown(), m_pCamera2->GetIsLockOn(), m_pBossShot->GetAttackKind());
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(),
+			m_pBossShot->GetPosDown(), m_pCamera->GetIsLockOn(), m_pBossShot->GetAttackKind());
 
 		//ショットボスのアップデート処理
 		m_pBossShot->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
@@ -355,12 +354,12 @@ void SceneGamePlay::Update()
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
 		//カメラのアップデート処理
-		m_pCamera2->Update(m_pPlayer->GetPos(), m_pBossRast->GetPosUp(),
+		m_pCamera->Update(m_pPlayer->GetPos(), m_pBossRast->GetPosUp(),
 			m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
 
 		//プレイヤーのアップデート処理
-		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(),
-			m_pBossRast->GetPosDown(), m_pCamera2->GetIsLockOn(), m_pBossRast->GetAttackKind());
+		m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(),
+			m_pBossRast->GetPosDown(), m_pCamera->GetIsLockOn(), m_pBossRast->GetAttackKind());
 
 		//ラストボスのアップデート処理
 		m_pBossRast->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
@@ -430,7 +429,7 @@ void SceneGamePlay::Draw()
 
 	m_pPlayer->Draw(*m_pPlayerWeapon);
 
-	m_pCamera2->Draw();
+	m_pCamera->Draw();
 
 	if (!m_pBossPower->GetIsClear() && !m_pBossSpeed->GetIsClear() && !m_pBossShot->GetIsClear())
 	{

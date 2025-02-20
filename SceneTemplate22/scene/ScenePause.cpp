@@ -84,7 +84,6 @@ ScenePause::~ScenePause()
 		DeleteGraph(m_handles[i]);
 	}
 
-
 	m_handles.clear();
 }
 

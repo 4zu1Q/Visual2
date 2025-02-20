@@ -12,6 +12,7 @@
 
 #include "scene/SceneManager.h"
 #include "scene/SceneTitle.h"
+#include "scene/SceneStory.h"
 #include "scene/SceneSelect.h"
 #include "scene/SceneGamePlay.h"
 #include "scene/SceneOption.h"
@@ -34,6 +35,7 @@ namespace
 		kQuitH,
 		kSelectH,
 		kPointerH,
+		kButtonH,
 	};
 
 	constexpr int kTextX = 64;
@@ -54,6 +56,7 @@ namespace
 	const Vec2 kLoadGamePos = { 540.0f , 480.0f };
 	const Vec2 kOptionPos = { 540.0f , 550.0f };
 	const Vec2 kEndPos = { 540.0f , 620.0f };
+	const Vec2 kButtonPos = { 950.0f , 660.0f };
 
 	const Vec2 kAnyPreesButtonPos = { 240.0f , 550.0f };
 	const Vec2 kAnyPreesButtonSelectLeftPos = { 360 , 585 };
@@ -117,6 +120,7 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_handles.push_back(LoadGraph("Data/Image/End.png"));					//End
 	m_handles.push_back(LoadGraph("Data/Image/Select2.png"));				//矢印
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				
+	m_handles.push_back(LoadGraph("Data/Image/Button.png"));				
 
 }
 
@@ -310,7 +314,8 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kNewGame)
 			{
 				SoundManager::GetInstance().StopBgm("titleBgm");
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
+				//m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				m_pManager.ChangeScene(std::make_shared<SceneStory>(m_pManager));
 				return;
 			}
 
@@ -426,6 +431,8 @@ void SceneTitle::Draw()
 
 		//タイトルロゴ
 		DrawFadeGraphTitleLogo(m_handles[kLogoStartH], m_titleLogoPos);
+
+		DrawGraph(kButtonPos.x, kButtonPos.y, m_handles[kButtonH], true);
 
 	}
 

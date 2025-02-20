@@ -7,12 +7,12 @@
 
 class LockOnTargetUi;
 
-class Camera2
+class Camera
 {
 public:
 
-	Camera2();
-	virtual ~Camera2();
+	Camera();
+	virtual ~Camera();
 
 	void Initialize(VECTOR playerPos);
 	void Finalize();

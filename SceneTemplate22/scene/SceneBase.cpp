@@ -1,4 +1,5 @@
 ﻿#include "SceneBase.h"
+
 #include "util/Game.h"
 
 #include "util/SoundManager.h"
@@ -18,6 +19,8 @@ namespace
 	constexpr int kFadeMax = 255;
 	constexpr int kFadeTime = 120;
 	constexpr int kFadeNum = 2;
+
+	
 
 }
 
@@ -248,6 +251,11 @@ void SceneBase::DrawFadeGraphTitleLogo(int graphHandle, Vec2 graphPos)
 void SceneBase::FadeGraphTitleLogoReset()
 {
 	m_fadeGraphTitleTime = 0;
+}
+
+void SceneBase::FadeGraphTitleLogoDraw()
+{
+	m_fadeGraphTitleTime = kFadeTime;
 }
 
 

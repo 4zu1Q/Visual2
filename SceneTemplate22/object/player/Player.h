@@ -22,7 +22,6 @@ public:
 		kBbutton,	//Bボタン
 		kXbutton,	//Xボタン
 		kYbutton,	//Yボタン
-
 	};
 
 	//後ろのボタンの種類
@@ -49,32 +48,23 @@ public:
 
 	void HitUpdate(VECTOR hitPos,VECTOR attackPos, VECTOR weaponPos, VECTOR shockPos,float hitRadius ,float attackRadius, float weaponRadius, float shockRadius, bool isBossAttack);
 
-	// 衝突したとき
-	//virtual void OnCollide(const Collidable& colider);
-
 	//プレイヤーのモデルハンドルを取得
 	const int& GetModelHandle() const { return m_modelH; }
 	void SetModelHandle(const int modelH) { m_modelH = modelH; }
 
 	//プレイヤー下の座標を取得
 	const VECTOR& GetPos() const;
-	void SetPosDown(const VECTOR pos);
 
 	//プレイヤー上の座標を取得
 	const VECTOR& GetPosUp() const { return m_posUp; }
-	void SetPosUp(const VECTOR pos) { m_posUp = pos; }
 
 	//プレイヤーの攻撃座標を取得
 	const VECTOR& GetAttackXPos() const { return m_attackXPos; }
-
 	const VECTOR& GetAttackYPos() const { return m_attackYPos; }
-
 	const VECTOR& GetShockPos() const { return m_attackYPos; }
 
 	const float& GetAttackXRadius() const { return m_attackXRadius; }
-
 	const float& GetAttackYRadius() const { return m_attackYRadius; }
-
 	const float& GetShockRadius() const { return m_attackShockRadius; }
 
 	const bool& GetIsAttack() const { return m_isAttack; }
@@ -115,15 +105,12 @@ public:
 
 	//半径の取得
 	const float& GetRadius() const;
-
 	const float& GetAngle() const { return m_angle; }
 
 
 private:
 
 	void Hit();
-
-	//void OnCollide(const Collidable& colider);
 
 	//攻撃判定
 	bool IsAttackHit(VECTOR attackPos, float radius);
@@ -211,7 +198,6 @@ private:
 	int m_modelSpeedH;
 	int m_modelShotH;
 	int m_modelRassH;
-	int m_weaponH;
 
 	//ステータス
 	float m_hp;

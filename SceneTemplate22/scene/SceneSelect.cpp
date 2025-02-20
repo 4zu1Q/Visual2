@@ -87,7 +87,7 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 
 	m_pPlayer = std::make_shared<Player>();
 	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
-	m_pCamera2 = std::make_shared<Camera2>();
+	m_pCamera = std::make_shared<Camera>();
 
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
 	m_pFaceUi = std::make_shared<FaceUi>();
@@ -112,7 +112,7 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
-	m_pCamera2->Initialize(m_pPlayer->GetPos());
+	m_pCamera->Initialize(m_pPlayer->GetPos());
 
 	m_isPowerStage = false;
 	m_isSpeedStage = false;
@@ -255,9 +255,9 @@ void SceneSelect::Update()
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update(m_pPhysics);
 
-	m_pCamera2->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(),m_pField->GetModelHandle(),m_pPlayer->GetAngle(), false);
-	m_pPlayer->SetCameraDirection(m_pCamera2->GetDirection());
-	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera2->GetCameraAngleX(), noPos, false, Game::e_BossAttackKind::kBossAttackNone);
+	m_pCamera->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(),m_pField->GetModelHandle(),m_pPlayer->GetAngle(), false);
+	m_pPlayer->SetCameraDirection(m_pCamera->GetDirection());
+	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), noPos, false, Game::e_BossAttackKind::kBossAttackNone);
 
 	m_pPhysics->Update();
 
@@ -397,7 +397,7 @@ void SceneSelect::Draw()
 
 #ifdef _DEBUG
 	DrawString(0, 0, "Scene Select", 0xffffff, false);
-	m_pCamera2->Draw();
+	m_pCamera->Draw();
 #endif
 
 }

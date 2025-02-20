@@ -4,13 +4,10 @@
 namespace 
 {
 
-	const char* const kFieldModelFilename = "Data/Model/Stage/Field12.mv1";
-	const char* const kTestModelFilename = "Data/Model/Weapon/Boss_Shield.mv1";
-
 	const char* const kShadowFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
 	{
 		"Data/Model/Stage/TitleStage.mv1",
-		"Data/Model/Stage/SelectStage.mv1",
+		"Data/Model/Stage/StageSelect.mv1",
 		"Data/Model/Stage/BattleStage.mv1",
 	};
 
@@ -21,7 +18,7 @@ namespace
 
 	//ステージの座標
 	constexpr VECTOR kTitleModelPosition = { 0, 60, 0 };
-	constexpr VECTOR kSelectModelPosition = { 70.0f, -1600.0f, 1200.0f };
+	constexpr VECTOR kSelectModelPosition = { 70.0f, -1700.0f, 1200.0f };
 	constexpr VECTOR kGamePlayModelPosition = { 0.0f, 150.0f, 0.0f };
 }
 

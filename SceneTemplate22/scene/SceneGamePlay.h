@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "SceneBase.h"
+#include "scene/SceneBase.h"
 #include "myLib/Physics.h"
 #include "util/Game.h"
 
@@ -9,7 +9,7 @@
 
 class Player;
 class PlayerWeapon;
-class Camera2;
+class Camera;
 class HpBar;
 class PlayerBarUi;
 class FaceUi;
@@ -45,7 +45,7 @@ private:
 	//スマートポインタ
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
-	std::shared_ptr<Camera2> m_pCamera2;
+	std::shared_ptr<Camera> m_pCamera;
 	std::shared_ptr<BossPower> m_pBossPower;
 	std::shared_ptr<BossSpeed> m_pBossSpeed;
 	std::shared_ptr<BossShot> m_pBossShot;

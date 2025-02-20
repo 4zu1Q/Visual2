@@ -17,10 +17,10 @@ namespace
 	constexpr VECTOR kModelScale = { 0.2f , 0.2f , 0.2f };
 
 	//ポジション
-	constexpr VECTOR kTombPowerPos = { -460.0f , 38.0f , 264.0f };
-	constexpr VECTOR kTombSpeedPos = { 327.0f , 138.0f , 602.0f };
-	constexpr VECTOR kTombShotPos = { 285.0f , 130.0f , -400.0f };
-	constexpr VECTOR kTombRastPos = { -145.0f , 435.0f , -335.0f };
+	constexpr VECTOR kTombPowerPos = { -210.0f , -38.0f , 641.0f };
+	constexpr VECTOR kTombSpeedPos = { 1025.0f , -38.0f , 635.0f };
+	constexpr VECTOR kTombShotPos = { 414.0f , -38.0f , -413.0f };
+	constexpr VECTOR kTombRastPos = { 415.0f , 3.5f , 272.0f };
 	//トライアングルのポジション
 	constexpr VECTOR kTrianglePowerPos = { 0.0f , 38.0f , 50.0f };
 	constexpr VECTOR kTriangleSpeedPos = { 0.0f , 38.0f , 50.0f };
@@ -122,10 +122,6 @@ void Tomb::Draw()
 	DrawSphere3D(m_posRast, m_radiusRB, 32, 0xffffff, 0xff0000, false);
 #endif
 
-	//DrawFormatString(0, 48, 0xff0fff, "PowerPos:%f,%f,%f", m_posPower.x, m_posPower.y, m_posPower.z);
-	//DrawFormatString(0, 64, 0xff0fff, "SpeedPos:%f,%f,%f", m_posSpeed.x, m_posSpeed.y, m_posSpeed.z);
-	//DrawFormatString(0, 80, 0xff0fff, "ShotPos:%f,%f,%f", m_posShot.x, m_posShot.y, m_posShot.z);
-	//DrawFormatString(0, 96, 0xff0fff, "RastPos:%f,%f,%f", m_posRast.x, m_posRast.y, m_posRast.z);
 }
 
 void Tomb::DrawTriangle(Game::e_BossKind bossKind)

@@ -181,6 +181,7 @@
     <ClCompile Include="scene\SceneOption.cpp" />
     <ClCompile Include="scene\ScenePause.cpp" />
     <ClCompile Include="scene\SceneSelect.cpp" />
+    <ClCompile Include="scene\SceneStory.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
     <ClCompile Include="ui\ButtonUi.cpp" />
     <ClCompile Include="ui\FaceFrameUi.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="scene\SceneOption.h" />
     <ClInclude Include="scene\ScenePause.h" />
     <ClInclude Include="scene\SceneSelect.h" />
+    <ClInclude Include="scene\SceneStory.h" />
     <ClInclude Include="scene\SceneTitle.h" />
     <ClInclude Include="ui\ButtonUi.h" />
     <ClInclude Include="ui\FaceFrameUi.h" />

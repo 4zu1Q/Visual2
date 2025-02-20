@@ -10,7 +10,6 @@
 #include "scene/SceneOption.h"
 #include "scene/ScenePause.h"
 
-
 #include "util/Pad.h"
 
 namespace

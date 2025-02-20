@@ -180,7 +180,6 @@ Player::Player() :
 	m_bossWeaponPos(VGet(0, 0, 0)),
 	m_bossShockPos(VGet(0, 0, 0)),
 	m_bossToPlayerVec(VGet(0, 0, 0)),
-	m_weaponH(-1),
 	m_radius(2),
 	m_posUp(kInitPos),
 	m_move(VGet(0, 0, 0)),
@@ -681,11 +680,6 @@ bool Player::IsPlayerAttackHit(VECTOR attackPos, float attackRadius)
 const VECTOR& Player::GetPos() const
 {
 	return m_rigidbody.GetPos();
-}
-
-void Player::SetPosDown(const VECTOR pos)
-{
-	m_rigidbody.SetPos(pos);
 }
 
 void Player::IdleUpdate()
