@@ -263,7 +263,7 @@ void BossPower::Draw()
 	// 3: 非表示
 	// 4: 表示される	...
 	// % 4 することで012301230123... に変換する
-	if (m_damageFrame % 8 >= 4) return;
+	//if (m_damageFrame % 8 >= 4) return;
 
 	if (!m_isClear)
 	{

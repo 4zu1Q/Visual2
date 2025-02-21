@@ -285,6 +285,10 @@ void SceneTitle::Update()
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
 
+				// セーブデータの書き込み
+				SaveDataManager::GetInstance().Save();
+
+				// ゲーム終了
 				DxLib_End();
 			}
 		}

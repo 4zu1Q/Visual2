@@ -206,6 +206,7 @@ private:
 	int m_modelSpeedH;
 	int m_modelShotH;
 	int m_modelRassH;
+	int m_shadowH;
 
 	//ステータス
 	float m_hp;

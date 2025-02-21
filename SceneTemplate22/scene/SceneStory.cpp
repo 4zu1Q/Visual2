@@ -27,7 +27,6 @@ namespace
 		kScene4H,
 		kScene5H,
 		kButtonH,
-		kButtonBH,
 	};
 
 	constexpr float kSelectSpeed = 0.06f;
