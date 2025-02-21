@@ -171,7 +171,15 @@ private:
 
 	void PlayerSetPosAndRotation(VECTOR pos, float angle);
 
+	//プレイヤーの移動
 	void Move();
+
+	//プレイヤーの攻撃更新処理
+	void CollisionPosUpdate();
+	//ダメージ更新処理
+	void DamageUpdate();
+	//プレイヤーのステータス更新処理
+	void StatusUpdate();
 
 	/// <summary>
 	/// プレイヤーが顔を使用時の関数

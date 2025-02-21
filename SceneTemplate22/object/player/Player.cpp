@@ -311,178 +311,29 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	//アップデート
 	(this->*m_updateFunc)();
 
+	//RTのインプットを取得
 	GetJoypadDirectInputState(DX_INPUT_PAD1, &m_input);
 
 	//アニメーションの更新処理
 	m_pAnim->UpdateAnim();
-
 	m_bossAttackKind = bossAttackKind;
 
-	//プレイヤーの処理によって攻撃判定のサイズを変える
-	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		m_attackXRadius = kPowerAttackXRadius;
-		m_attackYRadius = kPowerAttackYRadius;
-		m_attackShockRadius = kPowerAttackShockRadius;
-	}
-	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		m_attackXRadius = kSpeedAttackXRadius;
-		m_attackYRadius = kSpeedAttackYRadius;
-		m_attackShockRadius = kSpeedAttackShockRadius;
-	}
-	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		m_attackXRadius = kShotAttackXRadius;
-		m_attackYRadius = kShotAttackYRadius;
-		m_attackShockRadius = kShotAttackShockRadius;
-	}
-	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
-	{
-		m_attackXRadius = kRassAttackXRadius;
-		m_attackYRadius = kRassAttackYRadius;
-		m_attackShockRadius = kRassAttackShockRadius;
-	}
+	//ダメージの更新処理
+	DamageUpdate();
 
-	if (!m_isFaceUse)
-	{
-		m_attackXRadius = kNormalAttackXRadius;
-		m_attackYRadius = kNormalAttackYRadius;
-		m_attackShockRadius = kNormalAttackShockRadius;
-	}
-
-	//ヒットした場合の処理
-	if (m_isHitDamage)
-	{
-		m_damageFrame++;
-	}
-	else
-	{
-		m_damageFrame = 0;
-	}
-
-	if (m_damageFrame >= 120)
-	{
-		//ヒット無敵時間を解除
-		m_isHitDamage = false;
-	}
-
-	//プレイヤーの座標を代入
-	m_pos = m_rigidbody.GetPos();
-
-	//ヒット座標
-	m_hitPos = VGet(m_pos.x, m_pos.y + 9.0f, m_pos.z);
-	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
-
-	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		//攻撃X座標
-		m_attackMove = VScale(m_attackDir, 8.0f);
-		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
-	}
-	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		//攻撃X座標
-		m_attackMove = VScale(m_attackDir, 7.0f);
-		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
-	}
-	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		//攻撃X座標
-		 m_attackMove = VScale(m_attackDir, 20.0f);
-		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
-	}
-	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
-	{
-		//攻撃X座標
-		 m_attackMove = VScale(m_attackDir, 9.0f);
-		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
-	}
-
-	if (!m_isFaceUse)
-	{
-		//攻撃X座標
-		m_attackMove = VScale(m_attackDir, 7.0f);
-		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
-	}
-
-	//通常状態の攻撃Y座標(スピードタイプ以外)
-	if (!m_isFaceUse)
-	{
-		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
-	}
-	//攻撃Y座標(スピードタイプ以外)
-	else if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
-	{
-		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
-	}
-	//攻撃Y(スピードタイプのみショートカット)
-	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
-	{
-		m_attackMove = VScale(m_attackDir, 9.0f);
-		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
-	}
-	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
-	{
-		m_attackMove = VScale(m_attackDir, 50.0f);
-		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
-	}
-	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
-	{
-		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
-	}
+	//プレイヤーの当たり判定座標の更新
+	CollisionPosUpdate();
 
 	//ボスの座標を代入
 	m_isLockOn = isLockOn;
 	m_bossPos = bossPos;
 	m_bossToPlayerVec = VSub(m_pos, m_bossPos);
 
-	//モデルのポジションを合わせるよう
-	// 多分いらないやつ
-	//m_playerRotMtx = MGetRotY(cameraAngleX);
-
+	//プレイヤーモデルの回転処理
 	PlayerSetPosAndRotation(m_pos, m_angle);
 
-	//HPがゼロより下にいった場合
-	if (m_hp <= 0)
-	{
-		m_hp = 0;
-
-		//死亡状態へ遷移
-		OnDead();
-	}
-
-	//MPが0以下になったら
-	if (m_mp <= 0)
-	{
-		m_isMp = true;
-		m_mp = 0;
-	}
-
-	//MPが最大値を超えたら
-	if (m_mp > kMaxMp)
-	{
-		m_mp = kMaxMp;
-	}
-
-	//スタミナ関連
-	if (m_stamina <= 0)
-	{
-		m_stamina = 0;
-		m_isStamina = true;
-	}
-
-	//スタミナがスタミナの最大値を超えた場合
-	if (m_stamina > kMaxStamina)
-	{
-		m_stamina = kMaxStamina;
-	}
-
-	//スタミナがスタミナの最大値に達した場合
-	if (m_stamina == kMaxStamina)
-	{
-		m_isStamina = false;
-	}
+	//プレイヤーのステータス更新
+	StatusUpdate();
 
 }
 
@@ -2196,6 +2047,106 @@ void Player::Move()
 	}
 }
 
+void Player::CollisionPosUpdate()
+{
+	//プレイヤーの座標を代入
+	m_pos = m_rigidbody.GetPos();
+
+	//ヒット座標
+	m_hitPos = VGet(m_pos.x, m_pos.y + 9.0f, m_pos.z);
+	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
+
+	/* 通常攻撃 */
+
+	//プレイヤーの当たり判定の位置と大きさ
+	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		//球の攻撃半径
+		m_attackXRadius = kPowerAttackXRadius;
+		m_attackYRadius = kPowerAttackYRadius;
+		m_attackShockRadius = kPowerAttackShockRadius;
+
+		//攻撃X座標
+		m_attackMove = VScale(m_attackDir, 8.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		//球の攻撃半径
+		m_attackXRadius = kSpeedAttackXRadius;
+		m_attackYRadius = kSpeedAttackYRadius;
+		m_attackShockRadius = kSpeedAttackShockRadius;
+
+		//攻撃X座標
+		m_attackMove = VScale(m_attackDir, 7.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		//球の攻撃半径
+		m_attackXRadius = kShotAttackXRadius;
+		m_attackYRadius = kShotAttackYRadius;
+		m_attackShockRadius = kShotAttackShockRadius;
+
+		//攻撃X座標
+		m_attackMove = VScale(m_attackDir, 20.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+	{
+		//球の攻撃半径
+		m_attackXRadius = kRassAttackXRadius;
+		m_attackYRadius = kRassAttackYRadius;
+		m_attackShockRadius = kRassAttackShockRadius;
+
+		//攻撃X座標
+		m_attackMove = VScale(m_attackDir, 9.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+
+	//顔を付けていない場合
+	if (!m_isFaceUse)
+	{
+		//球の攻撃半径
+		m_attackXRadius = kNormalAttackXRadius;
+		m_attackYRadius = kNormalAttackYRadius;
+		m_attackShockRadius = kNormalAttackShockRadius;
+
+		//攻撃X座標
+		m_attackMove = VScale(m_attackDir, 7.0f);
+		m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+
+	/* 特殊攻撃 */
+
+	//通常状態の攻撃Y座標(スピードタイプ以外)
+	if (!m_isFaceUse)
+	{
+		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+	}
+	//攻撃Y座標(スピードタイプ以外)
+	else if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
+	{
+		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+	}
+	//攻撃Y(スピードタイプのみ)
+	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
+	{
+		m_attackMove = VScale(m_attackDir, 9.0f);
+		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
+	{
+		m_attackMove = VScale(m_attackDir, 50.0f);
+		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	}
+	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
+	{
+		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+	}
+
+}
+
 void Player::OnIdle()
 {
 	m_jumpCount = 0;
@@ -2479,6 +2430,70 @@ void Player::OnTalk()
 {
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &Player::TalkUpdate;
+}
+
+void Player::DamageUpdate()
+{
+	//ヒットした場合の処理
+	if (m_isHitDamage)
+	{
+		m_damageFrame++;
+	}
+	else
+	{
+		m_damageFrame = 0;
+	}
+
+	if (m_damageFrame >= 120)
+	{
+		//ヒット無敵時間を解除
+		m_isHitDamage = false;
+	}
+}
+
+void Player::StatusUpdate()
+{
+
+	//HPがゼロより下にいった場合
+	if (m_hp <= 0)
+	{
+		m_hp = 0;
+
+		//死亡状態へ遷移
+		OnDead();
+	}
+
+	//MPが0以下になったら
+	if (m_mp <= 0)
+	{
+		m_isMp = true;
+		m_mp = 0;
+	}
+
+	//MPが最大値を超えたら
+	if (m_mp > kMaxMp)
+	{
+		m_mp = kMaxMp;
+	}
+
+	//スタミナ関連
+	if (m_stamina <= 0)
+	{
+		m_stamina = 0;
+		m_isStamina = true;
+	}
+
+	//スタミナがスタミナの最大値を超えた場合
+	if (m_stamina > kMaxStamina)
+	{
+		m_stamina = kMaxStamina;
+	}
+
+	//スタミナがスタミナの最大値に達した場合
+	if (m_stamina == kMaxStamina)
+	{
+		m_isStamina = false;
+	}
 }
 
 void Player::FaceSelect()

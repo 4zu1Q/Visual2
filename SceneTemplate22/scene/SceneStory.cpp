@@ -13,7 +13,7 @@ namespace
 
 	//ポーズの背景アルファ値
 	constexpr int kAlpha = 200;
-
+	
 	constexpr int kTimeRimit = 320;
 
 	constexpr float kCursorSpeed = 0.05f;

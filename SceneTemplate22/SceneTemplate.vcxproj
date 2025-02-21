@@ -112,14 +112,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\DxLib_Effekseer;$(ProjectDir)scene;$(ProjectDir);C:\Users\fko2347038\Desktop\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\OneDrive\デスクトップ\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\Downloads\DxLib_VC3_24d\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\Desktop\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\fko2347038\Desktop\GitHub\Visual2\DxLib_Effekseer;C:\Users\souta\OneDrive\デスクトップ\GitHub\Visual2\DxLib_Effekseer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)DxLib;$(ProjectDir)scene;$(ProjectDir);C:\Users\souta\OneDrive\デスクトップ\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\Downloads\DxLib_VC3_24d\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\Desktop\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\fko2347038\Desktop\GitHub\Visual2\DxLib_Effekseer;C:\Users\souta\OneDrive\デスクトップ\GitHub\Visual2\DxLib_Effekseer</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\DxLib_Effekseer;$(ProjectDir)scene;$(ProjectDir);C:\Users\fko2347038\Desktop\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\OneDrive\デスクトップ\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\Downloads\DxLib_VC3_24d\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\Desktop\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\fko2347038\Desktop\GitHub\Visual2\DxLib_Effekseer;C:\Users\souta\OneDrive\デスクトップ\GitHub\Visual2\DxLib_Effekseer</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)DxLib;$(ProjectDir)scene;$(ProjectDir);C:\Users\souta\OneDrive\デスクトップ\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\Downloads\DxLib_VC3_24d\DxLib_VC\プロジェクトに追加すべきファイル_VC用;C:\Users\souta\Desktop\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;C:\Users\fko2347038\Desktop\GitHub\Visual2\DxLib_Effekseer;C:\Users\souta\OneDrive\デスクトップ\GitHub\Visual2\DxLib_Effekseer</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\DxLib_Effekseer;$(ProjectDir)scene;$(ProjectDir);C:\Users\fko2347038\Desktop\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;;C:\Users\fko2347038\Desktop\GitHub\Visual2\DxLib_Effekseer</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)DxLib;$(ProjectDir)scene;$(ProjectDir);;C:\Users\fko2347038\Desktop\GitHub\Visual2\DxLib_Effekseer</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -139,7 +139,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\DxLib_Effekseer;$(ProjectDir)scene;$(ProjectDir);C:\Users\fko2347038\Desktop\GitHub\Visual2\プロジェクトに追加すべきファイル_VC用;;C:\Users\fko2347038\Desktop\GitHub\Visual2\DxLib_Effekseer</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)DxLib;$(ProjectDir)scene;$(ProjectDir);;C:\Users\fko2347038\Desktop\GitHub\Visual2\DxLib_Effekseer</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
