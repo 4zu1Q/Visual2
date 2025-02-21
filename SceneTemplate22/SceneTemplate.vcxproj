@@ -202,7 +202,6 @@
     <ClCompile Include="util\StringUtility.cpp" />
     <ClCompile Include="util\Time.cpp" />
     <ClCompile Include="util\Vec2.cpp" />
-    <ClCompile Include="util\Vec3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib\Collidable.h" />
@@ -268,7 +267,6 @@
     <ClInclude Include="util\StringUtility.h" />
     <ClInclude Include="util\Time.h" />
     <ClInclude Include="util\Vec2.h" />
-    <ClInclude Include="util\Vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

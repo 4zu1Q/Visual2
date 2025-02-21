@@ -117,9 +117,6 @@
     <ClCompile Include="scene\SceneOption.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
-    <ClCompile Include="util\Vec3.cpp">
-      <Filter>ソース ファイル\util</Filter>
-    </ClCompile>
     <ClCompile Include="scene\ScenePause.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
@@ -298,9 +295,6 @@
     </ClInclude>
     <ClInclude Include="scene\SceneOption.h">
       <Filter>ヘッダー ファイル\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="util\Vec3.h">
-      <Filter>ヘッダー ファイル\util</Filter>
     </ClInclude>
     <ClInclude Include="scene\ScenePause.h">
       <Filter>ヘッダー ファイル\scene</Filter>

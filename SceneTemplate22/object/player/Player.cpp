@@ -148,23 +148,23 @@ namespace
 	constexpr float kShadowHeight = 50.0f;
 
 	//プレイヤーの種類によって変わる当たり判定の半径
-	constexpr float kNormalAttackXRadius = 4.0f;
+	constexpr float kNormalAttackXRadius = 6.0f;
 	constexpr float kNormalAttackYRadius = 15.0f;
 	constexpr float kNormalAttackShockRadius = 10.0f;
 
-	constexpr float kPowerAttackXRadius = 4.0f;
+	constexpr float kPowerAttackXRadius = 6.0f;
 	constexpr float kPowerAttackYRadius = 15.0f;
 	constexpr float kPowerAttackShockRadius = 10.0f;
 
-	constexpr float kSpeedAttackXRadius = 2.5f;
-	constexpr float kSpeedAttackYRadius = 5.5f;
+	constexpr float kSpeedAttackXRadius = 3.5f;
+	constexpr float kSpeedAttackYRadius = 6.5f;
 	constexpr float kSpeedAttackShockRadius = 3.0f;
 	
-	constexpr float kShotAttackXRadius = 8.0f;
-	constexpr float kShotAttackYRadius = 15.0f;
+	constexpr float kShotAttackXRadius = 12.0f;
+	constexpr float kShotAttackYRadius = 16.0f;
 	constexpr float kShotAttackShockRadius = 10.0f;
 	
-	constexpr float kRassAttackXRadius = 6.0f;
+	constexpr float kRassAttackXRadius = 9.0f;
 	constexpr float kRassAttackYRadius = 15.0f;
 	constexpr float kRassAttackShockRadius = 3.0f;
 

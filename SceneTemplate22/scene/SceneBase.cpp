@@ -93,7 +93,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	EffectManager::GetInstance().Load("jumpEffect", "Data/Effect/Jump.efkefc", 120, 2.0f);
 	EffectManager::GetInstance().Load("gameClearEffect", "Data/Effect/StageClear01.efkefc", 200, 4.0f);
 	EffectManager::GetInstance().Load("gameOverEffect", "Data/Effect/PlayerHit.efkefc", 120, 1.0f);
-	EffectManager::GetInstance().Load("attackChargeEffect", "Data/Effect/AttackCharge.efkefc", 60, 8.0f);
+	EffectManager::GetInstance().Load("attackChargeEffect", "Data/Effect/AttackCharge.efkefc", 60, 4.0f);
 	EffectManager::GetInstance().Load("attackChargeFinishEffect", "Data/Effect/ChargeFinish.efkefc", 120, 2.0f);
 	EffectManager::GetInstance().Load("attackYEffect", "Data/Effect/PlayerShockAttack.efkefc", 40, 5.0f);
 	EffectManager::GetInstance().Load("playerShockEffect", "Data/Effect/PlayerShockAttack.efkefc", 120, 1.0f);
