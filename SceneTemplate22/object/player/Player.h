@@ -14,6 +14,7 @@ class Player : public CharaBase
 {
 
 public:
+
 	//ボタンの種類
 	enum class e_ButtonKind : int
 	{
@@ -63,12 +64,15 @@ public:
 	const VECTOR& GetAttackYPos() const { return m_attackYPos; }
 	const VECTOR& GetShockPos() const { return m_attackYPos; }
 
+	//プレイヤーの攻撃半径を取得
 	const float& GetAttackXRadius() const { return m_attackXRadius; }
 	const float& GetAttackYRadius() const { return m_attackYRadius; }
 	const float& GetShockRadius() const { return m_attackShockRadius; }
 
+	//攻撃をしたかどうかを取得
 	const bool& GetIsAttack() const { return m_isAttack; }
 
+	//プレイヤーがどの攻撃をしたかを取得
 	const Game::e_PlayerAttackKind& GetAttackKind() const { return m_attackKind; }
 
 	/* ステータスの取得 */
@@ -110,7 +114,32 @@ public:
 
 private:
 
+	//プレイヤーの攻撃更新処理
+	void CollisionPosUpdate();
+	//ダメージ更新処理
+	void DamageUpdate();
+	//プレイヤーのステータス更新処理
+	void StatusUpdate();
+
+	//プレイヤーの回転処理
+	void PlayerSetPosAndRotation(VECTOR pos, float angle);
+	//プレイヤーの移動
+	void Move();
+	//ボスの攻撃の当たり判定
 	void Hit();
+
+	// プレイヤーが顔を使用時の関数
+	void FaceSelect();
+	//プレイヤーがアイテムを使うときの関数
+	void FaceUse();
+
+	//武器を描画するだけの関数
+	void WeaponDraw(PlayerWeapon& weapon);
+	//プレイヤーの種類で描画を変える関数
+	void PlayerDraw();
+
+	//攻撃半径と攻撃の距離をセットする関数
+	void SetAttackCollision(float attackXRadius, float attackYRadius, float attackShockRadius, float attackXMoveScale, float attackYMoveScale);
 
 	//攻撃判定
 	bool IsAttackHit(VECTOR attackPos, float radius);
@@ -162,32 +191,10 @@ private:
 	void OnFaceChange();
 	void OnFaceUse();
 
-	void OnTalk();
-
-	//武器を描画するだけの関数
-	void WeaponDraw(PlayerWeapon& weapon);
-	//プレイヤーの種類で描画を変える関数
-	void PlayerDraw();
-
-	void PlayerSetPosAndRotation(VECTOR pos, float angle);
-
-	//プレイヤーの移動
-	void Move();
-
-	//プレイヤーの攻撃更新処理
-	void CollisionPosUpdate();
-	//ダメージ更新処理
-	void DamageUpdate();
-	//プレイヤーのステータス更新処理
-	void StatusUpdate();
-
-	/// <summary>
-	/// プレイヤーが顔を使用時の関数
-	/// </summary>
-	void FaceSelect();
-
-	//プレイヤーがアイテムを使うときの関数
-	void FaceUse();
+	/* On関数に入る時にセットする関数 */
+	void SetOnReset();	//状態遷移した時に値をリセットさせる関数
+	void SetOnDamage();	//ダメージを受けた時のセット関数
+	void SetOnJump();		//ジャンプをした時のセット関数
 
 private:
 
@@ -218,7 +225,8 @@ private:
 	bool m_isStamina;//スタミナを使い切ったかどうか
 	bool m_isDash;	 //ダッシュしているかどうか
 	bool m_isLockOn; //ロックオンしてるかどうか
-	
+	bool m_isGameOver;	//ゲームオーバー画面に遷移するためのフラグ
+
 	//ジャンプ量を見る
 	float m_jumpPower;
 	int m_jumpCount;
@@ -234,6 +242,9 @@ private:
 	int m_moveCount;	//動いたときの音を出すカウント
 	int m_damageFrame;	//無敵時間の時の点滅時間
 
+	int m_deadTime;
+	bool m_isDead;		//死んだかどうかを判定
+
 	//攻撃座標
 	VECTOR m_attackXPos;
 	VECTOR m_attackYPos;
@@ -242,7 +253,6 @@ private:
 
 	bool m_isHitDamage;	//ボスの攻撃に当たったかどうか
 	bool m_isAttack;	//攻撃したかどうか
-	bool m_isShock;
 	int m_attackFrame;
 
 	int m_chargeTime;	//強攻撃のチャージ時間
@@ -260,10 +270,6 @@ private:
 	float m_attackXRadius;		//プレイヤーの通常攻撃半径
 	float m_attackYRadius;		//プレイヤーの特殊攻撃半径
 	float m_attackShockRadius;	//プレイヤーの衝撃攻撃半径
-
-	int m_deadTime;
-	bool m_isDead;		//死んだかどうかを判定
-	bool m_isGameOver;	//ゲームオーバー画面に遷移するためのフラグ
 	
 	//プレイヤーの顔の種類
 	Game::e_PlayerKind m_playerKind;
