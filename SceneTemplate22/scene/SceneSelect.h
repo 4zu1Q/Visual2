@@ -72,9 +72,9 @@ private:
 
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;
-
-	//フォントハンドル
-	int m_fontHandle;
+	
+	int m_fontH;	//フォントハンドル
+	int m_shadowH;	//シャドウマップハンドル
 
 	//ステージに移動する当たり判定フラグ
 	bool m_isPowerStage;

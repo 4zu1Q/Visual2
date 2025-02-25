@@ -238,7 +238,6 @@ Player::Player() :
 	m_attackXRadius = 0.0f;
 	m_attackYRadius = 0.0f;
 	m_attackShockRadius = 0.0f;
-
 }
 
 Player::~Player()
@@ -279,11 +278,6 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, Pla
 	//アニメーションの初期化
 	m_pAnim->Initialize(kNormalAnimInfoFilename, m_modelH, kAnimIdle);
 	m_angle = 48.0f;
-
-	m_shadowH = MakeShadowMap(2048, 2048);
-	SetShadowMapLightDirection(m_shadowH, VGet(0.0f, -38.0f, 0.0f));
-	// シャドウマップに描画する範囲を設定
-	SetShadowMapDrawArea(m_shadowH, VGet(-10000.0f, -30.0f, -10000.0f), VGet(10000.0f, 100.0f, 10000.0f));
 
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &Player::IdleUpdate;
@@ -355,20 +349,6 @@ void Player::Draw(PlayerWeapon& weapon)
 
 #endif
 
-	//ShadowMap_DrawSetup(m_shadowH);
-
-	////武器の描画
-	//WeaponDraw(weapon);
-	//////モデルの描画
-	//PlayerDraw();
-
-	//// ステージモデル用のシャドウマップへの描画を終了
-	//ShadowMap_DrawEnd();
-
-
-	// シャドウマップの反映開始
-	//SetUseShadowMap(0, m_shadowH);
-
 	// ダメージ演出  2フレーム間隔で表示非表示切り替え
 	if (m_damageFrame % 8 >= 4) return;
 
@@ -376,9 +356,6 @@ void Player::Draw(PlayerWeapon& weapon)
 	WeaponDraw(weapon);
 	////モデルの描画
 	PlayerDraw();
-
-	// 反映終了
-	//SetUseShadowMap(0, -1);
 
 }
 

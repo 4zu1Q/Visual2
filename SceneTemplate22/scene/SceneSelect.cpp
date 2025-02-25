@@ -134,7 +134,13 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_handles.push_back(LoadGraph("Data/Image/NoClearStar.png"));
 	m_handles.push_back(LoadGraph("Data/Image/ClearStar.png"));
 
-	m_fontHandle = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", kFontSize);
+	m_fontH = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", kFontSize);
+
+
+	m_shadowH = MakeShadowMap(2048, 2048);
+	SetShadowMapLightDirection(m_shadowH, VGet(0.0f, -38.0f, 0.0f));
+	// シャドウマップに描画する範囲を設定
+	SetShadowMapDrawArea(m_shadowH, VGet(-10000.0f, -30.0f, -10000.0f), VGet(10000.0f, 100.0f, 10000.0f));
 
 }
 
@@ -300,8 +306,19 @@ void SceneSelect::Update()
 
 void SceneSelect::Draw()
 {
-	m_pSkyDome->Draw();
+	//ShadowMap_DrawSetup(m_shadowH);
 	m_pField->Draw();
+	// ステージモデル用のシャドウマップへの描画を終了
+	//ShadowMap_DrawEnd();
+
+	// シャドウマップの反映開始
+	//SetUseShadowMap(0, m_shadowH);
+	m_pPlayer->Draw(*m_pPlayerWeapon);
+	// 反映終了
+	//SetUseShadowMap(0, -1);
+
+	m_pSkyDome->Draw();
+	m_pTomb->Draw();
 
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
@@ -311,8 +328,7 @@ void SceneSelect::Draw()
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pButtonUi->Draw(*m_pPlayer);
 
-	m_pTomb->Draw();
-	m_pPlayer->Draw(*m_pPlayerWeapon);
+
 
 	//ゲームシーンに行けるかどうかを分かりやすくするための画像
 	if (m_isPowerStage) 
