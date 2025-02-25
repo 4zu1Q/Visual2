@@ -130,7 +130,8 @@ namespace
 	constexpr float kShadowSize = 5.0f;
 	constexpr float kShadowHeight = 50.0f;
 
-	constexpr float kHitRadius = 6.0f;
+	constexpr float kInitRadius = 6.0f;
+	constexpr float kHitRadius = 3.0f;
 
 	//プレイヤーの種類によって変わる当たり判定の半径
 	constexpr float kNormalAttackXRadius = 6.0f;
@@ -152,6 +153,9 @@ namespace
 	constexpr float kRassAttackXRadius = 9.0f;
 	constexpr float kRassAttackYRadius = 15.0f;
 	constexpr float kRassAttackShockRadius = 3.0f;
+
+	constexpr int kDamageSmashNum = 8;
+	constexpr int kDrawHiddenNum = 4;
 
 }
 
@@ -230,11 +234,11 @@ Player::Player() :
 	//コライダーデータの生成
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
-	circleColliderData->m_radius = kHitRadius;
+	circleColliderData->m_radius = kInitRadius;
 
 	m_radius = circleColliderData->m_radius;
 
-	m_hitRadius = 0.0f;
+	m_hitRadius = kHitRadius;
 	m_attackXRadius = 0.0f;
 	m_attackYRadius = 0.0f;
 	m_attackShockRadius = 0.0f;
@@ -350,7 +354,7 @@ void Player::Draw(PlayerWeapon& weapon)
 #endif
 
 	// ダメージ演出  2フレーム間隔で表示非表示切り替え
-	if (m_damageFrame % 8 >= 4) return;
+	if (m_damageFrame % kDamageSmashNum >= kDrawHiddenNum) return;
 
 	//武器の描画
 	WeaponDraw(weapon);
@@ -425,7 +429,6 @@ bool Player::IsAttackHit(VECTOR attackPos, float radius)
 	float delX = (m_hitPos.x - attackPos.x) * (m_hitPos.x - attackPos.x);
 	float delY = ((m_hitPos.y) - (attackPos.y)) * ((m_hitPos.y) - (attackPos.y));
 	float delZ = (m_hitPos.z - attackPos.z) * (m_hitPos.z - attackPos.z);
-
 	//球と球の距離
 	float Distance = sqrt(delX + delY + delZ);
 
@@ -444,7 +447,6 @@ bool Player::IsWeaponHit(VECTOR attackPos, float radius)
 	float delX = (m_hitPos.x - attackPos.x) * (m_hitPos.x - attackPos.x);
 	float delY = ((m_hitPos.y) - (attackPos.y)) * ((m_hitPos.y) - (attackPos.y));
 	float delZ = (m_hitPos.z - attackPos.z) * (m_hitPos.z - attackPos.z);
-
 	//球と球の距離
 	float Distance = sqrt(delX + delY + delZ);
 
@@ -463,7 +465,6 @@ bool Player::IsShockAttackHit(VECTOR attackPos, float radius)
 	float delX = (m_hitPos.x - attackPos.x) * (m_hitPos.x - attackPos.x);
 	float delY = ((m_hitPos.y) - (attackPos.y)) * ((m_hitPos.y) - (attackPos.y));
 	float delZ = (m_hitPos.z - attackPos.z) * (m_hitPos.z - attackPos.z);
-
 	//球と球の距離
 	float Distance = sqrt(delX + delY + delZ);
 
@@ -482,7 +483,6 @@ bool Player::IsPlayerAttackHit(VECTOR attackPos, float attackRadius)
 	float delX = (m_bossHitPos.x - attackPos.x) * (m_bossHitPos.x - attackPos.x);
 	float delY = ((m_bossHitPos.y) - (attackPos.y)) * ((m_bossHitPos.y) - (attackPos.y));
 	float delZ = (m_bossHitPos.z - attackPos.z) * (m_bossHitPos.z - attackPos.z);
-
 	//球と球の距離
 	float Distance = sqrt(delX + delY + delZ);
 

@@ -57,6 +57,8 @@ namespace
 
 	constexpr float kMaxPercent = 20.0f;
 
+	constexpr float kSelectSpeed = 0.06f;
+	constexpr float kSelectAnimationSize = 3.0f;
 }
 
 PlayerBarUi::PlayerBarUi():
@@ -96,10 +98,14 @@ void PlayerBarUi::Update(Player& player)
 	m_playerStamina = player.GetStamina();
 	m_isPlayerStamina = player.GetIsStamina();
 
-	//スタミナの残り％を計算
-	m_percent = static_cast<double>(m_stamina) /
-		static_cast<double>(kMaxStamina) * kMaxPercent;
+	////スタミナの残り％を計算
+	//m_percent = static_cast<double>(m_stamina) /
+	//	static_cast<double>(kMaxStamina) * kMaxPercent;
 
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
 }
 
 void PlayerBarUi::Draw()
@@ -123,12 +129,14 @@ void PlayerBarUi::Draw()
 	//プレイヤーのロストした時のHP
 	for (int i = 1; i <= static_cast<int>(kMaxHp); i++)
 	{
-		DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpLostH], true);
+		DrawExtendGraph(kHpPos.x * i + 10, kHpPos.y /*+ m_selectAnimation*/, kHpPos.x * i + 42, 47, m_handles[kHpLostH], true);
+		//DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpLostH], true);
 	}
 	//プレイヤーのHP
 	for (int i = 1; i <= static_cast<int>(m_playerHp); i++)
 	{
-		DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpH], true);
+		DrawExtendGraph(kHpPos.x * i + 10, kHpPos.y + m_selectAnimation, kHpPos.x * i + 42, 47, m_handles[kHpH], true);
+		//DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpH], true);
 	}
 
 	DrawGraph(kMpBarPos.x, kMpBarPos.y, m_handles[kMpBarH], true);

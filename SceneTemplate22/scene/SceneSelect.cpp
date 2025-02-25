@@ -313,11 +313,13 @@ void SceneSelect::Draw()
 
 	// シャドウマップの反映開始
 	//SetUseShadowMap(0, m_shadowH);
+	
 	m_pPlayer->Draw(*m_pPlayerWeapon);
+	m_pSkyDome->Draw();
+
 	// 反映終了
 	//SetUseShadowMap(0, -1);
 
-	m_pSkyDome->Draw();
 	m_pTomb->Draw();
 
 	m_pItemHp->Draw();

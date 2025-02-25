@@ -30,6 +30,8 @@ private:
 	//スタミナを使い切った場合
 	bool m_isPlayerStamina;
 
+	//カーソルアニメーション
+	float m_selectAnimation;
 
 	double m_percent;
 	double m_percentGreenGauge;
