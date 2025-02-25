@@ -295,7 +295,6 @@ void SceneTitle::Update()
 		//Bボタンを押した場合
 		if (Pad::IsTrigger(PAD_INPUT_2))
 		{
-			//m_isActionBack = true;
 			SoundManager::GetInstance().PlaySe("backSe");
 			m_isActionStart = false;
 			m_isStart = false;
