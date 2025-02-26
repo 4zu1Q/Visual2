@@ -43,6 +43,7 @@ SceneStory::SceneStory(SceneManager& manager) :
 	m_isSkip = false;
 
 	m_isToNextScene = false;
+
 	m_storyTime = 0;
 
 	//画像のロード

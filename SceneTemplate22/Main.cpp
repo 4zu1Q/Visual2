@@ -56,9 +56,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//ポリゴンの裏面を描画しない
 	SetUseBackCulling(true);
 
-	//標準ライトの無効化
-	//SetLightEnable(false);
-
 	//エフェクシアを初期化
 	Effekseer_Init(3000);
 	//エフェクシアの歪み機能を初期化する

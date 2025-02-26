@@ -58,6 +58,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	m_selectTime(0)
 {
 	m_isToNextScene = false;
+
 	m_isCameraLockOn = true;
 	m_isPowerTriangl = false;
 	m_isSpeedTriangl = false;
@@ -117,8 +118,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/StageButton.png"));
 
-	//戦闘用BGMを最初に流す
-	SoundManager::GetInstance().PlayBgm("battleBgm", true);
+
 }
 
 SceneGamePlay::~SceneGamePlay()
@@ -149,6 +149,9 @@ void SceneGamePlay::Update()
 	UpdateFade();
 	UpdateFadeSelectGraph();
 	EffectManager::GetInstance().Update();
+
+	//戦闘用BGMを最初に流す
+	SoundManager::GetInstance().PlayBgm("battleBgm", true);
 
 #ifdef _DEBUG
 	MyLib::DebugDraw::Draw();

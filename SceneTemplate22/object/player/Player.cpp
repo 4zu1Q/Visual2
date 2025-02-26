@@ -64,8 +64,13 @@ namespace
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 0.0f,0.0f,0.0f };
-	//カプセルの上の座標
+	//上の座標
 	constexpr VECTOR kUpPos = { 0.0f,12.0f,0.0f };
+
+	//プレイヤーのヒット座標
+	constexpr float kUpHitPos = 9.0f;
+	constexpr float kUpAttackPos = 6.0f;
+	constexpr float kDownAttackPos = 5.0f;
 
 	//見えない壁を作るための座標
 	constexpr VECTOR kWallRightPos = { 510.0f,0.0f,790.0f };
@@ -137,22 +142,32 @@ namespace
 	constexpr float kNormalAttackXRadius = 6.0f;
 	constexpr float kNormalAttackYRadius = 15.0f;
 	constexpr float kNormalAttackShockRadius = 10.0f;
+	constexpr float kNormalAttackXMoveScale = 7.0f;
+	constexpr float kNormalAttackYMoveScale = 1.0f;
 
 	constexpr float kPowerAttackXRadius = 6.0f;
 	constexpr float kPowerAttackYRadius = 15.0f;
 	constexpr float kPowerAttackShockRadius = 10.0f;
+	constexpr float kPowerAttackXMoveScale = 8.0f;
+	constexpr float kPowerAttackYMoveScale = 1.0f;
 
 	constexpr float kSpeedAttackXRadius = 3.5f;
 	constexpr float kSpeedAttackYRadius = 6.5f;
 	constexpr float kSpeedAttackShockRadius = 3.0f;
-	
+	constexpr float kSpeedAttackXMoveScale = 7.0f;
+	constexpr float kSpeedAttackYMoveScale = 9.0f;
+
 	constexpr float kShotAttackXRadius = 12.0f;
 	constexpr float kShotAttackYRadius = 16.0f;
 	constexpr float kShotAttackShockRadius = 10.0f;
-	
+	constexpr float kShotAttackXMoveScale = 20.0f;
+	constexpr float kShotAttackYMoveScale = 50.0f;
+
 	constexpr float kRassAttackXRadius = 9.0f;
 	constexpr float kRassAttackYRadius = 15.0f;
 	constexpr float kRassAttackShockRadius = 3.0f;
+	constexpr float kRassAttackXMoveScale = 9.0f;
+	constexpr float kRassAttackYMoveScale = 1.0f;
 
 	constexpr int kDamageSmashNum = 8;
 	constexpr int kDrawHiddenNum = 4;
@@ -1834,11 +1849,11 @@ void Player::SetAttackCollision(float attackXRadius, float attackYRadius, float 
 
 	//攻撃X座標
 	m_attackMove = VScale(m_attackDir, attackXMoveScale);
-	m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	m_attackXPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - kDownAttackPos, m_hitPos.z), m_attackMove);
 
 	//攻撃Y座標
 	m_attackMove = VScale(m_attackDir, attackYMoveScale);
-	m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+	m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - kDownAttackPos, m_hitPos.z), m_attackMove);
 }
 
 void Player::PlayerSetPosAndRotation(VECTOR pos, float angle)
@@ -2031,41 +2046,41 @@ void Player::CollisionPosUpdate()
 	m_pos = m_rigidbody.GetPos();
 
 	//ヒット座標
-	m_hitPos = VGet(m_pos.x, m_pos.y + 9.0f, m_pos.z);
+	m_hitPos = VGet(m_pos.x, m_pos.y + kUpHitPos, m_pos.z);
 	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
 
 	//プレイヤーの当たり判定の位置と大きさ
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isFaceUse)
 	{
 		//攻撃の半径と座標をセット
-		SetAttackCollision(kPowerAttackXRadius, kPowerAttackYRadius, kPowerAttackShockRadius, 8.0f, 1.0f);
-		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+		SetAttackCollision(kPowerAttackXRadius, kPowerAttackYRadius, kPowerAttackShockRadius, kPowerAttackXMoveScale, kPowerAttackYMoveScale);
+		m_attackYPos = VGet(m_pos.x, m_pos.y + kUpAttackPos, m_pos.z);
 	}
 	else if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isFaceUse)
 	{
 		//攻撃の半径と座標をセット
-		SetAttackCollision(kSpeedAttackXRadius, kSpeedAttackYRadius, kSpeedAttackShockRadius, 7.0f, 9.0f);
-		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+		SetAttackCollision(kSpeedAttackXRadius, kSpeedAttackYRadius, kSpeedAttackShockRadius, kSpeedAttackXMoveScale, kSpeedAttackYMoveScale);
+		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - kDownAttackPos, m_hitPos.z), m_attackMove);
 	}
 	else if (m_playerKind == e_PlayerKind::kShotPlayer && m_isFaceUse)
 	{
 		//球の攻撃半径
-		SetAttackCollision(kShotAttackXRadius, kShotAttackYRadius, kShotAttackShockRadius, 20.0f, 50.0f);
-		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - 5.0f, m_hitPos.z), m_attackMove);
+		SetAttackCollision(kShotAttackXRadius, kShotAttackYRadius, kShotAttackShockRadius, kShotAttackXMoveScale, kShotAttackYMoveScale);
+		m_attackYPos = VAdd(VGet(m_hitPos.x, m_hitPos.y - kDownAttackPos, m_hitPos.z), m_attackMove);
 	}
 	else if (m_playerKind == e_PlayerKind::kRassPlayer && m_isFaceUse)
 	{
 		//球の攻撃半径
-		SetAttackCollision(kRassAttackXRadius, kRassAttackYRadius, kRassAttackShockRadius, 9.0f, 1.0f);
-		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+		SetAttackCollision(kRassAttackXRadius, kRassAttackYRadius, kRassAttackShockRadius, kRassAttackXMoveScale, kRassAttackYMoveScale);
+		m_attackYPos = VGet(m_pos.x, m_pos.y + kUpAttackPos, m_pos.z);
 	}
 
 	//顔を付けていない場合
 	if (!m_isFaceUse)
 	{
 		//球の攻撃半径
-		SetAttackCollision(kNormalAttackXRadius, kNormalAttackYRadius, kNormalAttackShockRadius, 7.0f, 1.0f);
-		m_attackYPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+		SetAttackCollision(kNormalAttackXRadius, kNormalAttackYRadius, kNormalAttackShockRadius, kNormalAttackXMoveScale, kNormalAttackYMoveScale);
+		m_attackYPos = VGet(m_pos.x, m_pos.y + kUpAttackPos, m_pos.z);
 	}
 }
 
@@ -2127,6 +2142,7 @@ void Player::OnAttackX()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
+	m_attackFrame = 0;
 	m_isAttack = true;
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kXbutton;
@@ -2192,7 +2208,7 @@ void Player::OnAttackY()
 		m_isAttack = true;
 	}
 
-
+	m_attackFrame = 0;
 	m_isButtonPush = true;
 	m_buttonKind = e_ButtonKind::kYbutton;
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackY;
@@ -2392,7 +2408,6 @@ void Player::DamageUpdate()
 
 void Player::StatusUpdate()
 {
-
 	//HPがゼロより下にいった場合
 	if (m_hp <= 0)
 	{

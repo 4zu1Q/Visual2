@@ -26,8 +26,7 @@ namespace
 	//使う画像の種類
 	enum e_Ui
 	{
-		kLogoStartH,
-		kLogoH,
+		kTitleLogoH,
 		kPleasePressH,
 		kNewGameH,
 		kLoadGameH,
@@ -111,7 +110,6 @@ SceneTitle::SceneTitle(SceneManager& manager):
 	m_PlayerPos = m_pPlayerProduction->GetPos();
 
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/TitleLogoStart.png"));
 	m_handles.push_back(LoadGraph("Data/Image/TitleLogo.png"));
 	m_handles.push_back(LoadGraph("Data/Image/PleasePressButton.png"));
 	m_handles.push_back(LoadGraph("Data/Image/NewGame.png"));				//NewGame
@@ -366,7 +364,7 @@ void SceneTitle::Draw()
 	if (!m_isStart)
 	{
 		//ロゴ
-		DrawFadeGraphTitleLogo(m_handles[kLogoStartH], m_titleLogoPos);
+		DrawFadeGraphTitleLogo(m_handles[kTitleLogoH], m_titleLogoPos);
 
 		if (m_isPreesAnyButton)
 		{
@@ -432,7 +430,7 @@ void SceneTitle::Draw()
 		}
 
 		//タイトルロゴ
-		DrawFadeGraphTitleLogo(m_handles[kLogoStartH], m_titleLogoPos);
+		DrawFadeGraphTitleLogo(m_handles[kTitleLogoH], m_titleLogoPos);
 
 		DrawGraph(kButtonPos.x, kButtonPos.y, m_handles[kButtonH], true);
 

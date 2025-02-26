@@ -235,7 +235,6 @@ void SceneBase::UpdateFadeGraphTitleLogo()
 	{
 		m_fadeGraphTitleTime += kFadeNum;
 	}
-
 }
 
 void SceneBase::DrawFadeGraphTitleLogo(int graphHandle, Vec2 graphPos)

@@ -130,13 +130,11 @@ void PlayerBarUi::Draw()
 	for (int i = 1; i <= static_cast<int>(kMaxHp); i++)
 	{
 		DrawExtendGraph(kHpPos.x * i + 10, kHpPos.y /*+ m_selectAnimation*/, kHpPos.x * i + 42, 47, m_handles[kHpLostH], true);
-		//DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpLostH], true);
 	}
 	//プレイヤーのHP
 	for (int i = 1; i <= static_cast<int>(m_playerHp); i++)
 	{
 		DrawExtendGraph(kHpPos.x * i + 10, kHpPos.y + m_selectAnimation, kHpPos.x * i + 42, 47, m_handles[kHpH], true);
-		//DrawGraph(kHpPos.x * i, kHpPos.y, m_handles[kHpH], true);
 	}
 
 	DrawGraph(kMpBarPos.x, kMpBarPos.y, m_handles[kMpBarH], true);
