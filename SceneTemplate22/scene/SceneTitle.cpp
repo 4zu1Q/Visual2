@@ -71,6 +71,10 @@ namespace
 
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
+
+	//プレイヤーの最初の位置
+	constexpr VECTOR kPlayerPos = { 400.0f,-35.0f,740.0f };
+
 }
 
 SceneTitle::SceneTitle(SceneManager& manager):
@@ -322,7 +326,7 @@ void SceneTitle::Update()
 			if (m_sceneTrans == e_SceneTrans::kLoadGame)
 			{
 				SoundManager::GetInstance().StopBgm("titleBgm");
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect, kPlayerPos));
 				return;
 			}
 		}

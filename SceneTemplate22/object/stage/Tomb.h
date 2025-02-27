@@ -10,13 +10,14 @@ public:
 	Tomb();
 	virtual ~Tomb();
 
-	void Initialize();
+	void Initialize(VECTOR powerPos, VECTOR speedPos, VECTOR shotPos);
 	void Finalize();
 
-	virtual void Update(VECTOR powerPos, VECTOR speedPos, VECTOR shotPos);
+	virtual void Update();
 	virtual void Draw();
 
 	virtual void DrawTriangle(Game::e_BossKind bossKind);
+	virtual void DrawTriangleSelect();
 
 	/// <summary>
 	/// 

@@ -30,6 +30,9 @@ namespace
 	const Vec2 kSelectSelectPos = { 110 , 430 };
 	const Vec2 kTitleSelectPos = { 110 , 550 };
 
+	//プレイヤーの最初の位置
+	constexpr VECTOR kPlayerPos = { 400.0f,-35.0f,740.0f };
+
 	//ポーズの背景アルファ値
 	constexpr int kAlpha = 200;
 
@@ -213,7 +216,7 @@ void ScenePause::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
-				m_pManager.ChangeAndClearScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect));
+				m_pManager.ChangeAndClearScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect, kPlayerPos));
 				return;
 			}
 			else if (m_sceneTrans == e_SceneTrans::kTitle)

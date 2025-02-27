@@ -39,6 +39,10 @@ namespace
 	constexpr VECTOR kLightUpPos = { -15.0f,15.0f, -27.0f };
 	constexpr VECTOR kLightDownPos = { -15.0f,15.0f, -27.0f };
 
+	constexpr VECTOR kPlayerPowerTombPos = { -168.0f,-37.0f,624.0f };
+	constexpr VECTOR kPlayerSpeedTombPos = { 979.0f,-37.0f,608.0f };
+	constexpr VECTOR kPlayerShotTombPos = { 409.0f,-37.0f,-363.0f };
+
 	constexpr int kGameOverTimeMax = 180;
 	constexpr int kGameClearTimeMax = 240;
 
@@ -112,7 +116,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	}
 
 	m_pCamera->Initialize(m_pPlayer->GetPos());
-	m_pTomb->Initialize();
+	m_pTomb->Initialize(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
 	m_pField->Initialize();
 
 	//画像のロード
@@ -240,7 +244,7 @@ void SceneGamePlay::Update()
 		SoundManager::GetInstance().StopBgm("battleBgm");
 		SoundManager::GetInstance().PlayBgm("stageClearBgm", true);
 		m_isCameraLockOn = false;
-		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
+		m_pTomb->Update();
 		//パワークリアトライアングルの当たり判定に入った場合
 		if (m_isPowerTriangl)
 		{
@@ -262,7 +266,7 @@ void SceneGamePlay::Update()
 		SoundManager::GetInstance().StopBgm("battleBgm");
 		SoundManager::GetInstance().PlayBgm("stageClearBgm", true);
 		m_isCameraLockOn = false;
-		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
+		m_pTomb->Update();
 		//スピードクリアトライアングルの当たり判定に入った場合
 		if (m_isSpeedTriangl)
 		{
@@ -284,7 +288,7 @@ void SceneGamePlay::Update()
 		SoundManager::GetInstance().StopBgm("battleBgm");
 		SoundManager::GetInstance().PlayBgm("stageClearBgm", true);
 		m_isCameraLockOn = false;
-		m_pTomb->Update(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
+		m_pTomb->Update();
 		//ショットクリアトライアングルの当たり判定に入った場合
 		if (m_isShotTriangl)
 		{
@@ -384,19 +388,19 @@ void SceneGamePlay::Update()
 		{
 			if (m_pBossPower->GetIsClear())
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerPowerTombPos));
 				return;
 			}
 
 			if (m_pBossSpeed->GetIsClear())
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerSpeedTombPos));
 				return;
 			}
 
 			if (m_pBossShot->GetIsClear())
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerShotTombPos));
 				return;
 			}
 		}

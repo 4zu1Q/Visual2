@@ -25,7 +25,7 @@ class SceneSelect :
 	public SceneBase
 {
 public:
-	SceneSelect(SceneManager& manager, Game::e_StageKind stageKind);
+	SceneSelect(SceneManager& manager, Game::e_StageKind stageKind, VECTOR playerPos);
 	virtual ~SceneSelect();
 
 	/// <summary>
@@ -75,6 +75,8 @@ private:
 	
 	int m_fontH;	//フォントハンドル
 	int m_shadowH;	//シャドウマップハンドル
+
+	int m_effectFrame;	//エフェクトのフレーム
 
 	//ステージに移動する当たり判定フラグ
 	bool m_isPowerStage;

@@ -34,6 +34,9 @@ namespace
 
 	const Vec2 kPos = { 0 , 0 };
 	const Vec2 kButtonPos = { 950 , 660 };
+
+	//プレイヤーの最初の位置
+	constexpr VECTOR kPlayerPos = { 400.0f,-35.0f,740.0f };
 }
 
 SceneStory::SceneStory(SceneManager& manager) :
@@ -45,6 +48,7 @@ SceneStory::SceneStory(SceneManager& manager) :
 	m_isToNextScene = false;
 
 	m_storyTime = 0;
+	m_pressTime = 0;
 
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/Scene1.png"));
@@ -80,6 +84,7 @@ void SceneStory::Update()
 	Pad::Update();
 	UpdateFade();
 	UpdateFadeGraphTitleLogo();
+
 	//セレクトのアニメーション
 	static float SinCount = 0;
 	SinCount += kSelectSpeed;
@@ -107,30 +112,6 @@ void SceneStory::Draw()
 
 
 		break;
-	case 2:
-		DrawGraph(kPos.x, kPos.y, m_handles[kScene2H], true);
-		DrawFadeGraphTitleLogo(m_handles[kScene3H], kPos);
-		DrawFadeGraphTitleLogo(m_handles[kButtonH], kButtonPos);
-		DrawString(0, 16, "3", 0xffffff, false);
-
-
-		break;
-	case 3:
-		DrawGraph(kPos.x, kPos.y, m_handles[kScene3H], true);
-		DrawFadeGraphTitleLogo(m_handles[kScene4H], kPos);
-		DrawFadeGraphTitleLogo(m_handles[kButtonH], kButtonPos);
-		DrawString(0, 16, "4", 0xffffff, false);
-
-
-		break;
-	case 4:
-		DrawGraph(kPos.x, kPos.y, m_handles[kScene4H], true);
-		DrawFadeGraphTitleLogo(m_handles[kScene5H], kPos);
-		DrawFadeGraphTitleLogo(m_handles[kButtonH], kButtonPos);
-		DrawString(0, 16, "5", 0xffffff, false);
-
-
-		break;
 	default:
 		break;
 	}
@@ -139,6 +120,7 @@ void SceneStory::Draw()
 	DrawFormatString(0, 32, 0xffffff, "Time:%d", m_storyTime);
 	DrawFormatString(0, 48, 0xffffff, "Skip:%d", m_isSkip);
 	DrawFormatString(0, 64, 0xffffff, "Next:%d", m_isNext);
+	DrawFormatString(0, 80, 0xffffff, "pressTime:%d", m_pressTime);
 
 	DrawFade(0x000000);
 }
@@ -151,28 +133,13 @@ void SceneStory::Update01()
 void SceneStory::Update02()
 {
 	Next();
-}
-
-void SceneStory::Update03()
-{
-	Next();
-}
-
-void SceneStory::Update04()
-{
-	Next();
-}
-
-void SceneStory::Update05()
-{
-	Next();
 
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
 	{
 		if (!IsFadingOut())
 		{
-			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerPos));
 			return;
 		}
 	}
@@ -189,41 +156,6 @@ void SceneStory::OnUpdate02()
 	m_updateFunc = &SceneStory::Update02;
 }
 
-void SceneStory::OnUpdate03()
-{
-	FadeGraphTitleLogoReset();
-	m_isNext = false;
-	m_isSkip = false;
-	m_storyTime = 0;
-
-	m_sceneTrans = e_Scene::kScene3;
-	m_updateFunc = &SceneStory::Update03;
-
-}
-
-void SceneStory::OnUpdate04()
-{
-	FadeGraphTitleLogoReset();
-	m_isNext = false;
-	m_isSkip = false;
-	m_storyTime = 0;
-
-	m_sceneTrans = e_Scene::kScene4;
-	m_updateFunc = &SceneStory::Update04;
-
-}
-
-void SceneStory::OnUpdate05()
-{
-	FadeGraphTitleLogoReset();
-	m_isNext = false;
-	m_isSkip = false;
-	m_storyTime = 0;
-
-	m_sceneTrans = e_Scene::kScene5;
-	m_updateFunc = &SceneStory::Update05;
-}
-
 void SceneStory::Next()
 {
 	m_storyTime++;
@@ -233,7 +165,7 @@ void SceneStory::Next()
 		m_isNext = true;
 	}
 
-	if (Pad::IsTrigger(PAD_INPUT_1) /*|| Pad::IsTrigger(PAD_INPUT_2)*/ && m_isNext)
+	if (Pad::IsTrigger(PAD_INPUT_1) && m_isNext)
 	{
 		switch (m_sceneTrans)
 		{
@@ -244,18 +176,6 @@ void SceneStory::Next()
 
 			break;
 		case 1:
-			OnUpdate03();
-
-			break;
-		case 2:
-			OnUpdate04();
-
-			break;
-		case 3:
-			OnUpdate05();
-
-			break;
-		case 4:
 			StartFadeOut();
 			m_isToNextScene = true;
 
@@ -265,15 +185,22 @@ void SceneStory::Next()
 		}
 	}
 
-	if (Pad::IsTrigger(PAD_INPUT_2))
+	if (Pad::IsPress(PAD_INPUT_2))
 	{
-		m_isSkip = true;
+		m_pressTime++;
+		if (m_pressTime > 120)
+		{
+			m_isSkip = true;
+		}
 	}
 
 	if (m_isSkip)
 	{
-		m_isNext = true;
-		FadeGraphTitleLogoDraw();
+		//m_isNext = true;
+		//FadeGraphTitleLogoDraw();
+
+		StartFadeOut();
+		m_isToNextScene = true;
 	}
 }
 

@@ -17,6 +17,9 @@ namespace
 	constexpr int kTextX = 64;
 	constexpr int kTextBlankSpaceY = 32;
 	constexpr int kTextIntervalY = 24;
+
+	//プレイヤーの最初の位置
+	constexpr VECTOR kPlayerPos = { 400.0f,-35.0f,740.0f };
 }
 
 SceneDebug::SceneDebug(SceneManager& manager) :
@@ -106,7 +109,7 @@ void SceneDebug::Update()
 
 		if (m_sceneTrans == e_SceneTrans::kSelect)
 		{
-			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
+			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerPos));
 			return;
 		}
 

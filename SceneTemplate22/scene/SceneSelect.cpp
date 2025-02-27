@@ -61,8 +61,13 @@ namespace
 	constexpr int kFontSize = 38;
 
 	//初期位置
-	constexpr VECTOR kInitPos = { -85.0f,35.0f,740.0f };
+	constexpr VECTOR kInitPos = { 400.0f,-35.0f,740.0f };
 	constexpr VECTOR kLookPos = { -100.0f,30.0f,500.0f };
+
+	constexpr VECTOR kPowerTrianglePos = { 296.0f, 18.0f, 340.0f };
+	constexpr VECTOR kSpeedTrianglePos = { 520.0f,18.0f,338.0f };
+	constexpr VECTOR kShotTrianglePos = { 406.0f,18.0f,112.0f };
+
 
 	//ボスに行く部屋に表示される画像の座標
 	const Vec2 kHitPos = { 440.0f , 480.0f };
@@ -79,7 +84,7 @@ namespace
 }
 
 
-SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
+SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind, VECTOR playerPos) :
 	SceneBase(manager)
 {
 
@@ -105,9 +110,11 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind) :
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
 
 	m_isToNextScene = false;
+	m_effectFrame = 0;
 
+	m_pTomb->Initialize(kPowerTrianglePos, kSpeedTrianglePos, kShotTrianglePos);
 
-	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
+	m_pPlayer->Initialize(m_pPhysics, playerPos, *m_pPlayerWeapon);
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
@@ -187,6 +194,19 @@ void SceneSelect::Update()
 	m_isShotStage = m_pTomb->TombShotHit(m_pPlayer);
 	m_isRastStage = m_pTomb->TombRastHit(m_pPlayer);
 
+
+	if (m_effectFrame % 190 == 0)
+	{
+		EffectManager::GetInstance().CreateEffect("stagePower", m_pTomb->GetPowerPos());
+		EffectManager::GetInstance().CreateEffect("stageSpeed", m_pTomb->GetSpeedPos());
+		EffectManager::GetInstance().CreateEffect("stageShot", m_pTomb->GetShotPos());
+		EffectManager::GetInstance().CreateEffect("stageRass", m_pTomb->GetRastPos());
+	
+		m_effectFrame = 0;
+	}
+	m_effectFrame++;
+
+
 	if (m_isPowerStage)
 	{
 		if (Pad::IsTrigger(PAD_INPUT_1))
@@ -260,6 +280,7 @@ void SceneSelect::Update()
 	m_pSkyDome->Update();
 	m_pItemHp->Update(m_pPhysics);
 	m_pItemMp->Update(m_pPhysics);
+	m_pTomb->Update();
 
 	m_pCamera->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(),m_pField->GetModelHandle(),m_pPlayer->GetAngle(), false);
 	m_pPlayer->SetCameraDirection(m_pCamera->GetDirection());
@@ -306,21 +327,26 @@ void SceneSelect::Update()
 
 void SceneSelect::Draw()
 {
-	ShadowMap_DrawSetup(m_shadowH);
+
+	//ShadowMap_DrawSetup(m_shadowH);
 	
-	m_pPlayer->Draw(*m_pPlayerWeapon);
+	//m_pPlayer->Draw(*m_pPlayerWeapon);
 
 	// ステージモデル用のシャドウマップへの描画を終了
-	ShadowMap_DrawEnd();
+	//ShadowMap_DrawEnd();
 
 	// シャドウマップの反映開始
-	SetUseShadowMap(0, m_shadowH);
+	//SetUseShadowMap(0, m_shadowH);
 	
-	m_pPlayer->Draw(*m_pPlayerWeapon);
 	m_pField->Draw();
 	m_pSkyDome->Draw();
+	m_pPlayer->Draw(*m_pPlayerWeapon);
+
+	EffectManager::GetInstance().Draw();
 
 	m_pTomb->Draw();
+	m_pTomb->DrawTriangleSelect();
+
 
 	m_pItemHp->Draw();
 	m_pItemMp->Draw();
@@ -331,7 +357,7 @@ void SceneSelect::Draw()
 	m_pButtonUi->Draw(*m_pPlayer);
 
 	// 反映終了
-	SetUseShadowMap(0, -1);
+	//SetUseShadowMap(0, -1);
 
 
 
@@ -406,7 +432,6 @@ void SceneSelect::Draw()
 		}
 	}
 
-	EffectManager::GetInstance().Draw();
 
 	if (!m_isFadeColor)
 	{

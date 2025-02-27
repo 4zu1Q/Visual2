@@ -40,6 +40,10 @@ namespace
 	const Vec2 kGameOverPos = { 380.0f , 100.0f };
 	const Vec2 kGameOverBgPos = { 0.0f , -10.0f };
 
+	constexpr VECTOR kPlayerPowerTombPos = { -168.0f,-37.0f,624.0f };
+	constexpr VECTOR kPlayerSpeedTombPos = { 979.0f,-37.0f,608.0f };
+	constexpr VECTOR kPlayerShotTombPos = { 409.0f,-37.0f,363.0f };
+	constexpr VECTOR kPlayerRassTombPos = { 402.0f,-37.0f,450.0f };
 
 	constexpr float kSelectSpeed = 0.06f;
 	constexpr float kSelectAnimationSize = 4.0f;
@@ -197,8 +201,26 @@ void SceneGameOver::Update()
 
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect));
-				return;
+				if (m_bossKind == Game::e_BossKind::kPower)
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerPowerTombPos));
+					return;
+				}
+				else if (m_bossKind == Game::e_BossKind::kSpeed)
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerSpeedTombPos));
+					return;
+				}
+				else if (m_bossKind == Game::e_BossKind::kShot)
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerShotTombPos));
+					return;
+				}
+				else if (m_bossKind == Game::e_BossKind::kRast)
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerRassTombPos));
+					return;
+				}
 			}
 		}
 	}

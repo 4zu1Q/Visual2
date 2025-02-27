@@ -205,11 +205,6 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 	m_playerKind = player.GetFaceKind();
 	m_isPlayerFace = player.GetIsFaceUse();
 
-	//auto pos = m_rigidbody.GetPos();
-
-	//モデルのポジションを合わせるよう
-	//VECTOR modelPos = VGet(pos.x, pos.y, pos.z);
-
 	if (m_isHit)
 	{
 		m_damageFrame++;
@@ -224,7 +219,7 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 		m_isHit = false;
 	}
 
-		//HPがゼロより下にいった場合
+	//HPがゼロより下にいった場合
 	if (m_hp <= 0)
 	{
 		m_hp = 0;

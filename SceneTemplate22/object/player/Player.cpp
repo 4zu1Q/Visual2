@@ -30,8 +30,8 @@ namespace
 	constexpr int kLeftModelFrameNo = 9;
 
 	//アナログスティック関連
-	constexpr float kAnalogRangeMin = 0.1f;		//アナログスティックの入力判定範囲
-	constexpr float kAnalogRangeMax = 0.8f;
+	constexpr float kAnalogRangeMin = 0.0f;		//アナログスティックの入力判定範囲
+	constexpr float kAnalogRangeMax = 0.9f;
 	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
 
 	constexpr float kSpeedConstant = 1.4f;

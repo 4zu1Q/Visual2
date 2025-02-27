@@ -23,14 +23,8 @@ private:
 
 	void Update01();
 	void Update02();
-	void Update03();
-	void Update04();
-	void Update05();
 
 	void OnUpdate02();
-	void OnUpdate03();
-	void OnUpdate04();
-	void OnUpdate05();
 
 	void Next();
 
@@ -41,9 +35,7 @@ private:
 	{
 		kScene1,
 		kScene2,
-		kScene3,
-		kScene4,
-		kScene5,
+
 	};
 
 	//メンバ関数ポインタ
@@ -61,6 +53,7 @@ private:
 
 	//タイム変数
 	int m_storyTime;
+	int m_pressTime;
 
 	//カーソルアニメーション
 	float m_selectAnimation;

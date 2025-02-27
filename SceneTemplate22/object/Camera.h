@@ -46,7 +46,6 @@ private:
 	VECTOR m_playerPos;       // プレイヤーの位置
 	VECTOR m_enemyPos;        // 敵の位置
 
-
 	float m_angleH;		//水平角度 弧度法
 	float m_angleV;		//垂直角度 弧度法
 

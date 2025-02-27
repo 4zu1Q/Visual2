@@ -44,6 +44,11 @@ namespace
 	constexpr float kSetAngleVMax = -0.89f;
 	constexpr float kSetAngleVMin = 0.59f;
 
+	//アナログスティック関連
+	constexpr float kAnalogRangeMin = 0.2f;		//アナログスティックの入力判定範囲
+	constexpr float kAnalogRangeMax = 0.8f;
+	constexpr float kAnalogInputMax = 1000.0f;	//アナログスティックから入力されるベクトルの最大
+
 }
 
 Camera::Camera():
@@ -74,7 +79,7 @@ void Camera::Initialize(VECTOR playerPos)
 	SetCameraNearFar(kCameraNear, kCameraFar);
 
 	// カメラの初期水平角度は180度
-	m_angleH = kInitAngle;
+	m_angleH = 0.0f;
 
 	// 垂直角度は0度
 	m_angleV = 0.0f;
@@ -86,6 +91,24 @@ void Camera::Finalize()
 
 void Camera::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float playerAngle, bool isLockOn)
 {
+	// DirectInput の入力を取得
+	DINPUT_JOYSTATE dInputState;
+	GetJoypadDirectInputState(DX_INPUT_PAD1, &dInputState);
+
+	
+
+	//float rate1 = dInputState.Rx / kAnalogInputMax;
+	//float rate2 = dInputState.Ry / kAnalogInputMax;
+
+	////アナログスティック無効な範囲を除外する
+	//rate1 = (rate1 - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	//rate1 = min(rate1, 1.0f);
+	//rate1 = max(rate1, 0.0f);
+
+	//rate2 = (rate2 - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
+	//rate2 = min(rate2, 1.0f);
+	//rate2 = max(rate2, 0.0f);
+
 	m_playerPos = playerPos;
 	m_enemyPos = enemyPos;
 
@@ -146,15 +169,14 @@ void Camera::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float pl
 	}
 	else if (!m_isLockOn)	//ロックオンされていない場合のカメラ処理
 	{
-		// DirectInput の入力を取得
-		DINPUT_JOYSTATE dInputState;
-		GetJoypadDirectInputState(DX_INPUT_PAD1, &dInputState);
+
 
 		// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
 		m_angleH += dInputState.Rx / kInputNum * Setting::GetInstance().GetSensitivity();
+
 		if (m_angleH < -DX_PI_F)
 		{
-			m_angleH -= DX_TWO_PI_F;
+			m_angleH += -DX_TWO_PI_F;
 		}
 		if (m_angleH > DX_PI_F)
 		{
@@ -307,8 +329,8 @@ void Camera::Draw()
 
 #if _DEBUG
 	// カメラの座標を描画
-	DrawFormatString(0, 550, GetColor(255, 255, 255), "CameraAngle : %f", m_angleV);
-	DrawFormatString(0, 560, GetColor(255, 255, 255), "CameraAngle : %f", m_angleH);
+	DrawFormatString(0, 550, GetColor(255, 255, 255), "CameraAngleV : %f", m_angleV);
+	DrawFormatString(0, 566, GetColor(255, 255, 255), "CameraAngleH : %f", m_angleH);
 #endif
 }
 
