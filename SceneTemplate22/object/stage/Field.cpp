@@ -7,18 +7,20 @@ namespace
 	const char* const kShadowFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
 	{
 		"Data/Model/Stage/TitleStage.mv1",
-		"Data/Model/Stage/StageSelect.mv1",
+		"Data/Model/Stage/tutorial1.mv1",
 		"Data/Model/Stage/BattleStage.mv1",
 	};
 
 	//ステージのスケール値
 	constexpr VECTOR kTitleModelScale = { 0.2f , 0.2f , 0.2f };
-	constexpr VECTOR kSelectModelScale = { 1.0f , 1.0f , 1.0f };
+	constexpr VECTOR kSelectModelScale = { 0.5f , 0.5f , 0.5f };
+	//constexpr VECTOR kSelectModelScale = { 1.0f , 1.0f , 1.0f };
 	constexpr VECTOR kGamePlayModelScale = { 0.4f , 0.4f , 0.4f };
 
 	//ステージの座標
 	constexpr VECTOR kTitleModelPosition = { 0, 60, 0 };
-	constexpr VECTOR kSelectModelPosition = { 70.0f, -1700.0f, 1200.0f };
+	//constexpr VECTOR kSelectModelPosition = { 70.0f, -1700.0f, 1200.0f };
+	constexpr VECTOR kSelectModelPosition = { 400.0f, -400.0f, -200.0f };
 	constexpr VECTOR kGamePlayModelPosition = { 0.0f, 150.0f, 0.0f };
 }
 

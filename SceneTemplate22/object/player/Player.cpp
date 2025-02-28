@@ -77,12 +77,15 @@ namespace
 	constexpr VECTOR kWallLeftPos = { -685.0f,0.0f,-600.0f };
 
 	/*　プレイヤーのアニメーションの種類　*/
-	const char* const kNormalAnimInfoFilename = "Data/Master/AnimPlayerNormalMaster.csv";
-	const char* const kPowerAnimInfoFilename = "Data/Master/AnimPlayerPowerMaster.csv";
-	const char* const kSpeedAnimInfoFilename = "Data/Master/AnimPlayerSpeedMaster.csv";
-	const char* const kShotAnimInfoFilename = "Data/Master/AnimPlayerShotMaster.csv";
-	const char* const kRassAnimInfoFilename = "Data/Master/AnimPlayerRassMaster.csv";
 
+	//Csvファイルパス名
+	const char* const kNormalAnimInfoFilename = "Data/Csv/AnimPlayerNormal.csv";
+	const char* const kPowerAnimInfoFilename = "Data/Csv/AnimPlayerPower.csv";
+	const char* const kSpeedAnimInfoFilename = "Data/Csv/AnimPlayerSpeed.csv";
+	const char* const kShotAnimInfoFilename = "Data/Csv/AnimPlayerShot.csv";
+	const char* const kRassAnimInfoFilename = "Data/Csv/AnimPlayerRass.csv";
+
+	//アニメーションの名前
 	const char* const kAnimIdle = "Idle";						//アイドル状態
 	const char* const kAnimWalk = "Walk";						//歩き状態
 	const char* const kAnimLockOnWalk = "LockOnWalk";			//ロックオン歩き状態
@@ -138,6 +141,19 @@ namespace
 	constexpr float kInitRadius = 6.0f;
 	constexpr float kHitRadius = 3.0f;
 
+	constexpr int kJumpCountNum = 6;
+	constexpr int kJumpCountMaxNum = 30;
+	constexpr float kJumpPowerNum = 4.0f;
+
+
+	constexpr int kChargeTimeMax = 60;
+	constexpr int kDeadTime = 30;
+	constexpr int kDamageFrame = 120;
+
+	constexpr int kAttackFrame = 30;
+	constexpr int kAttackXFrame = 20;
+	//constexpr int kChargeTimeMax = 60;
+
 	//プレイヤーの種類によって変わる当たり判定の半径
 	constexpr float kNormalAttackXRadius = 6.0f;
 	constexpr float kNormalAttackYRadius = 15.0f;
@@ -171,6 +187,9 @@ namespace
 
 	constexpr int kDamageSmashNum = 8;
 	constexpr int kDrawHiddenNum = 4;
+
+	constexpr int kMoveCountNum = 15;
+	constexpr int kWalkCountNum = 25;
 
 }
 
@@ -217,8 +236,6 @@ Player::Player() :
 	m_damageFrame(0),
 	m_attackFrame(0)
 {
-	
-
 	//攻撃の種類を
 	m_attackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 	m_bossAttackKind = Game::e_BossAttackKind::kBossAttackNone;
@@ -234,7 +251,6 @@ Player::Player() :
 	m_pAnim = std::make_shared<AnimController>();
 
 	m_isAttack = false;
-
 	m_isBossAttack = false;
 	m_isHitDamage = false;
 
@@ -250,7 +266,6 @@ Player::Player() :
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
 	circleColliderData->m_radius = kInitRadius;
-
 	m_radius = circleColliderData->m_radius;
 
 	m_hitRadius = kHitRadius;
@@ -549,7 +564,6 @@ void Player::IdleUpdate()
 	//攻撃X
 	if (Pad::IsTrigger(kPadButtonX) && !m_isStamina)
 	{
-
 		OnAttackX();
 		return;
 	}
@@ -850,7 +864,7 @@ void Player::DashUpdate()
 	//キャラクターの種類によって変える
 	if (len != 0.0f)
 	{
-		if (m_moveCount % 15 == 0)
+		if (m_moveCount % kMoveCountNum == 0)
 		{
 			SoundManager::GetInstance().PlaySe("footstepsSe");
 			auto pos = m_rigidbody.GetPos();
@@ -879,7 +893,7 @@ void Player::DashUpdate()
 	//動いている間
 	if (VSquareSize(move) > 0.01f)
 	{
-		m_stamina -= 0.5f;
+		m_stamina -= kStaminaDiminishSpeed;
 
 		//カメラの正面方向ベクトル
 		VECTOR front = VGet(m_cameraDirection.x, 0.0f, m_cameraDirection.z);
@@ -1038,7 +1052,7 @@ void Player::JumpUpdate()
 
 	auto vel = m_rigidbody.GetVelocity();
 
-	if (m_jumpCount < 6)
+	if (m_jumpCount < kJumpCountNum)
 	{
 		vel.y += kMaxJumpPower;
 		m_jumpPower += kMaxJumpPower;
@@ -1049,14 +1063,14 @@ void Player::JumpUpdate()
 		m_jumpPower += kMinJumpPower;
 	}
 
-	if (m_jumpPower > 4)
+	if (m_jumpPower > kJumpPowerNum)
 	{
 		OnAir();
 	}
 
 	m_rigidbody.SetVelocity(vel);
 
-	if (m_jumpCount > 30)
+	if (m_jumpCount > kJumpCountMaxNum)
 	{
 		OnFall();
 	}
@@ -1153,7 +1167,7 @@ void Player::DashJumpUpdate()
 
 	auto vel = m_rigidbody.GetVelocity();
 
-	if (m_jumpCount < 6)
+	if (m_jumpCount < kJumpCountNum)
 	{
 		vel.y += kMaxJumpPower;
 		m_jumpPower += kMaxJumpPower;
@@ -1164,14 +1178,14 @@ void Player::DashJumpUpdate()
 		m_jumpPower += kMinJumpPower;
 	}
 
-	if (m_jumpPower > 4)
+	if (m_jumpPower > kJumpPowerNum)
 	{
 		OnDashAir();
 	}
 
 	m_rigidbody.SetVelocity(vel);
 
-	if (m_jumpCount > 30)
+	if (m_jumpCount > kJumpCountMaxNum)
 	{
 		OnDashFall();
 	}
@@ -1519,8 +1533,7 @@ void Player::AttackCharge()
 		EffectManager::GetInstance().CreateEffect("attackChargeEffect", pos);
 	}
 
-
-	if (m_chargeTime == 60)
+	if (m_chargeTime == kChargeTimeMax)
 	{
 		SoundManager::GetInstance().PlaySe("healHpSe");
 		auto pos = m_rigidbody.GetPos();
@@ -1528,14 +1541,14 @@ void Player::AttackCharge()
 	}
 
 	//Yボタンを離した場合
-	if (Pad::IsRelase(kPadButtonY) && m_chargeTime > 60)
+	if (Pad::IsRelase(kPadButtonY) && m_chargeTime > kChargeTimeMax)
 	{
 		m_chargeTime = 0;
 
 		m_isUseMp = true;
 		OnAttackY();
 	}
-	else if(Pad::IsRelase(kPadButtonY) && m_chargeTime < 60)
+	else if(Pad::IsRelase(kPadButtonY) && m_chargeTime < kChargeTimeMax)
 	{
 		m_chargeTime = 0;
 		m_isButtonPush = false;
@@ -1562,6 +1575,12 @@ void Player::AttackXUpdate()
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 	m_stamina += kStaminaIncreaseSpeed;
 
+	m_attackFrame++;
+	if (m_attackFrame > kAttackXFrame)
+	{
+		m_isAttack = false;
+	}
+
 	//攻撃ボタンが押されたとき
 	if (Pad::IsTrigger(PAD_INPUT_3) && !m_isNextAttackFlag)
 	{
@@ -1575,8 +1594,6 @@ void Player::AttackXUpdate()
 		m_multiAttack = 0;
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
-
-		m_isAttack = false;
 
 		//アイドル状態に戻る
 		//ロックオンしていた場合
@@ -1620,9 +1637,13 @@ void Player::AttackYUpdate()
 		m_isUseMp = false;
 	}
 
-	if (m_attackFrame > 30)
+	if (m_attackFrame > kAttackFrame)
 	{
 		m_isAttack = true;
+	}
+	else if (m_attackFrame > 40)
+	{
+		m_isAttack = false;
 	}
 
 	//アニメーションが終わったら待機状態に遷移
@@ -1695,7 +1716,7 @@ void Player::DeadUpdate()
 	m_stamina += kStaminaIncreaseSpeed;
 	m_deadTime++;
 
-	if (!m_isDead && m_deadTime > 30)
+	if (!m_isDead && m_deadTime > kDeadTime)
 	{
 		m_isDead = true;
 		SoundManager::GetInstance().PlaySe("deadSe");
@@ -1885,7 +1906,7 @@ void Player::Move()
 	//キャラクターの種類によって変える
 	if (len != 0.0f)
 	{
-		if (m_moveCount % 25 == 0)
+		if (m_moveCount % kWalkCountNum == 0)
 		{
 			SoundManager::GetInstance().PlaySe("footstepsSe");
 		}
@@ -2399,7 +2420,7 @@ void Player::DamageUpdate()
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 120)
+	if (m_damageFrame >= kDamageFrame)
 	{
 		//ヒット無敵時間を解除
 		m_isHitDamage = false;

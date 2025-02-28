@@ -60,6 +60,9 @@ namespace
 	//フォントサイズ	
 	constexpr int kFontSize = 38;
 
+	//エフェクトを出すフレーム数
+	constexpr int kEffectFrame = 190;
+
 	//初期位置
 	constexpr VECTOR kInitPos = { 400.0f,-35.0f,740.0f };
 	constexpr VECTOR kLookPos = { -100.0f,30.0f,500.0f };
@@ -195,7 +198,7 @@ void SceneSelect::Update()
 	m_isRastStage = m_pTomb->TombRastHit(m_pPlayer);
 
 
-	if (m_effectFrame % 190 == 0)
+	if (m_effectFrame % kEffectFrame == 0)
 	{
 		EffectManager::GetInstance().CreateEffect("stagePower", m_pTomb->GetPowerPos());
 		EffectManager::GetInstance().CreateEffect("stageSpeed", m_pTomb->GetSpeedPos());

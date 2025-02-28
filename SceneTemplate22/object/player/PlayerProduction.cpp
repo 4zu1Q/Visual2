@@ -24,7 +24,7 @@ namespace
 	constexpr float kWeaponScale = 1.0f;
 
 	/*　プレイヤーのアニメーションの種類　*/
-	const char* const kAnimInfoFilename = "Data/Master/AnimPlayerProductionMaster.csv";
+	const char* const kAnimInfoFilename = "Data/Csv/AnimPlayerProduction.csv";
 
 	//他シーンに使うアニメーション
 	const char* const kAnimIdle = "Idle";

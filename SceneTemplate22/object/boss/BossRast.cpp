@@ -32,7 +32,7 @@ namespace
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
 	/*ボスのアニメーションの種類*/
-	const char* const kAnimBossInfoFilename = "Data/Master/AnimBossPowerMaster.csv";
+	const char* const kAnimBossInfoFilename = "Data/Csv/AnimBossPower.csv";
 
 	const char* const kAnimIdle = "Idle";
 	const char* const kAnimWalk = "Walk";
@@ -787,9 +787,6 @@ void BossRast::OnHitOneDamage()
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossRast::HitOneDamageUpdate;
 
-	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &BossRast::IdleUpdate;
-
 }
 
 void BossRast::OnHitTwoDamage()
@@ -827,7 +824,6 @@ void BossRast::OnHitTwoDamage()
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossRast::HitTwoDamageUpdate;
-	m_updateFunc = &BossRast::IdleUpdate;
 }
 
 void BossRast::OnDown()

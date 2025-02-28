@@ -15,6 +15,7 @@ namespace
 {
 	//プレイヤーのモデルファイル名
 	const char* const kModelFilename = "Data/Model/Boss/BossPower.mv1";
+
 	//モデルのスケール値
 	constexpr float kModelScale = 8.0f;
 
@@ -32,22 +33,17 @@ namespace
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
 	/*ボスのアニメーションの種類*/
-	const char* const kAnimBossInfoFilename = "Data/Master/AnimBossPowerMaster.csv";
+	const char* const kAnimBossInfoFilename = "Data/Csv/AnimBossPower.csv";
 
 	const char* const kAnimIdle = "Idle";
 	const char* const kAnimWalk = "Walk";
 	const char* const kAnimDash = "Dash";
-
 	const char* const kAnimAttack1 = "Attack1";
 	const char* const kAnimAttack2 = "Attack2";
 	const char* const kAnimAttack3 = "Attack3";
-
 	const char* const kAnimAvoid = "Avoid";
-
 	const char* const kAnimCoolTime = "CoolTime";
-
 	const char* const kAnimHit = "Hit";
-
 	const char* const kAnimDown = "Down";
 	const char* const kAnimDead = "Dead";
 

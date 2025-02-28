@@ -31,7 +31,7 @@ namespace
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
 	/*ボスのアニメーションの種類*/
-	const char* const kAnimBossInfoFilename = "Data/Master/AnimBossShotMaster.csv";
+	const char* const kAnimBossInfoFilename = "Data/Csv/AnimBossShot.csv";
 
 	const char* const kAnimIdle = "Idle";
 	const char* const kAnimWalk = "Walk";

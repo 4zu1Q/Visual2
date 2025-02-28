@@ -183,6 +183,7 @@
     <ClCompile Include="scene\SceneSelect.cpp" />
     <ClCompile Include="scene\SceneStory.cpp" />
     <ClCompile Include="scene\SceneTitle.cpp" />
+    <ClCompile Include="scene\SceneTutorial.cpp" />
     <ClCompile Include="ui\ButtonUi.cpp" />
     <ClCompile Include="ui\FaceFrameUi.cpp" />
     <ClCompile Include="ui\FaceUi.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="scene\SceneSelect.h" />
     <ClInclude Include="scene\SceneStory.h" />
     <ClInclude Include="scene\SceneTitle.h" />
+    <ClInclude Include="scene\SceneTutorial.h" />
     <ClInclude Include="ui\ButtonUi.h" />
     <ClInclude Include="ui\FaceFrameUi.h" />
     <ClInclude Include="ui\FaceUi.h" />

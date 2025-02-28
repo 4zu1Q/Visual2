@@ -95,20 +95,6 @@ void Camera::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float pl
 	DINPUT_JOYSTATE dInputState;
 	GetJoypadDirectInputState(DX_INPUT_PAD1, &dInputState);
 
-	
-
-	//float rate1 = dInputState.Rx / kAnalogInputMax;
-	//float rate2 = dInputState.Ry / kAnalogInputMax;
-
-	////アナログスティック無効な範囲を除外する
-	//rate1 = (rate1 - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	//rate1 = min(rate1, 1.0f);
-	//rate1 = max(rate1, 0.0f);
-
-	//rate2 = (rate2 - kAnalogRangeMin) / (kAnalogRangeMax - kAnalogRangeMin);
-	//rate2 = min(rate2, 1.0f);
-	//rate2 = max(rate2, 0.0f);
-
 	m_playerPos = playerPos;
 	m_enemyPos = enemyPos;
 
@@ -134,11 +120,13 @@ void Camera::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float pl
 		m_isLockOn = !m_isLockOn;
 	}
 
+	//ロックオンが解除された場合
 	if (!isLockOn)
 	{
 		m_isLockOn = false;
 	}
 
+	//ロックオンが解除された場合
 	if (!m_isLockOn)
 	{
 		m_pLockOnUi->CancelLockOn();
