@@ -80,11 +80,13 @@ namespace Game
 	enum class e_StageKind
 	{
 		kTitle,
+		kTutorial,
 		kSelect,
 		kGamePlay,
 		kStageNum		//ステージの種類の総数
 	};
 
+	//演出用のプレイヤーの位置
 	enum class e_PlayerProduction
 	{
 		kTitle,
@@ -113,9 +115,23 @@ namespace Game
 		kBossAttack2,		// 攻撃2(ボス用)
 		kBossAttack3,		// 攻撃3(ボス用)
 		kBossShot,			// 弾(ボス用) //できればやりたい…
-		kGround,		// 足場の地面
+		kGround,			// 足場の地面
 		kWall,
+	};
 
+	//チュートリアル進行用のenum
+	enum class e_TutorialProgress
+	{
+		kNone,
+		kOne,		//仮
+		kTwo,		//仮
+		kThree,		//仮
+		kFour,		//仮
+		kFive,		//仮
+		kSix,		//仮
+		kSeven,		//仮
+		kEight,		//仮
+		kNine,		//仮
 	};
 
 }

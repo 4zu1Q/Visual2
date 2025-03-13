@@ -165,40 +165,6 @@ void SceneGamePlay::Update()
 	MyLib::DebugDraw::Clear();
 #endif
 
-	//ボスのHPバーのアップデート処理
-	if (m_bossKind == Game::e_BossKind::kPower)
-	{
-		m_pHpBarUi->Update(m_pBossPower->GetHp());
-		
-		//ボスの攻撃座標や半径を取得
-		m_pPlayer->HitUpdate(m_pBossPower->GetHitPos(), m_pBossPower->GetAttackPos(), m_pBossPower->GetAttackPos(), m_pBossPower->GetShockPos(), m_pBossPower->GetHitRadius(), m_pBossPower->GetAttackRadius(), m_pBossPower->GetWeaponRadius(), m_pBossPower->GetShockRadius(), m_pBossPower->GetIsAttack());
-		m_pBossPower->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(), m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
-	}
-	else if (m_bossKind == Game::e_BossKind::kSpeed)
-	{
-		m_pHpBarUi->Update(m_pBossSpeed->GetHp());
-
-		//ボスの攻撃座標や半径を取得
-		m_pPlayer->HitUpdate(m_pBossSpeed->GetHitPos(),m_pBossSpeed->GetAttackPos(), m_pBossSpeed->GetAttackPos(), m_pBossSpeed->GetShockPos(), m_pBossSpeed->GetHitRadius(), m_pBossSpeed->GetAttackRadius(), m_pBossSpeed->GetWeaponRadius(), m_pBossSpeed->GetShockRadius(), m_pBossSpeed->GetIsAttack());
-		m_pBossSpeed->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(), m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
-	}
-	else if (m_bossKind == Game::e_BossKind::kShot)
-	{
-		m_pHpBarUi->Update(m_pBossShot->GetHp());
-
-		//ボスの攻撃座標や半径を取得
-		m_pPlayer->HitUpdate(m_pBossShot->GetHitPos(), m_pBossShot->GetAttackPos(), m_pBossShot->GetAttackPos(), m_pBossShot->GetShockPos(), m_pBossShot->GetHitRadius(), m_pBossShot->GetAttackRadius(), m_pBossShot->GetWeaponRadius(), m_pBossShot->GetShockRadius(), m_pBossShot->GetIsAttack());
-		m_pBossShot->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(), m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
-	}
-	else if (m_bossKind == Game::e_BossKind::kRast)
-	{
-		m_pHpBarUi->Update(m_pBossRast->GetHp());
-
-		//ボスの攻撃座標や半径を取得
-		m_pPlayer->HitUpdate(m_pBossRast->GetHitPos(), m_pBossRast->GetAttackPos(), m_pBossRast->GetAttackPos(), m_pBossRast->GetShockPos(), m_pBossRast->GetHitRadius(), m_pBossRast->GetAttackRadius(), m_pBossRast->GetWeaponRadius(), m_pBossRast->GetShockRadius(), m_pBossRast->GetIsAttack());
-		m_pBossRast->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(), m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
-	}
-
 	//ゲームステージに移動するための当たり判定
 	if(m_pBossPower->GetIsClear()) m_isPowerTriangl = m_pTomb->TrianglePowerHit(m_pPlayer);
 	if(m_pBossSpeed->GetIsClear()) m_isSpeedTriangl = m_pTomb->TriangleSpeedHit(m_pPlayer);
@@ -331,6 +297,21 @@ void SceneGamePlay::Update()
 
 		//パワーボスのアップデート処理
 		m_pBossPower->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+
+		//ボスのHPバーのアップデート処理
+		m_pHpBarUi->Update(m_pBossPower->GetHp());
+
+		//ボスの攻撃座標や半径を取得
+		m_pPlayer->HitUpdate(m_pBossPower->GetHitPos(), m_pBossPower->GetAttackPos(),
+			m_pBossPower->GetAttackPos(), m_pBossPower->GetShockPos(), m_pBossPower->GetHitRadius(),
+			m_pBossPower->GetAttackRadius(), m_pBossPower->GetWeaponRadius(), m_pBossPower->GetShockRadius(), 
+			m_pBossPower->GetIsAttack());
+
+		//プレイヤーの攻撃座標や半径を取得
+		m_pBossPower->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(), 
+			m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(),
+			m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
+
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
@@ -344,6 +325,21 @@ void SceneGamePlay::Update()
 
 		//スピードボスのアップデート処理
 		m_pBossSpeed->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+
+		//ボスのHPバーのアップデート処理
+		m_pHpBarUi->Update(m_pBossSpeed->GetHp());
+
+		//ボスの攻撃座標や半径を取得
+		m_pPlayer->HitUpdate(m_pBossSpeed->GetHitPos(), m_pBossSpeed->GetAttackPos(),
+			m_pBossSpeed->GetAttackPos(), m_pBossSpeed->GetShockPos(), m_pBossSpeed->GetHitRadius(),
+			m_pBossSpeed->GetAttackRadius(), m_pBossSpeed->GetWeaponRadius(), m_pBossSpeed->GetShockRadius(),
+			m_pBossSpeed->GetIsAttack());
+
+		//プレイヤーの攻撃座標や半径を取得
+		m_pBossSpeed->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(),
+			m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(),
+			m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
+
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
@@ -357,6 +353,21 @@ void SceneGamePlay::Update()
 
 		//ショットボスのアップデート処理
 		m_pBossShot->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+
+		//ボスのHPバーのアップデート処理
+		m_pHpBarUi->Update(m_pBossShot->GetHp());
+
+		//ボスの攻撃座標や半径を取得
+		m_pPlayer->HitUpdate(m_pBossShot->GetHitPos(), m_pBossShot->GetAttackPos(),
+			m_pBossShot->GetAttackPos(), m_pBossShot->GetShockPos(), m_pBossShot->GetHitRadius(),
+			m_pBossShot->GetAttackRadius(), m_pBossShot->GetWeaponRadius(), m_pBossShot->GetShockRadius(),
+			m_pBossShot->GetIsAttack());
+
+		//プレイヤーの攻撃座標や半径を取得
+		m_pBossShot->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(),
+			m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(),
+			m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
+
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast)
 	{
@@ -370,6 +381,21 @@ void SceneGamePlay::Update()
 
 		//ラストボスのアップデート処理
 		m_pBossRast->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+
+		//ボスのHPバーのアップデート処理
+		m_pHpBarUi->Update(m_pBossRast->GetHp());
+
+		//ボスの攻撃座標や半径を取得
+		m_pPlayer->HitUpdate(m_pBossRast->GetHitPos(), m_pBossRast->GetAttackPos(), 
+			m_pBossRast->GetAttackPos(), m_pBossRast->GetShockPos(), m_pBossRast->GetHitRadius(),
+			m_pBossRast->GetAttackRadius(), m_pBossRast->GetWeaponRadius(), m_pBossRast->GetShockRadius(),
+			m_pBossRast->GetIsAttack());
+
+		//プレイヤーの攻撃座標や半径を取得
+		m_pBossRast->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(),
+			m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(),
+			m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
+
 	}
 
 	m_pPhysics->Update();

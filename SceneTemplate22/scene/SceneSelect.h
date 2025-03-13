@@ -10,15 +10,15 @@
 class Player;
 class PlayerWeapon;
 class Camera;
-class SkyDome;
 class FaceUi;
 class FaceFrameUi;
 class ButtonUi;
 class PlayerBarUi;
 class ItemMp;
 class ItemHp;
-class Tomb;
+class SkyDome;
 class Field;
+class Tomb;
 class MyLib::Physics;
 
 class SceneSelect :
@@ -44,7 +44,6 @@ private:
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
 	std::shared_ptr<Camera> m_pCamera;
-	std::shared_ptr<SkyDome> m_pSkyDome;
 	
 	std::shared_ptr<PlayerBarUi> m_pPlayerBarUi;
 	std::shared_ptr<FaceUi> m_pFaceUi;
@@ -53,8 +52,10 @@ private:
 
 	std::shared_ptr<ItemMp> m_pItemMp;
 	std::shared_ptr<ItemHp> m_pItemHp;
-	std::shared_ptr<Tomb> m_pTomb;
+
 	std::shared_ptr<Field> m_pField;
+	std::shared_ptr<Tomb> m_pTomb;
+	std::shared_ptr<SkyDome> m_pSkyDome;
 
 	std::shared_ptr<MyLib::Physics> m_pPhysics;
 
