@@ -1,0 +1,3 @@
+bgmTest,BGM,0.75,ASYNC
+decide,SE,1,ASYNC
+cancel,SE,1,ASYNC
