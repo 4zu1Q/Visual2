@@ -73,6 +73,12 @@
     <Filter Include="ヘッダー ファイル\object\shot">
       <UniqueIdentifier>{245245f0-6f26-485c-a802-c6ec917e5582}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ヘッダー ファイル\object\enemy">
+      <UniqueIdentifier>{2be324c7-87d3-4b45-8e47-a5994621fec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\enemy">
+      <UniqueIdentifier>{c0e5c14e-75f5-4b3f-80a9-a0abe5d10547}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -254,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="scene\SceneTutorial.cpp">
       <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="object\boss\BossTutorial.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -448,6 +457,9 @@
     </ClInclude>
     <ClInclude Include="scene\SceneTutorial.h">
       <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossTutorial.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
