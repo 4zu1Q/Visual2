@@ -23,9 +23,6 @@ namespace
 	{
 		kScene1H,
 		kScene2H,
-		kScene3H,
-		kScene4H,
-		kScene5H,
 		kButtonH,
 	};
 
@@ -51,11 +48,8 @@ SceneStory::SceneStory(SceneManager& manager) :
 	m_pressTime = 0;
 
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/Scene1.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Scene2.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Scene3.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Scene4.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Scene5.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Scene1.jpg"));
+	m_handles.push_back(LoadGraph("Data/Image/Scene2.jpg"));
 	m_handles.push_back(LoadGraph("Data/Image/StoryButton.png"));
 
 	m_sceneTrans = e_Scene::kScene1;
