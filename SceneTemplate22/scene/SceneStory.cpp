@@ -2,6 +2,7 @@
 
 #include "scene/SceneManager.h"
 #include "scene/SceneSelect.h"
+#include "scene/SceneTutorial.h"
 
 #include "util/Vec2.h"
 #include "util/Game.h"
@@ -32,8 +33,7 @@ namespace
 	const Vec2 kPos = { 0 , 0 };
 	const Vec2 kButtonPos = { 950 , 660 };
 
-	//プレイヤーの最初の位置
-	constexpr VECTOR kPlayerPos = { 400.0f,-35.0f,740.0f };
+
 }
 
 SceneStory::SceneStory(SceneManager& manager) :
@@ -133,7 +133,8 @@ void SceneStory::Update02()
 	{
 		if (!IsFadingOut())
 		{
-			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerPos));
+			//m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerPos));
+			m_pManager.ChangeScene(std::make_shared<SceneTutorial>(m_pManager, Game::e_StageKind::kTutorial));
 			return;
 		}
 	}

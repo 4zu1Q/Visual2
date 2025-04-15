@@ -356,7 +356,8 @@ void Player::Draw(PlayerWeapon& weapon)
 
 #ifdef _DEBUG
 
-	DrawFormatString(0, 48, 0xff0fff, "playerPos:%f,%f,%f", m_rigidbody.GetPos().x, m_rigidbody.GetPos().y, m_rigidbody.GetPos().z);
+
+	DrawFormatString(0, 448, 0xff0fff, "playerPos:%f,%f,%f", m_rigidbody.GetPos().x, m_rigidbody.GetPos().y, m_rigidbody.GetPos().z);
 	DrawFormatString(0, 64, 0xff0fff, "playerAttackPos:%f,%f,%f", m_attackXPos.x, m_attackXPos.y, m_attackXPos.z);
 	DrawFormatString(0, 148, 0xff0fff, "playerHp:%f,playerMp:%f,playerStamina:%f", m_hp, m_mp, m_stamina);
 	DrawFormatString(0, 348, 0xffffff, "playerAngle:%f", m_angle);

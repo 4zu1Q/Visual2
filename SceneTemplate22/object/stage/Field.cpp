@@ -7,7 +7,7 @@ namespace
 	const char* const kShadowFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
 	{
 		"Data/Model/Stage/TitleStage.mv1",
-		"Data/Model/Stage/TutorialStage.mv1",
+		"Data/Model/Stage/TutorialStage1.mv1",
 		"Data/Model/Stage/SelectStage2.mv1",
 		"Data/Model/Stage/BattleStage.mv1",
 	};
@@ -35,6 +35,10 @@ Field::Field(Game::e_StageKind stageKind):
 	{
 		MV1SetScale(m_modelH, kTitleModelScale);
 	}
+	else if (stageKind == Game::e_StageKind::kTutorial)
+	{
+		MV1SetScale(m_modelH, kTutorialModelScale);
+	}
 	else if (stageKind == Game::e_StageKind::kSelect)
 	{
 		MV1SetScale(m_modelH, kSelectModelScale);
@@ -48,6 +52,10 @@ Field::Field(Game::e_StageKind stageKind):
 	{
 		m_pos = kTitleModelPosition;
 		MV1SetRotationXYZ(m_modelH, VGet(0, 14.1, 0));
+	}
+	else if (stageKind == Game::e_StageKind::kTutorial)
+	{
+		m_pos = kTutorialModelPosition;
 	}
 	else if (stageKind == Game::e_StageKind::kSelect)
 	{

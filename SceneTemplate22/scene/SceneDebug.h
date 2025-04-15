@@ -27,6 +27,7 @@ private:
 	{
 		kDebug,
 		kTitle,
+		kTutorial,
 		kSelect,
 		kGamePlayPower,
 		kGamePlaySpeed,

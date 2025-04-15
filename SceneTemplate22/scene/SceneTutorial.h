@@ -22,7 +22,7 @@ class SceneTutorial : public SceneBase
 {
 public:
 
-	SceneTutorial(SceneManager& manager);
+	SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind);
 	virtual ~SceneTutorial();
 
 	/// <summary>
@@ -47,6 +47,22 @@ private:
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
 	std::shared_ptr<ButtonUi> m_pButtonUi;
 
+	std::shared_ptr<Field> m_pField;
+	std::shared_ptr<SkyDome> m_pSkyDome;
+
+	std::shared_ptr<MyLib::Physics> m_pPhysics;
+
+
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
+
+	//チュートリアルの時に使う
+	std::vector<bool> m_isTutorial;
+
+	int m_fontH;	//フォントハンドル
+	int m_shadowH;	//シャドウマップハンドル
+
+	int m_effectFrame;	//エフェクトのフレーム
 
 	//ステージ移動する当たり判定フラグ
 	bool m_isSelectStage;

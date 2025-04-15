@@ -264,6 +264,9 @@
     <ClCompile Include="object\boss\BossTutorial.cpp">
       <Filter>ソース ファイル\object\boss</Filter>
     </ClCompile>
+    <ClCompile Include="scene\SceneWords.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scene\SceneBase.h">
@@ -460,6 +463,9 @@
     </ClInclude>
     <ClInclude Include="object\boss\BossTutorial.h">
       <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneWords.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

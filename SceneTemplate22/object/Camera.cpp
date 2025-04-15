@@ -162,15 +162,6 @@ void Camera::Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float pl
 		// 右スティックの入力に沿ってカメラを旋回させる( Xbox360 コントローラ用 )
 		m_angleH += dInputState.Rx / kInputNum * Setting::GetInstance().GetSensitivity();
 
-		if (m_angleH < -DX_PI_F)
-		{
-			m_angleH += -DX_TWO_PI_F;
-		}
-		if (m_angleH > DX_PI_F)
-		{
-			m_angleH += DX_TWO_PI_F;
-		}
-
 		//設定で上下反転変えられるようにする
 		if (Setting::GetInstance().GetIsFlipSideUp())
 		{
