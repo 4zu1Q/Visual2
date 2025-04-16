@@ -48,8 +48,8 @@ SceneStory::SceneStory(SceneManager& manager) :
 	m_pressTime = 0;
 
 	//画像のロード
-	m_handles.push_back(LoadGraph("Data/Image/Scene1.jpg"));
-	m_handles.push_back(LoadGraph("Data/Image/Scene2.jpg"));
+	m_handles.push_back(LoadGraph("Data/Image/Scene1.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Scene2.png"));
 	m_handles.push_back(LoadGraph("Data/Image/StoryButton.png"));
 
 	m_sceneTrans = e_Scene::kScene1;

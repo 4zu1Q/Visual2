@@ -9,6 +9,8 @@
 
 class Player;
 class PlayerWeapon;
+class EnemyNormal;
+//class BossTutorial;
 class Camera;
 class FaceUi;
 class FaceFrameUi;
@@ -41,6 +43,9 @@ private:
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
 	std::shared_ptr<Camera> m_pCamera;
+	std::shared_ptr<EnemyNormal> m_pEnemyNormal;
+
+	//std::shared_ptr<BossTutorial> m_pBossTutorial;
 
 	std::shared_ptr<PlayerBarUi> m_pPlayerBarUi;
 	std::shared_ptr<FaceUi> m_pFaceUi;
@@ -60,7 +65,7 @@ private:
 	std::vector<bool> m_isTutorial;
 
 	int m_fontH;	//フォントハンドル
-	int m_shadowH;	//シャドウマップハンドル
+	int m_shadowMap;	//シャドウマップハンドル
 
 	int m_effectFrame;	//エフェクトのフレーム
 

@@ -1,0 +1,8 @@
+ID,名前,スピード
+Idle,Idle,0.5
+Walk,Walking_D_Skeletons,0.8
+Dash,Running_C,0.8
+Attack,1H_Melee_Attack_Stab,0.5
+JumpAttack,1H_Melee_Attack_Jump_Chop,0.6
+Hit,Hit_B,0.4
+Dead,Death_B,0.8

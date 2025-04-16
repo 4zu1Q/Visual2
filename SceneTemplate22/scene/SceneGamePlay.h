@@ -42,6 +42,10 @@ public:
 
 private:
 
+	void ShadowDraw();
+
+private:
+
 	//スマートポインタ
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
@@ -61,6 +65,7 @@ private:
 
 	//ライトハンドル
 	int m_lightHandle;
+	int m_shadowMap; 
 
 	int m_gameOverTime;
 	int m_gameClearTime;

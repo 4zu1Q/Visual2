@@ -53,6 +53,17 @@ namespace
 	{
 		kStageTransH,
 	};
+
+	//プレイヤーの最初の位置
+	constexpr VECTOR kPlayerPos = { 350.0f,-35.0f,0 };
+
+	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
+	const VECTOR kShadowAreaMinPos = { -10000.0f, -500.0f, -10000.0f };		// シャドウマップに描画する最小範囲
+	const VECTOR kShadowAreaMaxPos = { 10000.0f, 0.0f, 10000.0f };	// シャドウマップに描画する最大範囲
+	const VECTOR kShadowDir = { 0.0f, -5.0f, 0.0f };					// ライト方向
+
+	constexpr float kShadowColor = 0.7f;
+	constexpr float kShadowAlpha = 0.3f;
 }
 
 SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, Game::e_StageKind stageKind) :
@@ -122,6 +133,15 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/StageButton.png"));
 
+	/* 影の初期設定 */
+	m_shadowMap = MakeShadowMap(kShadowMapSize, kShadowMapSize);
+	// シャドウマップに描画する範囲を設定
+	SetShadowMapDrawArea(m_shadowMap, kShadowAreaMinPos, kShadowAreaMaxPos);
+	// シャドウマップが想定するライトの方向をセット
+	SetShadowMapLightDirection(m_shadowMap, kShadowDir);
+
+	// 影色を調整
+	SetLightAmbColor(GetColorF(0.8f, 0.8f, 0.8f, 0.0f));
 
 }
 
@@ -436,7 +456,7 @@ void SceneGamePlay::Update()
 void SceneGamePlay::Draw()
 {
 
-	m_pField->Draw();
+	ShadowDraw();
 
 	if (m_pBossPower->GetIsClear() || m_pBossSpeed->GetIsClear() || m_pBossShot->GetIsClear())
 	{
@@ -499,4 +519,49 @@ void SceneGamePlay::Draw()
 	DrawString(0, 0, "Scene Game Play", 0xffffff, false);
 #endif // DEBUG
 
+}
+
+void SceneGamePlay::ShadowDraw()
+{
+	ShadowMap_DrawSetup(m_shadowMap);	//シャドウマップ描画開始
+
+	//影を描画するための球体
+	DrawSphere3D(VGet(m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + 5.0f, m_pPlayer->GetPos().z), 3.0f, 128, 0xffffff, 0xffffff, false);
+
+	if (m_bossKind == Game::e_BossKind::kPower)
+	{
+		if(m_pBossPower->GetHp() != 0)
+		{
+			DrawSphere3D(VGet(m_pBossPower->GetPosDown().x, m_pBossPower->GetPosDown().y + 5.0f, m_pBossPower->GetPosDown().z), 6.0f, 128, 0xffffff, 0xffffff, false);
+		}
+
+	}
+	else if (m_bossKind == Game::e_BossKind::kSpeed)
+	{
+		if (m_pBossPower->GetHp() != 0)
+		{
+			DrawSphere3D(VGet(m_pBossSpeed->GetPosDown().x, m_pBossSpeed->GetPosDown().y + 5.0f, m_pBossSpeed->GetPosDown().z), 6.0f, 128, 0xffffff, 0xffffff, false);
+		}
+	}
+	else if (m_bossKind == Game::e_BossKind::kShot)
+	{
+		if (m_pBossPower->GetHp() != 0)
+		{
+			DrawSphere3D(VGet(m_pBossShot->GetPosDown().x, m_pBossShot->GetPosDown().y + 5.0f, m_pBossShot->GetPosDown().z), 6.0f, 128, 0xffffff, 0xffffff, false);
+		}
+	}
+	else if (m_bossKind == Game::e_BossKind::kRast && !m_pBossRast->GetIsClear())
+	{
+		DrawSphere3D(VGet(m_pBossRast->GetPosDown().x, m_pBossRast->GetPosDown().y + 5.0f, m_pBossRast->GetPosDown().z), 6.0f, 128, 0xffffff, 0xffffff, false);
+	}
+
+
+
+	ShadowMap_DrawEnd();	//シャドウマップ描画終了
+
+	SetUseShadowMap(0, m_shadowMap);	// シャドウマップの反映開始
+
+	m_pField->Draw();
+
+	SetUseShadowMap(0, -1);	// シャドウマップの反映終了
 }

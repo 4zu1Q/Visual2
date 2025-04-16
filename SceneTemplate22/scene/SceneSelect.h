@@ -75,7 +75,7 @@ private:
 	std::vector<int> m_handles;
 	
 	int m_fontH;	//フォントハンドル
-	int m_shadowH;	//シャドウマップハンドル
+	int m_shadowMap;	//シャドウマップハンドル
 
 	int m_effectFrame;	//エフェクトのフレーム
 

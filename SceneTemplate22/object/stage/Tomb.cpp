@@ -30,6 +30,13 @@ namespace
 	constexpr VECTOR kTriangleShotPos = { 0.0f , 38.0f , 50.0f };
 	constexpr VECTOR kTriangleRastPos = { 0.0f , 38.0f , 50.0f };
 
+	//墓のメッセージポジション
+	constexpr VECTOR kMessagePowerPos = { 0.0f , 0.0f , 0.0f };
+	constexpr VECTOR kMessageSpeedPos = { 0.0f , 0.0f , 0.0f };
+	constexpr VECTOR kMessageShotPos = { 0.0f , 0.0f , 0.0f };
+	constexpr VECTOR kMessageRastPos = { 0.0f , 0.0f , 0.0f };
+
+
 	constexpr float kSinSpeed = 0.05f;
 	constexpr float kHeightSize = 0.2f;
 
@@ -58,6 +65,8 @@ Tomb::Tomb() :
 	m_modelTrianglePowerH = MV1LoadModel(kTrianglePowerModelFileName);
 	m_modelTriangleSpeedH = MV1LoadModel(kTriangleSpeedModelFileName);
 	m_modelTriangleShotH = MV1LoadModel(kTriangleShotModelFileName);
+
+
 }
 
 Tomb::~Tomb()

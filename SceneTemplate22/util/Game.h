@@ -66,6 +66,14 @@ namespace Game
 		kBossShot,		//玉の攻撃
 	};
 
+	//敵の攻撃種類
+	enum class e_EnemyAttackKind
+	{
+		kEnemyAttackNone,
+		kEnemyAttack,			//手の攻撃
+		kEnemyJumpAttack,		//衝撃波の攻撃
+	};
+
 	//プレイヤーの攻撃種類
 	enum class e_PlayerAttackKind
 	{

@@ -9,8 +9,9 @@
 
 #include "object/player/Player.h"
 #include "object/player/PlayerWeapon.h"
+#include "object/enemy/EnemyNormal.h"
+//#include "object/boss/BossTutorial.h"
 #include "object/Camera.h"
-#include "object/boss/BossShot.h"
 
 #include "object/item/ItemHp.h"
 #include "object/item/ItemMp.h"
@@ -85,6 +86,14 @@ namespace
 
 	//プレイヤーの最初の位置
 	constexpr VECTOR kPlayerPos = { 350.0f,-35.0f,0 };
+
+	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
+	const VECTOR kShadowAreaMinPos = { -10000.0f, -500.0f, -10000.0f };		// シャドウマップに描画する最小範囲
+	const VECTOR kShadowAreaMaxPos = { 10000.0f, 0.0f, 10000.0f };	// シャドウマップに描画する最大範囲
+	const VECTOR kShadowDir = { 0.0f, -5.0f, 0.0f };					// ライト方向
+
+	constexpr float kShadowColor = 0.7f;
+	constexpr float kShadowAlpha = 0.3f;
 }
 
 SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind) :
@@ -93,6 +102,9 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_pPlayer = std::make_shared<Player>();
 	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
 	m_pCamera = std::make_shared<Camera>();
+
+	m_pEnemyNormal = std::make_shared<EnemyNormal>();
+	//m_pBossTutorial = std::make_shared<BossTutorial>();
 
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
 	m_pFaceUi = std::make_shared<FaceUi>();
@@ -110,6 +122,7 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 
 
 	m_pPlayer->Initialize(m_pPhysics, kPlayerPos, *m_pPlayerWeapon);
+	m_pEnemyNormal->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
 	m_pCamera->Initialize(m_pPlayer->GetPos());
@@ -139,11 +152,22 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 
 	m_fontH = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", kFontSize);
 
+	/* 影の初期設定 */
+	m_shadowMap = MakeShadowMap(kShadowMapSize, kShadowMapSize);
+	// シャドウマップに描画する範囲を設定
+	SetShadowMapDrawArea(m_shadowMap, kShadowAreaMinPos, kShadowAreaMaxPos);
+	// シャドウマップが想定するライトの方向をセット
+	SetShadowMapLightDirection(m_shadowMap, kShadowDir);
+
+	// 影色を調整
+	SetLightAmbColor(GetColorF(0.8f, 0.8f, 0.8f, 0.0f));
+
 }
 
 SceneTutorial::~SceneTutorial()
 {
 	m_pPlayer->Finalize(m_pPhysics);
+	m_pEnemyNormal->Finalize(m_pPhysics);
 
 	//画像の削除
 	for (int i = 0; i < m_handles.size(); i++)
@@ -253,6 +277,8 @@ void SceneTutorial::Update()
 	m_pPlayer->SetCameraDirection(m_pCamera->GetDirection());
 	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), noPos, false, Game::e_BossAttackKind::kBossAttackNone);
 
+	m_pEnemyNormal->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+
 	m_pPhysics->Update();
 
 	/*フレームにアタッチするための更新処理*/
@@ -275,22 +301,31 @@ void SceneTutorial::Update()
 
 void SceneTutorial::Draw()
 {
-	m_pField->Draw();
 	m_pSkyDome->Draw();
+
+	ShadowMap_DrawSetup(m_shadowMap);	//シャドウマップ描画開始
+
+	//影を描画するための球体
+	DrawSphere3D(VGet(m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + 5.0f, m_pPlayer->GetPos().z), 3.0f, 128, 0xffffff, 0xffffff, false);
+	DrawSphere3D(VGet(m_pEnemyNormal->GetPosDown().x, m_pEnemyNormal->GetPosDown().y + 5.0f, m_pEnemyNormal->GetPosDown().z), 3.0f, 128, 0xffffff, 0xffffff, false);
+
+	ShadowMap_DrawEnd();	//シャドウマップ描画終了
+
+	SetUseShadowMap(0, m_shadowMap);	// シャドウマップの反映開始
+
+	m_pField->Draw();
+
+	SetUseShadowMap(0, -1);	// シャドウマップの反映終了
+
 	m_pPlayer->Draw(*m_pPlayerWeapon);
+	m_pEnemyNormal->Draw();
 
 	EffectManager::GetInstance().Draw();
-
-	//m_pTomb->Draw();
-	//m_pTomb->DrawTriangleSelect();
-
 	m_pPlayerBarUi->Draw();
 	m_pFaceFrameUi->Draw(*m_pPlayer);
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pButtonUi->Draw(*m_pPlayer);
 
-	// 反映終了
-	//SetUseShadowMap(0, -1);
 
 	if (!m_isFadeColor)
 	{
