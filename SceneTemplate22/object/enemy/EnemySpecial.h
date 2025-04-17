@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "BossBase.h"
+#include "EnemyBase.h"
+
 #include <memory>
 
 class AnimController;
@@ -7,11 +8,12 @@ class ActionTime;
 
 class Player;
 
-class BossTutorial : public BossBase
+class EnemySpecial : public EnemyBase
 {
 public:
-	BossTutorial();
-	virtual ~BossTutorial();
+
+	EnemySpecial();
+	virtual ~EnemySpecial();
 
 	void Initialize(std::shared_ptr<MyLib::Physics> physics) override;
 	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
@@ -38,15 +40,11 @@ private:
 	void DashUpdate();
 	void PreliminaryAttack1Update();
 	void PreliminaryAttack2Update();
-	void PreliminaryAttack3Update();
-	void Attack1Update();
-	void Attack2Update();
-	void Attack3Update();
-	void AvoidUpdate();
+	void AttackUpdate();
+	void JumpAttackUpdate();
 	void AttackCoolTimeUpdate();
 	void HitOneDamageUpdate();
 	void HitTwoDamageUpdate();
-	void DownUpdate();
 	void DeadUpdate();
 
 	/*アップデート処理に移動させるための関数*/
@@ -55,15 +53,10 @@ private:
 	void OnDash();
 	void OnPreliminaryAttack1();
 	void OnPreliminaryAttack2();
-	void OnPreliminaryAttack3();
-	void OnAttack1();
-	void OnAttack2();
-	void OnAttack3();
-	void OnAvoid();
-	void OnAttackCoolTime();
+	void OnAttack();
+	void OnJumpAttack();
 	void OnHitOneDamage();
 	void OnHitTwoDamage();
-	void OnDown();
 	void OnDead();
 
 private:
@@ -73,7 +66,7 @@ private:
 	std::shared_ptr<Player> m_pPlayer;
 
 	//メンバ関数ポインタ
-	using UpdateFunc_t = void(BossTutorial::*)();
+	using UpdateFunc_t = void(EnemySpecial::*)();
 	UpdateFunc_t m_updateFunc;
 
 	//次の行動に移るための変数

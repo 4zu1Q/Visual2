@@ -10,7 +10,8 @@
 #include "object/player/Player.h"
 #include "object/player/PlayerWeapon.h"
 #include "object/enemy/EnemyNormal.h"
-//#include "object/boss/BossTutorial.h"
+#include "object/enemy/EnemySpecial.h"
+#include "object/boss/BossTutorial.h"
 #include "object/Camera.h"
 
 #include "object/item/ItemHp.h"
@@ -104,7 +105,8 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_pCamera = std::make_shared<Camera>();
 
 	m_pEnemyNormal = std::make_shared<EnemyNormal>();
-	//m_pBossTutorial = std::make_shared<BossTutorial>();
+	m_pEnemySpecial = std::make_shared<EnemySpecial>();
+	m_pBossTutorial = std::make_shared<BossTutorial>();
 
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
 	m_pFaceUi = std::make_shared<FaceUi>();
@@ -123,6 +125,10 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 
 	m_pPlayer->Initialize(m_pPhysics, kPlayerPos, *m_pPlayerWeapon);
 	m_pEnemyNormal->Initialize(m_pPhysics);
+	m_pEnemySpecial->Initialize(m_pPhysics);
+	
+	m_pBossTutorial->Initialize(m_pPhysics);
+
 	m_pField->Initialize();
 
 	m_pCamera->Initialize(m_pPlayer->GetPos());
@@ -278,6 +284,9 @@ void SceneTutorial::Update()
 	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), noPos, false, Game::e_BossAttackKind::kBossAttackNone);
 
 	m_pEnemyNormal->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+	m_pEnemySpecial->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+
+	m_pBossTutorial->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 
 	m_pPhysics->Update();
 
@@ -308,6 +317,8 @@ void SceneTutorial::Draw()
 	//影を描画するための球体
 	DrawSphere3D(VGet(m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + 5.0f, m_pPlayer->GetPos().z), 3.0f, 128, 0xffffff, 0xffffff, false);
 	DrawSphere3D(VGet(m_pEnemyNormal->GetPosDown().x, m_pEnemyNormal->GetPosDown().y + 5.0f, m_pEnemyNormal->GetPosDown().z), 3.0f, 128, 0xffffff, 0xffffff, false);
+	DrawSphere3D(VGet(m_pEnemySpecial->GetPosDown().x, m_pEnemySpecial->GetPosDown().y + 5.0f, m_pEnemySpecial->GetPosDown().z), 3.0f, 128, 0xffffff, 0xffffff, false);
+	DrawSphere3D(VGet(m_pBossTutorial->GetPosDown().x, m_pBossTutorial->GetPosDown().y + 5.0f, m_pBossTutorial->GetPosDown().z), 5.0f, 128, 0xffffff, 0xffffff, false);
 
 	ShadowMap_DrawEnd();	//シャドウマップ描画終了
 
@@ -319,6 +330,8 @@ void SceneTutorial::Draw()
 
 	m_pPlayer->Draw(*m_pPlayerWeapon);
 	m_pEnemyNormal->Draw();
+	m_pEnemySpecial->Draw();
+	m_pBossTutorial->Draw();
 
 	EffectManager::GetInstance().Draw();
 	m_pPlayerBarUi->Draw();

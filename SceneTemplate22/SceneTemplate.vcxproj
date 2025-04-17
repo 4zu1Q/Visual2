@@ -162,6 +162,7 @@
     <ClCompile Include="object\CharaBase.cpp" />
     <ClCompile Include="object\enemy\EnemyBase.cpp" />
     <ClCompile Include="object\enemy\EnemyNormal.cpp" />
+    <ClCompile Include="object\enemy\EnemySpecial.cpp" />
     <ClCompile Include="object\item\ItemBase.cpp" />
     <ClCompile Include="object\item\ItemHp.cpp" />
     <ClCompile Include="object\item\ItemMp.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="object\CharaBase.h" />
     <ClInclude Include="object\enemy\EnemyBase.h" />
     <ClInclude Include="object\enemy\EnemyNormal.h" />
+    <ClInclude Include="object\enemy\EnemySpecial.h" />
     <ClInclude Include="object\item\ItemBase.h" />
     <ClInclude Include="object\item\ItemHp.h" />
     <ClInclude Include="object\item\ItemMp.h" />

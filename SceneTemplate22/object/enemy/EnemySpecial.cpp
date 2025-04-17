@@ -1,4 +1,4 @@
-﻿#include "EnemyNormal.h"
+﻿#include "EnemySpecial.h"
 #include "object/player/Player.h"
 
 #include "util/AnimController.h"
@@ -14,10 +14,10 @@
 namespace
 {
 	//プレイヤーのモデルファイル名
-	const char* const kModelFilename = "Data/Model/Enemy/EnemyNormal.mv1";
+	const char* const kModelFilename = "Data/Model/Enemy/EnemySpecial.mv1";
 
 	//モデルのスケール値
-	constexpr float kModelScale = 5.0f;
+	constexpr float kModelScale = 7.0f;
 
 	constexpr float kWalkSpeed = 0.4f;
 	constexpr float kDashSpeed = 0.7f;
@@ -33,7 +33,7 @@ namespace
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
 
 	/*ボスのアニメーションの種類*/
-	const char* const kAnimBossInfoFilename = "Data/Csv/AnimEnemyNormal.csv";
+	const char* const kAnimBossInfoFilename = "Data/Csv/AnimEnemySpecial.csv";
 
 	const char* const kAnimIdle = "Idle";
 	const char* const kAnimWalk = "Walk";
@@ -66,7 +66,7 @@ namespace
 }
 
 
-EnemyNormal::EnemyNormal():
+EnemySpecial::EnemySpecial() :
 	EnemyBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kEnemy, MyLib::ColliderData::e_Kind::kSphere, false),
 	m_posUp(kInitPos),
 	m_direction(VGet(0, 0, 0)),
@@ -129,17 +129,17 @@ EnemyNormal::EnemyNormal():
 	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
 
 	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
-	circleColliderData->m_radius = 2.0f;
+	circleColliderData->m_radius = 3.0f;
 }
 
-EnemyNormal::~EnemyNormal()
+EnemySpecial::~EnemySpecial()
 {
 	MV1DeleteModel(m_modelH);
 	m_modelH = -1;
 }
 
 
-void EnemyNormal::Initialize(std::shared_ptr<MyLib::Physics> physics)
+void EnemySpecial::Initialize(std::shared_ptr<MyLib::Physics> physics)
 {
 	//
 	Collidable::Initialize(physics);
@@ -159,16 +159,16 @@ void EnemyNormal::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	m_pAnim->Initialize(kAnimBossInfoFilename, m_modelH, kAnimIdle);
 
 	// メンバ関数ポインタの初期化
-	m_updateFunc = &EnemyNormal::IdleUpdate;
+	m_updateFunc = &EnemySpecial::IdleUpdate;
 
 }
 
-void EnemyNormal::Finalize(std::shared_ptr<MyLib::Physics> physics)
+void EnemySpecial::Finalize(std::shared_ptr<MyLib::Physics> physics)
 {
 	Collidable::Finalize(physics);
 }
 
-void EnemyNormal::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind)
+void EnemySpecial::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind)
 {
 	//アップデート
 	(this->*m_updateFunc)();
@@ -224,7 +224,7 @@ void EnemyNormal::Update(std::shared_ptr<MyLib::Physics> physics, Player& player
 
 }
 
-void EnemyNormal::Draw()
+void EnemySpecial::Draw()
 {
 
 #ifdef _DEBUG
@@ -267,23 +267,23 @@ void EnemyNormal::Draw()
 	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 }
 
-const VECTOR& EnemyNormal::GetPosDown() const
+const VECTOR& EnemySpecial::GetPosDown() const
 {
 	return m_rigidbody.GetPos();
 }
 
-const VECTOR& EnemyNormal::GetPosUp() const
+const VECTOR& EnemySpecial::GetPosUp() const
 {
 	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 10.0f, 0.0f));
 	return pos;
 }
 
-void EnemyNormal::SetPosDown(const VECTOR pos)
+void EnemySpecial::SetPosDown(const VECTOR pos)
 {
 	m_rigidbody.SetPos(pos);
 }
 
-void EnemyNormal::Hit()
+void EnemySpecial::Hit()
 {
 	if (!m_isClear)
 	{
@@ -310,7 +310,7 @@ void EnemyNormal::Hit()
 	}
 }
 
-void EnemyNormal::IdleUpdate()
+void EnemySpecial::IdleUpdate()
 {
 	m_actionTime++;
 
@@ -355,7 +355,7 @@ void EnemyNormal::IdleUpdate()
 
 }
 
-void EnemyNormal::WalkUpdate()
+void EnemySpecial::WalkUpdate()
 {
 	//VECTOR pos = m_rigidbody.GetPos();
 
@@ -395,7 +395,7 @@ void EnemyNormal::WalkUpdate()
 
 }
 
-void EnemyNormal::DashUpdate()
+void EnemySpecial::DashUpdate()
 {
 
 	Hit();
@@ -426,7 +426,7 @@ void EnemyNormal::DashUpdate()
 	}
 }
 
-void EnemyNormal::PreliminaryAttack1Update()
+void EnemySpecial::PreliminaryAttack1Update()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -440,7 +440,7 @@ void EnemyNormal::PreliminaryAttack1Update()
 	}
 }
 
-void EnemyNormal::PreliminaryAttack2Update()
+void EnemySpecial::PreliminaryAttack2Update()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -456,7 +456,7 @@ void EnemyNormal::PreliminaryAttack2Update()
 
 
 
-void EnemyNormal::AttackUpdate()
+void EnemySpecial::AttackUpdate()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -476,7 +476,7 @@ void EnemyNormal::AttackUpdate()
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 }
 
-void EnemyNormal::JumpAttackUpdate()
+void EnemySpecial::JumpAttackUpdate()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -497,7 +497,7 @@ void EnemyNormal::JumpAttackUpdate()
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 }
 
-void EnemyNormal::AttackCoolTimeUpdate()
+void EnemySpecial::AttackCoolTimeUpdate()
 {
 	Hit();
 
@@ -513,7 +513,7 @@ void EnemyNormal::AttackCoolTimeUpdate()
 	}
 }
 
-void EnemyNormal::HitOneDamageUpdate()
+void EnemySpecial::HitOneDamageUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -523,7 +523,7 @@ void EnemyNormal::HitOneDamageUpdate()
 	}
 }
 
-void EnemyNormal::HitTwoDamageUpdate()
+void EnemySpecial::HitTwoDamageUpdate()
 {
 	//アニメーションが終わったらアイドル状態に戻る
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -533,7 +533,7 @@ void EnemyNormal::HitTwoDamageUpdate()
 	}
 }
 
-void EnemyNormal::DeadUpdate()
+void EnemySpecial::DeadUpdate()
 {
 	//ワープアイテムが出現するフラグをおいておく
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -549,7 +549,7 @@ void EnemyNormal::DeadUpdate()
 	}
 }
 
-void EnemyNormal::OnIdle()
+void EnemySpecial::OnIdle()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
@@ -559,10 +559,10 @@ void EnemyNormal::OnIdle()
 	m_attackFrame = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
-	m_updateFunc = &EnemyNormal::IdleUpdate;
+	m_updateFunc = &EnemySpecial::IdleUpdate;
 }
 
-void EnemyNormal::OnWalk()
+void EnemySpecial::OnWalk()
 {
 
 	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
@@ -571,10 +571,10 @@ void EnemyNormal::OnWalk()
 	m_attackFrame = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimWalk);
-	m_updateFunc = &EnemyNormal::WalkUpdate;
+	m_updateFunc = &EnemySpecial::WalkUpdate;
 }
 
-void EnemyNormal::OnDash()
+void EnemySpecial::OnDash()
 {
 	m_isAttack = false;
 
@@ -583,10 +583,10 @@ void EnemyNormal::OnDash()
 	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimDash);
-	m_updateFunc = &EnemyNormal::DashUpdate;
+	m_updateFunc = &EnemySpecial::DashUpdate;
 }
 
-void EnemyNormal::OnPreliminaryAttack1()
+void EnemySpecial::OnPreliminaryAttack1()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_isAttack = false;
@@ -597,10 +597,10 @@ void EnemyNormal::OnPreliminaryAttack1()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("powerPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
-	m_updateFunc = &EnemyNormal::PreliminaryAttack1Update;
+	m_updateFunc = &EnemySpecial::PreliminaryAttack1Update;
 }
 
-void EnemyNormal::OnPreliminaryAttack2()
+void EnemySpecial::OnPreliminaryAttack2()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_isAttack = false;
@@ -611,10 +611,10 @@ void EnemyNormal::OnPreliminaryAttack2()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("powerPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
-	m_updateFunc = &EnemyNormal::PreliminaryAttack2Update;
+	m_updateFunc = &EnemySpecial::PreliminaryAttack2Update;
 }
 
-void EnemyNormal::OnAttack()
+void EnemySpecial::OnAttack()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
@@ -628,10 +628,10 @@ void EnemyNormal::OnAttack()
 	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttack;
 
 	m_pAnim->ChangeAnim(kAnimAttack, true, true, false);
-	m_updateFunc = &EnemyNormal::AttackUpdate;
+	m_updateFunc = &EnemySpecial::AttackUpdate;
 }
 
-void EnemyNormal::OnJumpAttack()
+void EnemySpecial::OnJumpAttack()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
@@ -645,10 +645,10 @@ void EnemyNormal::OnJumpAttack()
 	m_attackKind = Game::e_EnemyAttackKind::kEnemyJumpAttack;
 
 	m_pAnim->ChangeAnim(kAnimJumpAttack, true, true, false);
-	m_updateFunc = &EnemyNormal::JumpAttackUpdate;
+	m_updateFunc = &EnemySpecial::JumpAttackUpdate;
 }
 
-void EnemyNormal::OnHitOneDamage()
+void EnemySpecial::OnHitOneDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
@@ -682,13 +682,13 @@ void EnemyNormal::OnHitOneDamage()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimHit);
-	m_updateFunc = &EnemyNormal::HitOneDamageUpdate;
+	m_updateFunc = &EnemySpecial::HitOneDamageUpdate;
 
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &EnemyNormal::IdleUpdate;
+	//m_updateFunc = &EnemySpecial::IdleUpdate;
 }
 
-void EnemyNormal::OnHitTwoDamage()
+void EnemySpecial::OnHitTwoDamage()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
@@ -722,13 +722,13 @@ void EnemyNormal::OnHitTwoDamage()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimHit);
-	m_updateFunc = &EnemyNormal::HitTwoDamageUpdate;
+	m_updateFunc = &EnemySpecial::HitTwoDamageUpdate;
 
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &EnemyNormal::IdleUpdate;
+	//m_updateFunc = &EnemySpecial::IdleUpdate;
 }
 
-void EnemyNormal::OnDead()
+void EnemySpecial::OnDead()
 {
 	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
 	m_isAttack = false;
@@ -740,5 +740,5 @@ void EnemyNormal::OnDead()
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 
 
-	m_updateFunc = &EnemyNormal::DeadUpdate;
+	m_updateFunc = &EnemySpecial::DeadUpdate;
 }
