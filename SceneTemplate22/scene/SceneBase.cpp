@@ -20,8 +20,6 @@ namespace
 	constexpr int kFadeTime = 120;
 	constexpr int kFadeNum = 2;
 
-	
-
 }
 
 

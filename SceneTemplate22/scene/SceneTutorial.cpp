@@ -4,6 +4,7 @@
 #include "scene/ScenePause.h"
 #include "scene/SceneOption.h"
 #include "scene/SceneSelect.h"
+#include "scene/SceneWords.h"
 #include "scene/SceneDebug.h"
 #include "scene/SceneTutorial.h"
 
@@ -53,6 +54,18 @@ namespace
 		kShotClearItemH,
 		kRastNoClearItemH,
 		kRastClearItemH,
+	};
+
+	//
+	enum e_Tutorial
+	{
+		kTutorialStart,	//
+		kTutorialWalk,
+		kTutorialJump,
+		kTutorialDashJump,
+		kTutorialAttackX,
+		kTutorialAttackY,
+		kTutorialClear,
 	};
 
 	//フォントのパス
@@ -122,7 +135,6 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_isToNextScene = false;
 	m_effectFrame = 0;
 
-
 	m_pPlayer->Initialize(m_pPhysics, kPlayerPos, *m_pPlayerWeapon);
 	m_pEnemyNormal->Initialize(m_pPhysics);
 	m_pEnemySpecial->Initialize(m_pPhysics);
@@ -172,6 +184,7 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 
 SceneTutorial::~SceneTutorial()
 {
+
 	m_pPlayer->Finalize(m_pPhysics);
 	m_pEnemyNormal->Finalize(m_pPhysics);
 
@@ -205,39 +218,25 @@ void SceneTutorial::Update()
 
 	SoundManager::GetInstance().PlayBgm("selectBgm", true);
 
-	//ゲームステージに移動するための当たり判定
-	//m_isPowerStage = m_pTomb->TombPowerHit(m_pPlayer);
-	//m_isSpeedStage = m_pTomb->TombSpeedHit(m_pPlayer);
-	//m_isShotStage = m_pTomb->TombShotHit(m_pPlayer);
-	//m_isRastStage = m_pTomb->TombRastHit(m_pPlayer);
 
-	//プレイヤーの距離がここを超えたら
-	if (m_pPlayer->GetPos().z < -50.0f)
+	//1回だけチュートリアルの説明を入れるためのフラグ
+	if (!m_isTutorial[1])
 	{
-		
-	}
-	
-	if(m_pPlayer->GetPos().z == 100)
-	{
+		//円の当たり判定かなんかで入ったらチュートリアルの説明を入れる
+		if (m_isTutorial[1])
+		{
+			//もうチュートリアルを行わないよう
+			m_isTutorial[1] = true;
+			//セリフシーンに飛んで、解説する、Game.hにenumでチュートリアルを入れておく
+			//m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
 
+		}
 	}
 
-	if (m_pPlayer->GetPos().z == 100)
-	{
-
-	}
-
-	if (m_pPlayer->GetPos().z == 100)
-	{
-
-	}
 
 	if (m_effectFrame % kEffectFrame == 0)
 	{
-		//EffectManager::GetInstance().CreateEffect("stagePower", m_pTomb->GetPowerPos());
-		//EffectManager::GetInstance().CreateEffect("stageSpeed", m_pTomb->GetSpeedPos());
-		//EffectManager::GetInstance().CreateEffect("stageShot", m_pTomb->GetShotPos());
-		//EffectManager::GetInstance().CreateEffect("stageRass", m_pTomb->GetRastPos());
+
 
 		m_effectFrame = 0;
 	}

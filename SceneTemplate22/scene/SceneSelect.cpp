@@ -270,6 +270,7 @@ void SceneSelect::Update()
 	}
 
 #ifdef _DEBUG
+
 	if (Pad::IsTrigger PAD_INPUT_7)
 	{
 		SoundManager::GetInstance().StopBgm("selectBgm");
