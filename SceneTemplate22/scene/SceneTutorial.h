@@ -9,8 +9,8 @@
 
 class Player;
 class PlayerWeapon;
-class EnemyNormal;
-class EnemySpecial;
+//class EnemyNormal;
+//class EnemySpecial;
 class BossTutorial;
 class Camera;
 class FaceUi;
@@ -44,8 +44,8 @@ private:
 	std::shared_ptr<Player> m_pPlayer;
 	std::shared_ptr<PlayerWeapon> m_pPlayerWeapon;
 	std::shared_ptr<Camera> m_pCamera;
-	std::shared_ptr<EnemyNormal> m_pEnemyNormal;
-	std::shared_ptr<EnemySpecial> m_pEnemySpecial;
+	//std::shared_ptr<EnemyNormal> m_pEnemyNormal;
+	//std::shared_ptr<EnemySpecial> m_pEnemySpecial;
 
 	std::shared_ptr<BossTutorial> m_pBossTutorial;
 

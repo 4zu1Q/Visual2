@@ -1,744 +1,744 @@
-﻿#include "EnemyNormal.h"
-#include "object/player/Player.h"
-
-#include "util/AnimController.h"
-#include "util/ActionTime.h"
-#include "util/EffectManager.h"
-#include "util/SoundManager.h"
-
-#include "util/Pad.h"
-
-#include <cmath>
-#include <cassert>
-
-namespace
-{
-	//プレイヤーのモデルファイル名
-	const char* const kModelFilename = "Data/Model/Enemy/EnemyNormal.mv1";
-
-	//モデルのスケール値
-	constexpr float kModelScale = 5.0f;
-
-	constexpr float kWalkSpeed = 0.4f;
-	constexpr float kDashSpeed = 0.7f;
-
-
-	constexpr float kAvoidSpeed = 2.0f;
-
-
-	//初期位置
-	constexpr VECTOR kInitPos = { 376.0f,-358.0f,-132.0f };
-
-	//カプセルの上の座標
-	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
-
-	/*ボスのアニメーションの種類*/
-	const char* const kAnimBossInfoFilename = "Data/Csv/AnimEnemyNormal.csv";
-
-	const char* const kAnimIdle = "Idle";
-	const char* const kAnimWalk = "Walk";
-	const char* const kAnimDash = "Dash";
-	const char* const kAnimAttack = "Attack";
-	const char* const kAnimJumpAttack = "JumpAttack";
-	const char* const kAnimHit = "Hit";
-	const char* const kAnimDead = "Dead";
-
-	//HPの最大値
-	constexpr float kMaxHp = 100.0f;
-
-	//次の状態に遷移するまでの時間
-	constexpr float kIdleToAttackTime = 20.0f;
-	constexpr float kIdleToAvoidTime = 35.0f;
-	constexpr float kCoolTimeToAvoidTime = 60.0f;
-	constexpr float kAvoidToIdleTime = 29.0f;
-
-	//次の状態に遷移するまでのプレイヤーとの長さ
-	constexpr float kIdleToAttackLength = 20.0f;
-	//constexpr float kIdleToAttackLength = 20.0f;
-	constexpr float kWalkToIdleLength = 20.0f;
-
-	constexpr float kWalkToDashLength = 100.0f;
-	constexpr float kDashToWalkLength = 80.0f;
-
-	//攻撃の種類
-	constexpr int kAttackKind = 3;
-
-}
-
-
-EnemyNormal::EnemyNormal():
-	EnemyBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kEnemy, MyLib::ColliderData::e_Kind::kSphere, false),
-	m_posUp(kInitPos),
-	m_direction(VGet(0, 0, 0)),
-	m_velocity(VGet(0, 0, 0)),
-	m_playerPos(VGet(0, 0, 0)),
-	m_angle(0.0f),
-	m_nextAngle(0.0f),
-	m_length(0.0f),
-	m_actionTime(0),
-	m_actionKind(0)
-{
-	//HPバー
-	m_hp = kMaxHp;
-
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
-	m_playerKind = e_PlayerKind::kNormalPlayer;
-
-	m_isClear = false;
-
-	m_isAttack = false;
-	m_isShock = false;
-	m_isHit = false;
-	m_isPlayerFace = false;
-
-	m_downCountDown = 0;
-	m_damageFrame = 0;
-	m_preliminaryActionFrame = 0;
-	m_attackFrame = 0;
-
-	m_hitRadius = 8.0f;
-	m_normalAttackRadius = 3.0f;
-	m_weaponAttackRadius = 6.0f;
-	m_shockRadius = 15.0f;
-
-	m_pos = kInitPos;
-	m_hitPos = VGet(0, 0, 0);
-	m_attackPos = VGet(0, 0, 0);
-	m_shockAttackPos = VGet(0, 0, 0);
-	m_attackDir = VGet(0, 0, 0);
-
-	//プレイヤーの攻撃変数の初期化
-	m_playerAttackXPos = VGet(0, 0, 0);
-	m_playerAttackYPos = VGet(0, 0, 0);
-	m_playerShockPos = VGet(0, 0, 0);
-
-	m_playerAttackXRadius = 0.0f;
-	m_playerAttackYRadius = 0.0f;
-	m_playerShockRadius = 0.0f;
-
-	m_isPlayerAttack = false;
-
-	m_modelH = MV1LoadModel(kModelFilename);
-
-	m_pAnim = std::make_shared<AnimController>();
-
-
-	m_pPlayer = std::make_shared<Player>();
-
-	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
-
-	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
-	circleColliderData->m_radius = 2.0f;
-}
-
-EnemyNormal::~EnemyNormal()
-{
-	MV1DeleteModel(m_modelH);
-	m_modelH = -1;
-}
-
-
-void EnemyNormal::Initialize(std::shared_ptr<MyLib::Physics> physics)
-{
-	//
-	Collidable::Initialize(physics);
-
-	// 物理挙動の初期化
-	m_rigidbody.Initialize(true);
-	m_rigidbody.SetPos(kInitPos);
-	//m_speed = 0.1f;
-
-	//初期位置を代入
-	m_pos = m_rigidbody.GetPos();
-
-	//モデルのスケールを決める
-	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
-
-	//アニメーションの初期化
-	m_pAnim->Initialize(kAnimBossInfoFilename, m_modelH, kAnimIdle);
-
-	// メンバ関数ポインタの初期化
-	m_updateFunc = &EnemyNormal::IdleUpdate;
-
-}
-
-void EnemyNormal::Finalize(std::shared_ptr<MyLib::Physics> physics)
-{
-	Collidable::Finalize(physics);
-}
-
-void EnemyNormal::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind)
-{
-	//アップデート
-	(this->*m_updateFunc)();
-
-	//アニメーションの更新処理
-	m_pAnim->UpdateAnim();
-
-	//プレイヤーとボスの距離を距離を求める
-	VECTOR toPlayer = VSub(m_playerPos, m_pos);
-	m_length = VSize(toPlayer);
-
-	m_playerAttackKind = playerAttackKind;
-	m_playerKind = player.GetFaceKind();
-	m_isPlayerFace = player.GetIsFaceUse();
-
-	if (m_isHit)
-	{
-		m_damageFrame++;
-	}
-	else if (!m_isHit)
-	{
-		m_damageFrame = 0;
-	}
-
-	if (m_damageFrame >= 140)
-	{
-		m_isHit = false;
-	}
-
-	m_playerPos = player.GetPos();
-	m_pos = m_rigidbody.GetPos();
-	m_hitPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
-
-	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
-
-	//HPがゼロより下にいった場合
-	if (m_hp <= 0)
-	{
-		m_hp = 0;
-
-		//死亡状態へ遷移
-		OnDead();
-	}
-
-	VECTOR attackMove = VScale(m_attackDir, 12.0f);
-	VECTOR shockAttackMove = VScale(m_attackDir, 20.0f);
-	m_attackPos = VAdd(m_hitPos, attackMove);
-	m_shockAttackPos = VAdd(m_hitPos, shockAttackMove);
-
-	//モデルに座標をセットする
-	MV1SetPosition(m_modelH, m_pos);
-	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));
-
-}
-
-void EnemyNormal::Draw()
-{
-
-#ifdef _DEBUG
-
-	DrawFormatString(0, 248, 0xff0fff, "PowerBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
-	DrawFormatString(0, 348, 0xff0fff, "PowerBossToPlayer:%f", m_length);
-	DrawFormatString(0, 370, 0xff000f, "PowerBossHp:%f", m_hp);
-
-
-	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
-
-	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
-
-	if (m_isHit)
-	{
-		DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xff00ff, 0xffffff, false);
-	}
-
-	if (m_isAttack)
-	{
-		if (m_attackKind == Game::e_EnemyAttackKind::kEnemyAttack) DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xffff00, 0xffffff, false);
-		if (m_attackKind == Game::e_EnemyAttackKind::kEnemyJumpAttack) DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xffff00, 0xffffff, false);
-	}
-
-#endif // DEBUG
-
-	// ダメージ演出  2フレーム間隔で表示非表示切り替え
-	// 0: 表示される
-	// 1: 表示される
-	// 2: 非表示
-	// 3: 非表示
-	// 4: 表示される	...
-	// % 4 することで012301230123... に変換する
-	//if (m_damageFrame % 8 >= 4) return;
-
-	if (!m_isClear)
-	{
-		MV1DrawModel(m_modelH);
-	}
-	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
-}
-
-const VECTOR& EnemyNormal::GetPosDown() const
-{
-	return m_rigidbody.GetPos();
-}
-
-const VECTOR& EnemyNormal::GetPosUp() const
-{
-	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 10.0f, 0.0f));
-	return pos;
-}
-
-void EnemyNormal::SetPosDown(const VECTOR pos)
-{
-	m_rigidbody.SetPos(pos);
-}
-
-void EnemyNormal::Hit()
-{
-	if (!m_isClear)
-	{
-		if (m_isPlayerAttack)
-		{
-
-			if (!m_isHit)
-			{
-
-				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX)
-				{
-					OnHitOneDamage();
-				}
-				else if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
-				{
-					OnHitTwoDamage();
-				}
-				else if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
-				{
-					OnHitOneDamage();
-				}
-			}
-		}
-	}
-}
-
-void EnemyNormal::IdleUpdate()
-{
-	m_actionTime++;
-
-	Hit();
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	//auto pos = m_rigidbody.GetPos();
-
-	//プレイヤーへの向きを取得
-	m_direction = VSub(m_playerPos, m_pos);
-	m_direction = VNorm(m_direction);
-
-	//m_angle = atan2f(m_direction.x, m_direction.z);
-
-	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
-	if (m_actionTime > kIdleToAttackTime && m_length > kIdleToAttackLength)
-	{
-		//OnWalk();
-	}
-	//プレイヤーと十分な距離の場合 && タイマー
-	else if (m_actionTime > kIdleToAvoidTime && m_length < kIdleToAttackLength)
-	{
-		//ランダム関数かなんか使ってやる
-
-		m_actionKind = GetRand(kAttackKind);
-
-		//近づいたら攻撃する
-		//遠くなったらジャンプ攻撃をする
-
-
-	}
-	m_nextAngle = atan2(m_direction.x, m_direction.z);
-
-	SmoothAngle(m_angle, m_nextAngle);
-
-	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
-	m_attackDir = VNorm(m_attackDir);
-
-	VECTOR move;
-	move.y = m_rigidbody.GetVelocity().y;
-	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
-
-}
-
-void EnemyNormal::WalkUpdate()
-{
-	//VECTOR pos = m_rigidbody.GetPos();
-
-	Hit();
-
-	//プレイヤーへの向きを取得
-	m_direction = VSub(m_playerPos, m_pos);
-
-	VECTOR length = VSub(m_pos, m_playerPos);
-	float size = VSize(length);
-
-	m_direction = VNorm(m_direction);
-
-	m_angle = atan2f(m_direction.x, m_direction.z);
-
-	//ベクトルを、正規化し、向きだけを保存させる
-	m_velocity = VScale(m_direction, kWalkSpeed);
-
-	//敵の移動
-	m_rigidbody.SetVelocity(m_velocity);
-
-	//プレイヤーとの距離が指定されている距離未満なら
-	if (size < kWalkToIdleLength)
-	{
-		OnIdle();
-	}
-
-	//距離が遠かった場合ダッシュ状態に遷移
-	if (m_length > kWalkToDashLength)
-	{
-		OnDash();
-	}
-
-
-	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
-	m_attackDir = VNorm(m_attackDir);
-
-}
-
-void EnemyNormal::DashUpdate()
-{
-
-	Hit();
-
-
-	//プレイヤーへの向きを取得
-	m_direction = VSub(m_playerPos, m_pos);
-
-	VECTOR length = VSub(m_pos, m_playerPos);
-	float size = VSize(length);
-
-	//正規化
-	m_direction = VNorm(m_direction);
-
-	//モデルの角度
-	m_angle = atan2f(m_direction.x, m_direction.z);
-
-	//ベクトルを、正規化し、向きだけを保存させる
-	m_velocity = VScale(m_direction, kDashSpeed);
-
-	//敵の移動
-	m_rigidbody.SetVelocity(m_velocity);
-
-	//距離が近くなっていったら歩きに状態に遷移
-	if (m_length < kDashToWalkLength)
-	{
-		OnWalk();
-	}
-}
-
-void EnemyNormal::PreliminaryAttack1Update()
-{
-	Hit();
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-
-	m_preliminaryActionFrame++;
-
-	if (m_preliminaryActionFrame > 15)
-	{
-		OnAttack();
-	}
-}
-
-void EnemyNormal::PreliminaryAttack2Update()
-{
-	Hit();
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-
-	m_preliminaryActionFrame++;
-
-	if (m_preliminaryActionFrame > 15)
-	{
-		OnJumpAttack();
-	}
-}
-
-
-
-void EnemyNormal::AttackUpdate()
-{
-	Hit();
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	m_attackFrame++;
-
-	if (m_attackFrame > 15)
-	{
-		m_isAttack = false;
-	}
-
-	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
-	{
-		OnIdle();
-	}
-	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
-}
-
-void EnemyNormal::JumpAttackUpdate()
-{
-	Hit();
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	m_attackFrame++;
-
-	if (m_attackFrame > 15)
-	{
-		m_isAttack = false;
-	}
-
-
-	//アニメーションが終わったらアイドル状態に戻る
-	if (m_pAnim->IsLoop())
-	{
-		OnIdle();
-	}
-	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
-}
-
-void EnemyNormal::AttackCoolTimeUpdate()
-{
-	Hit();
-
-
-	m_actionTime++;
-
-	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
-
-
-	if (m_actionTime > kCoolTimeToAvoidTime)
-	{
-		OnIdle();
-	}
-}
-
-void EnemyNormal::HitOneDamageUpdate()
-{
-	//アニメーションが終わったらアイドル状態に戻る
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	if (m_damageFrame > 34)
-	{
-		OnIdle();
-	}
-}
-
-void EnemyNormal::HitTwoDamageUpdate()
-{
-	//アニメーションが終わったらアイドル状態に戻る
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	if (m_damageFrame > 34)
-	{
-		OnIdle();
-	}
-}
-
-void EnemyNormal::DeadUpdate()
-{
-	//ワープアイテムが出現するフラグをおいておく
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	if (m_pAnim->IsLoop())
-	{
-		m_isClear = true;
-	}
-
-	if (!m_isClear)
-	{
-		auto pos = m_rigidbody.GetPos();
-		EffectManager::GetInstance().CreateEffect("gameClearEffect", VGet(pos.x, pos.y, pos.z));
-	}
-}
-
-void EnemyNormal::OnIdle()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-	m_isAttack = false;
-
-	m_attackFrame = 0;
-	m_actionTime = 0;
-	m_pAnim->ChangeAnim(kAnimIdle);
-	m_updateFunc = &EnemyNormal::IdleUpdate;
-}
-
-void EnemyNormal::OnWalk()
-{
-
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-	m_isAttack = false;
-
-	m_attackFrame = 0;
-	m_actionTime = 0;
-	m_pAnim->ChangeAnim(kAnimWalk);
-	m_updateFunc = &EnemyNormal::WalkUpdate;
-}
-
-void EnemyNormal::OnDash()
-{
-	m_isAttack = false;
-
-	m_attackFrame = 0;
-
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-	m_actionTime = 0;
-	m_pAnim->ChangeAnim(kAnimDash);
-	m_updateFunc = &EnemyNormal::DashUpdate;
-}
-
-void EnemyNormal::OnPreliminaryAttack1()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_isAttack = false;
-
-	m_attackFrame = 0;
-
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("powerPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
-	m_pAnim->ChangeAnim(kAnimIdle);
-	m_updateFunc = &EnemyNormal::PreliminaryAttack1Update;
-}
-
-void EnemyNormal::OnPreliminaryAttack2()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_isAttack = false;
-
-	m_attackFrame = 0;
-
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("powerPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
-	m_pAnim->ChangeAnim(kAnimIdle);
-	m_updateFunc = &EnemyNormal::PreliminaryAttack2Update;
-}
-
-void EnemyNormal::OnAttack()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-
-	m_attackFrame = 0;
-	m_actionKind = 0;
-	m_actionTime = 0;
-	m_preliminaryActionFrame = 0;
-	m_isAttack = true;
-
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttack;
-
-	m_pAnim->ChangeAnim(kAnimAttack, true, true, false);
-	m_updateFunc = &EnemyNormal::AttackUpdate;
-}
-
-void EnemyNormal::OnJumpAttack()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-
-	m_attackFrame = 0;
-	m_actionKind = 0;
-	m_actionTime = 0;
-	m_preliminaryActionFrame = 0;
-	m_isAttack = true;
-
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyJumpAttack;
-
-	m_pAnim->ChangeAnim(kAnimJumpAttack, true, true, false);
-	m_updateFunc = &EnemyNormal::JumpAttackUpdate;
-}
-
-void EnemyNormal::OnHitOneDamage()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
-	{
-		m_hp -= 40.0f;
-	}
-	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
-	{
-		m_hp -= 15.0f;
-	}
-	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
-	{
-		m_hp -= 10.0f;
-	}
-	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
-	{
-		m_hp -= 50.0f;
-	}
-
-	if (!m_isPlayerFace)
-	{
-		m_hp -= 20.0f;
-	}
-
-	m_attackFrame = 0;
-	m_isHit = true;
-	m_isAttack = false;
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-
-	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
-	m_pAnim->ChangeAnim(kAnimHit);
-	m_updateFunc = &EnemyNormal::HitOneDamageUpdate;
-
-	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &EnemyNormal::IdleUpdate;
-}
-
-void EnemyNormal::OnHitTwoDamage()
-{
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-
-	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
-	{
-		m_hp -= 100.0f;
-	}
-	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
-	{
-		m_hp -= 40.0f;
-	}
-	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
-	{
-		m_hp -= 40.0f;
-	}
-	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
-	{
-		m_hp -= 100.0f;
-	}
-
-	if (!m_isPlayerFace)
-	{
-		m_hp -= 50.0f;
-	}
-
-	m_attackFrame = 0;
-	m_isHit = true;
-	m_isAttack = false;
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-
-	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
-	m_pAnim->ChangeAnim(kAnimHit);
-	m_updateFunc = &EnemyNormal::HitTwoDamageUpdate;
-
-	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &EnemyNormal::IdleUpdate;
-}
-
-void EnemyNormal::OnDead()
-{
-	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
-	m_isAttack = false;
-	m_rigidbody.SetVelocity(VGet(0, 0, 0));
-	m_actionKind = 0;
-	m_actionTime = 0;
-	m_attackFrame = 0;
-
-	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
-
-
-	m_updateFunc = &EnemyNormal::DeadUpdate;
-}
+﻿//#include "EnemyNormal.h"
+//#include "object/player/Player.h"
+//
+//#include "util/AnimController.h"
+//#include "util/ActionTime.h"
+//#include "util/EffectManager.h"
+//#include "util/SoundManager.h"
+//
+//#include "util/Pad.h"
+//
+//#include <cmath>
+//#include <cassert>
+//
+//namespace
+//{
+//	//プレイヤーのモデルファイル名
+//	const char* const kModelFilename = "Data/Model/Enemy/EnemyNormal.mv1";
+//
+//	//モデルのスケール値
+//	constexpr float kModelScale = 5.0f;
+//
+//	constexpr float kWalkSpeed = 0.4f;
+//	constexpr float kDashSpeed = 0.7f;
+//
+//
+//	constexpr float kAvoidSpeed = 2.0f;
+//
+//
+//	//初期位置
+//	constexpr VECTOR kInitPos = { 376.0f,-358.0f,-132.0f };
+//
+//	//カプセルの上の座標
+//	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
+//
+//	/*ボスのアニメーションの種類*/
+//	const char* const kAnimBossInfoFilename = "Data/Csv/AnimEnemyNormal.csv";
+//
+//	const char* const kAnimIdle = "Idle";
+//	const char* const kAnimWalk = "Walk";
+//	const char* const kAnimDash = "Dash";
+//	const char* const kAnimAttack = "Attack";
+//	const char* const kAnimJumpAttack = "JumpAttack";
+//	const char* const kAnimHit = "Hit";
+//	const char* const kAnimDead = "Dead";
+//
+//	//HPの最大値
+//	constexpr float kMaxHp = 100.0f;
+//
+//	//次の状態に遷移するまでの時間
+//	constexpr float kIdleToAttackTime = 20.0f;
+//	constexpr float kIdleToAvoidTime = 35.0f;
+//	constexpr float kCoolTimeToAvoidTime = 60.0f;
+//	constexpr float kAvoidToIdleTime = 29.0f;
+//
+//	//次の状態に遷移するまでのプレイヤーとの長さ
+//	constexpr float kIdleToAttackLength = 20.0f;
+//	//constexpr float kIdleToAttackLength = 20.0f;
+//	constexpr float kWalkToIdleLength = 20.0f;
+//
+//	constexpr float kWalkToDashLength = 100.0f;
+//	constexpr float kDashToWalkLength = 80.0f;
+//
+//	//攻撃の種類
+//	constexpr int kAttackKind = 3;
+//
+//}
+//
+//
+//EnemyNormal::EnemyNormal():
+//	EnemyBase(Collidable::e_Priority::kStatic, Game::e_GameObjectTag::kEnemy, MyLib::ColliderData::e_Kind::kSphere, false),
+//	m_posUp(kInitPos),
+//	m_direction(VGet(0, 0, 0)),
+//	m_velocity(VGet(0, 0, 0)),
+//	m_playerPos(VGet(0, 0, 0)),
+//	m_angle(0.0f),
+//	m_nextAngle(0.0f),
+//	m_length(0.0f),
+//	m_actionTime(0),
+//	m_actionKind(0)
+//{
+//	//HPバー
+//	m_hp = kMaxHp;
+//
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
+//	m_playerKind = e_PlayerKind::kNormalPlayer;
+//
+//	m_isClear = false;
+//
+//	m_isAttack = false;
+//	m_isShock = false;
+//	m_isHit = false;
+//	m_isPlayerFace = false;
+//
+//	m_downCountDown = 0;
+//	m_damageFrame = 0;
+//	m_preliminaryActionFrame = 0;
+//	m_attackFrame = 0;
+//
+//	m_hitRadius = 8.0f;
+//	m_normalAttackRadius = 3.0f;
+//	m_weaponAttackRadius = 6.0f;
+//	m_shockRadius = 15.0f;
+//
+//	m_pos = kInitPos;
+//	m_hitPos = VGet(0, 0, 0);
+//	m_attackPos = VGet(0, 0, 0);
+//	m_shockAttackPos = VGet(0, 0, 0);
+//	m_attackDir = VGet(0, 0, 0);
+//
+//	//プレイヤーの攻撃変数の初期化
+//	m_playerAttackXPos = VGet(0, 0, 0);
+//	m_playerAttackYPos = VGet(0, 0, 0);
+//	m_playerShockPos = VGet(0, 0, 0);
+//
+//	m_playerAttackXRadius = 0.0f;
+//	m_playerAttackYRadius = 0.0f;
+//	m_playerShockRadius = 0.0f;
+//
+//	m_isPlayerAttack = false;
+//
+//	m_modelH = MV1LoadModel(kModelFilename);
+//
+//	m_pAnim = std::make_shared<AnimController>();
+//
+//
+//	m_pPlayer = std::make_shared<Player>();
+//
+//	m_pColliderData = std::make_shared<MyLib::ColliderDataSphere>(false);
+//
+//	auto circleColliderData = std::dynamic_pointer_cast<MyLib::ColliderDataSphere>(m_pColliderData);
+//	circleColliderData->m_radius = 2.0f;
+//}
+//
+//EnemyNormal::~EnemyNormal()
+//{
+//	MV1DeleteModel(m_modelH);
+//	m_modelH = -1;
+//}
+//
+//
+//void EnemyNormal::Initialize(std::shared_ptr<MyLib::Physics> physics)
+//{
+//	//
+//	Collidable::Initialize(physics);
+//
+//	// 物理挙動の初期化
+//	m_rigidbody.Initialize(true);
+//	m_rigidbody.SetPos(kInitPos);
+//	//m_speed = 0.1f;
+//
+//	//初期位置を代入
+//	m_pos = m_rigidbody.GetPos();
+//
+//	//モデルのスケールを決める
+//	MV1SetScale(m_modelH, VGet(kModelScale, kModelScale, kModelScale));
+//
+//	//アニメーションの初期化
+//	m_pAnim->Initialize(kAnimBossInfoFilename, m_modelH, kAnimIdle);
+//
+//	// メンバ関数ポインタの初期化
+//	m_updateFunc = &EnemyNormal::IdleUpdate;
+//
+//}
+//
+//void EnemyNormal::Finalize(std::shared_ptr<MyLib::Physics> physics)
+//{
+//	Collidable::Finalize(physics);
+//}
+//
+//void EnemyNormal::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind)
+//{
+//	//アップデート
+//	(this->*m_updateFunc)();
+//
+//	//アニメーションの更新処理
+//	m_pAnim->UpdateAnim();
+//
+//	//プレイヤーとボスの距離を距離を求める
+//	VECTOR toPlayer = VSub(m_playerPos, m_pos);
+//	m_length = VSize(toPlayer);
+//
+//	m_playerAttackKind = playerAttackKind;
+//	m_playerKind = player.GetFaceKind();
+//	m_isPlayerFace = player.GetIsFaceUse();
+//
+//	if (m_isHit)
+//	{
+//		m_damageFrame++;
+//	}
+//	else if (!m_isHit)
+//	{
+//		m_damageFrame = 0;
+//	}
+//
+//	if (m_damageFrame >= 140)
+//	{
+//		m_isHit = false;
+//	}
+//
+//	m_playerPos = player.GetPos();
+//	m_pos = m_rigidbody.GetPos();
+//	m_hitPos = VGet(m_pos.x, m_pos.y + 6.0f, m_pos.z);
+//
+//	m_posUp = VGet(m_pos.x, m_pos.y + kUpPos.y, m_pos.z);
+//
+//	//HPがゼロより下にいった場合
+//	if (m_hp <= 0)
+//	{
+//		m_hp = 0;
+//
+//		//死亡状態へ遷移
+//		OnDead();
+//	}
+//
+//	VECTOR attackMove = VScale(m_attackDir, 12.0f);
+//	VECTOR shockAttackMove = VScale(m_attackDir, 20.0f);
+//	m_attackPos = VAdd(m_hitPos, attackMove);
+//	m_shockAttackPos = VAdd(m_hitPos, shockAttackMove);
+//
+//	//モデルに座標をセットする
+//	MV1SetPosition(m_modelH, m_pos);
+//	MV1SetRotationXYZ(m_modelH, VGet(0.0f, m_angle + DX_PI_F, 0.0f));
+//
+//}
+//
+//void EnemyNormal::Draw()
+//{
+//
+//#ifdef _DEBUG
+//
+//	DrawFormatString(0, 248, 0xff0fff, "PowerBossPos:%f,%f,%f", m_pos.x, m_pos.y, m_pos.z);
+//	DrawFormatString(0, 348, 0xff0fff, "PowerBossToPlayer:%f", m_length);
+//	DrawFormatString(0, 370, 0xff000f, "PowerBossHp:%f", m_hp);
+//
+//
+//	DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xffffff, 0xffffff, false);
+//
+//	DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xff00ff, 0xffffff, false);
+//
+//	if (m_isHit)
+//	{
+//		DrawSphere3D(m_hitPos, m_hitRadius, 16, 0xff00ff, 0xffffff, false);
+//	}
+//
+//	if (m_isAttack)
+//	{
+//		if (m_attackKind == Game::e_EnemyAttackKind::kEnemyAttack) DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xffff00, 0xffffff, false);
+//		if (m_attackKind == Game::e_EnemyAttackKind::kEnemyJumpAttack) DrawSphere3D(m_attackPos, m_normalAttackRadius, 16, 0xffff00, 0xffffff, false);
+//	}
+//
+//#endif // DEBUG
+//
+//	// ダメージ演出  2フレーム間隔で表示非表示切り替え
+//	// 0: 表示される
+//	// 1: 表示される
+//	// 2: 非表示
+//	// 3: 非表示
+//	// 4: 表示される	...
+//	// % 4 することで012301230123... に変換する
+//	//if (m_damageFrame % 8 >= 4) return;
+//
+//	if (!m_isClear)
+//	{
+//		MV1DrawModel(m_modelH);
+//	}
+//	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
+//}
+//
+//const VECTOR& EnemyNormal::GetPosDown() const
+//{
+//	return m_rigidbody.GetPos();
+//}
+//
+//const VECTOR& EnemyNormal::GetPosUp() const
+//{
+//	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 10.0f, 0.0f));
+//	return pos;
+//}
+//
+//void EnemyNormal::SetPosDown(const VECTOR pos)
+//{
+//	m_rigidbody.SetPos(pos);
+//}
+//
+//void EnemyNormal::Hit()
+//{
+//	if (!m_isClear)
+//	{
+//		if (m_isPlayerAttack)
+//		{
+//
+//			if (!m_isHit)
+//			{
+//
+//				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX)
+//				{
+//					OnHitOneDamage();
+//				}
+//				else if (IsAttackYHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackY)
+//				{
+//					OnHitTwoDamage();
+//				}
+//				else if (IsShockAttackHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerShock)
+//				{
+//					OnHitOneDamage();
+//				}
+//			}
+//		}
+//	}
+//}
+//
+//void EnemyNormal::IdleUpdate()
+//{
+//	m_actionTime++;
+//
+//	Hit();
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//	//auto pos = m_rigidbody.GetPos();
+//
+//	//プレイヤーへの向きを取得
+//	m_direction = VSub(m_playerPos, m_pos);
+//	m_direction = VNorm(m_direction);
+//
+//	//m_angle = atan2f(m_direction.x, m_direction.z);
+//
+//	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
+//	if (m_actionTime > kIdleToAttackTime && m_length > kIdleToAttackLength)
+//	{
+//		//OnWalk();
+//	}
+//	//プレイヤーと十分な距離の場合 && タイマー
+//	else if (m_actionTime > kIdleToAvoidTime && m_length < kIdleToAttackLength)
+//	{
+//		//ランダム関数かなんか使ってやる
+//
+//		m_actionKind = GetRand(kAttackKind);
+//
+//		//近づいたら攻撃する
+//		//遠くなったらジャンプ攻撃をする
+//
+//
+//	}
+//	m_nextAngle = atan2(m_direction.x, m_direction.z);
+//
+//	SmoothAngle(m_angle, m_nextAngle);
+//
+//	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
+//	m_attackDir = VNorm(m_attackDir);
+//
+//	VECTOR move;
+//	move.y = m_rigidbody.GetVelocity().y;
+//	m_rigidbody.SetVelocity(VGet(0, move.y, 0));
+//
+//}
+//
+//void EnemyNormal::WalkUpdate()
+//{
+//	//VECTOR pos = m_rigidbody.GetPos();
+//
+//	Hit();
+//
+//	//プレイヤーへの向きを取得
+//	m_direction = VSub(m_playerPos, m_pos);
+//
+//	VECTOR length = VSub(m_pos, m_playerPos);
+//	float size = VSize(length);
+//
+//	m_direction = VNorm(m_direction);
+//
+//	m_angle = atan2f(m_direction.x, m_direction.z);
+//
+//	//ベクトルを、正規化し、向きだけを保存させる
+//	m_velocity = VScale(m_direction, kWalkSpeed);
+//
+//	//敵の移動
+//	m_rigidbody.SetVelocity(m_velocity);
+//
+//	//プレイヤーとの距離が指定されている距離未満なら
+//	if (size < kWalkToIdleLength)
+//	{
+//		OnIdle();
+//	}
+//
+//	//距離が遠かった場合ダッシュ状態に遷移
+//	if (m_length > kWalkToDashLength)
+//	{
+//		OnDash();
+//	}
+//
+//
+//	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
+//	m_attackDir = VNorm(m_attackDir);
+//
+//}
+//
+//void EnemyNormal::DashUpdate()
+//{
+//
+//	Hit();
+//
+//
+//	//プレイヤーへの向きを取得
+//	m_direction = VSub(m_playerPos, m_pos);
+//
+//	VECTOR length = VSub(m_pos, m_playerPos);
+//	float size = VSize(length);
+//
+//	//正規化
+//	m_direction = VNorm(m_direction);
+//
+//	//モデルの角度
+//	m_angle = atan2f(m_direction.x, m_direction.z);
+//
+//	//ベクトルを、正規化し、向きだけを保存させる
+//	m_velocity = VScale(m_direction, kDashSpeed);
+//
+//	//敵の移動
+//	m_rigidbody.SetVelocity(m_velocity);
+//
+//	//距離が近くなっていったら歩きに状態に遷移
+//	if (m_length < kDashToWalkLength)
+//	{
+//		OnWalk();
+//	}
+//}
+//
+//void EnemyNormal::PreliminaryAttack1Update()
+//{
+//	Hit();
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//
+//	m_preliminaryActionFrame++;
+//
+//	if (m_preliminaryActionFrame > 15)
+//	{
+//		OnAttack();
+//	}
+//}
+//
+//void EnemyNormal::PreliminaryAttack2Update()
+//{
+//	Hit();
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//
+//	m_preliminaryActionFrame++;
+//
+//	if (m_preliminaryActionFrame > 15)
+//	{
+//		OnJumpAttack();
+//	}
+//}
+//
+//
+//
+//void EnemyNormal::AttackUpdate()
+//{
+//	Hit();
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//	m_attackFrame++;
+//
+//	if (m_attackFrame > 15)
+//	{
+//		m_isAttack = false;
+//	}
+//
+//	//アニメーションが終わったらアイドル状態に戻る
+//	if (m_pAnim->IsLoop())
+//	{
+//		OnIdle();
+//	}
+//	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
+//}
+//
+//void EnemyNormal::JumpAttackUpdate()
+//{
+//	Hit();
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//	m_attackFrame++;
+//
+//	if (m_attackFrame > 15)
+//	{
+//		m_isAttack = false;
+//	}
+//
+//
+//	//アニメーションが終わったらアイドル状態に戻る
+//	if (m_pAnim->IsLoop())
+//	{
+//		OnIdle();
+//	}
+//	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
+//}
+//
+//void EnemyNormal::AttackCoolTimeUpdate()
+//{
+//	Hit();
+//
+//
+//	m_actionTime++;
+//
+//	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
+//
+//
+//	if (m_actionTime > kCoolTimeToAvoidTime)
+//	{
+//		OnIdle();
+//	}
+//}
+//
+//void EnemyNormal::HitOneDamageUpdate()
+//{
+//	//アニメーションが終わったらアイドル状態に戻る
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//	if (m_damageFrame > 34)
+//	{
+//		OnIdle();
+//	}
+//}
+//
+//void EnemyNormal::HitTwoDamageUpdate()
+//{
+//	//アニメーションが終わったらアイドル状態に戻る
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//	if (m_damageFrame > 34)
+//	{
+//		OnIdle();
+//	}
+//}
+//
+//void EnemyNormal::DeadUpdate()
+//{
+//	//ワープアイテムが出現するフラグをおいておく
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//	if (m_pAnim->IsLoop())
+//	{
+//		m_isClear = true;
+//	}
+//
+//	if (!m_isClear)
+//	{
+//		auto pos = m_rigidbody.GetPos();
+//		EffectManager::GetInstance().CreateEffect("gameClearEffect", VGet(pos.x, pos.y, pos.z));
+//	}
+//}
+//
+//void EnemyNormal::OnIdle()
+//{
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//	m_isAttack = false;
+//
+//	m_attackFrame = 0;
+//	m_actionTime = 0;
+//	m_pAnim->ChangeAnim(kAnimIdle);
+//	m_updateFunc = &EnemyNormal::IdleUpdate;
+//}
+//
+//void EnemyNormal::OnWalk()
+//{
+//
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//	m_isAttack = false;
+//
+//	m_attackFrame = 0;
+//	m_actionTime = 0;
+//	m_pAnim->ChangeAnim(kAnimWalk);
+//	m_updateFunc = &EnemyNormal::WalkUpdate;
+//}
+//
+//void EnemyNormal::OnDash()
+//{
+//	m_isAttack = false;
+//
+//	m_attackFrame = 0;
+//
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//	m_actionTime = 0;
+//	m_pAnim->ChangeAnim(kAnimDash);
+//	m_updateFunc = &EnemyNormal::DashUpdate;
+//}
+//
+//void EnemyNormal::OnPreliminaryAttack1()
+//{
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//	m_isAttack = false;
+//
+//	m_attackFrame = 0;
+//
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//	auto pos = m_rigidbody.GetPos();
+//	EffectManager::GetInstance().CreateEffect("powerPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+//	m_pAnim->ChangeAnim(kAnimIdle);
+//	m_updateFunc = &EnemyNormal::PreliminaryAttack1Update;
+//}
+//
+//void EnemyNormal::OnPreliminaryAttack2()
+//{
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//	m_isAttack = false;
+//
+//	m_attackFrame = 0;
+//
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//	auto pos = m_rigidbody.GetPos();
+//	EffectManager::GetInstance().CreateEffect("powerPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+//	m_pAnim->ChangeAnim(kAnimIdle);
+//	m_updateFunc = &EnemyNormal::PreliminaryAttack2Update;
+//}
+//
+//void EnemyNormal::OnAttack()
+//{
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//
+//	m_attackFrame = 0;
+//	m_actionKind = 0;
+//	m_actionTime = 0;
+//	m_preliminaryActionFrame = 0;
+//	m_isAttack = true;
+//
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttack;
+//
+//	m_pAnim->ChangeAnim(kAnimAttack, true, true, false);
+//	m_updateFunc = &EnemyNormal::AttackUpdate;
+//}
+//
+//void EnemyNormal::OnJumpAttack()
+//{
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//
+//	m_attackFrame = 0;
+//	m_actionKind = 0;
+//	m_actionTime = 0;
+//	m_preliminaryActionFrame = 0;
+//	m_isAttack = true;
+//
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyJumpAttack;
+//
+//	m_pAnim->ChangeAnim(kAnimJumpAttack, true, true, false);
+//	m_updateFunc = &EnemyNormal::JumpAttackUpdate;
+//}
+//
+//void EnemyNormal::OnHitOneDamage()
+//{
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
+//	{
+//		m_hp -= 40.0f;
+//	}
+//	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
+//	{
+//		m_hp -= 15.0f;
+//	}
+//	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
+//	{
+//		m_hp -= 10.0f;
+//	}
+//	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
+//	{
+//		m_hp -= 50.0f;
+//	}
+//
+//	if (!m_isPlayerFace)
+//	{
+//		m_hp -= 20.0f;
+//	}
+//
+//	m_attackFrame = 0;
+//	m_isHit = true;
+//	m_isAttack = false;
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//
+//	auto pos = m_rigidbody.GetPos();
+//	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
+//	m_pAnim->ChangeAnim(kAnimHit);
+//	m_updateFunc = &EnemyNormal::HitOneDamageUpdate;
+//
+//	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
+//	//m_updateFunc = &EnemyNormal::IdleUpdate;
+//}
+//
+//void EnemyNormal::OnHitTwoDamage()
+//{
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//
+//	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
+//	{
+//		m_hp -= 100.0f;
+//	}
+//	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
+//	{
+//		m_hp -= 40.0f;
+//	}
+//	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
+//	{
+//		m_hp -= 40.0f;
+//	}
+//	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
+//	{
+//		m_hp -= 100.0f;
+//	}
+//
+//	if (!m_isPlayerFace)
+//	{
+//		m_hp -= 50.0f;
+//	}
+//
+//	m_attackFrame = 0;
+//	m_isHit = true;
+//	m_isAttack = false;
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//
+//	auto pos = m_rigidbody.GetPos();
+//	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
+//	m_pAnim->ChangeAnim(kAnimHit);
+//	m_updateFunc = &EnemyNormal::HitTwoDamageUpdate;
+//
+//	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
+//	//m_updateFunc = &EnemyNormal::IdleUpdate;
+//}
+//
+//void EnemyNormal::OnDead()
+//{
+//	m_attackKind = Game::e_EnemyAttackKind::kEnemyAttackNone;
+//	m_isAttack = false;
+//	m_rigidbody.SetVelocity(VGet(0, 0, 0));
+//	m_actionKind = 0;
+//	m_actionTime = 0;
+//	m_attackFrame = 0;
+//
+//	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
+//
+//
+//	m_updateFunc = &EnemyNormal::DeadUpdate;
+//}

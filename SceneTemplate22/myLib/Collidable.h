@@ -75,8 +75,8 @@ namespace MyLib
 		// 物理データ
 		Rigidbody m_rigidbody;		
 		// 当たり判定データ
-		//std::shared_ptr<ColliderData> m_pColliderData;	
-		std::list<std::shared_ptr<ColliderData>> m_pColliderData;	
+		std::shared_ptr<ColliderData> m_pColliderData;	
+		//std::list<std::shared_ptr<ColliderData>> m_pColliderData;	
 
 		//タグ
 		Game::e_GameObjectTag m_tag;

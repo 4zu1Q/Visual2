@@ -115,8 +115,8 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_pPlayerWeapon = std::make_shared<PlayerWeapon>();
 	m_pCamera = std::make_shared<Camera>();
 
-	m_pEnemyNormal = std::make_shared<EnemyNormal>();
-	m_pEnemySpecial = std::make_shared<EnemySpecial>();
+	//m_pEnemyNormal = std::make_shared<EnemyNormal>();
+	//m_pEnemySpecial = std::make_shared<EnemySpecial>();
 	m_pBossTutorial = std::make_shared<BossTutorial>();
 
 	m_pPlayerBarUi = std::make_shared<PlayerBarUi>();
@@ -135,8 +135,8 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_tutorialFrame = 0;
 
 	m_pPlayer->Initialize(m_pPhysics, kPlayerPos, *m_pPlayerWeapon);
-	m_pEnemyNormal->Initialize(m_pPhysics);
-	m_pEnemySpecial->Initialize(m_pPhysics);
+	//m_pEnemyNormal->Initialize(m_pPhysics);
+	//m_pEnemySpecial->Initialize(m_pPhysics);
 	
 	m_pBossTutorial->Initialize(m_pPhysics);
 
@@ -190,7 +190,7 @@ SceneTutorial::~SceneTutorial()
 {
 
 	m_pPlayer->Finalize(m_pPhysics);
-	m_pEnemyNormal->Finalize(m_pPhysics);
+	//m_pEnemyNormal->Finalize(m_pPhysics);
 
 	//画像の削除
 	for (int i = 0; i < m_handles.size(); i++)
@@ -295,58 +295,6 @@ void SceneTutorial::Update()
 		}
 	}
 
-	//通常攻撃する位置に行ったらチュートリアルの説明を入れる
-	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialAttackX])
-	{
-		if (m_pPlayer->GetPos().z <= kTutorialAttackXPosZ)
-		{
-			m_isTutorial[Game::e_TutorialProgress::kTutorialAttackX] = true;
-			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
-		}
-	}
-
-	//敵を倒したらチュートリアルの説明を入れる
-	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialAttackXClear])
-	{
-		if (m_pEnemyNormal->GetHp() <= 0.0f)
-		{
-			m_tutorialFrame++;
-
-			if (m_tutorialFrame >= kTutorialFrame)
-			{
-				m_isTutorial[Game::e_TutorialProgress::kTutorialAttackXClear] = true;
-				m_tutorialFrame = 0;
-				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
-			}
-		}
-	}
-
-	//特殊攻撃する位置に行ったらチュートリアルの説明を入れる
-	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialAttackY])
-	{
-		if (m_pPlayer->GetPos().z <= kTutorialAttackYPosZ)
-		{
-			m_isTutorial[Game::e_TutorialProgress::kTutorialAttackY] = true;
-			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
-		}
-	}
-
-	//敵を倒したらチュートリアルの説明を入れる
-	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialAttackYClear])
-	{
-		if (m_pEnemySpecial->GetHp() <= 0.0f)
-		{
-			m_tutorialFrame++;
-
-			if (m_tutorialFrame >= kTutorialFrame)
-			{
-				m_isTutorial[Game::e_TutorialProgress::kTutorialAttackYClear] = true;
-				m_tutorialFrame = 0;
-				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
-			}
-		}
-	}
-
 	//ボス戦する位置に行ったらチュートリアルの説明を入れる
 	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialBoss])
 	{
@@ -373,7 +321,7 @@ void SceneTutorial::Update()
 	}
 
 	//ボスを倒したらステージセレクトに移動
-	//if (m_isTutorial[Game::e_TutorialProgress::kTutorialBossClear])
+	if (m_isTutorial[Game::e_TutorialProgress::kTutorialBossClear])
 	{
 		if (m_pPlayer->GetPos().z <= kTutorialSelectPosZ)
 		{
@@ -385,25 +333,6 @@ void SceneTutorial::Update()
 			}
 		}
 	}
-
-
-
-	if (m_effectFrame % kEffectFrame == 0)
-	{
-
-
-		m_effectFrame = 0;
-	}
-	m_effectFrame++;
-
-
-	//if (Pad::IsTrigger(PAD_INPUT_1))
-	//{
-	//	SoundManager::GetInstance().PlaySe("gamePlayTransSe");
-	//	StartFadeOut();
-	//	m_isToNextScene = true;
-	//}
-
 	
 
 #ifdef _DEBUG
@@ -429,17 +358,18 @@ void SceneTutorial::Update()
 	//ロックオンするのがいないため
 	VECTOR noPos = VGet(0, 0, 0);
 
+
+	m_pCamera->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), false);
+	m_pPlayer->SetCameraDirection(m_pCamera->GetDirection());
+	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), noPos, false, Game::e_BossAttackKind::kBossAttackNone);
+	
+	m_pBossTutorial->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+
 	//ボスの攻撃座標や半径を取得
 	m_pPlayer->HitUpdate(m_pBossTutorial->GetHitPos(), m_pBossTutorial->GetAttackPos(),
 		m_pBossTutorial->GetAttackPos(), m_pBossTutorial->GetShockPos(), m_pBossTutorial->GetHitRadius(),
 		m_pBossTutorial->GetAttackRadius(), m_pBossTutorial->GetWeaponRadius(), m_pBossTutorial->GetShockRadius(),
 		m_pBossTutorial->GetIsAttack());
-
-	//ボスの攻撃座標や半径を取得
-	m_pPlayer->HitUpdate(m_pEnemyNormal->GetHitPos(), m_pEnemyNormal->GetAttackPos(),
-		m_pEnemyNormal->GetAttackPos(), m_pEnemyNormal->GetShockPos(), m_pEnemyNormal->GetHitRadius(),
-		m_pEnemyNormal->GetAttackRadius(), m_pEnemyNormal->GetWeaponRadius(), m_pEnemyNormal->GetShockRadius(),
-		m_pEnemyNormal->GetIsAttack());
 
 	//プレイヤーの攻撃座標や半径を取得
 	m_pBossTutorial->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(),
@@ -449,14 +379,9 @@ void SceneTutorial::Update()
 
 	m_pSkyDome->Update();
 
-	m_pCamera->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), false);
-	m_pPlayer->SetCameraDirection(m_pCamera->GetDirection());
-	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), noPos, false, Game::e_BossAttackKind::kBossAttackNone);
+	//m_pEnemyNormal->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+	//m_pEnemySpecial->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 
-	m_pEnemyNormal->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
-	m_pEnemySpecial->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
-
-	m_pBossTutorial->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
 
 	m_pPhysics->Update();
 
@@ -486,8 +411,8 @@ void SceneTutorial::Draw()
 
 	//影を描画するための球体
 	DrawSphere3D(VGet(m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + 5.0f, m_pPlayer->GetPos().z), 3.0f, 128, 0xffffff, 0xffffff, false);
-	DrawSphere3D(VGet(m_pEnemyNormal->GetPosDown().x, m_pEnemyNormal->GetPosDown().y + 5.0f, m_pEnemyNormal->GetPosDown().z), 3.0f, 128, 0xffffff, 0xffffff, false);
-	DrawSphere3D(VGet(m_pEnemySpecial->GetPosDown().x, m_pEnemySpecial->GetPosDown().y + 5.0f, m_pEnemySpecial->GetPosDown().z), 3.0f, 128, 0xffffff, 0xffffff, false);
+	//DrawSphere3D(VGet(m_pEnemyNormal->GetPosDown().x, m_pEnemyNormal->GetPosDown().y + 5.0f, m_pEnemyNormal->GetPosDown().z), 3.0f, 128, 0xffffff, 0xffffff, false);
+	//DrawSphere3D(VGet(m_pEnemySpecial->GetPosDown().x, m_pEnemySpecial->GetPosDown().y + 5.0f, m_pEnemySpecial->GetPosDown().z), 3.0f, 128, 0xffffff, 0xffffff, false);
 	DrawSphere3D(VGet(m_pBossTutorial->GetPosDown().x, m_pBossTutorial->GetPosDown().y + 5.0f, m_pBossTutorial->GetPosDown().z), 5.0f, 128, 0xffffff, 0xffffff, false);
 
 	ShadowMap_DrawEnd();	//シャドウマップ描画終了
@@ -499,8 +424,8 @@ void SceneTutorial::Draw()
 	SetUseShadowMap(0, -1);	// シャドウマップの反映終了
 
 	m_pPlayer->Draw(*m_pPlayerWeapon);
-	m_pEnemyNormal->Draw();
-	m_pEnemySpecial->Draw();
+	//m_pEnemyNormal->Draw();
+	//m_pEnemySpecial->Draw();
 	m_pBossTutorial->Draw();
 
 	EffectManager::GetInstance().Draw();

@@ -126,7 +126,7 @@ std::shared_ptr<ColliderData> Collidable::CreateColliderData(ColliderData::e_Kin
 	}
 
 	//当たり判定を追加する
-	m_pColliderData.emplace_back(create);
+	//m_pColliderData.emplace_back(create);
 
 	return create;
 }
