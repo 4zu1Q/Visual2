@@ -22,7 +22,32 @@ public:
 	/// </summary>
 	virtual void Draw() override final;	//毎フレーム行う描画処理
 
+private:
+	//遷移先
+	enum class e_SceneTrans : int
+	{
+		kRestart,				//リスタート
+		kOption,				//オプション
+		kSelect,				//セレクト
+		kTitle,					//タイトル
+	};
 
+	//enum変数
+	e_SceneTrans m_sceneTrans;
+
+	//画像ハンドルこれで全ての画像をロードする
+	std::vector<int> m_handles;
+
+	int m_fontH;
+
+	//画像ハンドル
+	int m_pauseHandle;
+	float m_selectAnimation;
+
+	//カーソル座標
+	Vec2 m_cursorPos;
+	Vec2 m_targetCursorUpPos;
+	Vec2 m_targetCursorDownPos;
 
 
 };

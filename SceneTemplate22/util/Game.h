@@ -107,6 +107,7 @@ namespace Game
 	{
 		kPlayer,			// プレイヤー
 		kCamera,			// カメラ
+		kAttack,			// 攻撃
 		
 		kItemHp,			// アイテム(体力回復用)
 		kItemMp,			// アイテム(魔力回復用)
@@ -123,18 +124,19 @@ namespace Game
 	};
 
 	//チュートリアル進行用のenum
-	enum class e_TutorialProgress
+	enum e_TutorialProgress
 	{
-		kNone,
-		kOne,		//仮
-		kTwo,		//仮
-		kThree,		//仮
-		kFour,		//仮
-		kFive,		//仮
-		kSix,		//仮
-		kSeven,		//仮
-		kEight,		//仮
-		kNine,		//仮
+		kTutorialStart,			//始まって10秒後
+		kTutorialJump,			//ジャンプ
+		kTutorialJumpClear,		//ジャンプクリア
+		kTutorialDashJump,		//ダッシュジャンプ
+		kTutorialDashJumpClear,	//ダッシュジャンプクリア
+		kTutorialAttackX,		//通常攻撃
+		kTutorialAttackXClear,	//通常攻撃クリア
+		kTutorialAttackY,		//特殊攻撃
+		kTutorialAttackYClear,	//特殊攻撃クリア
+		kTutorialBoss,			//ボス戦
+		kTutorialBossClear,		//ボス戦クリア
 	};
 
 }

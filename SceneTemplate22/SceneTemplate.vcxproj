@@ -151,6 +151,7 @@
     <ClCompile Include="myLib\DebugDraw.cpp" />
     <ClCompile Include="myLib\Physics.cpp" />
     <ClCompile Include="myLib\Rigidbody.cpp" />
+    <ClCompile Include="object\Attack.cpp" />
     <ClCompile Include="object\boss\BossBase.cpp" />
     <ClCompile Include="object\boss\BossPower.cpp" />
     <ClCompile Include="object\boss\BossRast.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="myLib\MyLib.h" />
     <ClInclude Include="myLib\Physics.h" />
     <ClInclude Include="myLib\Rigidbody.h" />
+    <ClInclude Include="object\Attack.h" />
     <ClInclude Include="object\boss\BossBase.h" />
     <ClInclude Include="object\boss\BossPower.h" />
     <ClInclude Include="object\boss\BossRast.h" />

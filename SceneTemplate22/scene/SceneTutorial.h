@@ -69,6 +69,8 @@ private:
 	int m_fontH;	//フォントハンドル
 	int m_shadowMap;	//シャドウマップハンドル
 
+	int m_tutorialFrame;
+
 	int m_effectFrame;	//エフェクトのフレーム
 
 	//ステージ移動する当たり判定フラグ

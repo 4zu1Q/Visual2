@@ -81,6 +81,11 @@ namespace MyLib
 		void FixPositionWithWall(std::shared_ptr<Collidable>& col);
 
 		/// <summary>
+		/// 
+		/// </summary>
+		void PushOutFromCollision(std::shared_ptr<Collidable>& col, const VECTOR& normal, float pushDistance);
+
+		/// <summary>
 		/// 壁の中から押し出す
 		/// </summary>
 		/// <param name="col">登録したコライダー情報</param>

@@ -27,7 +27,7 @@ namespace
 
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 350.0f,-35.0f,0 };
+	constexpr VECTOR kInitPos = { 376.0f,-358.0f,-360.0f };
 
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
@@ -328,7 +328,7 @@ void EnemySpecial::IdleUpdate()
 	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
 	if (m_actionTime > kIdleToAttackTime && m_length > kIdleToAttackLength)
 	{
-		OnWalk();
+		//OnWalk();
 	}
 	//プレイヤーと十分な距離の場合 && タイマー
 	else if (m_actionTime > kIdleToAvoidTime && m_length < kIdleToAttackLength)

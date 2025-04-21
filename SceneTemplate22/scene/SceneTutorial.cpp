@@ -56,17 +56,6 @@ namespace
 		kRastClearItemH,
 	};
 
-	//
-	enum e_Tutorial
-	{
-		kTutorialStart,	//
-		kTutorialWalk,
-		kTutorialJump,
-		kTutorialDashJump,
-		kTutorialAttackX,
-		kTutorialAttackY,
-		kTutorialClear,
-	};
 
 	//フォントのパス
 	const char* kFontPath = "Data/Font/Dela-Gothic-One.ttf";
@@ -76,15 +65,23 @@ namespace
 
 	//エフェクトを出すフレーム数
 	constexpr int kEffectFrame = 190;
+	//チュートリアルのフレーム数
+	constexpr int kTutorialFrame = 60;
+	constexpr int kTutorialBossFrame = 180;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 400.0f,-35.0f,740.0f };
 	constexpr VECTOR kLookPos = { -100.0f,30.0f,500.0f };
 
-	constexpr VECTOR kPowerTrianglePos = { 296.0f, 18.0f, 340.0f };
-	constexpr VECTOR kSpeedTrianglePos = { 520.0f,18.0f,338.0f };
-	constexpr VECTOR kShotTrianglePos = { 406.0f,18.0f,112.0f };
-
+	//チュートリアルの説明を行う位置
+	constexpr float kTutorialJumpPosZ = 620.0f;
+	constexpr float kTutorialJumpClearPosZ =506.0f;
+	constexpr float kTutorialDashJumpPosZ = 317.0f;
+	constexpr float kTutorialDashJumpClearPosZ = 88.0f;
+	constexpr float kTutorialAttackXPosZ = -9.0f;
+	constexpr float kTutorialAttackYPosZ = -242.0f;
+	constexpr float kTutorialBossBattlePosZ = -455.0f;
+	constexpr float kTutorialSelectPosZ = -843.0f;
 
 	//ボスに行く部屋に表示される画像の座標
 	const Vec2 kHitPos = { 440.0f , 480.0f };
@@ -99,7 +96,8 @@ namespace
 	const Vec2 kHitAdjustmentUpPos = { 25.0f , 80.0f };
 
 	//プレイヤーの最初の位置
-	constexpr VECTOR kPlayerPos = { 350.0f,-35.0f,0 };
+	constexpr VECTOR kPlayerPos = { 383.0f,-410.0f,670.0f };
+	constexpr VECTOR kSelectPlayerPos = { 400.0f,-35.0f,740.0f };
 
 	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
 	const VECTOR kShadowAreaMinPos = { -10000.0f, -500.0f, -10000.0f };		// シャドウマップに描画する最小範囲
@@ -134,6 +132,7 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 
 	m_isToNextScene = false;
 	m_effectFrame = 0;
+	m_tutorialFrame = 0;
 
 	m_pPlayer->Initialize(m_pPhysics, kPlayerPos, *m_pPlayerWeapon);
 	m_pEnemyNormal->Initialize(m_pPhysics);
@@ -161,6 +160,11 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_handles.push_back(LoadGraph("Data/Image/ClearStar.png"));
 
 	//チュートリアルの時に使うフラグ
+	m_isTutorial.push_back(false);
+	m_isTutorial.push_back(false);
+	m_isTutorial.push_back(false);
+	m_isTutorial.push_back(false);
+	m_isTutorial.push_back(false);
 	m_isTutorial.push_back(false);
 	m_isTutorial.push_back(false);
 	m_isTutorial.push_back(false);
@@ -219,19 +223,169 @@ void SceneTutorial::Update()
 	SoundManager::GetInstance().PlayBgm("selectBgm", true);
 
 
-	//1回だけチュートリアルの説明を入れるためのフラグ
-	if (!m_isTutorial[1])
-	{
-		//円の当たり判定かなんかで入ったらチュートリアルの説明を入れる
-		if (m_isTutorial[1])
-		{
-			//もうチュートリアルを行わないよう
-			m_isTutorial[1] = true;
-			//セリフシーンに飛んで、解説する、Game.hにenumでチュートリアルを入れておく
-			//m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
 
+	//1回だけチュートリアルの説明を入れるためのフラグ
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialStart])
+	{
+		m_tutorialFrame++;
+
+		//ゲームを開始して2秒後にチュートリアルの説明を入れる
+		if (m_tutorialFrame >= kTutorialFrame)
+		{
+
+			//もうチュートリアルを行わないよう
+			m_isTutorial[Game::e_TutorialProgress::kTutorialStart] = true;
+			m_tutorialFrame = 0;
+			//セリフシーンに飛んで、解説する、Game.hにenumでチュートリアルを入れておく
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+		}
+
+	}
+	
+	//ジャンプする位置に行ったらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialJump])
+	{
+
+		if (m_pPlayer->GetPos().z <= kTutorialJumpPosZ)
+		{
+			m_isTutorial[Game::e_TutorialProgress::kTutorialJump] = true;
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
 		}
 	}
+
+	//ジャンプして位置に行ったらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialJumpClear])
+	{
+		if (m_pPlayer->GetPos().z <= kTutorialJumpClearPosZ)
+		{
+			m_tutorialFrame++;
+
+			if (m_tutorialFrame >= kTutorialFrame)
+			{
+				m_isTutorial[Game::e_TutorialProgress::kTutorialJumpClear] = true;
+				m_tutorialFrame = 0;
+				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			}
+		}
+	}
+
+	//歩いて位置まで行ったらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialDashJump])
+	{
+		if (m_pPlayer->GetPos().z <= kTutorialDashJumpPosZ)
+		{
+			m_isTutorial[Game::e_TutorialProgress::kTutorialDashJump] = true;
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+		}
+	}
+	
+	//ダッシュジャンプで位置まで行ったらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialDashJumpClear])
+	{
+		if (m_pPlayer->GetPos().z <= kTutorialDashJumpClearPosZ)
+		{
+			m_tutorialFrame++;
+
+			if (m_tutorialFrame >= kTutorialFrame)
+			{
+				m_isTutorial[Game::e_TutorialProgress::kTutorialDashJumpClear] = true;
+				m_tutorialFrame = 0;
+				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			}
+		}
+	}
+
+	//通常攻撃する位置に行ったらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialAttackX])
+	{
+		if (m_pPlayer->GetPos().z <= kTutorialAttackXPosZ)
+		{
+			m_isTutorial[Game::e_TutorialProgress::kTutorialAttackX] = true;
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+		}
+	}
+
+	//敵を倒したらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialAttackXClear])
+	{
+		if (m_pEnemyNormal->GetHp() <= 0.0f)
+		{
+			m_tutorialFrame++;
+
+			if (m_tutorialFrame >= kTutorialFrame)
+			{
+				m_isTutorial[Game::e_TutorialProgress::kTutorialAttackXClear] = true;
+				m_tutorialFrame = 0;
+				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			}
+		}
+	}
+
+	//特殊攻撃する位置に行ったらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialAttackY])
+	{
+		if (m_pPlayer->GetPos().z <= kTutorialAttackYPosZ)
+		{
+			m_isTutorial[Game::e_TutorialProgress::kTutorialAttackY] = true;
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+		}
+	}
+
+	//敵を倒したらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialAttackYClear])
+	{
+		if (m_pEnemySpecial->GetHp() <= 0.0f)
+		{
+			m_tutorialFrame++;
+
+			if (m_tutorialFrame >= kTutorialFrame)
+			{
+				m_isTutorial[Game::e_TutorialProgress::kTutorialAttackYClear] = true;
+				m_tutorialFrame = 0;
+				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			}
+		}
+	}
+
+	//ボス戦する位置に行ったらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialBoss])
+	{
+		if (m_pPlayer->GetPos().z <= kTutorialBossBattlePosZ)
+		{
+			m_isTutorial[Game::e_TutorialProgress::kTutorialBoss] = true;
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+		}
+	}
+
+	//ボスを倒したらチュートリアルの説明を入れる
+	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialBossClear])
+	{
+		if (m_pBossTutorial->GetHp() <= 0.0f)
+		{
+			m_tutorialFrame++;
+
+			if (m_tutorialFrame >= kTutorialBossFrame)
+			{
+				m_isTutorial[Game::e_TutorialProgress::kTutorialBossClear] = true;
+				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			}
+		}
+	}
+
+	//ボスを倒したらステージセレクトに移動
+	//if (m_isTutorial[Game::e_TutorialProgress::kTutorialBossClear])
+	{
+		if (m_pPlayer->GetPos().z <= kTutorialSelectPosZ)
+		{
+			if (Pad::IsTrigger(PAD_INPUT_1))
+			{
+				SoundManager::GetInstance().PlaySe("gamePlayTransSe");
+				StartFadeOut();
+				m_isToNextScene = true;
+			}
+		}
+	}
+
 
 
 	if (m_effectFrame % kEffectFrame == 0)
@@ -275,8 +429,25 @@ void SceneTutorial::Update()
 	//ロックオンするのがいないため
 	VECTOR noPos = VGet(0, 0, 0);
 
+	//ボスの攻撃座標や半径を取得
+	m_pPlayer->HitUpdate(m_pBossTutorial->GetHitPos(), m_pBossTutorial->GetAttackPos(),
+		m_pBossTutorial->GetAttackPos(), m_pBossTutorial->GetShockPos(), m_pBossTutorial->GetHitRadius(),
+		m_pBossTutorial->GetAttackRadius(), m_pBossTutorial->GetWeaponRadius(), m_pBossTutorial->GetShockRadius(),
+		m_pBossTutorial->GetIsAttack());
+
+	//ボスの攻撃座標や半径を取得
+	m_pPlayer->HitUpdate(m_pEnemyNormal->GetHitPos(), m_pEnemyNormal->GetAttackPos(),
+		m_pEnemyNormal->GetAttackPos(), m_pEnemyNormal->GetShockPos(), m_pEnemyNormal->GetHitRadius(),
+		m_pEnemyNormal->GetAttackRadius(), m_pEnemyNormal->GetWeaponRadius(), m_pEnemyNormal->GetShockRadius(),
+		m_pEnemyNormal->GetIsAttack());
+
+	//プレイヤーの攻撃座標や半径を取得
+	m_pBossTutorial->HitUpdate(m_pPlayer->GetAttackXPos(), m_pPlayer->GetAttackYPos(),
+		m_pPlayer->GetShockPos(), m_pPlayer->GetAttackXRadius(), m_pPlayer->GetAttackYRadius(),
+		m_pPlayer->GetShockRadius(), m_pPlayer->GetIsAttack());
+
+
 	m_pSkyDome->Update();
-	//m_pTomb->Update();
 
 	m_pCamera->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), false);
 	m_pPlayer->SetCameraDirection(m_pCamera->GetDirection());
@@ -301,7 +472,7 @@ void SceneTutorial::Update()
 	{
 		if (!IsFadingOut())
 		{
-			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerPos));
+			m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kSelectPlayerPos));
 			return;
 		}
 	}
@@ -350,6 +521,8 @@ void SceneTutorial::Draw()
 
 #ifdef _DEBUG
 	DrawString(0, 0, "Scene Select", 0xffffff, false);
+
+	DrawFormatString(0, 600, 0xffffff,"%d", m_tutorialFrame);
 	m_pCamera->Draw();
 #endif
 }
