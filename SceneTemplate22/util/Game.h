@@ -63,7 +63,6 @@ namespace Game
 		kBossAttack,	//手の攻撃
 		kBossShock,		//衝撃波の攻撃
 		kBossWeapon,	//武器の攻撃
-		kBossShot,		//玉の攻撃
 	};
 
 	//敵の攻撃種類
@@ -131,12 +130,11 @@ namespace Game
 		kTutorialJumpClear,		//ジャンプクリア
 		kTutorialDashJump,		//ダッシュジャンプ
 		kTutorialDashJumpClear,	//ダッシュジャンプクリア
-		kTutorialAttackX,		//通常攻撃
-		kTutorialAttackXClear,	//通常攻撃クリア
-		kTutorialAttackY,		//特殊攻撃
-		kTutorialAttackYClear,	//特殊攻撃クリア
+		kTutorialAction,		//一通りのアクション
+		kTutorialActionClear,	//一通りのアクションクリア
 		kTutorialBoss,			//ボス戦
 		kTutorialBossClear,		//ボス戦クリア
+		kTutorialMask,			//マスクを拾ったとき
 	};
 
 }

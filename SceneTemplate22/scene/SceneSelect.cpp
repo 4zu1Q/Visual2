@@ -92,6 +92,9 @@ namespace
 
 	constexpr float kShadowColor = 0.7f;
 	constexpr float kShadowAlpha = 0.3f;
+
+	constexpr float kPlayerAngle = 0.014954f;
+	constexpr float kCameraAngleH = 1.562750f;
 }
 
 
@@ -125,12 +128,12 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind, VE
 
 	m_pTomb->Initialize(kPowerTrianglePos, kSpeedTrianglePos, kShotTrianglePos);
 
-	m_pPlayer->Initialize(m_pPhysics, playerPos, *m_pPlayerWeapon);
+	m_pPlayer->Initialize(m_pPhysics, playerPos, *m_pPlayerWeapon, kPlayerAngle);
 	m_pItemHp->Initialize(m_pPhysics);
 	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
-	m_pCamera->Initialize(m_pPlayer->GetPos());
+	m_pCamera->Initialize(m_pPlayer->GetPos(),kCameraAngleH);
 
 	m_isPowerStage = false;
 	m_isSpeedStage = false;

@@ -21,11 +21,6 @@ Collidable::Collidable(e_Priority priority, Game::e_GameObjectTag tag, ColliderD
 /// </summary>
 Collidable::~Collidable()
 {
-	//if (m_colliderData != nullptr)
-	//{
-	//	delete m_colliderData;
-	//	m_colliderData = nullptr;
-	//}
 }
 
 /// <summary>

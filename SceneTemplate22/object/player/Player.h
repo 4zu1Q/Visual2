@@ -39,7 +39,7 @@ public:
 	Player();
 	virtual ~Player();
 
-	void Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon);
+	void Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon, float angle);
 	void Finalize(std::shared_ptr<MyLib::Physics> physics);
 
 	void Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapon, float cameraAngleX, VECTOR bossPos, bool isLockOn, Game::e_BossAttackKind bossAttackKind);

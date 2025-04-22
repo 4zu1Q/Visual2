@@ -6,7 +6,6 @@
 #include "scene/SceneSelect.h"
 #include "scene/SceneOption.h"
 
-#include "util/Game.h"
 #include "util/Pad.h"
 #include "util/Font.h"
 #include "util/SoundManager.h"
@@ -61,12 +60,56 @@ namespace
 
 	constexpr float kShadowColor = 0.7f;
 	constexpr float kShadowAlpha = 0.3f;
+
+	enum e_Ui
+	{
+		kStart01H,
+		kStart02H,
+		kStart03H,
+		kStart04H,
+		kStart05H,
+		kJump01H,
+		kJumpClear01H,
+		kDashJump01H,
+		kDashJumpClear01H,
+		kActionClear01H,
+		kBattle01H,
+		kBattle02H,
+		kBattle03H,
+		kBattleClear01H,
+		kBattleClear02H,
+		kMask01H,
+		kMask02H,
+		kCursorH,
+		kSerihuH,
+	};
 }
 
-SceneWords::SceneWords(SceneManager& manager):
-	SceneBase(manager)
-
+SceneWords::SceneWords(SceneManager& manager, Game::e_TutorialProgress progress):
+	SceneBase(manager),
+	m_wordsNum(0),
+	m_skipTime(0)
 {
+	//m_tutorialProgress = progress;
+
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start02.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start03.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start04.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start05.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Jump01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Jump02.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/DashJump01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/DashJump02.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/ActionClear01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Battle01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Battle02.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Battle03.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Battle04.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Battle05.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Mask01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Mask02.png"));
+	m_handles.push_back(LoadGraph("Data/Image/messageCursor.png"));
 	m_handles.push_back(LoadGraph("Data/Image/TutorialSerihu.png"));
 
 	m_fontH = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", 32);
@@ -88,6 +131,78 @@ SceneWords::~SceneWords()
 void SceneWords::Update()
 {
 	Pad::Update();
+	UpdateFade();
+	UpdateFadeSelectGraph();
+	UpdateFadeGraphTitleLogo();
+
+	//タイマーを使う
+	m_skipTime++;
+
+	if (m_skipTime > 60)
+	{
+		if (Pad::IsTrigger(PAD_INPUT_1))
+		{
+			m_wordsNum++;	//プラス1
+			m_skipTime = 0;	//スキップタイムをリセット
+		}
+
+	}
+
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialStart)
+	{
+		//メンバ関数ポインタでチュートリアルスタートの関数に移動する
+		Next();	
+		CloseWords(4);
+
+	}
+	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJump)
+	{
+		Next();
+		CloseWords(0);
+
+	}
+	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJumpClear)
+	{
+		Next();
+		CloseWords(0);
+
+	}
+	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJump)
+	{
+		Next();
+		CloseWords(0);
+
+	}
+	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJumpClear)
+	{
+		Next();
+		CloseWords(0);
+
+	}
+	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialActionClear)
+	{
+		Next();
+		CloseWords(0);
+
+	}
+	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBoss)
+	{
+		Next();
+		CloseWords(2);
+
+	}
+	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBossClear)
+	{
+		Next();
+		CloseWords(1);
+
+	}
+	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialMask)
+	{
+		Next();
+		CloseWords(1);
+
+	}
 
 	//スタートボタンを押した場合
 	if (Pad::IsTrigger(PAD_INPUT_8))
@@ -100,9 +215,147 @@ void SceneWords::Update()
 
 void SceneWords::Draw()
 {
-	DrawGraph(130, 50, m_handles[0], true);
-	//DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0xffffff, true);
+	DrawGraph(130, 50, m_handles[kSerihuH], true);
 
-	DrawFormatStringToHandle(300, 100, 0xffffff, m_fontH, "TEST");
+	switch (m_tutorialProgress)
+	{
+
+	case Game::e_TutorialProgress::kTutorialStart:
+		
+		//Aボタンを押したら次のセリフに行く
+		if (m_wordsNum == 0)
+		{
+			DrawGraph(130, 50, m_handles[kStart01H], true);
+		}
+		else if (m_wordsNum == 1)
+		{
+			DrawGraph(130, 50, m_handles[kStart02H], true);
+		}
+		else if (m_wordsNum == 2)
+		{
+			DrawGraph(130, 50, m_handles[kStart03H], true);
+		}
+		else if (m_wordsNum == 3)
+		{
+			DrawGraph(130, 50, m_handles[kStart04H], true);
+		}
+		else if (m_wordsNum == 4)
+		{
+			DrawGraph(130, 50, m_handles[kStart05H], true);
+		}
+
+		//switch (m_wordsNum)
+		//{
+		//case 0:
+		//	DrawGraph(130, 50, m_handles[kStart01H], true);
+		//	break;
+		//case 1:
+		//	DrawGraph(130, 50, m_handles[kStart02H], true);
+		//	break;
+		//case 2:
+		//	DrawGraph(130, 50, m_handles[kStart03H], true);
+		//	break;
+		//case 3:
+		//	DrawGraph(130, 50, m_handles[kStart04H], true);
+		//	break;
+		//case 4:
+		//	DrawGraph(130, 50, m_handles[kStart05H], true);
+		//	break;
+		//default:
+		//	break;
+		//}
+
+		break;
+	case Game::e_TutorialProgress::kTutorialJump:
+		DrawGraph(130, 50, m_handles[kJump01H], true);
+
+		break;
+	case Game::e_TutorialProgress::kTutorialJumpClear:
+		DrawGraph(130, 50, m_handles[kJumpClear01H], true);
+
+		break;
+	case Game::e_TutorialProgress::kTutorialDashJump:
+		DrawGraph(130, 50, m_handles[kDashJump01H], true);
+
+		break;
+	case Game::e_TutorialProgress::kTutorialDashJumpClear:
+		DrawGraph(130, 50, m_handles[kDashJumpClear01H], true);
+
+		break;
+	case Game::e_TutorialProgress::kTutorialActionClear:
+		DrawGraph(130, 50, m_handles[kActionClear01H], true);
+
+		break;
+	case Game::e_TutorialProgress::kTutorialBoss:
+
+		switch (m_wordsNum)
+		{
+		case 0:
+			DrawGraph(130, 50, m_handles[kBattle01H], true);
+			break;
+		case 1:
+			DrawGraph(130, 50, m_handles[kBattle02H], true);
+			break;
+		case 2:
+			DrawGraph(130, 50, m_handles[kBattle03H], true);
+			break;
+		default:
+			break;
+		}
+
+		break;
+	case Game::e_TutorialProgress::kTutorialBossClear:
+
+		switch (m_wordsNum)
+		{
+		case 0:
+			DrawGraph(130, 50, m_handles[kBattleClear01H], true);
+			break;
+		case 1:
+			DrawGraph(130, 50, m_handles[kBattleClear02H], true);
+			break;
+		}
+
+		break;
+	case Game::e_TutorialProgress::kTutorialMask:
+
+		switch (m_wordsNum)
+		{
+		case 0:
+			DrawGraph(130, 50, m_handles[kMask01H], true);
+			break;
+		case 1:
+			DrawGraph(130, 50, m_handles[kMask02H], true);
+			break;
+		}
+
+		break;
+	default:
+		break;
+	}
+
+	//タイムが以上になったら表示
+	if (m_skipTime > 60)
+	{
+		DrawGraph(130, 50, m_handles[kCursorH], true);
+	}
+
+	//DrawFormatStringToHandle(300, 100, 0xffffff, m_fontH, "TEST");
 
 }
+
+
+
+void SceneWords::Next()
+{
+
+}
+
+void SceneWords::CloseWords(int wordsNum)
+{
+	if (m_wordsNum == wordsNum)
+	{
+		m_pManager.PopScene();
+	}
+}
+

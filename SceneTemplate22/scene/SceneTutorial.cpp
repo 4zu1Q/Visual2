@@ -106,6 +106,10 @@ namespace
 
 	constexpr float kShadowColor = 0.7f;
 	constexpr float kShadowAlpha = 0.3f;
+
+	constexpr float kPlayerAngle = 0.014954f;
+	constexpr float kCameraAngleH = 1.562750f;
+
 }
 
 SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind) :
@@ -134,7 +138,7 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_effectFrame = 0;
 	m_tutorialFrame = 0;
 
-	m_pPlayer->Initialize(m_pPhysics, kPlayerPos, *m_pPlayerWeapon);
+	m_pPlayer->Initialize(m_pPhysics, kPlayerPos, *m_pPlayerWeapon, kPlayerAngle);
 	//m_pEnemyNormal->Initialize(m_pPhysics);
 	//m_pEnemySpecial->Initialize(m_pPhysics);
 	
@@ -142,7 +146,7 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 
 	m_pField->Initialize();
 
-	m_pCamera->Initialize(m_pPlayer->GetPos());
+	m_pCamera->Initialize(m_pPlayer->GetPos(), kCameraAngleH);
 
 	//タイトルのBgmが流れていたら止める用
 	SoundManager::GetInstance().StopBgm("selectBgm");
@@ -237,7 +241,7 @@ void SceneTutorial::Update()
 			m_isTutorial[Game::e_TutorialProgress::kTutorialStart] = true;
 			m_tutorialFrame = 0;
 			//セリフシーンに飛んで、解説する、Game.hにenumでチュートリアルを入れておく
-			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager,Game::e_TutorialProgress::kTutorialStart));
 		}
 
 	}
@@ -249,7 +253,7 @@ void SceneTutorial::Update()
 		if (m_pPlayer->GetPos().z <= kTutorialJumpPosZ)
 		{
 			m_isTutorial[Game::e_TutorialProgress::kTutorialJump] = true;
-			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager, Game::e_TutorialProgress::kTutorialJump));
 		}
 	}
 
@@ -264,7 +268,7 @@ void SceneTutorial::Update()
 			{
 				m_isTutorial[Game::e_TutorialProgress::kTutorialJumpClear] = true;
 				m_tutorialFrame = 0;
-				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager, Game::e_TutorialProgress::kTutorialJumpClear));
 			}
 		}
 	}
@@ -275,7 +279,7 @@ void SceneTutorial::Update()
 		if (m_pPlayer->GetPos().z <= kTutorialDashJumpPosZ)
 		{
 			m_isTutorial[Game::e_TutorialProgress::kTutorialDashJump] = true;
-			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager, Game::e_TutorialProgress::kTutorialDashJump));
 		}
 	}
 	
@@ -290,7 +294,7 @@ void SceneTutorial::Update()
 			{
 				m_isTutorial[Game::e_TutorialProgress::kTutorialDashJumpClear] = true;
 				m_tutorialFrame = 0;
-				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager, Game::e_TutorialProgress::kTutorialDashJumpClear));
 			}
 		}
 	}
@@ -301,7 +305,7 @@ void SceneTutorial::Update()
 		if (m_pPlayer->GetPos().z <= kTutorialBossBattlePosZ)
 		{
 			m_isTutorial[Game::e_TutorialProgress::kTutorialBoss] = true;
-			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+			m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager, Game::e_TutorialProgress::kTutorialBoss));
 		}
 	}
 
@@ -315,7 +319,7 @@ void SceneTutorial::Update()
 			if (m_tutorialFrame >= kTutorialBossFrame)
 			{
 				m_isTutorial[Game::e_TutorialProgress::kTutorialBossClear] = true;
-				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager));
+				m_pManager.PushScene(std::make_shared<SceneWords>(m_pManager, Game::e_TutorialProgress::kTutorialBossClear));
 			}
 		}
 	}

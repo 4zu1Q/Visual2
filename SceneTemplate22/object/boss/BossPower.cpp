@@ -67,6 +67,9 @@ namespace
 	//攻撃の種類
 	constexpr int kAttackKind = 3;
 
+	//攻撃の回数
+	constexpr int kAttackNum = 3;
+
 }
 
 BossPower::BossPower():
@@ -295,10 +298,8 @@ void BossPower::Hit()
 	{
 		if (m_isPlayerAttack)
 		{
-
 			if (!m_isHit)
 			{
-
 				if (IsAttackXHit() == true && m_playerAttackKind == Game::e_PlayerAttackKind::kPlayerAttackX)
 				{
 					OnHitOneDamage();
@@ -457,7 +458,7 @@ void BossPower::PreliminaryAttack1Update()
 
 	if (m_preliminaryActionFrame > 15)
 	{
-		OnAttack1();
+		OnAxeAttack();
 	}
 }
 
@@ -471,7 +472,7 @@ void BossPower::PreliminaryAttack2Update()
 
 	if (m_preliminaryActionFrame > 15)
 	{
-		OnAttack2();
+		OnTwoHandedAttack();
 	}
 }
 
@@ -485,11 +486,11 @@ void BossPower::PreliminaryAttack3Update()
 
 	if (m_preliminaryActionFrame > 15)
 	{
-		OnAttack3();
+		OnJumpAttack();
 	}
 }
 
-void BossPower::Attack1Update()
+void BossPower::AxeAttackUpdate()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -509,7 +510,7 @@ void BossPower::Attack1Update()
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
 }
 
-void BossPower::Attack2Update()
+void BossPower::TwoHandedAttackUpdate()
 {
 	Hit();
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
@@ -548,33 +549,6 @@ void BossPower::Attack3Update()
 		OnAttackCoolTime();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
-}
-
-void BossPower::AvoidUpdate()
-{
-	Hit();
-
-
-	m_actionTime++;
-
-	//プレイヤーへの向きを取得
-	m_direction = VSub(m_playerPos, m_pos);
-	//正規化
-	m_direction = VNorm(m_direction);
-	//モデルの角度
-	m_angle = atan2f(m_direction.x, m_direction.z);
-
-	//ベクトルを、正規化し、向きだけを保存させる
-	m_velocity = VScale(m_direction, -kAvoidSpeed);
-
-	//敵の移動
-	m_rigidbody.SetVelocity(m_velocity);
-
-	//アニメーションが終わったらアイドル状態に戻る
-	if (m_actionTime > kAvoidToIdleTime)
-	{
-		OnIdle();
-	}
 }
 
 void BossPower::AttackCoolTimeUpdate()
@@ -718,7 +692,7 @@ void BossPower::OnPreliminaryAttack3()
 	m_updateFunc = &BossPower::PreliminaryAttack3Update;
 }
 
-void BossPower::OnAttack1()
+void BossPower::OnAxeAttack()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
@@ -732,10 +706,10 @@ void BossPower::OnAttack1()
 	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
-	m_updateFunc = &BossPower::Attack1Update;
+	m_updateFunc = &BossPower::AxeAttackUpdate;
 }
 
-void BossPower::OnAttack2()
+void BossPower::OnTwoHandedAttack()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
@@ -746,13 +720,13 @@ void BossPower::OnAttack2()
 	m_preliminaryActionFrame = 0;
 	m_isAttack = true;
 
-	m_attackKind = Game::e_BossAttackKind::kBossAttack;
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
-	m_updateFunc = &BossPower::Attack2Update;
+	m_updateFunc = &BossPower::TwoHandedAttackUpdate;
 }
 
-void BossPower::OnAttack3()
+void BossPower::OnJumpAttack()
 {
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 
@@ -767,17 +741,6 @@ void BossPower::OnAttack3()
 
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	m_updateFunc = &BossPower::Attack3Update;
-}
-
-void BossPower::OnAvoid()
-{
-	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
-	m_isAttack = false;
-	m_attackFrame = 0;
-	m_actionKind = 0;
-	m_actionTime = 0;
-	m_pAnim->ChangeAnim(kAnimAvoid, true, true, false);
-	m_updateFunc = &BossPower::AvoidUpdate;
 }
 
 void BossPower::OnAttackCoolTime()
@@ -825,9 +788,9 @@ void BossPower::OnHitOneDamage()
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
-	m_pAnim->ChangeAnim(kAnimCoolTime);
-	m_updateFunc = &BossPower::HitOneDamageUpdate;
+	//EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
+	//m_pAnim->ChangeAnim(kAnimCoolTime);
+	//m_updateFunc = &BossPower::HitOneDamageUpdate;
 
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
 	//m_updateFunc = &BossPower::IdleUpdate;
@@ -865,12 +828,10 @@ void BossPower::OnHitTwoDamage()
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
-	m_pAnim->ChangeAnim(kAnimCoolTime);
-	m_updateFunc = &BossPower::HitTwoDamageUpdate;
+	//EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
+	//m_pAnim->ChangeAnim(kAnimCoolTime);
+	//m_updateFunc = &BossPower::HitTwoDamageUpdate;
 
-	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &BossPower::IdleUpdate;
 }
 
 void BossPower::OnDown()

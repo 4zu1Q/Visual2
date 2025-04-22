@@ -290,7 +290,7 @@ Player::~Player()
 	m_modelRassH = -1;
 }
 
-void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon)
+void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, PlayerWeapon& weapon, float angle)
 {
 	Collidable::Initialize(physics);
 
@@ -311,7 +311,7 @@ void Player::Initialize(std::shared_ptr<MyLib::Physics> physics, VECTOR pos, Pla
 
 	//アニメーションの初期化
 	m_pAnim->Initialize(kNormalAnimInfoFilename, m_modelH, kAnimIdle);
-	m_angle = 48.0f;
+	m_angle = angle;
 
 	// メンバ関数ポインタの初期化
 	m_updateFunc = &Player::IdleUpdate;
@@ -2381,16 +2381,15 @@ void Player::SetOnReset()
 
 void Player::SetOnDamage()
 {
+	auto pos = m_rigidbody.GetPos();
+	EffectManager::GetInstance().CreateEffect("playerHitEffect", VGet(pos.x, pos.y + 4.0f, pos.z));
+
 	//リセット処理
 	SetOnReset();
 
 	//プラスアルファでヒットした時の処理
 	m_isHitDamage = true;
 	SoundManager::GetInstance().PlaySe("damageSe");
-
-	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("hitEffect", VGet(pos.x, pos.y + 4.0f, pos.z));
-
 }
 
 void Player::SetOnJump()

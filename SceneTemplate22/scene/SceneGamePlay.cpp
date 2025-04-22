@@ -64,6 +64,10 @@ namespace
 
 	constexpr float kShadowColor = 0.7f;
 	constexpr float kShadowAlpha = 0.3f;
+
+	constexpr float kPlayerAngle = -3.149639f;
+	constexpr float kCameraAngleH = -1.562750f;
+
 }
 
 SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, Game::e_StageKind stageKind) :
@@ -103,7 +107,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
 
 	//初期位置をセット
-	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon);
+	m_pPlayer->Initialize(m_pPhysics, kInitPos, *m_pPlayerWeapon, kPlayerAngle);
 
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
@@ -126,7 +130,7 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 		m_pPlayer->BossLook(m_pBossRast->GetPosDown());
 	}
 
-	m_pCamera->Initialize(m_pPlayer->GetPos());
+	m_pCamera->Initialize(m_pPlayer->GetPos(), kCameraAngleH);
 	m_pTomb->Initialize(m_pBossPower->GetPosUp(), m_pBossSpeed->GetPosUp(), m_pBossShot->GetPosUp());
 	m_pField->Initialize();
 

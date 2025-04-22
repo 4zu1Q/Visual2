@@ -84,7 +84,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	/*エフェクトのロード*/
 
 	//プレイヤーエフェクト
-	EffectManager::GetInstance().Load("playerHitEffect", "Data/Effect/PlayerHit.efkefc", 120, 6.0f);
+	EffectManager::GetInstance().Load("playerHitEffect", "Data/Effect/BossHit.efkefc", 120, 2.0f);
 	EffectManager::GetInstance().Load("moveEffect", "Data/Effect/Move.efkefc", 120, 1.0f);
 	EffectManager::GetInstance().Load("jumpEffect", "Data/Effect/Jump.efkefc", 120, 2.0f);
 	EffectManager::GetInstance().Load("hpHitEffect", "Data/Effect/HpHeal.efkefc", 120, 5.0f);

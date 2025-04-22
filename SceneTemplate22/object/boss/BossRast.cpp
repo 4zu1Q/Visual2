@@ -26,7 +26,7 @@ namespace
 
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 0.0f,15.0f,200.0f };
+	constexpr VECTOR kInitPos = { 0.0f,13.0f,200.0f  };
 
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };

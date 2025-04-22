@@ -24,7 +24,7 @@ namespace
 	constexpr float kAvoidSpeed = 2.0f;
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 0.0f,15.0f,0.0f };
+	constexpr VECTOR kInitPos = { 0.0f,13.0f,200.0f };
 
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
@@ -71,6 +71,7 @@ namespace
 	//攻撃の種類
 	constexpr int kAttackKind = 3;
 
+	//攻撃の回数
 	constexpr int kAttackNum = 2;
 
 }
@@ -334,8 +335,6 @@ void BossSpeed::IdleUpdate()
 	m_direction = VSub(m_playerPos, m_pos);
 	m_direction = VNorm(m_direction);
 
-	//m_angle = atan2f(m_direction.x, m_direction.z);
-
 	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
 	if (m_actionTime > kIdleToAttackTime && m_bossToPlayerLength > kIdleToDashLength)
 	{
@@ -353,14 +352,18 @@ void BossSpeed::IdleUpdate()
 		{
 		case 0:
 			OnPreliminaryAttack1();
+			//OnAttack1();
 			break;
 		case 1:
+			//OnAttack2();
 			OnPreliminaryAttack2();
 			break;
 		case 2:
+			//OnAttack3();
 			OnPreliminaryAttack3();
 			break;
 		case 3:
+			//OnAttack3();
 			OnPreliminaryAttack3();
 			break;
 		default:
@@ -722,7 +725,7 @@ void BossSpeed::OnPreliminaryAttack1()
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossSpeed::PreliminaryAttack1Update;
 }
@@ -732,7 +735,7 @@ void BossSpeed::OnPreliminaryAttack2()
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossSpeed::PreliminaryAttack2Update;
 }
@@ -742,7 +745,7 @@ void BossSpeed::OnPreliminaryAttack3()
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("speedPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossSpeed::PreliminaryAttack3Update;
 }
@@ -755,7 +758,7 @@ void BossSpeed::OnAttack1()
 	m_attackNum++;
 	m_attackType = 0;
 	m_actionTime = 0;
-	m_attackKind = Game::e_BossAttackKind::kBossAttack;
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 	m_pAnim->ChangeAnim(kAnimAttack1, true, true, false);
 	m_updateFunc = &BossSpeed::Attack1Update;
 }
@@ -768,7 +771,7 @@ void BossSpeed::OnAttack2()
 	m_attackNum++;
 	m_attackType = 0;
 	m_actionTime = 0;
-	m_attackKind = Game::e_BossAttackKind::kBossAttack;
+	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
 	m_pAnim->ChangeAnim(kAnimAttack2, true, true, false);
 	m_updateFunc = &BossSpeed::Attack2Update;
 }
@@ -781,7 +784,7 @@ void BossSpeed::OnAttack3()
 	m_attackNum++;
 	m_attackType = 0;
 	m_actionTime = 0;
-	m_attackKind = Game::e_BossAttackKind::kBossWeapon;
+	m_attackKind = Game::e_BossAttackKind::kBossShock;
 	m_pAnim->ChangeAnim(kAnimAttack3, true, true, false);
 	EffectManager::GetInstance().CreateEffect("bossShockEffect", m_shockAttackPos);
 	m_updateFunc = &BossSpeed::Attack3Update;

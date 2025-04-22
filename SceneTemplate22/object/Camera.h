@@ -14,7 +14,7 @@ public:
 	Camera();
 	virtual ~Camera();
 
-	void Initialize(VECTOR playerPos);
+	void Initialize(VECTOR playerPos, float angleH);
 	void Finalize();
 
 	void Update(VECTOR playerPos, VECTOR enemyPos, int stageHandle, float playerAngle, bool isLockOn);

@@ -41,10 +41,9 @@ private:
 	void PreliminaryAttack1Update();
 	void PreliminaryAttack2Update();
 	void PreliminaryAttack3Update();
-	void Attack1Update();
-	void Attack2Update();
+	void AxeAttackUpdate();
+	void TwoHandedAttackUpdate();
 	void Attack3Update();
-	void AvoidUpdate();
 	void AttackCoolTimeUpdate();
 	void HitOneDamageUpdate();
 	void HitTwoDamageUpdate();
@@ -58,10 +57,9 @@ private:
 	void OnPreliminaryAttack1();
 	void OnPreliminaryAttack2();
 	void OnPreliminaryAttack3();
-	void OnAttack1();
-	void OnAttack2();
-	void OnAttack3();
-	void OnAvoid();
+	void OnAxeAttack();
+	void OnTwoHandedAttack();
+	void OnJumpAttack();
 	void OnAttackCoolTime();
 	void OnHitOneDamage();
 	void OnHitTwoDamage();

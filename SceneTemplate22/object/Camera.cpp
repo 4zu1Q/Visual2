@@ -73,13 +73,13 @@ Camera::~Camera()
 	DeleteLightHandle(m_lightHandle);
 }
 
-void Camera::Initialize(VECTOR playerPos)
+void Camera::Initialize(VECTOR playerPos, float angleH)
 {
 	m_lightHandle = CreateDirLightHandle(VSub(m_targetPos, m_pos));
 	SetCameraNearFar(kCameraNear, kCameraFar);
 
 	// カメラの初期水平角度は180度
-	m_angleH = 0.0f;
+	m_angleH = angleH;
 
 	// 垂直角度は0度
 	m_angleV = 0.0f;

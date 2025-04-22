@@ -25,7 +25,7 @@ namespace
 	constexpr float kAvoidSpeed = 3.0f;
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 0.0f,20.0f,200.0f };
+	constexpr VECTOR kInitPos = { 0.0f,13.0f,200.0f };
 
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
@@ -817,8 +817,8 @@ void BossShot::OnPreliminaryAttack1()
 	m_attackFrame = 0;
 	m_isAttack = false;
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
-	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(m_attackPos.x, m_attackPos.y + 6.0f, m_attackPos.z));
+	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	//EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(m_attackPos.x, m_attackPos.y + 6.0f, m_attackPos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossShot::PreliminaryAttack1Update;
 }
@@ -830,8 +830,8 @@ void BossShot::OnPreliminaryAttack2()
 	m_attackFrame = 0;
 	m_isAttack = false;
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
-	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(m_attackPos.x, m_attackPos.y + 6.0f, m_attackPos.z));
+	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	//EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(m_attackPos.x, m_attackPos.y + 6.0f, m_attackPos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossShot::PreliminaryAttack2Update;
 }
@@ -842,8 +842,8 @@ void BossShot::OnPreliminaryAttack3()
 	m_attackFrame = 0;
 	m_isAttack = false;
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
-	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(m_shockAttackPos.x, m_shockAttackPos.y + 6.0f, m_shockAttackPos.z));
+	EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
+	//EffectManager::GetInstance().CreateEffect("shotPreliminaryActionEffect", VGet(m_shockAttackPos.x, m_shockAttackPos.y + 6.0f, m_shockAttackPos.z));
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &BossShot::PreliminaryAttack3Update;
 }
