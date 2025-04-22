@@ -38,6 +38,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	/*サウンドのロード*/
 	//BGM
 	SoundManager::GetInstance().Load("titleBgm", "Data/Sound/Bgm/TitleBGM.mp3", true);
+	SoundManager::GetInstance().Load("tutorialBgm", "Data/Sound/Bgm/TutorialBGM.mp3", true);
 	SoundManager::GetInstance().Load("selectBgm", "Data/Sound/Bgm/SelectBGM.mp3", true);
 	SoundManager::GetInstance().Load("battleBgm", "Data/Sound/Bgm/BattleBGM.mp3", true);
 	SoundManager::GetInstance().Load("stageClearBgm", "Data/Sound/Bgm/StageClearClearBGM.mp3", true);
@@ -55,9 +56,7 @@ SceneBase::SceneBase(SceneManager& manager):
 	SoundManager::GetInstance().Load("selectTransSe", "Data/Sound/Se/SelectSceneTrans.mp3", false);
 	SoundManager::GetInstance().Load("gamePlayTransSe", "Data/Sound/Se/GamePlaySceneTrans.mp3", false);
 	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
-	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
 	SoundManager::GetInstance().Load("faceSelectSe", "Data/Sound/Se/FaceSelect.mp3", false);
-
 
 	//プレイヤー用SE
 	SoundManager::GetInstance().Load("healHpSe", "Data/Sound/Se/HealHp.mp3", false);
@@ -69,17 +68,18 @@ SceneBase::SceneBase(SceneManager& manager):
 	SoundManager::GetInstance().Load("attackThirdSe", "Data/Sound/Se/AttackXActionThird.mp3", false);
 	SoundManager::GetInstance().Load("attackYSe", "Data/Sound/Se/AttackYAction.mp3", false);
 	SoundManager::GetInstance().Load("attackChargeSe", "Data/Sound/Se/Charge.mp3", false);
-	SoundManager::GetInstance().Load("damageSe", "Data/Sound/Se/Damage.mp3", false);
 	SoundManager::GetInstance().Load("deadSe", "Data/Sound/Se/Dead.mp3", false);
 	SoundManager::GetInstance().Load("faceUseSe", "Data/Sound/Se/FaceUse.mp3", false);
 	SoundManager::GetInstance().Load("lockOnSe", "Data/Sound/Se/LockOn.mp3", false);
 	SoundManager::GetInstance().Load("cameraResetSe", "Data/Sound/Se/CameraReset.mp3", false);
+	SoundManager::GetInstance().Load("playerOneHitSe", "Data/Sound/Se/PlayerOneHit.mp3", false);
+	SoundManager::GetInstance().Load("playerTwoHitSe", "Data/Sound/Se/PlayerTwoHit.mp3", false);
 
 	//ボス用SE
-	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
-	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
-	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
-	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/Back.mp3", false);
+	SoundManager::GetInstance().Load("bossFootStepsSe", "Data/Sound/Se/BossBack.mp3", false);
+	SoundManager::GetInstance().Load("bossShockAttackSe", "Data/Sound/Se/BossShockAttack.mp3", false);
+	SoundManager::GetInstance().Load("bossOneHitSe", "Data/Sound/Se/BossOneHit.mp3", false);
+	SoundManager::GetInstance().Load("bossTwoHitSe", "Data/Sound/Se/BossTwoHit.mp3", false);
 
 	/*エフェクトのロード*/
 

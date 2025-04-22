@@ -2389,7 +2389,7 @@ void Player::SetOnDamage()
 
 	//プラスアルファでヒットした時の処理
 	m_isHitDamage = true;
-	SoundManager::GetInstance().PlaySe("damageSe");
+	SoundManager::GetInstance().PlaySe("playerOneHitSe");
 }
 
 void Player::SetOnJump()

@@ -74,14 +74,13 @@ namespace
 	constexpr VECTOR kLookPos = { -100.0f,30.0f,500.0f };
 
 	//チュートリアルの説明を行う位置
-	constexpr float kTutorialJumpPosZ = 620.0f;
-	constexpr float kTutorialJumpClearPosZ =506.0f;
-	constexpr float kTutorialDashJumpPosZ = 317.0f;
-	constexpr float kTutorialDashJumpClearPosZ = 88.0f;
-	constexpr float kTutorialAttackXPosZ = -9.0f;
-	constexpr float kTutorialAttackYPosZ = -242.0f;
-	constexpr float kTutorialBossBattlePosZ = -455.0f;
-	constexpr float kTutorialSelectPosZ = -843.0f;
+	constexpr float kTutorialJumpPosZ = 320.0f;
+	constexpr float kTutorialJumpClearPosZ = 292.0f;
+	constexpr float kTutorialDashJumpPosZ = 92.0f;
+	constexpr float kTutorialDashJumpClearPosZ = -208.0f;
+	constexpr float kTutorialActionPosZ = -117.0f;
+	constexpr float kTutorialBossBattlePosZ = -420.0f;
+	constexpr float kTutorialSelectPosZ = -875.0f;
 
 	//ボスに行く部屋に表示される画像の座標
 	const Vec2 kHitPos = { 440.0f , 480.0f };
@@ -96,11 +95,11 @@ namespace
 	const Vec2 kHitAdjustmentUpPos = { 25.0f , 80.0f };
 
 	//プレイヤーの最初の位置
-	constexpr VECTOR kPlayerPos = { 383.0f,-410.0f,670.0f };
+	constexpr VECTOR kPlayerPos = { 383.0f,-410.0f,420.0f };
 	constexpr VECTOR kSelectPlayerPos = { 400.0f,-35.0f,740.0f };
 
 	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
-	const VECTOR kShadowAreaMinPos = { -10000.0f, -500.0f, -10000.0f };		// シャドウマップに描画する最小範囲
+	const VECTOR kShadowAreaMinPos = { -10000.0f, -600.0f, -10000.0f };		// シャドウマップに描画する最小範囲
 	const VECTOR kShadowAreaMaxPos = { 10000.0f, 0.0f, 10000.0f };	// シャドウマップに描画する最大範囲
 	const VECTOR kShadowDir = { 0.0f, -5.0f, 0.0f };					// ライト方向
 
@@ -149,7 +148,7 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_pCamera->Initialize(m_pPlayer->GetPos(), kCameraAngleH);
 
 	//タイトルのBgmが流れていたら止める用
-	SoundManager::GetInstance().StopBgm("selectBgm");
+	SoundManager::GetInstance().StopBgm("titleBgm");
 
 	m_handles.push_back(LoadGraph("Data/Image/StageButton.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Power.png"));
@@ -206,7 +205,7 @@ SceneTutorial::~SceneTutorial()
 	//フラグのクリア
 	m_isTutorial.clear();
 
-	SoundManager::GetInstance().StopBgm("selectBgm");
+	SoundManager::GetInstance().StopBgm("tutorialBgm");
 }
 
 void SceneTutorial::Update()
@@ -224,7 +223,7 @@ void SceneTutorial::Update()
 	UpdateFadeSelectGraph();
 	EffectManager::GetInstance().Update();
 
-	SoundManager::GetInstance().PlayBgm("selectBgm", true);
+	SoundManager::GetInstance().PlayBgm("tutorialBgm", true);
 
 
 

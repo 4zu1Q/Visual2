@@ -762,6 +762,8 @@ void BossTutorial::OnAttack3()
 	m_actionTime = 0;
 	m_preliminaryActionFrame = 0;
 
+	SoundManager::GetInstance().PlaySe("bossShockAttackSe");
+
 	m_attackKind = Game::e_BossAttackKind::kBossShock;
 	EffectManager::GetInstance().CreateEffect("bossShockEffect", m_shockAttackPos);
 
@@ -824,8 +826,10 @@ void BossTutorial::OnHitOneDamage()
 	m_isAttack = false;
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
+	SoundManager::GetInstance().PlaySe("bossOneHitSe");
+
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 15.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossTutorial::HitOneDamageUpdate;
 
@@ -864,8 +868,10 @@ void BossTutorial::OnHitTwoDamage()
 	m_isAttack = false;
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
+	SoundManager::GetInstance().PlaySe("bossTwoHitSe");
+
 	auto pos = m_rigidbody.GetPos();
-	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 15.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
 	m_updateFunc = &BossTutorial::HitTwoDamageUpdate;
 
@@ -894,6 +900,8 @@ void BossTutorial::OnDead()
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_attackFrame = 0;
+
+	SoundManager::GetInstance().PlaySe("deadSe");
 
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 

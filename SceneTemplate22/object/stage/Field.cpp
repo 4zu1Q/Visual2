@@ -7,7 +7,7 @@ namespace
 	const char* const kShadowFileName[static_cast<int>(Game::e_StageKind::kStageNum)] =
 	{
 		"Data/Model/Stage/TitleStage.mv1",
-		"Data/Model/Stage/TutorialStage1.mv1",
+		"Data/Model/Stage/TutorialStage3.mv1",
 		"Data/Model/Stage/SelectStage2.mv1",
 		"Data/Model/Stage/BattleStage.mv1",
 	};

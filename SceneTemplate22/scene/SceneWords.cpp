@@ -14,19 +14,12 @@ namespace
 {
 	//フォントのパス
 	const char* kFontPath = "Data/Font/Dela-Gothic-One.ttf";
-
 	//フォントサイズ	
 	constexpr int kFontSize = 38;
 
-	//エフェクトを出すフレーム数
-	constexpr int kEffectFrame = 190;
 	//チュートリアルのフレーム数
 	constexpr int kTutorialFrame = 120;
 	constexpr int kTutorialBossFrame = 180;
-
-	//初期位置
-	constexpr VECTOR kInitPos = { 400.0f,-35.0f,740.0f };
-	constexpr VECTOR kLookPos = { -100.0f,30.0f,500.0f };
 
 	//チュートリアルの説明を行う位置
 	constexpr float kTutorialJumpPosZ = 620.0f;
@@ -37,29 +30,16 @@ namespace
 	constexpr float kTutorialAttackYPosZ = -242.0f;
 	constexpr float kTutorialBossBattlePosZ = -455.0f;
 
-	//ボスに行く部屋に表示される画像の座標
-	const Vec2 kHitPos = { 440.0f , 480.0f };
-	const Vec2 kHitBossPos = { 340.0f , 30.0f };
-	const Vec2 kHitTextPos = { 740.0f , 230.0f };
-	const Vec2 kHitText2Pos = { 743.0f , 230.0f };
-	const Vec2 kHitItemPos = { 790.0f , 160.0f };
-	const Vec2 kHitStarPos = { 790.0f , 220.0f };
+	//チュートリアルのセリフの座標
+	const Vec2 kWordsPos = { 130.0f , 50.0f };
+	const Vec2 kMessageCursorPos = { 619.0f , 320.0f };
 
 	//調整する座標
 	const Vec2 kHitAdjustmentPos = { 25.0f , 40.0f };
 	const Vec2 kHitAdjustmentUpPos = { 25.0f , 80.0f };
 
-	//プレイヤーの最初の位置
-	constexpr VECTOR kPlayerPos = { 383.0f,-410.0f,670.0f };
-	constexpr VECTOR kSelectPlayerPos = { 400.0f,-35.0f,740.0f };
-
-	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
-	const VECTOR kShadowAreaMinPos = { -10000.0f, -500.0f, -10000.0f };		// シャドウマップに描画する最小範囲
-	const VECTOR kShadowAreaMaxPos = { 10000.0f, 0.0f, 10000.0f };	// シャドウマップに描画する最大範囲
-	const VECTOR kShadowDir = { 0.0f, -5.0f, 0.0f };					// ライト方向
-
-	constexpr float kShadowColor = 0.7f;
-	constexpr float kShadowAlpha = 0.3f;
+	constexpr float kSelectSpeed = 0.1f;
+	constexpr float kSelectAnimationSize = 4.0f;
 
 	enum e_Ui
 	{
@@ -88,9 +68,10 @@ namespace
 SceneWords::SceneWords(SceneManager& manager, Game::e_TutorialProgress progress):
 	SceneBase(manager),
 	m_wordsNum(0),
-	m_skipTime(0)
+	m_skipTime(0),
+	m_selectAnimation(0.0f)
 {
-	//m_tutorialProgress = progress;
+	m_tutorialProgress = progress;
 
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start01.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start02.png"));
@@ -109,8 +90,8 @@ SceneWords::SceneWords(SceneManager& manager, Game::e_TutorialProgress progress)
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Battle05.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Mask01.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Mask02.png"));
-	m_handles.push_back(LoadGraph("Data/Image/messageCursor.png"));
-	m_handles.push_back(LoadGraph("Data/Image/TutorialSerihu.png"));
+	m_handles.push_back(LoadGraph("Data/Image/MessageCursor.png"));
+	m_handles.push_back(LoadGraph("Data/Image/TutorialSerihu1.png"));
 
 	m_fontH = Font::GetInstance().GetFontHandle(kFontPath, "Dela Gothic One", 32);
 
@@ -144,6 +125,8 @@ void SceneWords::Update()
 		{
 			m_wordsNum++;	//プラス1
 			m_skipTime = 0;	//スキップタイムをリセット
+			SoundManager::GetInstance().PlaySe("dectionSe");
+			FadeGraphTitleLogoReset();
 		}
 
 	}
@@ -151,57 +134,39 @@ void SceneWords::Update()
 	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialStart)
 	{
 		//メンバ関数ポインタでチュートリアルスタートの関数に移動する
-		Next();	
 		CloseWords(4);
-
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJump)
 	{
-		Next();
 		CloseWords(0);
-
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJumpClear)
 	{
-		Next();
 		CloseWords(0);
-
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJump)
 	{
-		Next();
 		CloseWords(0);
-
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJumpClear)
 	{
-		Next();
 		CloseWords(0);
-
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialActionClear)
 	{
-		Next();
 		CloseWords(0);
-
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBoss)
 	{
-		Next();
-		CloseWords(2);
-
+		CloseWords(3);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBossClear)
 	{
-		Next();
-		CloseWords(1);
-
+		CloseWords(2);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialMask)
 	{
-		Next();
 		CloseWords(1);
-
 	}
 
 	//スタートボタンを押した場合
@@ -211,151 +176,117 @@ void SceneWords::Update()
 		SoundManager::GetInstance().PlaySe("backSe");
 		m_pManager.PopScene();
 	}
+
+	//セレクトのアニメーション
+	static float SinCount = 0;
+	SinCount += kSelectSpeed;
+	m_selectAnimation = sinf(SinCount) * kSelectAnimationSize;
 }
 
 void SceneWords::Draw()
 {
-	DrawGraph(130, 50, m_handles[kSerihuH], true);
+	DrawGraph(kWordsPos.x, kWordsPos.y, m_handles[kSerihuH], true);
 
-	switch (m_tutorialProgress)
+	DrawFormatString(0, 450, 0xffffff, "%d", m_wordsNum);
+
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialStart)
 	{
-
-	case Game::e_TutorialProgress::kTutorialStart:
-		
-		//Aボタンを押したら次のセリフに行く
 		if (m_wordsNum == 0)
 		{
-			DrawGraph(130, 50, m_handles[kStart01H], true);
+			DrawFadeGraphTitleLogo(m_handles[kStart01H], kWordsPos);
 		}
 		else if (m_wordsNum == 1)
 		{
-			DrawGraph(130, 50, m_handles[kStart02H], true);
+			DrawFadeGraphTitleLogo(m_handles[kStart02H], kWordsPos);
 		}
 		else if (m_wordsNum == 2)
 		{
-			DrawGraph(130, 50, m_handles[kStart03H], true);
+			DrawFadeGraphTitleLogo(m_handles[kStart03H], kWordsPos);
 		}
 		else if (m_wordsNum == 3)
 		{
-			DrawGraph(130, 50, m_handles[kStart04H], true);
+			DrawFadeGraphTitleLogo(m_handles[kStart04H], kWordsPos);
 		}
 		else if (m_wordsNum == 4)
 		{
-			DrawGraph(130, 50, m_handles[kStart05H], true);
+			DrawFadeGraphTitleLogo(m_handles[kStart05H], kWordsPos);
 		}
-
-		//switch (m_wordsNum)
-		//{
-		//case 0:
-		//	DrawGraph(130, 50, m_handles[kStart01H], true);
-		//	break;
-		//case 1:
-		//	DrawGraph(130, 50, m_handles[kStart02H], true);
-		//	break;
-		//case 2:
-		//	DrawGraph(130, 50, m_handles[kStart03H], true);
-		//	break;
-		//case 3:
-		//	DrawGraph(130, 50, m_handles[kStart04H], true);
-		//	break;
-		//case 4:
-		//	DrawGraph(130, 50, m_handles[kStart05H], true);
-		//	break;
-		//default:
-		//	break;
-		//}
-
-		break;
-	case Game::e_TutorialProgress::kTutorialJump:
-		DrawGraph(130, 50, m_handles[kJump01H], true);
-
-		break;
-	case Game::e_TutorialProgress::kTutorialJumpClear:
-		DrawGraph(130, 50, m_handles[kJumpClear01H], true);
-
-		break;
-	case Game::e_TutorialProgress::kTutorialDashJump:
-		DrawGraph(130, 50, m_handles[kDashJump01H], true);
-
-		break;
-	case Game::e_TutorialProgress::kTutorialDashJumpClear:
-		DrawGraph(130, 50, m_handles[kDashJumpClear01H], true);
-
-		break;
-	case Game::e_TutorialProgress::kTutorialActionClear:
-		DrawGraph(130, 50, m_handles[kActionClear01H], true);
-
-		break;
-	case Game::e_TutorialProgress::kTutorialBoss:
-
-		switch (m_wordsNum)
+	}
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJump)
+	{
+		DrawFadeGraphTitleLogo(m_handles[kJump01H], kWordsPos);
+	}
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJumpClear)
+	{
+		DrawFadeGraphTitleLogo(m_handles[kJumpClear01H], kWordsPos);
+	}
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJump)
+	{
+		DrawFadeGraphTitleLogo(m_handles[kDashJump01H], kWordsPos);
+	}
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJumpClear)
+	{
+		DrawFadeGraphTitleLogo(m_handles[kDashJumpClear01H], kWordsPos);
+	}
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialActionClear)
+	{
+		DrawFadeGraphTitleLogo(m_handles[kActionClear01H], kWordsPos);
+	}
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBoss)
+	{
+		if (m_wordsNum == 0)
 		{
-		case 0:
-			DrawGraph(130, 50, m_handles[kBattle01H], true);
-			break;
-		case 1:
-			DrawGraph(130, 50, m_handles[kBattle02H], true);
-			break;
-		case 2:
-			DrawGraph(130, 50, m_handles[kBattle03H], true);
-			break;
-		default:
-			break;
+			DrawFadeGraphTitleLogo(m_handles[kBattle01H], kWordsPos);
 		}
-
-		break;
-	case Game::e_TutorialProgress::kTutorialBossClear:
-
-		switch (m_wordsNum)
+		else if (m_wordsNum == 1)
 		{
-		case 0:
-			DrawGraph(130, 50, m_handles[kBattleClear01H], true);
-			break;
-		case 1:
-			DrawGraph(130, 50, m_handles[kBattleClear02H], true);
-			break;
+			DrawFadeGraphTitleLogo(m_handles[kBattle02H], kWordsPos);
 		}
-
-		break;
-	case Game::e_TutorialProgress::kTutorialMask:
-
-		switch (m_wordsNum)
+		else if (m_wordsNum == 2)
 		{
-		case 0:
-			DrawGraph(130, 50, m_handles[kMask01H], true);
-			break;
-		case 1:
-			DrawGraph(130, 50, m_handles[kMask02H], true);
-			break;
+			DrawFadeGraphTitleLogo(m_handles[kBattle03H], kWordsPos);
 		}
 
-		break;
-	default:
-		break;
+	}
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBossClear)
+	{
+		if (m_wordsNum == 0)
+		{
+			DrawFadeGraphTitleLogo(m_handles[kBattleClear01H], kWordsPos);
+		}
+		else if (m_wordsNum == 1)
+		{
+			DrawFadeGraphTitleLogo(m_handles[kBattleClear02H], kWordsPos);
+		}
+	}
+	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialMask)
+	{
+		if (m_wordsNum == 0)
+		{
+			DrawFadeGraphTitleLogo(m_handles[kMask01H], kWordsPos);
+		}
+		else if (m_wordsNum == 1)
+		{
+			DrawFadeGraphTitleLogo(m_handles[kMask02H], kWordsPos);
+		}
 	}
 
 	//タイムが以上になったら表示
 	if (m_skipTime > 60)
 	{
-		DrawGraph(130, 50, m_handles[kCursorH], true);
+		DrawGraph(kMessageCursorPos.x, kMessageCursorPos.y + m_selectAnimation, m_handles[kCursorH], true);
 	}
-
-	//DrawFormatStringToHandle(300, 100, 0xffffff, m_fontH, "TEST");
-
-}
-
-
-
-void SceneWords::Next()
-{
-
 }
 
 void SceneWords::CloseWords(int wordsNum)
 {
-	if (m_wordsNum == wordsNum)
+	if (m_wordsNum >= wordsNum)
 	{
-		m_pManager.PopScene();
+		if (Pad::IsTrigger(PAD_INPUT_1))
+		{
+			m_wordsNum = 0;
+			m_pManager.PopScene();
+		}
 	}
 }
 

@@ -70,6 +70,8 @@ namespace
 	//攻撃の回数
 	constexpr int kAttackNum = 3;
 
+	constexpr int kWalkCountNum = 18;
+	constexpr int kDashCountNum = 22;
 }
 
 BossPower::BossPower():
@@ -82,7 +84,8 @@ BossPower::BossPower():
 	m_nextAngle(0.0f),
 	m_length(0.0f),
 	m_actionTime(0),
-	m_actionKind(0)
+	m_actionKind(0),
+	m_moveCount(0)
 {
 	//HPバー
 	m_hp = 400.0f;
@@ -411,6 +414,13 @@ void BossPower::WalkUpdate()
 		OnDash();
 	}
 
+	if (m_moveCount % kWalkCountNum == 0)
+	{
+		SoundManager::GetInstance().PlaySe("bossFootStepsSe");
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("moveEffect", pos);
+	}
+	m_moveCount++;
 
 	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
 	m_attackDir = VNorm(m_attackDir);
@@ -440,6 +450,14 @@ void BossPower::DashUpdate()
 
 	//敵の移動
 	m_rigidbody.SetVelocity(m_velocity);
+
+	if (m_moveCount % kDashCountNum == 0)
+	{
+		SoundManager::GetInstance().PlaySe("bossFootStepsSe");
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("moveEffect", pos);
+	}
+	m_moveCount++;
 
 	//距離が近くなっていったら歩きに状態に遷移
 	if(m_length < kDashToWalkLength)
@@ -620,6 +638,7 @@ void BossPower::OnIdle()
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_isAttack = false;
 
+	m_moveCount = 0;
 	m_attackFrame = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -736,6 +755,8 @@ void BossPower::OnJumpAttack()
 	m_actionTime = 0;
 	m_preliminaryActionFrame = 0;
 
+	SoundManager::GetInstance().PlaySe("bossShockAttackSe");
+
 	m_attackKind = Game::e_BossAttackKind::kBossShock;
 	EffectManager::GetInstance().CreateEffect("bossShockEffect", m_shockAttackPos);
 
@@ -787,10 +808,12 @@ void BossPower::OnHitOneDamage()
 	m_isAttack = false;
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
+	SoundManager::GetInstance().PlaySe("bossOneHitSe");
+
 	auto pos = m_rigidbody.GetPos();
-	//EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
-	//m_pAnim->ChangeAnim(kAnimCoolTime);
-	//m_updateFunc = &BossPower::HitOneDamageUpdate;
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 15.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimCoolTime);
+	m_updateFunc = &BossPower::HitOneDamageUpdate;
 
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
 	//m_updateFunc = &BossPower::IdleUpdate;
@@ -827,10 +850,12 @@ void BossPower::OnHitTwoDamage()
 	m_isAttack = false;
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 
+	SoundManager::GetInstance().PlaySe("bossTwoHitSe");
+
 	auto pos = m_rigidbody.GetPos();
-	//EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 10.0f, pos.z));
-	//m_pAnim->ChangeAnim(kAnimCoolTime);
-	//m_updateFunc = &BossPower::HitTwoDamageUpdate;
+	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 15.0f, pos.z));
+	m_pAnim->ChangeAnim(kAnimCoolTime);
+	m_updateFunc = &BossPower::HitTwoDamageUpdate;
 
 }
 
@@ -855,9 +880,11 @@ void BossPower::OnDead()
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_attackFrame = 0;
+	m_moveCount = 0;
 
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 
+	//SoundManager::GetInstance().PlaySe("deadSe");
 
 	m_updateFunc = &BossPower::DeadUpdate;
 }

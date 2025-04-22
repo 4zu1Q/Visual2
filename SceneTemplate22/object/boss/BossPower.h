@@ -86,6 +86,7 @@ private:
 	float m_angle;
 	float m_nextAngle;
 
+	int m_moveCount;
 
 	VECTOR m_playerPos;
 
