@@ -41,6 +41,7 @@ namespace
 	//使う画像の種類
 	enum e_Ui
 	{
+		kBcakGroundH,
 		kPauseH,
 		kReStartH,
 		kOptionH,
@@ -66,6 +67,7 @@ ScenePause::ScenePause(SceneManager& manager) :
 	m_isToNextScene = false;
 
 	//画像のロード
+	m_handles.push_back(LoadGraph("Data/Image/BackGround.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Pause.png"));
 	m_handles.push_back(LoadGraph("Data/Image/ReStart.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Option2.png"));
@@ -235,11 +237,9 @@ void ScenePause::Update()
 
 void ScenePause::Draw()
 {
-	//背景フェード
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x00000, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
+
+	DrawGraph(0, 0, m_handles[kBcakGroundH], true);
 	DrawGraph(0, 0, m_handles[kPauseBarH], true);
 
 	DrawGraph(kPausePos.x, kPausePos.y, m_handles[kPauseH], true);

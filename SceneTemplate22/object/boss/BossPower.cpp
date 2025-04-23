@@ -84,8 +84,7 @@ BossPower::BossPower():
 	m_nextAngle(0.0f),
 	m_length(0.0f),
 	m_actionTime(0),
-	m_actionKind(0),
-	m_moveCount(0)
+	m_actionKind(0)
 {
 	//HPバー
 	m_hp = 400.0f;
@@ -105,6 +104,7 @@ BossPower::BossPower():
 	m_damageFrame = 0;
 	m_preliminaryActionFrame = 0;
 	m_attackFrame = 0;
+	m_moveCount = 0;
 
 	m_hitRadius = 8.0f;
 	m_normalAttackRadius = 3.0f;
@@ -276,7 +276,6 @@ void BossPower::Draw()
 	{
 		MV1DrawModel(m_modelH);
 	}
-	//DrawCapsule3D(m_posDown, m_posUp, m_radius, 32, 0xffffff, 0xffffff, false);
 }
 
 const VECTOR& BossPower::GetPosDown() const
@@ -880,7 +879,6 @@ void BossPower::OnDead()
 	m_actionKind = 0;
 	m_actionTime = 0;
 	m_attackFrame = 0;
-	m_moveCount = 0;
 
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 

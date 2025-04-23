@@ -126,6 +126,9 @@ protected:
 	//ボスのショット攻撃半径
 	float m_shotRadius;
 
+	//ボスの足音を出すためのカウント
+	int m_moveCount;
+
 	//攻撃判定
 	bool m_isAttack;
 	bool m_isShock;

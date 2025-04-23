@@ -35,7 +35,7 @@ namespace
 {
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 20.0f,15.0f,-100.0f };
+	constexpr VECTOR kInitPos = { 20.0f,10.0f,-100.0f };
 	constexpr VECTOR kLightUpPos = { -15.0f,15.0f, -27.0f };
 	constexpr VECTOR kLightDownPos = { -15.0f,15.0f, -27.0f };
 

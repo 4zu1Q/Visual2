@@ -119,17 +119,6 @@ void SceneWords::Update()
 	//タイマーを使う
 	m_skipTime++;
 
-	if (m_skipTime > 60)
-	{
-		if (Pad::IsTrigger(PAD_INPUT_1))
-		{
-			m_wordsNum++;	//プラス1
-			m_skipTime = 0;	//スキップタイムをリセット
-			SoundManager::GetInstance().PlaySe("dectionSe");
-			FadeGraphTitleLogoReset();
-		}
-
-	}
 
 	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialStart)
 	{
@@ -158,11 +147,11 @@ void SceneWords::Update()
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBoss)
 	{
-		CloseWords(3);
+		CloseWords(2);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBossClear)
 	{
-		CloseWords(2);
+		CloseWords(1);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialMask)
 	{
@@ -186,8 +175,6 @@ void SceneWords::Update()
 void SceneWords::Draw()
 {
 	DrawGraph(kWordsPos.x, kWordsPos.y, m_handles[kSerihuH], true);
-
-	DrawFormatString(0, 450, 0xffffff, "%d", m_wordsNum);
 
 	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialStart)
 	{
@@ -218,6 +205,7 @@ void SceneWords::Draw()
 	}
 	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJumpClear)
 	{
+		DrawFadeGraphTitleLogo(m_handles[kJumpClear01H], kWordsPos);
 		DrawFadeGraphTitleLogo(m_handles[kJumpClear01H], kWordsPos);
 	}
 	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJump)
@@ -280,13 +268,30 @@ void SceneWords::Draw()
 
 void SceneWords::CloseWords(int wordsNum)
 {
-	if (m_wordsNum >= wordsNum)
+
+	if (m_skipTime > 60)
 	{
-		if (Pad::IsTrigger(PAD_INPUT_1))
+		if (m_wordsNum == wordsNum)
 		{
-			m_wordsNum = 0;
-			m_pManager.PopScene();
+			if (Pad::IsTrigger(PAD_INPUT_1))
+			{
+				m_wordsNum = 0;
+				SoundManager::GetInstance().PlaySe("dectionSe");
+				FadeGraphTitleLogoReset();
+				m_pManager.PopScene();
+			}
+		}
+		else if (m_wordsNum != wordsNum)
+		{
+			if (Pad::IsTrigger(PAD_INPUT_1))
+			{
+				m_wordsNum++;	//プラス1
+				m_skipTime = 0;	//スキップタイムをリセット
+				SoundManager::GetInstance().PlaySe("dectionSe");
+				FadeGraphTitleLogoReset();
+			}
 		}
 	}
+
 }
 

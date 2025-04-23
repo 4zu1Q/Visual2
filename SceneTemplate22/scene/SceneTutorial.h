@@ -16,6 +16,7 @@ class Camera;
 class FaceUi;
 class FaceFrameUi;
 class ButtonUi;
+class HpBar;
 class PlayerBarUi;
 class SkyDome;
 class Field;
@@ -53,6 +54,7 @@ private:
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
 	std::shared_ptr<ButtonUi> m_pButtonUi;
+	std::shared_ptr<HpBar> m_pHpBarUi;
 
 	std::shared_ptr<Field> m_pField;
 	std::shared_ptr<SkyDome> m_pSkyDome;
@@ -77,7 +79,7 @@ private:
 	bool m_isSelectStage;
 
 	//
-
+	bool m_isCameraLockOn;	//ボスをロックオンしていいかどうか
 
 };
 

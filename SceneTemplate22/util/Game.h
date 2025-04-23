@@ -49,6 +49,7 @@ namespace Game
 	//ボスの種類
 	enum class e_BossKind
 	{
+		kTutorial,		//チュートリアル
 		kPower,		//パワー
 		kSpeed,		//スピード
 		kShot,			//ショット

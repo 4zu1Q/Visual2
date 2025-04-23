@@ -69,12 +69,8 @@ namespace
 	constexpr int kTutorialFrame = 60;
 	constexpr int kTutorialBossFrame = 180;
 
-	//初期位置
-	constexpr VECTOR kInitPos = { 400.0f,-35.0f,740.0f };
-	constexpr VECTOR kLookPos = { -100.0f,30.0f,500.0f };
-
 	//チュートリアルの説明を行う位置
-	constexpr float kTutorialJumpPosZ = 320.0f;
+	constexpr float kTutorialJumpPosZ = 405.0f;
 	constexpr float kTutorialJumpClearPosZ = 292.0f;
 	constexpr float kTutorialDashJumpPosZ = 92.0f;
 	constexpr float kTutorialDashJumpClearPosZ = -208.0f;
@@ -95,12 +91,12 @@ namespace
 	const Vec2 kHitAdjustmentUpPos = { 25.0f , 80.0f };
 
 	//プレイヤーの最初の位置
-	constexpr VECTOR kPlayerPos = { 383.0f,-410.0f,420.0f };
+	constexpr VECTOR kPlayerPos = { 383.0f,-53.0f,450.0f };
 	constexpr VECTOR kSelectPlayerPos = { 400.0f,-35.0f,740.0f };
 
 	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
-	const VECTOR kShadowAreaMinPos = { -10000.0f, -600.0f, -10000.0f };		// シャドウマップに描画する最小範囲
-	const VECTOR kShadowAreaMaxPos = { 10000.0f, 0.0f, 10000.0f };	// シャドウマップに描画する最大範囲
+	const VECTOR kShadowAreaMinPos = { -10000.0f, -100.0f, -10000.0f };		// シャドウマップに描画する最小範囲
+	const VECTOR kShadowAreaMaxPos = { 10000.0f, 100.0f, 10000.0f };	// シャドウマップに描画する最大範囲
 	const VECTOR kShadowDir = { 0.0f, -5.0f, 0.0f };					// ライト方向
 
 	constexpr float kShadowColor = 0.7f;
@@ -127,12 +123,15 @@ SceneTutorial::SceneTutorial(SceneManager& manager, Game::e_StageKind stageKind)
 	m_pFaceFrameUi = std::make_shared<FaceFrameUi>();
 	m_pButtonUi = std::make_shared<ButtonUi>();
 
+	m_pHpBarUi = std::make_shared<HpBar>();
+
 	m_pField = std::make_shared<Field>(stageKind);
 	m_pSkyDome = std::make_shared<SkyDome>();
 
 
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
 
+	m_isCameraLockOn = true;
 	m_isToNextScene = false;
 	m_effectFrame = 0;
 	m_tutorialFrame = 0;
@@ -225,7 +224,10 @@ void SceneTutorial::Update()
 
 	SoundManager::GetInstance().PlayBgm("tutorialBgm", true);
 
-
+	if (m_pBossTutorial->GetIsBattle())
+	{
+		m_isCameraLockOn = true;
+	}
 
 	//1回だけチュートリアルの説明を入れるためのフラグ
 	if (!m_isTutorial[Game::e_TutorialProgress::kTutorialStart])
@@ -358,15 +360,21 @@ void SceneTutorial::Update()
 		}
 	}
 
-	//ロックオンするのがいないため
-	VECTOR noPos = VGet(0, 0, 0);
-
-
-	m_pCamera->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(), m_pField->GetModelHandle(), m_pPlayer->GetAngle(), false);
 	m_pPlayer->SetCameraDirection(m_pCamera->GetDirection());
-	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(), noPos, false, Game::e_BossAttackKind::kBossAttackNone);
-	
+
+	//カメラのアップデート処理
+	m_pCamera->Update(m_pPlayer->GetPos(), m_pBossTutorial->GetPosUp(),
+		m_pField->GetModelHandle(), m_pPlayer->GetAngle(), m_isCameraLockOn);
+
+	//プレイヤーのアップデート処理
+	m_pPlayer->Update(m_pPhysics, *m_pPlayerWeapon, m_pCamera->GetCameraAngleX(),
+		m_pBossTutorial->GetPosDown(), m_pCamera->GetIsLockOn(), m_pBossTutorial->GetAttackKind());
+
+	//パワーボスのアップデート処理
 	m_pBossTutorial->Update(m_pPhysics, *m_pPlayer, m_pPlayer->GetAttackKind());
+
+	//ボスのHPバーのアップデート処理
+	m_pHpBarUi->Update(m_pBossTutorial->GetHp());
 
 	//ボスの攻撃座標や半径を取得
 	m_pPlayer->HitUpdate(m_pBossTutorial->GetHitPos(), m_pBossTutorial->GetAttackPos(),
@@ -394,6 +402,12 @@ void SceneTutorial::Update()
 
 	m_pFaceUi->Update();
 	m_pPlayerBarUi->Update(*m_pPlayer);
+
+	if (m_pBossTutorial->GetIsClear())
+	{
+
+		m_isCameraLockOn = false;
+	}
 
 	//シーンフラグがたった場合
 	if (m_isToNextScene)
@@ -437,6 +451,11 @@ void SceneTutorial::Draw()
 	m_pFaceUi->Draw(*m_pPlayer);
 	m_pButtonUi->Draw(*m_pPlayer);
 
+	if (!m_pBossTutorial->GetIsClear() && m_pBossTutorial->GetIsBattle())
+	{
+		m_pHpBarUi->Draw();
+		m_pHpBarUi->DrawBossName(Game::e_BossKind::kTutorial);
+	}
 
 	if (!m_isFadeColor)
 	{

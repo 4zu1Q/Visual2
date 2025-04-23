@@ -106,11 +106,13 @@ void SceneStory::Draw()
 		break;
 	}
 
+#ifdef _DEBUG
 	DrawString(0, 0, "Scene Story", 0xffffff, false);
 	DrawFormatString(0, 32, 0xffffff, "Time:%d", m_storyTime);
 	DrawFormatString(0, 48, 0xffffff, "Skip:%d", m_isSkip);
 	DrawFormatString(0, 64, 0xffffff, "Next:%d", m_isNext);
 	DrawFormatString(0, 80, 0xffffff, "pressTime:%d", m_pressTime);
+#endif
 
 	DrawFade(0x000000);
 }

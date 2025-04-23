@@ -74,6 +74,7 @@ namespace
 	//使う画像の種類
 	enum e_Ui
 	{
+		kBackGroundH,
 		kBgmH,
 		kSeH,
 		kSensitivityH,
@@ -113,6 +114,7 @@ SceneOption::SceneOption(SceneManager& manager) :
 	m_nowItem = e_Item::kBgm;
 
 	//画像のロード
+	m_handles.push_back(LoadGraph("Data/Image/BackGround.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Bgm2.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Se2.png"));				
 	m_handles.push_back(LoadGraph("Data/Image/Sensitivity.png"));		
@@ -225,9 +227,7 @@ void SceneOption::Draw()
 	DrawFade(0x000000);
 
 	//背景フェード
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, kAlpha);
-	DrawBox(0, 0, Game::kScreenWidth, Game::kScreenHeight, 0x000000, true);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	DrawGraph(0, 0, m_handles[kBackGroundH], true);
 
 	DrawGraph(0, 0, m_handles[kOptionBarH], true);
 

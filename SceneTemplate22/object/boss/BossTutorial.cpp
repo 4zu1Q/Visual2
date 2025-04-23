@@ -27,7 +27,7 @@ namespace
 
 
 	//初期位置
-	constexpr VECTOR kInitPos = { 386.0f,-358.0f,-778.0f };
+	constexpr VECTOR kInitPos = { 386.0f, 13.0f,-778.0f };
 
 	//カプセルの上の座標
 	constexpr VECTOR kUpPos = { 0.0f,18.0f,0.0f };
@@ -49,6 +49,8 @@ namespace
 
 	//HPの最大値
 	constexpr float kMaxHp = 400.0f;
+	//ボスが戦う位置
+	constexpr float kBossBattlePosZ = -465.0f;
 
 	//次の状態に遷移するまでの時間
 	constexpr float kIdleToAttackTime = 20.0f;
@@ -67,6 +69,8 @@ namespace
 	//攻撃の種類
 	constexpr int kAttackKind = 3;
 
+	constexpr int kWalkCountNum = 18;
+	constexpr int kDashCountNum = 22;
 }
 
 BossTutorial::BossTutorial() :
@@ -88,6 +92,7 @@ BossTutorial::BossTutorial() :
 	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 	m_playerKind = e_PlayerKind::kNormalPlayer;
 
+	m_isBattle = false;
 	m_isClear = false;
 
 	m_isAttack = false;
@@ -99,6 +104,7 @@ BossTutorial::BossTutorial() :
 	m_damageFrame = 0;
 	m_preliminaryActionFrame = 0;
 	m_attackFrame = 0;
+	m_moveCount = 0;
 
 	m_hitRadius = 8.0f;
 	m_normalAttackRadius = 3.0f;
@@ -216,6 +222,11 @@ void BossTutorial::Update(std::shared_ptr<MyLib::Physics> physics, Player& playe
 		OnDead();
 	}
 
+	if (m_playerPos.z <= kBossBattlePosZ)
+	{
+		m_isBattle = true;
+	}
+
 	VECTOR attackMove = VScale(m_attackDir, 12.0f);
 	VECTOR shockAttackMove = VScale(m_attackDir, 20.0f);
 	m_attackPos = VAdd(m_hitPos, attackMove);
@@ -280,7 +291,8 @@ const VECTOR& BossTutorial::GetPosDown() const
 
 const VECTOR& BossTutorial::GetPosUp() const
 {
-	auto pos = VAdd(m_rigidbody.GetPos(), VGet(0.0f, 10.0f, 0.0f));
+	auto pos = m_rigidbody.GetPos();
+	
 	return pos;
 }
 
@@ -334,7 +346,10 @@ void BossTutorial::IdleUpdate()
 	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
 	if (m_actionTime > kIdleToAttackTime && m_length > kIdleToAttackLength)
 	{
-		//OnWalk();
+		if (m_isBattle)
+		{
+			OnWalk();
+		}
 	}
 	//プレイヤーと十分な距離の場合 && タイマー
 	else if (m_actionTime > kIdleToAvoidTime && m_length < kIdleToAttackLength)
@@ -410,6 +425,13 @@ void BossTutorial::WalkUpdate()
 		OnDash();
 	}
 
+	if (m_moveCount % kWalkCountNum == 0)
+	{
+		SoundManager::GetInstance().PlaySe("bossFootStepsSe");
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("moveEffect", pos);
+	}
+	m_moveCount++;
 
 	m_attackDir = VGet(m_direction.x, m_direction.y, m_direction.z);
 	m_attackDir = VNorm(m_attackDir);
@@ -439,6 +461,14 @@ void BossTutorial::DashUpdate()
 
 	//敵の移動
 	m_rigidbody.SetVelocity(m_velocity);
+
+	if (m_moveCount % kDashCountNum == 0)
+	{
+		SoundManager::GetInstance().PlaySe("bossFootStepsSe");
+		auto pos = m_rigidbody.GetPos();
+		EffectManager::GetInstance().CreateEffect("moveEffect", pos);
+	}
+	m_moveCount++;
 
 	//距離が近くなっていったら歩きに状態に遷移
 	if (m_length < kDashToWalkLength)
@@ -646,6 +676,7 @@ void BossTutorial::OnIdle()
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_isAttack = false;
 
+	m_moveCount = 0;
 	m_attackFrame = 0;
 	m_actionTime = 0;
 	m_pAnim->ChangeAnim(kAnimIdle);
@@ -801,24 +832,24 @@ void BossTutorial::OnHitOneDamage()
 
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
 	{
-		m_hp -= 40.0f;
+		m_hp -= 80.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
 	{
-		m_hp -= 15.0f;
+		m_hp -= 30.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
 	{
-		m_hp -= 10.0f;
+		m_hp -= 20.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
 	{
-		m_hp -= 50.0f;
+		m_hp -= 100.0f;
 	}
 
 	if (!m_isPlayerFace)
 	{
-		m_hp -= 20.0f;
+		m_hp -= 40.0f;
 	}
 
 	m_attackFrame = 0;
@@ -843,24 +874,24 @@ void BossTutorial::OnHitTwoDamage()
 
 	if (m_playerKind == e_PlayerKind::kPowerPlayer && m_isPlayerFace)
 	{
-		m_hp -= 80.0f;
+		m_hp -= 160.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kSpeedPlayer && m_isPlayerFace)
 	{
-		m_hp -= 40.0f;
+		m_hp -= 80.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kShotPlayer && m_isPlayerFace)
 	{
-		m_hp -= 40.0f;
+		m_hp -= 80.0f;
 	}
 	if (m_playerKind == e_PlayerKind::kRassPlayer && m_isPlayerFace)
 	{
-		m_hp -= 100.0f;
+		m_hp -= 200.0f;
 	}
 
 	if (!m_isPlayerFace)
 	{
-		m_hp -= 50.0f;
+		m_hp -= 100.0f;
 	}
 
 	m_attackFrame = 0;
@@ -901,8 +932,8 @@ void BossTutorial::OnDead()
 	m_actionTime = 0;
 	m_attackFrame = 0;
 
-	SoundManager::GetInstance().PlaySe("deadSe");
-
+	//SoundManager::GetInstance().PlaySe("deadSe");
+	m_isClear = true;
 	m_pAnim->ChangeAnim(kAnimDead, false, true, true);
 
 
