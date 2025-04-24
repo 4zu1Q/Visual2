@@ -29,41 +29,38 @@ namespace
 
 	//グラフの座標
 	const Vec2 kBgmPos = { 160.0f , 180.0f };
-	const Vec2 kSePos = { 160.0f , 300.0f };
-	const Vec2 kSensitivityPos = { 160.0f , 420.0f };
-	const Vec2 kFlipSideUpPos = { 160.0f , 540.0f };
-	const Vec2 kFullScreenPos = { 160.0f , 660.0f };
+	const Vec2 kSePos = { 160.0f , 280.0f };
+	const Vec2 kSensitivityPos = { 160.0f , 380.0f };
+	const Vec2 kFlipSideUpPos = { 160.0f , 480.0f };
+	const Vec2 kFullScreenPos = { 160.0f , 580.0f };
 
 	//選択UIのポジション
 	const Vec2 kBgmSelectPos = { 110 , 195 };
-	const Vec2 kSeSelectPos = { 110 , 315 };
-	const Vec2 kSensitivitySelectPos = { 110 , 430 };
-	const Vec2 kFlipSideUpSelectPos = { 110 , 550 };
-	const Vec2 kFullScreenSelectPos = { 110 , 670 };
+	const Vec2 kSeSelectPos = { 110 , 295 };
+	const Vec2 kSensitivitySelectPos = { 110 , 395 };
+	const Vec2 kFlipSideUpSelectPos = { 110 , 495 };
+	const Vec2 kFullScreenSelectPos = { 110 , 595 };
 	
 	const Vec2 kTextBgmPosFront = { 1030 , 170 };
 	const Vec2 kTextBgmPosBack = { 1033 , 170 };
 
-	const Vec2 kTextSePosFront = { 1030 , 290 };
-	const Vec2 kTextSePosBack = { 1033 , 290 };
+	const Vec2 kTextSePosFront = { 1030 , 270 };
+	const Vec2 kTextSePosBack = { 1033 , 270 };
 
-	const Vec2 kTextSensitivityPosFront = { 1030 , 410 };
-	const Vec2 kTextSensitivityPosBack = { 1033 , 410 };
+	const Vec2 kTextSensitivityPosFront = { 1030 , 370 };
+	const Vec2 kTextSensitivityPosBack = { 1033 , 370 };
 
 	const Vec2 kBBackPos = { 1160 , 680 };
 	
 	const Vec2 kBgmBarPos = { 550 , 170 };
-	const Vec2 kSeBarPos = { 550 , 290 };
-	const Vec2 kSensitivityBarPos = { 550 , 410 };
-	const Vec2 kFlipSideUpMathPos = { 550 , 530 };
-	const Vec2 kFullScreenMathPos = { 550 , 650 };
+	const Vec2 kSeBarPos = { 550 , 270 };
+	const Vec2 kSensitivityBarPos = { 550 , 370 };
+	const Vec2 kFlipSideUpMathPos = { 550 , 470 };
+	const Vec2 kFullScreenMathPos = { 550 , 570 };
 	
 	const Vec2 kPointBgmPos = { 550 , 174 };
-	const Vec2 kPointSePos = { 550 , 294 };
-	const Vec2 kPointSensitivityPos = { 550 , 414 };
-
-	const Vec2 kFlipSideUpCheckPos = { 550 , 530 };
-	const Vec2 kFullScreenCheckPos = { 550 , 650 };
+	const Vec2 kPointSePos = { 550 , 274 };
+	const Vec2 kPointSensitivityPos = { 550 , 374 };
 
 
 	constexpr float kCursorSpeed = 0.05f;
@@ -234,7 +231,7 @@ void SceneOption::Draw()
 	DrawGraph(kBgmBarPos.x, kBgmBarPos.y, m_handles[kBarH], true);
 	DrawGraph(kSeBarPos.x, kSeBarPos.y, m_handles[kBarH], true);
 	DrawGraph(kSensitivityBarPos.x, kSensitivityBarPos.y, m_handles[kBarH], true);
-	DrawGraph(kFlipSideUpCheckPos.x, kFlipSideUpCheckPos.y, m_handles[kMathH], true);
+	DrawGraph(kFlipSideUpMathPos.x, kFlipSideUpMathPos.y, m_handles[kMathH], true);
 	DrawGraph(kFullScreenMathPos.x, kFullScreenMathPos.y, m_handles[kMathH], true);
 
 	DrawGraph(kPointBgmPos.x + m_bgmScale * 3.68, kPointBgmPos.y, m_handles[kPointH], true);
@@ -243,12 +240,12 @@ void SceneOption::Draw()
 
 	if (m_isFlipSideUp)
 	{
-		DrawGraph(kFlipSideUpCheckPos.x, kFlipSideUpCheckPos.y, m_handles[kCheckH], true);
+		DrawGraph(kFlipSideUpMathPos.x, kFlipSideUpMathPos.y, m_handles[kCheckH], true);
 	}
 
 	if (m_isFullScreen)
 	{
-		DrawGraph(kFullScreenCheckPos.x, kFullScreenCheckPos.y, m_handles[kCheckH], true);
+		DrawGraph(kFullScreenMathPos.x, kFullScreenMathPos.y, m_handles[kCheckH], true);
 	}
 
 	DrawGraph(kBBackPos.x, kBBackPos.y, m_handles[kBackH], true);

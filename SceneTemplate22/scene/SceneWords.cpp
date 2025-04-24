@@ -50,6 +50,7 @@ namespace
 		kStart05H,
 		kJump01H,
 		kJumpClear01H,
+		kJumpClear02H,
 		kDashJump01H,
 		kDashJumpClear01H,
 		kActionClear01H,
@@ -79,7 +80,8 @@ SceneWords::SceneWords(SceneManager& manager, Game::e_TutorialProgress progress)
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start04.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Start05.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Jump01.png"));
-	m_handles.push_back(LoadGraph("Data/Image/Tutorial/Jump02.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/JumpClear01.png"));
+	m_handles.push_back(LoadGraph("Data/Image/Tutorial/JumpClear02.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/DashJump01.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/DashJump02.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Tutorial/ActionClear01.png"));
@@ -131,7 +133,7 @@ void SceneWords::Update()
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJumpClear)
 	{
-		CloseWords(0);
+		CloseWords(1);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJump)
 	{
@@ -205,8 +207,14 @@ void SceneWords::Draw()
 	}
 	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJumpClear)
 	{
-		DrawFadeGraphTitleLogo(m_handles[kJumpClear01H], kWordsPos);
-		DrawFadeGraphTitleLogo(m_handles[kJumpClear01H], kWordsPos);
+		if (m_wordsNum == 0)
+		{
+			DrawFadeGraphTitleLogo(m_handles[kJumpClear01H], kWordsPos);
+		}
+		else if (m_wordsNum == 1)
+		{
+			DrawFadeGraphTitleLogo(m_handles[kJumpClear02H], kWordsPos);
+		}
 	}
 	if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJump)
 	{
