@@ -50,12 +50,11 @@ SceneBase::SceneBase(SceneManager& manager):
 	SoundManager::GetInstance().Load("dectionSe", "Data/Sound/Se/Dection.mp3", false);
 	SoundManager::GetInstance().Load("backSe", "Data/Sound/Se/Back.mp3", false);
 	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
-	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
+	SoundManager::GetInstance().Load("tutorialSe", "Data/Sound/Se/TutorialOperation.mp3", false);
 
 	//シーン遷移用SE
 	SoundManager::GetInstance().Load("selectTransSe", "Data/Sound/Se/SelectSceneTrans.mp3", false);
 	SoundManager::GetInstance().Load("gamePlayTransSe", "Data/Sound/Se/GamePlaySceneTrans.mp3", false);
-	SoundManager::GetInstance().Load("pouseSe", "Data/Sound/Se/PouseOpen.mp3", false);
 	SoundManager::GetInstance().Load("faceSelectSe", "Data/Sound/Se/FaceSelect.mp3", false);
 
 	//プレイヤー用SE

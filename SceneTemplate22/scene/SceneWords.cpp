@@ -158,26 +158,20 @@ void SceneWords::Update()
 	{
 		//メンバ関数ポインタでチュートリアルスタートの関数に移動する
 		CloseWords(7);
-		if (m_wordsNum == 6)
-		{
-			m_isBgDraw = true;
-		}
+		TutorialBgFlag(6);
+		TutorialSe(5);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJump)
 	{
 		CloseWords(1);
-		if (m_wordsNum == 1)
-		{
-			m_isBgDraw = true;
-		}
+		TutorialBgFlag(1);
+		TutorialSe(0);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialJumpClear)
 	{
 		CloseWords(2);
-		if (m_wordsNum == 2)
-		{
-			m_isBgDraw = true;
-		}
+		TutorialBgFlag(2);
+		TutorialSe(1);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJump)
 	{
@@ -186,18 +180,14 @@ void SceneWords::Update()
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialDashJumpClear)
 	{
 		CloseWords(1);
-		if (m_wordsNum == 1)
-		{
-			m_isBgDraw = true;
-		}
+		TutorialBgFlag(1);
+		TutorialSe(0);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBoss)
 	{
 		CloseWords(4);
-		if (m_wordsNum == 4)
-		{
-			m_isBgDraw = true;
-		}
+		TutorialBgFlag(4);
+		TutorialSe(3);
 	}
 	else if (m_tutorialProgress == Game::e_TutorialProgress::kTutorialBossClear)
 	{
@@ -405,5 +395,21 @@ void SceneWords::CloseWords(int wordsNum)
 		}
 	}
 
+}
+
+void SceneWords::TutorialSe(int wordsNum)
+{
+	if (m_wordsNum == wordsNum)
+	{
+		SoundManager::GetInstance().PlaySe("tutorialSe");
+	}
+}
+
+void SceneWords::TutorialBgFlag(int wordsNum)
+{
+	if (m_wordsNum == wordsNum)
+	{
+		m_isBgDraw = true;
+	}
 }
 

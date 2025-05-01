@@ -26,6 +26,8 @@ public:
 private:
 
 	void CloseWords(int wordsNum);
+	void TutorialSe(int wordsNum);
+	void TutorialBgFlag(int wordsNum);
 
 private:
 	Game::e_TutorialProgress m_tutorialProgress;
@@ -47,7 +49,6 @@ private:
 	Vec2 m_cursorPos;
 	Vec2 m_targetCursorUpPos;
 	Vec2 m_targetCursorDownPos;
-
 
 };
 
