@@ -34,7 +34,6 @@ private:
 	{
 		kRestart,				//リスタート
 		kOption,				//オプション
-		kSelect,				//セレクト
 		kTitle,					//タイトル
 	};
 

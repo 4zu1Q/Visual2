@@ -72,6 +72,7 @@ private:
 	int m_shadowMap;	//シャドウマップハンドル
 
 	int m_tutorialFrame;
+	int m_gameOverTime;
 
 	int m_effectFrame;	//エフェクトのフレーム
 

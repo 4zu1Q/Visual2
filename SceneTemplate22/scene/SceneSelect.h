@@ -14,8 +14,6 @@ class FaceUi;
 class FaceFrameUi;
 class ButtonUi;
 class PlayerBarUi;
-class ItemMp;
-class ItemHp;
 class SkyDome;
 class Field;
 class Tomb;
@@ -49,9 +47,6 @@ private:
 	std::shared_ptr<FaceUi> m_pFaceUi;
 	std::shared_ptr<FaceFrameUi> m_pFaceFrameUi;
 	std::shared_ptr<ButtonUi> m_pButtonUi;
-
-	std::shared_ptr<ItemMp> m_pItemMp;
-	std::shared_ptr<ItemHp> m_pItemHp;
 
 	std::shared_ptr<Field> m_pField;
 	std::shared_ptr<Tomb> m_pTomb;

@@ -12,9 +12,6 @@
 #include "object/Camera.h"
 #include "object/boss/BossShot.h"
 
-#include "object/item/ItemHp.h"
-#include "object/item/ItemMp.h"
-
 #include "object/stage/Field.h"
 #include "object/stage/SkyDome.h"
 #include "object/stage/Tomb.h"
@@ -86,8 +83,8 @@ namespace
 
 	//プレイヤーの最初の位置
 	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
-	const VECTOR kShadowAreaMinPos = { -10000.0f, -80.0f, -10000.0f };		// シャドウマップに描画する最小範囲
-	const VECTOR kShadowAreaMaxPos = { 10000.0f, 100.0f, 10000.0f };	// シャドウマップに描画する最大範囲
+	const VECTOR kShadowAreaMinPos = { -1000.0f, -80.0f, -1000.0f };		// シャドウマップに描画する最小範囲
+	const VECTOR kShadowAreaMaxPos = { 1000.0f, 100.0f, 1000.0f };	// シャドウマップに描画する最大範囲
 	const VECTOR kShadowDir = { 0.0f, -5.0f, 0.0f };					// ライト方向
 
 	constexpr float kShadowColor = 0.7f;
@@ -116,9 +113,6 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind, VE
 	m_pField = std::make_shared<Field>(stageKind);
 	m_pSkyDome = std::make_shared<SkyDome>();
 
-	m_pItemHp = std::make_shared<ItemHp>();
-	m_pItemMp = std::make_shared<ItemMp>();
-
 	m_pTomb = std::make_shared<Tomb>();
 
 	m_pPhysics = std::make_shared<MyLib::Physics>(stageKind);
@@ -129,8 +123,6 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind, VE
 	m_pTomb->Initialize(kPowerTrianglePos, kSpeedTrianglePos, kShotTrianglePos);
 
 	m_pPlayer->Initialize(m_pPhysics, playerPos, *m_pPlayerWeapon, kPlayerAngle);
-	m_pItemHp->Initialize(m_pPhysics);
-	m_pItemMp->Initialize(m_pPhysics);
 	m_pField->Initialize();
 
 	m_pCamera->Initialize(m_pPlayer->GetPos(),kCameraAngleH);
@@ -172,8 +164,10 @@ SceneSelect::SceneSelect(SceneManager& manager , Game::e_StageKind stageKind, VE
 SceneSelect::~SceneSelect()
 {
 	m_pPlayer->Finalize(m_pPhysics);
-	m_pItemHp->Finalize(m_pPhysics);
-	m_pItemMp->Finalize(m_pPhysics);
+
+	//シャドウマップの削除
+	DeleteShadowMap(m_shadowMap);
+	m_shadowMap = -1;
 
 	//画像の削除
 	for (int i = 0; i < m_handles.size(); i++)
@@ -297,8 +291,6 @@ void SceneSelect::Update()
 	VECTOR noPos = VGet(0, 0, 0);
 
 	m_pSkyDome->Update();
-	m_pItemHp->Update(m_pPhysics);
-	m_pItemMp->Update(m_pPhysics);
 	m_pTomb->Update();
 
 	m_pCamera->Update(m_pPlayer->GetPos(), m_pPlayer->GetPos(),m_pField->GetModelHandle(),m_pPlayer->GetAngle(), false);
@@ -351,15 +343,9 @@ void SceneSelect::Draw()
 
 	ShadowMap_DrawSetup(m_shadowMap); //シャドウマップ描画開始
 
-	//影を描画するための球体
-	DrawSphere3D(VGet(m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + 5.0f, m_pPlayer->GetPos().z), 3.0f, 128, 0xffffff, 0xffffff, false);
-
+	m_pPlayer->Draw(*m_pPlayerWeapon);
 
 	m_pTomb->DrawTriangleSelect();
-
-
-	m_pItemHp->Draw();
-	m_pItemMp->Draw();
 
 	ShadowMap_DrawEnd(); //シャドウマップ描画終了
 
@@ -371,9 +357,6 @@ void SceneSelect::Draw()
 	m_pTomb->DrawTriangleSelect();
 
 	SetUseShadowMap(0, -1); // シャドウマップの反映終了
-
-	m_pItemHp->Draw();
-	m_pItemMp->Draw();
 
 	m_pPlayer->Draw(*m_pPlayerWeapon);
 

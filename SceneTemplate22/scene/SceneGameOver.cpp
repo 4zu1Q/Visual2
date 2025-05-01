@@ -6,6 +6,7 @@
 #include "scene/SceneGamePlay.h"
 #include "scene/SceneTitle.h"
 #include "scene/SceneDebug.h"
+#include "scene/SceneTutorial.h"
 
 #include "object/player/PlayerProduction.h"
 #include "object/CameraProduction.h"
@@ -24,6 +25,7 @@ namespace
 	{
 		kGameOverH,
 		kSelectH,
+		kTitleH,
 		kGamePlayH,
 		kPointerH,
 		kGameOverBgH,
@@ -73,6 +75,7 @@ SceneGameOver::SceneGameOver(SceneManager& manager, Game::e_BossKind bossKind) :
 	//画像のロード
 	m_handles.push_back(LoadGraph("Data/Image/GameOver.png"));
 	m_handles.push_back(LoadGraph("Data/Image/Select.png"));				//Select
+	m_handles.push_back(LoadGraph("Data/Image/Title.png"));				//
 	m_handles.push_back(LoadGraph("Data/Image/Retry.png"));					//Title
 	m_handles.push_back(LoadGraph("Data/Image/Pointer.png"));				//矢印
 	m_handles.push_back(LoadGraph("Data/Image/GameOverBg.png"));				//
@@ -195,13 +198,26 @@ void SceneGameOver::Update()
 		{
 			if (m_sceneTrans == e_SceneTrans::kGamePlay)
 			{
-				m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, m_bossKind, Game::e_StageKind::kGamePlay));
-				return;
+				if (m_bossKind == Game::e_BossKind::kTutorial)
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneTutorial>(m_pManager, Game::e_StageKind::kTutorial));
+					return;
+				}
+				else
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneGamePlay>(m_pManager, m_bossKind, Game::e_StageKind::kGamePlay));
+					return;
+				}
 			}
 
 			if (m_sceneTrans == e_SceneTrans::kSelect)
 			{
-				if (m_bossKind == Game::e_BossKind::kPower)
+				if (m_bossKind == Game::e_BossKind::kTutorial)
+				{
+					m_pManager.ChangeScene(std::make_shared<SceneTitle>(m_pManager));
+					return;
+				}
+				else if (m_bossKind == Game::e_BossKind::kPower)
 				{
 					m_pManager.ChangeScene(std::make_shared<SceneSelect>(m_pManager, Game::e_StageKind::kSelect, kPlayerPowerTombPos));
 					return;
@@ -242,20 +258,43 @@ void SceneGameOver::Draw()
 	DrawCursor();
 
 	//選択
-	if (m_sceneTrans == e_SceneTrans::kGamePlay)
+	if (m_bossKind == Game::e_BossKind::kTutorial)
 	{
-		//GamePlay
-		DrawFadeSelectGraph(m_handles[kGamePlayH], kGamePlayPos);
-		//Select
-		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
+		if (m_sceneTrans == e_SceneTrans::kGamePlay)
+		{
+			//GamePlay
+			DrawFadeSelectGraph(m_handles[kGamePlayH], kGamePlayPos);
+			//Select
+			DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kTitleH], true);
+		}
+
+		if (m_sceneTrans == e_SceneTrans::kSelect)
+		{
+			//GamePlay
+			DrawGraph(kGamePlayPos.x, kGamePlayPos.y, m_handles[kGamePlayH], true);
+			//Select
+			DrawFadeSelectGraph(m_handles[kTitleH], kSelectPos);
+		}
 	}
-	if (m_sceneTrans == e_SceneTrans::kSelect)
+	else
 	{
-		//GamePlay
-		DrawGraph(kGamePlayPos.x, kGamePlayPos.y, m_handles[kGamePlayH], true);
-		//Select
-		DrawFadeSelectGraph(m_handles[kSelectH], kSelectPos);
+		if (m_sceneTrans == e_SceneTrans::kGamePlay)
+		{
+			//GamePlay
+			DrawFadeSelectGraph(m_handles[kGamePlayH], kGamePlayPos);
+			//Select
+			DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
+		}
+
+		if (m_sceneTrans == e_SceneTrans::kSelect)
+		{
+			//GamePlay
+			DrawGraph(kGamePlayPos.x, kGamePlayPos.y, m_handles[kGamePlayH], true);
+			//Select
+			DrawFadeSelectGraph(m_handles[kSelectH], kSelectPos);
+		}
 	}
+
 
 	DrawGraph(kGameOverBgPos.x, kGameOverBgPos.y + m_selectAnimation, m_handles[kGameOverBgH], true);
 	DrawGraph(kGameOverPos.x, kGameOverPos.y, m_handles[kGameOverH], true);

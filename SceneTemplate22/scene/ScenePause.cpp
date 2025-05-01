@@ -20,15 +20,13 @@ namespace
 	const Vec2 kPausePos = { 0.0f , 0.0f };
 	const Vec2 kReStartPos = { 160.0f , 180.0f };
 	const Vec2 kOptionPos = { 160.0f , 300.0f };
-	const Vec2 kSelectPos = { 160.0f , 420.0f };
-	const Vec2 kTitlePos = { 160.0f , 540.0f };
+	const Vec2 kTitlePos = { 160.0f , 420.0f };
 	const Vec2 kBackPos = { 1160.0f , 680.0f };
 
 	//選択UIのポジション
 	const Vec2 kReStartSelectPos = { 110 , 195 };
 	const Vec2 kOptionSelectPos = { 110 , 315 };
-	const Vec2 kSelectSelectPos = { 110 , 430 };
-	const Vec2 kTitleSelectPos = { 110 , 550 };
+	const Vec2 kTitleSelectPos = { 110 , 430 };
 
 	//プレイヤーの最初の位置
 	constexpr VECTOR kPlayerPos = { 400.0f,-35.0f,740.0f };
@@ -112,20 +110,13 @@ void ScenePause::Update()
 		m_cursorPos = kOptionSelectPos;
 
 		m_targetCursorUpPos = kReStartSelectPos;
-		m_targetCursorDownPos = kSelectSelectPos;
-	}
-	else if (m_sceneTrans == e_SceneTrans::kSelect)
-	{
-		m_cursorPos = kSelectSelectPos;
-
-		m_targetCursorUpPos = kOptionSelectPos;
 		m_targetCursorDownPos = kTitleSelectPos;
 	}
 	else if (m_sceneTrans == e_SceneTrans::kTitle)
 	{
 		m_cursorPos = kTitleSelectPos;
 
-		m_targetCursorUpPos = kSelectSelectPos;
+		m_targetCursorUpPos = kOptionSelectPos;
 		m_targetCursorDownPos = kReStartSelectPos;
 	}
 
@@ -183,14 +174,6 @@ void ScenePause::Update()
 				SoundManager::GetInstance().PlaySe("dectionSe");
 				m_pManager.PushScene(std::make_shared<SceneOption>(m_pManager));
 			}
-			if (m_sceneTrans == e_SceneTrans::kSelect)
-			{
-				SoundManager::GetInstance().PlaySe("dectionSe");
-				SoundManager::GetInstance().StopBgm("battleBgm");
-				SoundManager::GetInstance().StopBgm("selectBgm");
-				StartFadeOut();	//フェードアウト開始
-				m_isToNextScene = true;
-			}
 			if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				SoundManager::GetInstance().PlaySe("dectionSe");
@@ -216,12 +199,7 @@ void ScenePause::Update()
 		//フェードアウトのフラグがたっていない場合
 		if (!IsFadingOut())
 		{
-			if (m_sceneTrans == e_SceneTrans::kSelect)
-			{
-				m_pManager.ChangeAndClearScene(std::make_shared<SceneSelect>(m_pManager,Game::e_StageKind::kSelect, kPlayerPos));
-				return;
-			}
-			else if (m_sceneTrans == e_SceneTrans::kTitle)
+			if (m_sceneTrans == e_SceneTrans::kTitle)
 			{
 				m_pManager.ChangeAndClearScene(std::make_shared<SceneTitle>(m_pManager));
 				return;
@@ -255,7 +233,6 @@ void ScenePause::Draw()
 		
 		DrawFadeSelectGraph(m_handles[kReStartH], kReStartPos);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
-		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
 	if (m_sceneTrans == e_SceneTrans::kOption)
@@ -264,16 +241,6 @@ void ScenePause::Draw()
 
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
 		DrawFadeSelectGraph(m_handles[kOptionH], kOptionPos);
-		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
-		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
-	}
-	else if (m_sceneTrans == e_SceneTrans::kSelect)
-	{
-
-		
-		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
-		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
-		DrawFadeSelectGraph(m_handles[kSelectH], kSelectPos);
 		DrawGraph(kTitlePos.x, kTitlePos.y, m_handles[kTitleH], true);
 	}
 	else if (m_sceneTrans == e_SceneTrans::kTitle)
@@ -282,7 +249,6 @@ void ScenePause::Draw()
 		
 		DrawGraph(kReStartPos.x, kReStartPos.y, m_handles[kReStartH], true);
 		DrawGraph(kOptionPos.x, kOptionPos.y, m_handles[kOptionH], true);
-		DrawGraph(kSelectPos.x, kSelectPos.y, m_handles[kSelectH], true);
 		DrawFadeSelectGraph(m_handles[kTitleH], kTitlePos);
 	}
 
@@ -294,7 +260,6 @@ void ScenePause::Draw()
 
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kRestart) * kTextIntervalY, 0xffffff, "Restart");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kOption) * kTextIntervalY, 0xffffff, "Option");
-	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kSelect) * kTextIntervalY, 0xffffff, "Select");
 	DrawFormatString(kTextX, kTextBlankSpaceY + static_cast<int>(e_SceneTrans::kTitle) * kTextIntervalY, 0xffffff, "Title");
 
 	DrawString(0, 0, "Scene Pause", 0xffffff, false);

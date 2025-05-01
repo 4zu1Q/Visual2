@@ -58,8 +58,8 @@ namespace
 	constexpr VECTOR kPlayerPos = { 350.0f,-35.0f,0 };
 
 	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
-	const VECTOR kShadowAreaMinPos = { -10000.0f, -500.0f, -10000.0f };		// シャドウマップに描画する最小範囲
-	const VECTOR kShadowAreaMaxPos = { 10000.0f, 0.0f, 10000.0f };	// シャドウマップに描画する最大範囲
+	const VECTOR kShadowAreaMinPos = { -600.0f, -300.0f, -600.0f };		// シャドウマップに描画する最小範囲
+	const VECTOR kShadowAreaMaxPos = { 600.0f, 0.0f, 600.0f };	// シャドウマップに描画する最大範囲
 	const VECTOR kShadowDir = { 0.0f, -5.0f, 0.0f };					// ライト方向
 
 	constexpr float kShadowColor = 0.7f;
@@ -151,6 +151,10 @@ SceneGamePlay::SceneGamePlay(SceneManager& manager, Game::e_BossKind bosskind, G
 
 SceneGamePlay::~SceneGamePlay()
 {
+	//シャドウマップの削除
+	DeleteShadowMap(m_shadowMap);
+	m_shadowMap = -1;
+
 	m_pPlayer->Finalize(m_pPhysics);
 	m_pBossPower->Finalize(m_pPhysics);
 	m_pBossSpeed->Finalize(m_pPhysics);
@@ -529,34 +533,32 @@ void SceneGamePlay::ShadowDraw()
 {
 	ShadowMap_DrawSetup(m_shadowMap);	//シャドウマップ描画開始
 
-	//影を描画するための球体
-	DrawSphere3D(VGet(m_pPlayer->GetPos().x, m_pPlayer->GetPos().y + 5.0f, m_pPlayer->GetPos().z), 3.0f, 128, 0xffffff, 0xffffff, false);
+	m_pPlayer->Draw(*m_pPlayerWeapon);
 
 	if (m_bossKind == Game::e_BossKind::kPower)
 	{
 		if(m_pBossPower->GetHp() != 0)
 		{
-			DrawSphere3D(VGet(m_pBossPower->GetPosDown().x, m_pBossPower->GetPosDown().y + 5.0f, m_pBossPower->GetPosDown().z), 6.0f, 128, 0xffffff, 0xffffff, false);
+			m_pBossPower->Draw();
 		}
-
 	}
 	else if (m_bossKind == Game::e_BossKind::kSpeed)
 	{
-		if (m_pBossPower->GetHp() != 0)
+		if (m_pBossSpeed->GetHp() != 0)
 		{
-			DrawSphere3D(VGet(m_pBossSpeed->GetPosDown().x, m_pBossSpeed->GetPosDown().y + 5.0f, m_pBossSpeed->GetPosDown().z), 6.0f, 128, 0xffffff, 0xffffff, false);
+			m_pBossSpeed->Draw();
 		}
 	}
 	else if (m_bossKind == Game::e_BossKind::kShot)
 	{
-		if (m_pBossPower->GetHp() != 0)
+		if (m_pBossShot->GetHp() != 0)
 		{
-			DrawSphere3D(VGet(m_pBossShot->GetPosDown().x, m_pBossShot->GetPosDown().y + 5.0f, m_pBossShot->GetPosDown().z), 6.0f, 128, 0xffffff, 0xffffff, false);
+			m_pBossShot->Draw();
 		}
 	}
 	else if (m_bossKind == Game::e_BossKind::kRast && !m_pBossRast->GetIsClear())
 	{
-		DrawSphere3D(VGet(m_pBossRast->GetPosDown().x, m_pBossRast->GetPosDown().y + 5.0f, m_pBossRast->GetPosDown().z), 6.0f, 128, 0xffffff, 0xffffff, false);
+		m_pBossRast->Draw();
 	}
 
 
