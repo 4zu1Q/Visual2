@@ -51,8 +51,8 @@ namespace
 	constexpr float kMaxHp = 400.0f;
 
 	//次の状態に遷移するまでの時間
-	constexpr float kIdleToAttackTime = 20.0f;
-	constexpr float kIdleToAvoidTime = 35.0f;
+	constexpr float kIdleToAttackTime = 60.0f;
+	constexpr float kIdleToWalkTime = 35.0f;
 	constexpr float kCoolTimeToAvoidTime = 60.0f;
 	constexpr float kAvoidToIdleTime = 29.0f;
 
@@ -202,7 +202,7 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 140)
+	if (m_damageFrame >= 10)
 	{
 		m_isHit = false;
 	}
@@ -329,18 +329,18 @@ void BossPower::IdleUpdate()
 	//auto pos = m_rigidbody.GetPos();
 
 	//プレイヤーへの向きを取得
-	m_direction = VSub(m_playerPos, m_pos);
-	m_direction = VNorm(m_direction);
+	//m_direction = VSub(m_playerPos, m_pos);
+	//m_direction = VNorm(m_direction);
 
 	//m_angle = atan2f(m_direction.x, m_direction.z);
 
 	//プレイヤーと離れていた場合歩き状態に移動 && タイマー
-	if (m_actionTime > kIdleToAttackTime && m_length > kIdleToAttackLength)
+	if (m_actionTime > kIdleToWalkTime && m_length > kIdleToAttackLength)
 	{
 		OnWalk();
 	}
 	//プレイヤーと十分な距離の場合 && タイマー
-	else if (m_actionTime > kIdleToAvoidTime && m_length < kIdleToAttackLength)
+	else if (m_actionTime > kIdleToAttackTime && m_length < kIdleToAttackLength)
 	{
 		//ランダム関数かなんか使ってやる
 
@@ -475,6 +475,9 @@ void BossPower::PreliminaryAttack1Update()
 
 	if (m_preliminaryActionFrame > 15)
 	{
+		//プレイヤーへの向きを取得
+		m_direction = VSub(m_playerPos, m_pos);
+		m_direction = VNorm(m_direction);
 		OnAxeAttack();
 	}
 }
@@ -489,6 +492,9 @@ void BossPower::PreliminaryAttack2Update()
 
 	if (m_preliminaryActionFrame > 15)
 	{
+		//プレイヤーへの向きを取得
+		m_direction = VSub(m_playerPos, m_pos);
+		m_direction = VNorm(m_direction);
 		OnTwoHandedAttack();
 	}
 }
@@ -503,6 +509,9 @@ void BossPower::PreliminaryAttack3Update()
 
 	if (m_preliminaryActionFrame > 15)
 	{
+		//プレイヤーへの向きを取得
+		m_direction = VSub(m_playerPos, m_pos);
+		m_direction = VNorm(m_direction);
 		OnJumpAttack();
 	}
 }
@@ -522,6 +531,9 @@ void BossPower::AxeAttackUpdate()
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
+		//プレイヤーへの向きを取得
+		m_direction = VSub(m_playerPos, m_pos);
+		m_direction = VNorm(m_direction);
 		OnIdle();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
@@ -543,6 +555,9 @@ void BossPower::TwoHandedAttackUpdate()
 	//アニメーションが終わったらアイドル状態に戻る
 	if (m_pAnim->IsLoop())
 	{
+		//プレイヤーへの向きを取得
+		m_direction = VSub(m_playerPos, m_pos);
+		m_direction = VNorm(m_direction);
 		OnIdle();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f,0.0f,0.0f));
@@ -563,6 +578,9 @@ void BossPower::Attack3Update()
 	//アニメーションが終わったらクールタイム状態に入る
 	if (m_pAnim->IsLoop())
 	{
+		//プレイヤーへの向きを取得
+		m_direction = VSub(m_playerPos, m_pos);
+		m_direction = VNorm(m_direction);
 		OnAttackCoolTime();
 	}
 	m_rigidbody.SetVelocity(VGet(0.0f, 0.0f, 0.0f));
@@ -812,10 +830,10 @@ void BossPower::OnHitOneDamage()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 15.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
-	m_updateFunc = &BossPower::HitOneDamageUpdate;
+	//m_updateFunc = &BossPower::HitOneDamageUpdate;
 
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &BossPower::IdleUpdate;
+	m_updateFunc = &BossPower::IdleUpdate;
 }
 
 void BossPower::OnHitTwoDamage()
@@ -854,7 +872,8 @@ void BossPower::OnHitTwoDamage()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 15.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
-	m_updateFunc = &BossPower::HitTwoDamageUpdate;
+	//m_updateFunc = &BossPower::HitTwoDamageUpdate;
+	m_updateFunc = &BossPower::IdleUpdate;
 
 }
 

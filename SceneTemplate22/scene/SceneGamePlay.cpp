@@ -60,7 +60,7 @@ namespace
 	constexpr int kShadowMapSize = 16384;								// ステージのシャドウマップサイズ
 	const VECTOR kShadowAreaMinPos = { -600.0f, -300.0f, -600.0f };		// シャドウマップに描画する最小範囲
 	const VECTOR kShadowAreaMaxPos = { 600.0f, 0.0f, 600.0f };	// シャドウマップに描画する最大範囲
-	const VECTOR kShadowDir = { 0.0f, -5.0f, 0.0f };					// ライト方向
+	const VECTOR kShadowDir = { 0.0f, -2.0f, 0.0f };					// ライト方向
 
 	constexpr float kShadowColor = 0.7f;
 	constexpr float kShadowAlpha = 0.3f;

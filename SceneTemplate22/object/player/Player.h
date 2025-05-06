@@ -254,6 +254,7 @@ private:
 	bool m_isHitDamage;	//ボスの攻撃に当たったかどうか
 	bool m_isAttack;	//攻撃したかどうか
 	int m_attackFrame;	//攻撃のフレーム
+	int m_attackTime;	//攻撃した時の遅延を行うための時間
 
 	int m_chargeTime;	//強攻撃のチャージ時間
 

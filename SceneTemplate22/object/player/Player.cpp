@@ -191,6 +191,8 @@ namespace
 	constexpr int kMoveCountNum = 15;
 	constexpr int kWalkCountNum = 25;
 
+	constexpr int kAttackCountNum = 2;
+
 }
 
 Player::Player() :
@@ -268,6 +270,8 @@ Player::Player() :
 	circleColliderData->m_radius = kInitRadius;
 	m_radius = circleColliderData->m_radius;
 
+	m_attackTime = 0;
+
 	m_hitRadius = kHitRadius;
 	m_attackXRadius = 0.0f;
 	m_attackYRadius = 0.0f;
@@ -341,6 +345,20 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 	DamageUpdate();
 	//プレイヤーの当たり判定座標の更新
 	CollisionPosUpdate();
+
+	//攻撃が入った場合
+	if (m_isAttack)
+	{
+		if (IsPlayerAttackHit(m_attackXPos, m_attackXRadius))
+		{
+			m_attackTime++;
+			if (m_attackTime > kAttackCountNum)
+			{
+				m_isAttack = false;
+				m_attackTime = 0;
+			}
+		}
+	}
 
 	//ボスの座標を代入
 	m_isLockOn = isLockOn;
