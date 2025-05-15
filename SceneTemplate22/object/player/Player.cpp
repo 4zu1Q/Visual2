@@ -358,6 +358,16 @@ void Player::Update(std::shared_ptr<MyLib::Physics> physics, PlayerWeapon& weapo
 				m_attackTime = 0;
 			}
 		}
+		else if (IsPlayerAttackHit(m_attackYPos, m_attackYRadius))
+		{
+			m_attackTime++;
+			if (m_attackTime > kAttackCountNum)
+			{
+				m_isAttack = false;
+				m_attackTime = 0;
+			}
+		}
+
 	}
 
 	//ボスの座標を代入
@@ -1656,14 +1666,15 @@ void Player::AttackYUpdate()
 		m_isUseMp = false;
 	}
 
-	if (m_attackFrame > kAttackFrame)
-	{
-		m_isAttack = true;
-	}
-	else if (m_attackFrame > 40)
-	{
-		m_isAttack = false;
-	}
+	//一旦保留
+	//if (m_attackFrame > kAttackFrame)
+	//{
+	//	m_isAttack = true;
+	//}
+	//else if (m_attackFrame > 40)
+	//{
+	//	m_isAttack = false;
+	//}
 
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())

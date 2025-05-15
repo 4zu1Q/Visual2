@@ -55,8 +55,8 @@ namespace
 
 
 	//次の状態に遷移するまでの時間
-	constexpr float kIdleToAttackTime = 40.0f;
-	constexpr float kIdleToAvoidTime = 40.0f;
+	constexpr float kIdleToAttackTime = 90.0f;
+	constexpr float kIdleToAvoidTime = 90.0f;
 	constexpr float kCoolTimeToAvoidTime = 80.0f;
 	constexpr float kAvoidToIdleTime = 29.0f;
 
@@ -212,7 +212,7 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 140)
+	if (m_damageFrame >= 10)
 	{
 		m_isHit = false;
 	}
@@ -343,7 +343,6 @@ void BossSpeed::IdleUpdate()
 	//プレイヤーと十分な距離の場合 && タイマー
 	else if (m_actionTime > kIdleToAvoidTime && m_bossToPlayerLength < kIdleToAttackLength)
 	{
-		//ランダム関数かなんか使ってやる
 
 		m_attackType = GetRand(kAttackKind);
 
@@ -352,18 +351,14 @@ void BossSpeed::IdleUpdate()
 		{
 		case 0:
 			OnPreliminaryAttack1();
-			//OnAttack1();
 			break;
 		case 1:
-			//OnAttack2();
 			OnPreliminaryAttack2();
 			break;
 		case 2:
-			//OnAttack3();
 			OnPreliminaryAttack3();
 			break;
 		case 3:
-			//OnAttack3();
 			OnPreliminaryAttack3();
 			break;
 		default:
@@ -847,9 +842,9 @@ void BossSpeed::OnHitOneDamage()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
-	m_updateFunc = &BossSpeed::HitOneDamageUpdate;
+	//m_updateFunc = &BossSpeed::HitOneDamageUpdate;
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &BossSpeed::IdleUpdate;
+	m_updateFunc = &BossSpeed::IdleUpdate;
 
 }
 
@@ -887,10 +882,10 @@ void BossSpeed::OnHitTwoDamage()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 6.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
-	m_updateFunc = &BossSpeed::HitTwoDamageUpdate;
+	//m_updateFunc = &BossSpeed::HitTwoDamageUpdate;
 
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &BossSpeed::IdleUpdate;
+	m_updateFunc = &BossSpeed::IdleUpdate;
 }
 
 void BossSpeed::OnDown()
