@@ -72,6 +72,9 @@ namespace
 
 	constexpr int kWalkCountNum = 18;
 	constexpr int kDashCountNum = 22;
+
+	constexpr int kDamageResetTime = 10;
+
 }
 
 BossPower::BossPower():
@@ -202,7 +205,7 @@ void BossPower::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 10)
+	if (m_damageFrame >= kDamageResetTime)
 	{
 		m_isHit = false;
 	}

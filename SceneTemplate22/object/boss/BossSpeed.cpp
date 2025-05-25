@@ -74,6 +74,8 @@ namespace
 	//攻撃の回数
 	constexpr int kAttackNum = 2;
 
+	constexpr int kDamageResetTime = 10;
+
 }
 
 BossSpeed::BossSpeed() :
@@ -212,7 +214,7 @@ void BossSpeed::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, 
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 10)
+	if (m_damageFrame >= kDamageResetTime)
 	{
 		m_isHit = false;
 	}

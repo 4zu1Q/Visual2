@@ -193,6 +193,7 @@ namespace
 
 	constexpr int kAttackCountNum = 2;
 
+
 }
 
 Player::Player() :

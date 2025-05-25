@@ -71,6 +71,7 @@ namespace
 	//攻撃の種類
 	constexpr int kAttackKind = 3;
 
+	constexpr int kDamageResetTime = 10;
 }
 
 BossRast::BossRast() :
@@ -214,7 +215,7 @@ void BossRast::Update(std::shared_ptr<MyLib::Physics> physics, Player& player,Ga
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 140)
+	if (m_damageFrame >= kDamageResetTime)
 	{
 		m_isHit = false;
 	}

@@ -69,6 +69,9 @@ namespace
 	constexpr int kAttackKind = 3;
 	constexpr int kAvoidKind = 2;
 
+
+	constexpr int kDamageResetTime = 10;
+
 }
 
 BossShot::BossShot() :
@@ -250,7 +253,7 @@ void BossShot::Update(std::shared_ptr<MyLib::Physics> physics, Player& player, G
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 140)
+	if (m_damageFrame >= kDamageResetTime)
 	{
 		m_isHit = false;
 	}
