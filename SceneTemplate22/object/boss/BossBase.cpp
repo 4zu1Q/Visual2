@@ -22,27 +22,22 @@ BossBase::BossBase(Collidable::e_Priority priority, e_GameObjectTag tag, MyLib::
 
 BossBase::~BossBase()
 {
-
 }
 
 void BossBase::Initialize()
 {
-
 }
 
 void BossBase::Finalize()
 {
-
 }
 
 void BossBase::Update()
 {
-
 }
 
 void BossBase::Draw()
 {
-
 }
 
 void BossBase::HitUpdate(VECTOR attackXPos, VECTOR attackYPos, VECTOR shockPos, float attackXRadius, float attackYRadius, float shockRadius, bool isAttack)
