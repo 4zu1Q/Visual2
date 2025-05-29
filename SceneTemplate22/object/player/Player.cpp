@@ -152,7 +152,6 @@ namespace
 
 	constexpr int kAttackFrame = 30;
 	constexpr int kAttackXFrame = 20;
-	//constexpr int kChargeTimeMax = 60;
 
 	//プレイヤーの種類によって変わる当たり判定の半径
 	constexpr float kNormalAttackXRadius = 6.0f;
@@ -1667,20 +1666,9 @@ void Player::AttackYUpdate()
 		m_isUseMp = false;
 	}
 
-	//一旦保留
-	//if (m_attackFrame > kAttackFrame)
-	//{
-	//	m_isAttack = true;
-	//}
-	//else if (m_attackFrame > 40)
-	//{
-	//	m_isAttack = false;
-	//}
-
 	//アニメーションが終わったら待機状態に遷移
 	if (m_pAnim->IsLoop())
 	{
-
 		m_isButtonPush = false;
 		m_buttonKind = e_ButtonKind::kNone;
 
