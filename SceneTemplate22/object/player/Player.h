@@ -49,7 +49,7 @@ public:
 
 	void HitUpdate(VECTOR hitPos,VECTOR attackPos, VECTOR weaponPos, VECTOR shockPos,float hitRadius ,float attackRadius, float weaponRadius, float shockRadius, bool isBossAttack);
 
-	//プレイヤーのモデルハンドルを取得
+	//モデルハンドルを取得
 	const int& GetModelHandle() const { return m_modelH; }
 	void SetModelHandle(const int modelH) { m_modelH = modelH; }
 
@@ -59,12 +59,12 @@ public:
 	//プレイヤー上の座標を取得
 	const VECTOR& GetPosUp() const { return m_posUp; }
 
-	//プレイヤーの攻撃座標を取得
+	//攻撃座標を取得
 	const VECTOR& GetAttackXPos() const { return m_attackXPos; }
 	const VECTOR& GetAttackYPos() const { return m_attackYPos; }
 	const VECTOR& GetShockPos() const { return m_attackYPos; }
 
-	//プレイヤーの攻撃半径を取得
+	//攻撃半径を取得
 	const float& GetAttackXRadius() const { return m_attackXRadius; }
 	const float& GetAttackYRadius() const { return m_attackYRadius; }
 	const float& GetShockRadius() const { return m_attackShockRadius; }
@@ -72,21 +72,24 @@ public:
 	//攻撃をしたかどうかを取得
 	const bool& GetIsAttack() const { return m_isAttack; }
 
-	//プレイヤーがどの攻撃をしたかを取得
+	//どの攻撃をしたかを取得
 	const Game::e_PlayerAttackKind& GetAttackKind() const { return m_attackKind; }
 
 	/* ステータスの取得 */
-	//プレイヤーのHPを取得
+	//HPを取得
 	const float& GetHp() const { return m_hp; }
 
-	//プレイヤーのMPを取得
+	//MPを取得
 	const float& GetMp() const { return m_mp; }
+	//MPのフラグを取得
+	const bool& GetIsMp() const { return m_isMp; }
 
-	//プレイヤーのスタミナを取得
+	//スタミナを取得
 	const float& GetStamina() const { return m_stamina; }
+	//スタミナのフラグを取得
 	const bool& GetIsStamina() const { return m_isStamina; }
 
-	//プレイヤーの顔の種類を取得
+	//顔の種類を取得
 	const Game::e_PlayerKind& GetFaceKind() const { return m_playerKind; }
 	void SetFaceKind(const Game::e_PlayerKind playerKind) { m_playerKind = playerKind; }
 
@@ -114,23 +117,23 @@ public:
 
 private:
 
-	//プレイヤーの攻撃更新処理
+	//攻撃更新処理
 	void CollisionPosUpdate();
 	//ダメージ更新処理
 	void DamageUpdate();
-	//プレイヤーのステータス更新処理
+	//ステータス更新処理
 	void StatusUpdate();
 
-	//プレイヤーの回転処理
+	//回転処理
 	void PlayerSetPosAndRotation(VECTOR pos, float angle);
-	//プレイヤーの移動
+	//移動
 	void Move();
 	//ボスの攻撃の当たり判定
 	void Hit();
 
-	// プレイヤーが顔を使用時の関数
+	// 顔を使用時の関数
 	void FaceSelect();
-	//プレイヤーがアイテムを使うときの関数
+	// 顔を使うときの関数
 	void FaceUse();
 
 	//武器を描画するだけの関数
@@ -146,7 +149,7 @@ private:
 	bool IsWeaponHit(VECTOR attackPos, float radius);
 	bool IsShockAttackHit(VECTOR attackPos, float radius);
 
-	//プレイヤーの攻撃が当たっていたら
+	//攻撃が当たっていたら
 	bool IsPlayerAttackHit(VECTOR attackPos, float attackRadius);
 
 	/*各々の状態のアップデート処理*/
@@ -220,7 +223,6 @@ private:
 	float m_mp;
 	float m_stamina;
 
-	bool m_isUseMp;	 //一回だけ使うため
 	bool m_isMp;	 //MPを使い切ったかどうか
 	bool m_isStamina;//スタミナを使い切ったかどうか
 	bool m_isDash;	 //ダッシュしているかどうか

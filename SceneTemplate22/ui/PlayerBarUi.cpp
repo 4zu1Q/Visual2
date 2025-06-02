@@ -65,7 +65,8 @@ PlayerBarUi::PlayerBarUi():
 	m_playerHp(0.0f),
 	m_playerMp(0.0f),
 	m_playerStamina(0.0f),
-	m_isPlayerStamina(false)
+	m_isPlayerStamina(false),
+	m_isPlayerMP(false)
 {
 	m_percent = 100.0f;
 	m_percentGreenGauge = 0.0f;
@@ -97,6 +98,7 @@ void PlayerBarUi::Update(Player& player)
 	m_playerMp = player.GetMp();
 	m_playerStamina = player.GetStamina();
 	m_isPlayerStamina = player.GetIsStamina();
+	m_isPlayerMP = player.GetIsMp();
 
 	////スタミナの残り％を計算
 	//m_percent = static_cast<double>(m_stamina) /
@@ -115,7 +117,14 @@ void PlayerBarUi::Draw()
 	DrawBox(kStaminaLeftBarPos.x, kStaminaLeftBarPos.y, kStaminaRightBarPos.x + kMaxStamina, kStaminaRightBarPos.y, 0x000000, true);
 
 	//変動するバー
-	DrawBox(kMpLeftBarPos.x, kMpLeftBarPos.y, kMpRightBarPos.x + m_playerMp, kMpRightBarPos.y, 0x00bfff, true);
+	if (!m_isPlayerMP)
+	{
+		DrawBox(kMpLeftBarPos.x, kMpLeftBarPos.y, kMpRightBarPos.x + m_playerMp, kMpRightBarPos.y, 0x00bfff, true);
+	}
+	else
+	{
+		DrawBox(kMpLeftBarPos.x, kMpLeftBarPos.y, kMpRightBarPos.x + m_playerMp, kMpRightBarPos.y, 0xffa500, true);
+	}
 
 	if (!m_isPlayerStamina)
 	{

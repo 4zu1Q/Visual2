@@ -81,7 +81,7 @@ namespace MyLib
 		void FixPositionWithWall(std::shared_ptr<Collidable>& col);
 
 		/// <summary>
-		/// 
+		/// 壁ポリゴンとの当たり判定をチェックし、押し出す
 		/// </summary>
 		void PushOutFromCollision(std::shared_ptr<Collidable>& col, const VECTOR& normal, float pushDistance);
 
@@ -118,7 +118,7 @@ namespace MyLib
 		};
 
 	private:
-
+		
 		//フィールドのポインタ
 		std::shared_ptr<Field> m_pField;
 

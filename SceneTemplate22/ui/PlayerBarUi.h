@@ -23,6 +23,7 @@ private:
 	float m_playerHp;
 	float m_playerMp;
 	float m_playerStamina;
+	float m_isPlayerMP;
 
 	//画像ハンドルこれで全ての画像をロードする
 	std::vector<int> m_handles;

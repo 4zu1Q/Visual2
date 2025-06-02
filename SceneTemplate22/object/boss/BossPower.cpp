@@ -85,8 +85,6 @@ namespace
 	constexpr float kAttackLength = 12.0f;
 	constexpr float kShockAttackLength = 20.0f;
 
-	constexpr float kUpPos = 10.0f;
-
 	constexpr int kAttackActionFrameNum = 15;
 	constexpr int kShockAttackActionFrameNum = 30;
 	constexpr int kDamageFrameNum = 34;
