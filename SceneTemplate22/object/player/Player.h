@@ -315,6 +315,9 @@ private:
 	int m_analogX;
 	int m_analogZ;
 
+	//プレイヤーの移動する向きを取得するための変数
+	int m_rate;	
+
 	//RT用のインプット
 	DINPUT_JOYSTATE m_input;
 

@@ -192,7 +192,6 @@ namespace
 
 	constexpr int kAttackCountNum = 2;
 
-
 }
 
 Player::Player() :
@@ -215,6 +214,7 @@ Player::Player() :
 	m_cameraDirection(VGet(0, 0, 0)),
 	m_analogX(0),
 	m_analogZ(0),
+	m_rate(0),
 	m_hp(kMaxHp),
 	m_mp(kMaxMp),
 	m_stamina(kMaxStamina),
@@ -617,6 +617,8 @@ void Player::IdleUpdate()
 		m_buttonKind = e_ButtonKind::kNone;
 		OnAttackY();
 	}
+
+
 
 	//プレイヤーを変える関数
 	FaceUse();
@@ -1929,6 +1931,8 @@ void Player::Move()
 	rate = min(rate, 1.0f);
 	rate = max(rate, 0.0f);
 
+	m_rate = rate;
+
 	float speed = 0;
 
 	//動いている間
@@ -2114,6 +2118,8 @@ void Player::OnIdle()
 	//リセット処理
 	SetOnReset();
 
+	m_isButtonPush = false;
+
 	//アイドルアニメーションにチェンジ
 	m_pAnim->ChangeAnim(kAnimIdle);
 	m_updateFunc = &Player::IdleUpdate;
@@ -2161,7 +2167,6 @@ void Player::OnDash()
 	m_pAnim->ChangeAnim(kAnimDash);
 	m_updateFunc = &Player::DashUpdate;
 }
-
 
 void Player::OnAttackX()
 {

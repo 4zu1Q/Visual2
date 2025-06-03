@@ -112,33 +112,7 @@ namespace Pad
 	{
 		return m_leftTrigger;
 	}
-	//bool GetIsPushedTriggerButton(bool isRight)
-	//{
-	//	if (isRight)
-	//	{
-	//		//ZRの入力情報を返す
-	//		if (XInputState->RightTrigger > kTriggerDeadZone)
-	//		{
-	//			return true;
-	//		}
-	//		else
-	//		{
-	//			return false;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		//ZRの入力情報を返す
-	//		if (XInputState->LeftTrigger > kTriggerDeadZone)
-	//		{
-	//			return true;
-	//		}
-	//		else
-	//		{
-	//			return false;
-	//		}
-	//	}
-	//}
+
 	void startRecordLog()
 	{
 		isRecordLog = true;

@@ -20,7 +20,7 @@ namespace
 	constexpr int kMaxColHitTryNum = 16;
 
 	//壁押し出し時にスライドさせる距離
-	constexpr float kColHitSlideLength = 0.2f;
+	constexpr float kColHitSlideLength = 1.5f;
 
 	//壁ポリゴンか床ポリゴンかを判断するための変数
 	constexpr float kWallPolyBorder = 0.4f;
