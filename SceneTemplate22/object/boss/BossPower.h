@@ -19,7 +19,6 @@ public:
 	void Finalize(std::shared_ptr<MyLib::Physics> physics) override;
 
 	void Update(std::shared_ptr<MyLib::Physics> physics, Player& player, Game::e_PlayerAttackKind playerAttackKind);
-	//void HitUpdate(VECTOR attackXPos, VECTOR attackYPos, VECTOR shockPos, float attackXRadius, float attackYRadius, float shockRadius, bool isAttack);
 
 	void Draw();
 
@@ -27,8 +26,6 @@ public:
 	void SetPosDown(const VECTOR pos);
 
 	const VECTOR& GetPosUp() const;
-
-	//const float& GetHp() const { return m_hp; }
 
 private:
 
@@ -79,9 +76,6 @@ private:
 	//次の行動に移るための変数
 	int m_actionTime;
 	int m_actionKind;
-
-	//攻撃判定の半径
-	float m_attackRadius;
 
 	float m_angle;
 	float m_nextAngle;

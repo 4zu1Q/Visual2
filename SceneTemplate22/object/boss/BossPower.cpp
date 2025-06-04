@@ -120,10 +120,12 @@ BossPower::BossPower():
 {
 	//HPバー
 	m_hp = 400.0f;
-
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 	m_playerKind = e_PlayerKind::kNormalPlayer;
+
+	// メンバ関数ポインタの初期化
+	m_updateFunc = &BossPower::IdleUpdate;
 
 	m_isClear = false;
 
@@ -199,8 +201,7 @@ void BossPower::Initialize(std::shared_ptr<MyLib::Physics> physics)
 	//アニメーションの初期化
 	m_pAnim->Initialize(kAnimBossInfoFilename, m_modelH, kAnimIdle);
 
-	// メンバ関数ポインタの初期化
-	m_updateFunc = &BossPower::IdleUpdate;
+
 
 }
 

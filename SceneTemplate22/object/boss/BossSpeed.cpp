@@ -103,6 +103,9 @@ BossSpeed::BossSpeed() :
 	m_playerAttackKind = Game::e_PlayerAttackKind::kPlayerAttackNone;
 	m_playerKind = e_PlayerKind::kNormalPlayer;
 
+	// メンバ関数ポインタの初期化
+	m_updateFunc = &BossSpeed::IdleUpdate;
+
 	m_isClear = false;
 
 	m_isAttack = false;
