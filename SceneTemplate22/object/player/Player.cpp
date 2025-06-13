@@ -2448,14 +2448,15 @@ void Player::StatusUpdate()
 	//MPが0以下になったら
 	if (m_mp <= 0)
 	{
-		m_isMp = true;
 		m_mp = 0;
+		m_isMp = true;
 	}
 
 	//MPが最大値を超えたら
 	if (m_mp > kMaxMp)
 	{
 		m_mp = kMaxMp;
+		m_isMp = false;
 	}
 
 	//MP回復速度
@@ -2466,12 +2467,6 @@ void Player::StatusUpdate()
 	else
 	{
 		m_mp += 0.1f;
-	}
-
-	//MPが最大値に達した場合
-	if (m_mp == kMaxMp)
-	{
-		m_isMp = false;
 	}
 
 	//スタミナ関連

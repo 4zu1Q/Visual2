@@ -25,6 +25,7 @@ namespace
 
 	constexpr float kAvoidSpeed = 2.0f;
 
+	constexpr int kDamageResetTime = 10;
 
 	//初期位置
 	constexpr VECTOR kInitPos = { 386.0f, 13.0f,-778.0f };
@@ -202,7 +203,7 @@ void BossTutorial::Update(std::shared_ptr<MyLib::Physics> physics, Player& playe
 		m_damageFrame = 0;
 	}
 
-	if (m_damageFrame >= 140)
+	if (m_damageFrame >= kDamageResetTime)
 	{
 		m_isHit = false;
 	}
