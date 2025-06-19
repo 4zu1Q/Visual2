@@ -153,7 +153,7 @@ namespace
 	constexpr int kAttackFrame = 30;
 	constexpr int kAttackXFrame = 20;
 
-	//プレイヤーの種類によって変わる当たり判定の半径
+	/* プレイヤーの種類によって変わる当たり判定の半径 */
 	constexpr float kNormalAttackXRadius = 6.0f;
 	constexpr float kNormalAttackYRadius = 15.0f;
 	constexpr float kNormalAttackShockRadius = 10.0f;
@@ -184,8 +184,9 @@ namespace
 	constexpr float kRassAttackXMoveScale = 9.0f;
 	constexpr float kRassAttackYMoveScale = 1.0f;
 
-	constexpr int kDamageSmashNum = 8;
-	constexpr int kDrawHiddenNum = 4;
+
+	constexpr int kDamageSmashNum = 8;	//ダメージを受けた際の割る数値
+	constexpr int kDrawHiddenNum = 4;	//条件の満たない場合に描画しないフレーム数
 
 	constexpr int kMoveCountNum = 15;
 	constexpr int kWalkCountNum = 25;
