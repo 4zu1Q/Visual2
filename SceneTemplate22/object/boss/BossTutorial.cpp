@@ -857,16 +857,13 @@ void BossTutorial::OnHitOneDamage()
 	m_isHit = true;
 	m_isAttack = false;
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
-
 	SoundManager::GetInstance().PlaySe("bossOneHitSe");
-
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 15.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
-	m_updateFunc = &BossTutorial::HitOneDamageUpdate;
-
+	//m_updateFunc = &BossTutorial::HitOneDamageUpdate;
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &BossTutorial::IdleUpdate;
+	m_updateFunc = &BossTutorial::IdleUpdate;
 }
 
 void BossTutorial::OnHitTwoDamage()
@@ -905,10 +902,9 @@ void BossTutorial::OnHitTwoDamage()
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("bossHitEffect", VGet(pos.x, pos.y + 15.0f, pos.z));
 	m_pAnim->ChangeAnim(kAnimCoolTime);
-	m_updateFunc = &BossTutorial::HitTwoDamageUpdate;
-
+	//m_updateFunc = &BossTutorial::HitTwoDamageUpdate;
 	//攻撃判定がバグらなければこっちの方がボスの難易度が上がってよい
-	//m_updateFunc = &BossTutorial::IdleUpdate;
+	m_updateFunc = &BossTutorial::IdleUpdate;
 }
 
 void BossTutorial::OnDown()
