@@ -244,8 +244,8 @@ void BossTutorial::Update(std::shared_ptr<MyLib::Physics> physics, Player& playe
 
 	VECTOR attackMove = VScale(m_attackDir, 12.0f);
 	VECTOR shockAttackMove = VScale(m_attackDir, 20.0f);
-	m_attackPos = VAdd(m_hitPos, attackMove);
-	m_shockAttackPos = VAdd(m_hitPos, shockAttackMove);
+	//m_attackPos = VAdd(m_hitPos, attackMove);
+	//m_shockAttackPos = VAdd(m_hitPos, shockAttackMove);
 
 	//モデルに座標をセットする
 	MV1SetPosition(m_modelH, m_pos);
@@ -727,6 +727,9 @@ void BossTutorial::OnPreliminaryAttack1()
 	m_rigidbody.SetVelocity(VGet(0, 0, 0));
 	m_isAttack = false;
 
+	m_attackPos = m_hitPos;
+	m_shockAttackPos = m_hitPos;
+
 	m_attackFrame = 0;
 
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
@@ -743,6 +746,9 @@ void BossTutorial::OnPreliminaryAttack2()
 
 	m_attackFrame = 0;
 
+	m_attackPos = m_hitPos;
+	m_shockAttackPos = m_hitPos;
+
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	auto pos = m_rigidbody.GetPos();
 	EffectManager::GetInstance().CreateEffect("powerPreliminaryActionEffect", VGet(pos.x, pos.y + 25.0f, pos.z));
@@ -756,6 +762,9 @@ void BossTutorial::OnPreliminaryAttack3()
 	m_isAttack = false;
 
 	m_attackFrame = 0;
+
+	m_attackPos = m_hitPos;
+	m_shockAttackPos = m_hitPos;
 
 	m_attackKind = Game::e_BossAttackKind::kBossAttackNone;
 	auto pos = m_rigidbody.GetPos();
