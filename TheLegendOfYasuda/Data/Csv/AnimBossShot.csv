@@ -1,0 +1,12 @@
+ID,名前,スピード
+Idle,Armature|Idle2,0.6
+Walk,Armature|Walk,0.8
+Dash,Armature|Dash,1.2
+Attack1,Armature|Attack1,0.6
+Attack2,Armature|Attack2,0.5
+Attack3,Armature|Attack3,0.5
+Avoid,Armature|Armature.011|Default Take|Layer0,0.5
+CoolTime,Armature|Armature.010|Default Take|Layer0,0.5
+Hit,Armature|KnockBack2,0.6
+Down,Armature|Idle2,0.2
+Dead,Armature|Dead2,1

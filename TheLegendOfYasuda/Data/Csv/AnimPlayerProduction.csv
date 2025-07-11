@@ -1,0 +1,9 @@
+ID,名前,スピード
+Sit,Sit_Floor_Idle,0.4
+SitDown,Sit_Floor_Down,0.4
+SitUp,Sit_Floor_StandUp,0.6
+GameOver,Death_C_Skeletons,0.6
+Retry,Death_C_Skeletons_Resurrect,0.8
+GameClear,Spellcast_Raise,0.5
+Idle,Idle,0.5
+Dash,Running_A,0.8

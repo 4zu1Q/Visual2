@@ -1,0 +1,495 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\scene">
+      <UniqueIdentifier>{134ab034-6fb6-477c-8fd0-9ca3128801df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\scene">
+      <UniqueIdentifier>{d78f6074-698a-4597-8142-3eeff49c15c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\util">
+      <UniqueIdentifier>{e8112931-1b45-4025-a50a-98641f743658}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\util">
+      <UniqueIdentifier>{ac98cc68-fb62-4d37-8045-c01d926ef751}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object">
+      <UniqueIdentifier>{9edadc2e-3d4f-46b8-bff8-9628309907a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object">
+      <UniqueIdentifier>{c65f7591-fe62-47a0-b7d8-7f07dbae06ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\ui">
+      <UniqueIdentifier>{fdc75016-ec61-4df4-83e4-626090a30cca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\ui">
+      <UniqueIdentifier>{8b5d3e3f-e322-42e2-b2be-953696603440}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\player">
+      <UniqueIdentifier>{ea35bc6f-6416-4785-bad6-7d4d22e0842d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\boss">
+      <UniqueIdentifier>{f7b4f7a9-2e79-498c-9450-ab2705c8472c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\player">
+      <UniqueIdentifier>{16eb3663-2808-4cfe-947a-8cfb754ef642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\boss">
+      <UniqueIdentifier>{135e1ad1-d56e-4e5e-b88e-79057e065fe1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\item">
+      <UniqueIdentifier>{1800bdca-3dc7-4e50-ac91-0009b3e3d60e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\item">
+      <UniqueIdentifier>{abb822f2-c72f-477b-bbb6-b3284ac053a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\myLib">
+      <UniqueIdentifier>{e5362394-e213-4770-88d6-1248e0af1da6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\myLib">
+      <UniqueIdentifier>{f4bf15a2-b8e1-4f06-b113-494134f39c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\stage">
+      <UniqueIdentifier>{774fc939-23d0-4125-ad5e-aff0564864a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\stage">
+      <UniqueIdentifier>{17b196ff-7941-457f-8c7f-af5325170c22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\shot">
+      <UniqueIdentifier>{e1666975-3d42-46b0-bc23-01c264b4c9f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\shot">
+      <UniqueIdentifier>{245245f0-6f26-485c-a802-c6ec917e5582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\object\enemy">
+      <UniqueIdentifier>{2be324c7-87d3-4b45-8e47-a5994621fec1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\object\enemy">
+      <UniqueIdentifier>{c0e5c14e-75f5-4b3f-80a9-a0abe5d10547}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneTitle.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneBase.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneManager.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneDebug.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneSelect.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Time.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Pad.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Vec2.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\SoundManager.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneGameOver.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneGameClear.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneGamePlay.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneOption.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\ScenePause.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="object\player\Player.cpp">
+      <Filter>ソース ファイル\object\player</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\HpBar.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\FaceUi.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="object\player\PlayerWeapon.cpp">
+      <Filter>ソース ファイル\object\player</Filter>
+    </ClCompile>
+    <ClCompile Include="object\boss\BossBase.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="object\boss\BossPower.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="object\boss\BossSpeed.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="object\boss\BossShot.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="object\CharaBase.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="util\ActionTime.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="object\item\ItemMp.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
+    <ClCompile Include="object\item\ItemHp.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
+    <ClCompile Include="util\AnimController.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\StringUtility.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\OnAttackFrame.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\Collidable.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\Physics.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\Rigidbody.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\DebugDraw.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\ColliderDataSphere.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\ColliderDataCapsule.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="util\EffectManager.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="myLib\ColliderDataLine.cpp">
+      <Filter>ソース ファイル\myLib</Filter>
+    </ClCompile>
+    <ClCompile Include="object\ObjectBase.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="object\stage\Field.cpp">
+      <Filter>ソース ファイル\object\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="object\stage\SkyDome.cpp">
+      <Filter>ソース ファイル\object\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="object\stage\Tomb.cpp">
+      <Filter>ソース ファイル\object\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="object\item\ItemBase.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
+    <ClCompile Include="object\item\ItemWarp.cpp">
+      <Filter>ソース ファイル\object\item</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\ButtonUi.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\FaceFrameUi.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\PlayerBarUi.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="object\boss\BossRast.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="object\shot\ShotBase.cpp">
+      <Filter>ソース ファイル\object\shot</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Setting.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="object\Camera.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="util\MoveDirectionVec.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Font.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="object\player\PlayerProduction.cpp">
+      <Filter>ソース ファイル\object\player</Filter>
+    </ClCompile>
+    <ClCompile Include="object\CameraProduction.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+    <ClCompile Include="object\stage\TitleField.cpp">
+      <Filter>ソース ファイル\object\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="util\SaveDataManager.cpp">
+      <Filter>ソース ファイル\util</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\LockOnTargetUi.cpp">
+      <Filter>ソース ファイル\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneStory.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneTutorial.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="object\boss\BossTutorial.cpp">
+      <Filter>ソース ファイル\object\boss</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\SceneWords.cpp">
+      <Filter>ソース ファイル\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="object\enemy\EnemyBase.cpp">
+      <Filter>ソース ファイル\object\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="object\enemy\EnemyNormal.cpp">
+      <Filter>ソース ファイル\object\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="object\enemy\EnemySpecial.cpp">
+      <Filter>ソース ファイル\object\enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="object\Attack.cpp">
+      <Filter>ソース ファイル\object</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="scene\SceneBase.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneManager.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneTitle.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneDebug.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Game.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneSelect.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Time.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Pad.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Vec2.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\SoundManager.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneGameClear.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneGameOver.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneGamePlay.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneOption.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\ScenePause.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="object\player\Player.h">
+      <Filter>ヘッダー ファイル\object\player</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\HpBar.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\FaceUi.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="object\player\PlayerWeapon.h">
+      <Filter>ヘッダー ファイル\object\player</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossPower.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossBase.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossSpeed.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossShot.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\CharaBase.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+    <ClInclude Include="util\ActionTime.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemMp.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemHp.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
+    </ClInclude>
+    <ClInclude Include="util\AnimController.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\StringUtility.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\OnAttackFrame.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Collidable.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\ColliderData.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\MathHelper.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Physics.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\Rigidbody.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\DebugDraw.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\ColliderDataSphere.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\MyLib.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\ColliderDataCapsule.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="util\EffectManager.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\ColliderDataLine.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="object\ObjectBase.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+    <ClInclude Include="object\stage\Field.h">
+      <Filter>ヘッダー ファイル\object\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="object\stage\SkyDome.h">
+      <Filter>ヘッダー ファイル\object\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="object\stage\Tomb.h">
+      <Filter>ヘッダー ファイル\object\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="myLib\GameObjectTag.h">
+      <Filter>ヘッダー ファイル\myLib</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemBase.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
+    </ClInclude>
+    <ClInclude Include="object\item\ItemWarp.h">
+      <Filter>ヘッダー ファイル\object\item</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\ButtonUi.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\FaceFrameUi.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\PlayerBarUi.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossRast.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="object\shot\ShotBase.h">
+      <Filter>ヘッダー ファイル\object\shot</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Setting.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="object\Camera.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+    <ClInclude Include="util\MoveDirectionVec.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Font.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="object\player\PlayerProduction.h">
+      <Filter>ヘッダー ファイル\object\player</Filter>
+    </ClInclude>
+    <ClInclude Include="object\CameraProduction.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+    <ClInclude Include="object\stage\TitleField.h">
+      <Filter>ヘッダー ファイル\object\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="util\SaveDataManager.h">
+      <Filter>ヘッダー ファイル\util</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\LockOnTargetUi.h">
+      <Filter>ヘッダー ファイル\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneStory.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneTutorial.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="object\boss\BossTutorial.h">
+      <Filter>ヘッダー ファイル\object\boss</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\SceneWords.h">
+      <Filter>ヘッダー ファイル\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="object\enemy\EnemyBase.h">
+      <Filter>ヘッダー ファイル\object\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="object\enemy\EnemyNormal.h">
+      <Filter>ヘッダー ファイル\object\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="object\enemy\EnemySpecial.h">
+      <Filter>ヘッダー ファイル\object\enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="object\Attack.h">
+      <Filter>ヘッダー ファイル\object</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,16 @@
+ID,名前,スピード
+Idle,Idle,0.5
+Walk,Walking_C,0.9
+LockOnWalk,Walking_C,0.6
+Dash,Running_B,1
+Jump,Jump_Start,1
+Jumping,Jump_Idle,0.75
+AttackCharge,Blocking,1
+AttackX_First,2H_Melee_Attack_Chop,0.75
+AttackX_Second,2H_Melee_Attack_Slice,1
+AttackX_Third,2H_Melee_Attack_Stab,1
+AttackX_Fourth,2H_Melee_Attack_Spin,1
+AttackY,2H_Melee_Attack_Spin,1
+Hit,Hit_A,0.6
+Down,Death_B,1.2
+UseFace,Use_Item,1.2
